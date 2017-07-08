@@ -1,5 +1,5 @@
 import cv2
-import time
+import time, random
 import os, sys
 import argparse
 
@@ -10,14 +10,15 @@ ap = argparse.ArgumentParser()
 path = "fps30.h264"
 ap.add_argument("--file", type=str, default=path)
 
+ap.add_argument("--writepath", type=str, default="")
+ap.add_argument("--writebook", type=bool, default=True)
+
 ap.add_argument("--refresh", type=int, default=1)
 ap.add_argument("--interactive", type=bool, default=True)
 
 ap.add_argument("--evalall", type=bool, default=False)
 ap.add_argument("--printframes", type=bool, default=False)
 ap.add_argument("--reporting", type=bool, default=True)
-
-ap.add_argument("--controls", type=bool, default=False)
 
 ap.add_argument("--timems", type=int, default=1000)
 
@@ -40,15 +41,32 @@ if args["interactive"]:
             print 'exception loading frames', e
     print 'loaded ', len(frames), ' frames in secs ', time.time() - t0
 
-#dir_to_write = func(getcwd)
+
+default_book = "book" + str(random.random()) + ".html"
+
+def writebook(jpg_list, writepath, **kwargs):
+    mybook = """<html>"""
+    for jpg in jpg_list:
+        mybook += '<img src="'
+        mybook += jpg
+        mybook += '"></img>'
+    mybook += "</html>"
+    bookname = kwargs.get("book", default_book )
+    output_file = writepath + bookname
+    f = open(output_file, 'w',)
+    f.writelines(mybook)
+    f.close()
 
 i = 0
+book_jpgs = []
 i_bool = True
 pause_bool = False
 ret = True
 t1 = time.time()
 refresh0 = int(args["refresh"])
 refresh = refresh0
+writepath0 = args["writepath"]
+writepath = writepath0
 i_last = -1
 
 vc = cv2.VideoCapture(args["file"])
@@ -82,48 +100,57 @@ while(vc.isOpened()):
             
         else:
             vc.release()
-        
-        if args["controls"]:
-            timea = time.time()
-            if cv2.waitKey(refresh) == ord('w'):
-                print 'writing out current frame'
-                #PrintFunc(frame,**kwargs)
-                continue
-
-            if cv2.waitKey(refresh) == ord('e'):
-                print 'advancing and writing'
-            if cv2.waitKey(refresh) == ord('o'):
-                pass
-                #input()  #options
-
-            if cv2.waitKey(refresh) == ord('a'):
-                i -= 1
-                print i
-                print 'backing up'
-                continue
-
-            if cv2.waitKey(refresh) == ord('s'):
-                i += 1
-                print i
-                print 'advancing'
-                continue
             
-            if cv2.waitKey(refresh) == ord('d'):
-                i_bool = False if i_bool else True
-                pause_bool = True if not i_bool else False
-                pause_msg = "play" if i_bool else "paused"
-                print pause_msg
-                if not(i_bool):
-                    refresh = 5000
-                else:
-                    refresh = refresh0
-                time.sleep(1)
-                continue
+            
+            
+        key0 = cv2.waitKey(refresh)
+        
+        if key0 == ord('w'):
+            print 'writing out current frame'
+            pic_name = "pic" + str(random.uniform(1,10)) + ".jpg"
+            cv2.imwrite(pic_name,frame)
+            
 
-            print time.time() - timea
-        if cv2.waitKey(refresh) & 0xFF == ord('q'):
+            if args["writebook"]:
+                book_jpgs.append(pic_name)
+                writebook(book_jpgs,writepath)
+            continue
+
+        elif key0 == ord('e'):
+            print 'advancing and writing'
+        
+        elif key0 == ord('o'):
+            pass
+            #input()  #options
+
+        elif key0 == ord('a'):
+            i -= 1
+            print i
+            print 'backing up'
+            continue
+
+        elif key0 == ord('s'):
+            i += 1
+            print i
+            print 'advancing'
+            continue
+        
+        elif key0 == ord('d'):
+            i_bool = False if i_bool else True
+            pause_bool = True if not i_bool else False
+            pause_msg = "play" if i_bool else "paused"
+            print pause_msg
+            if not(i_bool):
+                refresh = 5000
+            else:
+                refresh = refresh0
+            time.sleep(1)
+            continue
+        
+        elif key0 == ord('q'):
             print 'quitting'
             break
+        
         
         if i == len(frames):
             break
