@@ -17,10 +17,13 @@ ap.add_argument("--evalall", type=bool, default=False)
 ap.add_argument("--printframes", type=bool, default=False)
 ap.add_argument("--reporting", type=bool, default=True)
 
+ap.add_argument("--controls", type=bool, default=False)
+
 ap.add_argument("--timems", type=int, default=1000)
 
 args = vars(ap.parse_args())
 
+print 'print frames? ', args["printframes"]
 t0 = time.time()
 
 frames = []
@@ -65,9 +68,8 @@ while(vc.isOpened()):
         if i_bool:
             i += 1
 
-        if ret and (i > 0):            
+        if ret and (i > 0):       
             cv2.imshow('frame',frame)
-            
             #cv2.imwrite
 
             if i == 1 or args["evalall"]:
@@ -80,31 +82,45 @@ while(vc.isOpened()):
             
         else:
             vc.release()
-
-        if cv2.waitKey(refresh) == ord('a'):
-            i -= 1
-            print i
-            print 'backing up'
-            continue
-
-        if cv2.waitKey(refresh) == ord('s'):
-            i += 1
-            print i
-            print 'advancing'
-            continue
         
-        if cv2.waitKey(refresh) == ord('d'):
-            i_bool = False if i_bool else True
-            pause_bool = True if not i_bool else False
-            pause_msg = "play" if i_bool else "paused"
-            print pause_msg
-            if not(i_bool):
-                refresh = 5000
-            else:
-                refresh = refresh0
-            time.sleep(1)
-            continue
+        if args["controls"]:
+            timea = time.time()
+            if cv2.waitKey(refresh) == ord('w'):
+                print 'writing out current frame'
+                #PrintFunc(frame,**kwargs)
+                continue
 
+            if cv2.waitKey(refresh) == ord('e'):
+                print 'advancing and writing'
+            if cv2.waitKey(refresh) == ord('o'):
+                pass
+                #input()  #options
+
+            if cv2.waitKey(refresh) == ord('a'):
+                i -= 1
+                print i
+                print 'backing up'
+                continue
+
+            if cv2.waitKey(refresh) == ord('s'):
+                i += 1
+                print i
+                print 'advancing'
+                continue
+            
+            if cv2.waitKey(refresh) == ord('d'):
+                i_bool = False if i_bool else True
+                pause_bool = True if not i_bool else False
+                pause_msg = "play" if i_bool else "paused"
+                print pause_msg
+                if not(i_bool):
+                    refresh = 5000
+                else:
+                    refresh = refresh0
+                time.sleep(1)
+                continue
+
+            print time.time() - timea
         if cv2.waitKey(refresh) & 0xFF == ord('q'):
             print 'quitting'
             break
