@@ -6,11 +6,14 @@ import argparse
 
 ap = argparse.ArgumentParser()
 path = "fps30.h264"
+
 ap.add_argument("--file", type=str, default=path)
 
 ap.add_argument("--writepath", type=str, default="")
 ap.add_argument("--writebook", action="store_true")
 ap.add_argument("--writebookinfo", action="store_true")
+ap.add_argument("--picsize", type=str, default="")
+
 
 ap.add_argument("--writebookvideo", action="store_true")
 
@@ -20,8 +23,10 @@ ap.add_argument("--interactive", action="store_true")
 ap.add_argument("--printframes", action="store_true")
 ap.add_argument("--reporting", action="store_true")
 
-args = vars(ap.parse_args())
 
+
+args = vars(ap.parse_args())
+print args["picsize"]
 
 t0 = time.time()
 print 'starting script...'
@@ -29,16 +34,18 @@ print 'print frames? ', args["printframes"]
 
 
 frames = []
+j = 0
 try:
     if args["interactive"]:
-        
         vc = cv2.VideoCapture(args["file"])
         while(vc.isOpened()):
             try:
                 ret,frame = vc.read()
                 if ret:
                     frames.append(frame)
+                    j += 1
                 else:
+                    print 'no ret num: ', str(j)
                     vc.release()
             except Exception as e:
                 print 'exception loading frames', e
@@ -75,15 +82,24 @@ def concat_dict(d):
     return s
 
 def writebook(jpg_list, writepath, **kwargs):
+    
+    info =  kwargs.get('info',[])
+    if len(info)>0:
+        b_info = True
+        info_rev = info[:]
+        info_rev.reverse()    
     mybook = """<html>"""
-    info =  kwargs.get('info',{})
-    b_info = info.get('bool',False)
     for jpg in jpg_list:
         if b_info:
-            mybook += '<p>' + concat_dict(info) + '</p>'   
+            frame_info = info_rev.pop()
+            mybook += '<p>' + concat_dict(frame_info) + '</p>'   
         mybook += '<img src="'
         mybook += jpg
-        mybook += '"></img>'
+        mybook += '"'
+        if len(args["picsize"]) > 0:
+            mybook += ' ' + str(args['picsize']).split(',')[0] + \
+                    '="' + str(args['picsize']).split(',')[1] + 'px"'
+        mybook += '></img>'
     mybook += "</html>"
     bookname = kwargs.get("book", default_book )
     output_file = writepath + bookname
@@ -94,8 +110,8 @@ def writebook(jpg_list, writepath, **kwargs):
 
 i = 0
 book_jpgs = []
+book_info = []
 i_bool = True
-pause_bool = False
 ret = True
 t1 = time.time()
 refresh0 = int(args["refresh"])
@@ -108,19 +124,15 @@ while(vc.isOpened()):
     
     try:
         if args["interactive"]:
-            if not(pause_bool):
-                ret,frame = True, frames[i]    
-            else:
-                pause_bool = False
+            ret,frame = True, frames[i]
         else:
             if i_bool:
-                ret,frame = vc.read()
-                
+                ret,frame = vc.read()  
         
         if i_bool:
             i += 1
 
-        if ret and (i > 0):       
+        if ret and (i >= 0):       
             cv2.imshow('frame',frame)
 
             if i == 1:
@@ -143,12 +155,12 @@ while(vc.isOpened()):
             cv2.imwrite(pic_name,frame)
             
             if args["writebook"]:
-                book_info = {}
+                frame_info = {}
                 if args["writebookinfo"]:
-                    book_info['bool'] = True
-                    book_info['frame'] = i
-                    book_info['shape'] = str( (shape1[0], shape1[1]) )
-                    book_info['orig_fn'] = args["file"]
+                    frame_info['frame'] = i - 1
+                    frame_info['shape'] = str( (shape1[0], shape1[1]) )
+                    frame_info['orig_fn'] = args["file"]
+                book_info.append(frame_info)
                 book_jpgs.append(pic_name)
                 writebook(book_jpgs,writepath,info=book_info)
 
@@ -164,9 +176,10 @@ while(vc.isOpened()):
                 frame_info = {}
                 if args["writebookinfo"]:
                     frame_info['bool'] = True
-                    frame_info['frame'] = i
+                    frame_info['frame'] = i - 1
                     frame_info['shape'] = str( (shape1[0], shape1[1]) )
                     frame_info['orig_fn'] = args["file"]
+                book_info.append(frame_info)
                 book_jpgs.append(pic_name)
                 writebook(book_jpgs,writepath,info=book_info)
             
@@ -192,16 +205,15 @@ while(vc.isOpened()):
             print 'advancing'
             continue
         
-        elif key0 == ord('d'):
+        elif key0 == ord('d') or i == 150:
             i_bool = False if i_bool else True
-            pause_bool = True if not i_bool else False
             pause_msg = "play" if i_bool else "paused"
             print pause_msg
+            i -= 1  #weve already incremented after read
             if not(i_bool):
                 refresh = 5000
             else:
                 refresh = refresh0
-            time.sleep(1)
             continue
         
         elif key0 == ord('q'):

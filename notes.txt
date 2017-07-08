@@ -1,0 +1,105 @@
+
+Summary of Day1 Learning:
+
+
+python fbf.py --file file.h264
+
+	press key 'a' to advance thru frames
+	
+	make sure the codec.dll's are in the folder's path
+
+to play a h264 on the pi:
+		omxplayer file.h264
+		
+	to play at correct speed
+		MP4Box -fps files_fps -add file.h264 file.mp4
+			(also this shows how many frames)
+		omxplayer file.mp4 [--fps desired_fps]
+
+to preview the FOV of cam:
+	
+	raspistill [-rot 270] [-vf] [-hf] -t 0 -p 200,200,640,480 -w 640 -h 480
+		
+		(but rotation doesn't work on raspivid)
+		
+to take a video with raspivid:
+
+	raspivid -w 640 -h480 -ss 5000[ms] -fps 30 -o output.h264 -t 5000[ms] 
+	
+		(ss and fps are sometimes conflicting, whichever one comes last overwrites)
+		
+		fps also alters FOV with > 30ish dropping down to half-FOV
+		
+
+		
+Need to Do:
+
+	Basic Ipython notebook where you:
+		display a frame, correct colors
+		play the video
+		have a way to edit sections of video
+		have a storage folder to save them
+		
+	Output frame by frame
+		also for 
+	
+	Attach a tracking algo
+		parameterize for different environments
+		
+	Benchmarks and Tests
+		FP/FN
+		Speed
+		
+	Then we can focus on throwing different samples at it
+		
+
+Notes 7/5
+
+List IPs on LAN (windows): arp -a
+44	
+45	7.19
+46	
+47	# this copies from pi -> laptop; 
+48	# reverse arg order for laptop -> pi
+49	pscp pi@192.168.43.243:Desktop/camera1/vid1.h264 myvi
+
+https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspivid.md
+
+For Help:
+	raspivid 2>&1 | less
+	
+To make videos playable
+	sudo apt-get install -y gpac
+	MP4Box -add pivideo.h264 pivideo.mp4
+	omxplayer pivideo.mp4
+
+https://www.raspberrypi.org/blog/new-camera-mode-released/
+
+	sudo rpi-update
+	
+	raspivid -w 640 -h 480 -fps 90 -t 10000 -o test90fps.h264
+	
+	
+https://www.raspberrypi.org/forums/viewtopic.php?f=43&t=76909
+
+	No Shutter as of May2014
+	
+	Setting fps to 0 tells the camera to use dynamic frame rates. You will get 30 fps until your exposure time is too long to archive 30fps. To enforce a fixed frame rates (i.e. 30fps) the maximum shutter speed needs to be limited to 1/fps. All settings of ss over 33333 will be limited to 33333.
+
+	For me here:
+	CODE: SELECT ALL
+	 raspivid -ISO 100 -ss 1 -fps 0 -o test2.h264
+
+	does give a complete black video.
+
+	
+	The problem of setting -ss first and then -exposure is that the exposure settings will overwrite the shutter speed settings.
+	
+sudo apt-get install vlc
+
+https://www.techjunkie.com/video-frame-by-frame-vlc/
+
+
+	
+	
+	
