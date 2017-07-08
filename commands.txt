@@ -1,0 +1,8 @@
+
+Example for writing out a book
+    python fbf2.py --file t6/ss5000.h264 --writebook --writebookinfo --interactive --reporting
+
+    add:
+        --printframes
+        --refresh 1000 (for slow play)
+        
