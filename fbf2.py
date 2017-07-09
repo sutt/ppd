@@ -60,7 +60,6 @@ def uni_file(inp_path,name="output",ext=".h264"):
         else:
             return fn
 
-#default_book = "book" + str(random.random()) +     ".html"
 writepath0 = args["writepath"]
 writepath = writepath0
 default_book = uni_file(writepath,name="book",ext=".html")
@@ -74,45 +73,6 @@ if args['writebookvideo']:
     output_size = (640,480)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
-    
-
-
-if False:
-    
-    #vw = cv2.VideoWriter()
-    print 'in here'
-    try:
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        # have openh264-1.4.0-win64msvc.dll, but need openh264-1.4.0-win32msvc.dll
-        #Please check environment and/or download library from here: https://github.com/cisco/openh264/releases
-        #fourcc = cv2.VideoWriter_fourcc(*'X264')
-        output_fps = 30
-        output_size = (640,480)
-        output_ext = '.h264'
-        output_vid_fn = uni_file(writepath,'outvid',output_ext)
-        #output_vid_fn = writepath + "/" + output_vid_fn
-        
-        out = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
-
-        vc = cv2.VideoCapture(args["file"])
-        print 'outputting here: ', str(output_vid_fn)
-        while(vc.isOpened()):
-            ret, frame = vc.read()
-            if ret==True:
-            
-                #frame = cv2.flip(frame,0)
-                out.write(frame)
-            else:
-                vc.release()
-    except Exception as e:
-        print 'error in vid write', str(e)
-
-    
-    vc.release()
-    out.release()
-    sys.exit()
-
-
 
 
 def pause(dispTxt, breaker):
@@ -198,8 +158,47 @@ while(vc.isOpened()):
             
         #controls ----------------------------------------------
         key0 = cv2.waitKey(refresh)
-        
-        if key0 == ord('w'):
+
+        if key0 == ord('o'):
+
+            # options ---------------------------------------
+            while(True):
+                ret = pause('options ... ', \
+                             ['quit','newbook'])                
+
+                if ret == 'quit':
+                    break
+                
+                elif ret[:7] == "newbook":
+                    
+                    if len(ret.split(' ')) > 1:
+                        nb = writebook([],writepath, ret.split(' ')[1] )
+                    else:
+                        nb = writebook([],writepath, \
+                                    uni_file(writepath,name="book",ext=".html"))
+                    current_book = nb
+                
+                elif ret[:9] == "resetbook":
+                    book_info = []
+                    book_jpgs = []
+
+                elif ret[:7] == "newvideo":
+                    
+                    ret_args = len(ret.split(' ')
+                    if len(ret_args)) > 1:
+                        output_vid_fn = str(ret_args[1)]
+                    else:
+                        output_vid_fn = uni_file(writepath,'outvid',output_ext)
+                    vw.release()
+                    vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
+
+                else:
+                    print 'option <', str(ret),  '> not recognized'
+            
+            print 'quitting options...'
+            # /options -----------------------------------------------
+
+        elif key0 == ord('w'):
             
             pic_name = uni_file(writepath,name="pic",ext=".jpg")
             cv2.imwrite(pic_name,frame)
@@ -245,39 +244,6 @@ while(vc.isOpened()):
             i += 1
             print i
             print 'advancing to ', str(i)
-            
-        
-        elif key0 == ord('o'):
-
-            while(True):
-                ret = pause('options ... ', \
-                             ['quit','newbook'])
-                
-                #print ret
-                #strip_ret = str(ret) # filter(lambda char: char.isalpha(), ret)
-                #print strip_ret
-                #print strip_ret[0:len('newbook')]
-
-                if ret == 'quit':
-                    break
-                
-                elif ret[:7] == "newbook":
-                    
-                    if len(ret.split(' ')) > 1:
-                        nb = writebook([],writepath, ret.split(' ')[1] )
-                    else:
-                        nb = writebook([],writepath, \
-                                    uni_file(writepath,name="book",ext=".html"))
-                    current_book = nb
-                
-                elif ret[:9] == "resetbook":
-                    book_info = []
-                    book_jpgs = []
-
-                else:
-                    print 'option <', str(ret),  '> not recognized'
-            print 'quitting options...'
-
 
 
         elif key0 == ord('a'):
@@ -307,14 +273,13 @@ while(vc.isOpened()):
             print 'quitting'
             break
         
-        #/controls --------------------------------------------
+        #/controls -------------------------------------------------------
         
         if args["interactive"] and (i == len(frames)):
             break   #exit on last frame
 
     except Exception as e:
         print 'exception in main loop', e.message
-        #traceback.print_tb(e.__traceback__)
         print(traceback.format_exc())
         break
 
@@ -324,8 +289,6 @@ if args["reporting"]:
     print 'runtime: ', run_time
     print 'shape1: ', shape1
     print 'len(frames): ', len(frames)
-
-
 
 vc.release()
 cv2.destroyAllWindows()

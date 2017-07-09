@@ -6,7 +6,7 @@ Example for writing out a book
         --printframes
         --refresh 1000 (for slow play)
         --picsize width,300 (comma seperated for width="300px" attr in book's-img)
-        --writebookvid  can use 'e' to a video too
+        --writebookvid  can use 'e' to output a video too
 
 Keyboard Commands
 
@@ -20,4 +20,3 @@ Keyboard Commands
         newbook [bookname]      new output book
         resetbook               dont record prev saved imgs
         newvideo                [todo]
-        
