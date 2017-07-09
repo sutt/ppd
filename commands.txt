@@ -5,4 +5,16 @@ Example for writing out a book
     add:
         --printframes
         --refresh 1000 (for slow play)
+        --picsize width,300 (comma seperated for width="300px" attr in book's-img)
+
+Keyboard Commands
+
+    d:      pause/play 
+    a / s:  back a frame / forward a frame
+    w:      write the current frame
+    e:      write the current frame, advance a frame
+    o:      options, on cmd line
         
+        quit                    quit opt
+        newbook [bookname]      new output book
+        resetbook               dont record prev saved imgs

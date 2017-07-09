@@ -1,4 +1,28 @@
 
+Summary of Day2 
+
+	see commands.txt
+
+	Need ToDo:
+
+		-sub directory
+		-video write
+		-vf/-hf
+		-write text onto img
+		-info.xml
+		-summarize rpi networking notes
+		-python debugger
+			-debug with args
+
+	Questions:
+
+		performance of rapsistill [ or picamera] over vid:
+			how quickly can we do them?
+			consistently?
+			quickly change thru settings? into/out of hi-fps
+
+
+
 Summary of Day1 Learning:
 
 
@@ -30,6 +54,13 @@ to take a video with raspivid:
 		
 		fps also alters FOV with > 30ish dropping down to half-FOV
 		
+to setup ssh on rpi:
+
+	ip addr show
+	arp -a
+	ping rpi.ip.addr.xx
+	sudo raspi-config ~ enable ssh
+	pscp pi@192.168.43.243:Desktop/camera1/vid1.h264 myvid.h264
 
 		
 Need to Do:

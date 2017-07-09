@@ -1,7 +1,7 @@
 import cv2
 import time, random
 import os, sys
-import argparse
+import argparse, traceback
 
 
 ap = argparse.ArgumentParser()
@@ -13,7 +13,6 @@ ap.add_argument("--writepath", type=str, default="")
 ap.add_argument("--writebook", action="store_true")
 ap.add_argument("--writebookinfo", action="store_true")
 ap.add_argument("--picsize", type=str, default="")
-
 
 ap.add_argument("--writebookvideo", action="store_true")
 
@@ -69,8 +68,12 @@ def uni_file(inp_path,name="output",ext=".h264"):
 writepath0 = args["writepath"]
 writepath = writepath0
 default_book = uni_file(writepath,name="book",ext=".html")
+current_book = default_book
 
-
+def pause(dispTxt, breaker):
+    while(True):
+        inp = raw_input(dispTxt)
+        return inp
 
 def concat_dict(d):
     s = ""
@@ -81,13 +84,14 @@ def concat_dict(d):
         s += str( d.get(key_x,'') )
     return s
 
-def writebook(jpg_list, writepath, **kwargs):
+def writebook(jpg_list, writepath, bookname, **kwargs):
     
     info =  kwargs.get('info',[])
     if len(info)>0:
         b_info = True
         info_rev = info[:]
         info_rev.reverse()    
+    
     mybook = """<html>"""
     for jpg in jpg_list:
         if b_info:
@@ -101,11 +105,12 @@ def writebook(jpg_list, writepath, **kwargs):
                     '="' + str(args['picsize']).split(',')[1] + 'px"'
         mybook += '></img>'
     mybook += "</html>"
-    bookname = kwargs.get("book", default_book )
+    
     output_file = writepath + bookname
     f = open(output_file, 'w',)
     f.writelines(mybook)
     f.close()
+    return bookname
 
 
 i = 0
@@ -162,7 +167,7 @@ while(vc.isOpened()):
                     frame_info['orig_fn'] = args["file"]
                 book_info.append(frame_info)
                 book_jpgs.append(pic_name)
-                writebook(book_jpgs,writepath,info=book_info)
+                writebook(book_jpgs,writepath,current_book,info=book_info)
 
             print 'writing out current frame num: ', str(i)
             continue
@@ -181,7 +186,7 @@ while(vc.isOpened()):
                     frame_info['orig_fn'] = args["file"]
                 book_info.append(frame_info)
                 book_jpgs.append(pic_name)
-                writebook(book_jpgs,writepath,info=book_info)
+                writebook(book_jpgs,writepath,current_book,info=book_info)
             
             print 'writing out current frame num: ', str(i)
             i += 1
@@ -190,8 +195,37 @@ while(vc.isOpened()):
             
         
         elif key0 == ord('o'):
-            pass
-            #input()  #options
+
+            while(True):
+                ret = pause('options ... ', \
+                             ['quit','newbook'])
+                
+                #print ret
+                #strip_ret = str(ret) # filter(lambda char: char.isalpha(), ret)
+                #print strip_ret
+                #print strip_ret[0:len('newbook')]
+
+                if ret == 'quit':
+                    break
+                
+                elif ret[:7] == "newbook":
+                    
+                    if len(ret.split(' ')) > 1:
+                        nb = writebook([],writepath, ret.split(' ')[1] )
+                    else:
+                        nb = writebook([],writepath, \
+                                    uni_file(writepath,name="book",ext=".html"))
+                    current_book = nb
+                
+                elif ret[:9] == "resetbook":
+                    book_info = []
+                    book_jpgs = []
+
+                else:
+                    print 'option <', str(ret),  '> not recognized'
+            print 'quitting options...'
+
+
 
         elif key0 == ord('a'):
             i -= 1
@@ -205,7 +239,7 @@ while(vc.isOpened()):
             print 'advancing'
             continue
         
-        elif key0 == ord('d') or i == 150:
+        elif key0 == ord('d'):
             i_bool = False if i_bool else True
             pause_msg = "play" if i_bool else "paused"
             print pause_msg
@@ -226,7 +260,9 @@ while(vc.isOpened()):
             break   #exit on last frame
 
     except Exception as e:
-        print 'exception in main loop', e
+        print 'exception in main loop', e.message
+        #traceback.print_tb(e.__traceback__)
+        print(traceback.format_exc())
         break
 
 run_time = time.time() - t1
