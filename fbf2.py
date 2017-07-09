@@ -5,10 +5,8 @@ import argparse, traceback
 
 
 ap = argparse.ArgumentParser()
-path = "fps30.h264"
 
-ap.add_argument("--file", type=str, default=path)
-
+ap.add_argument("--file", type=str, default="fps30.h264")
 ap.add_argument("--writepath", type=str, default="")
 ap.add_argument("--writebook", action="store_true")
 ap.add_argument("--writebookinfo", action="store_true")
@@ -23,13 +21,11 @@ ap.add_argument("--printframes", action="store_true")
 ap.add_argument("--reporting", action="store_true")
 
 
-
 args = vars(ap.parse_args())
-print args["picsize"]
+
 
 t0 = time.time()
 print 'starting script...'
-print 'print frames? ', args["printframes"]
 
 
 frames = []
@@ -64,11 +60,60 @@ def uni_file(inp_path,name="output",ext=".h264"):
         else:
             return fn
 
-#default_book = "book" + str(random.random()) + ".html"
+#default_book = "book" + str(random.random()) +     ".html"
 writepath0 = args["writepath"]
 writepath = writepath0
 default_book = uni_file(writepath,name="book",ext=".html")
 current_book = default_book
+
+if args['writebookvideo']:
+    
+    output_ext = '.h264'
+    output_vid_fn = uni_file(writepath,'outvid',output_ext)
+    output_fps = 30
+    output_size = (640,480)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
+    
+
+
+if False:
+    
+    #vw = cv2.VideoWriter()
+    print 'in here'
+    try:
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # have openh264-1.4.0-win64msvc.dll, but need openh264-1.4.0-win32msvc.dll
+        #Please check environment and/or download library from here: https://github.com/cisco/openh264/releases
+        #fourcc = cv2.VideoWriter_fourcc(*'X264')
+        output_fps = 30
+        output_size = (640,480)
+        output_ext = '.h264'
+        output_vid_fn = uni_file(writepath,'outvid',output_ext)
+        #output_vid_fn = writepath + "/" + output_vid_fn
+        
+        out = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
+
+        vc = cv2.VideoCapture(args["file"])
+        print 'outputting here: ', str(output_vid_fn)
+        while(vc.isOpened()):
+            ret, frame = vc.read()
+            if ret==True:
+            
+                #frame = cv2.flip(frame,0)
+                out.write(frame)
+            else:
+                vc.release()
+    except Exception as e:
+        print 'error in vid write', str(e)
+
+    
+    vc.release()
+    out.release()
+    sys.exit()
+
+
+
 
 def pause(dispTxt, breaker):
     while(True):
@@ -187,7 +232,15 @@ while(vc.isOpened()):
                 book_info.append(frame_info)
                 book_jpgs.append(pic_name)
                 writebook(book_jpgs,writepath,current_book,info=book_info)
-            
+
+            if args["writebookvideo"]:
+                
+                if vw is None:
+                    output_vid_fn = uni_file(writepath,'outvid',output_ext)
+                    vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
+                else:
+                    vw.write(frame)
+
             print 'writing out current frame num: ', str(i)
             i += 1
             print i
@@ -272,5 +325,8 @@ if args["reporting"]:
     print 'shape1: ', shape1
     print 'len(frames): ', len(frames)
 
+
+
 vc.release()
 cv2.destroyAllWindows()
+vw.release()
