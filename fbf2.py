@@ -72,6 +72,7 @@ if args['writebookvideo']:
     output_fps = 30
     output_size = (640,480)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*'H264')
     vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
 
 
@@ -182,11 +183,11 @@ while(vc.isOpened()):
                     book_info = []
                     book_jpgs = []
 
-                elif ret[:7] == "newvideo":
+                elif ret[:8] == "newvideo":
                     
-                    ret_args = len(ret.split(' ')
-                    if len(ret_args)) > 1:
-                        output_vid_fn = str(ret_args[1)]
+                    ret_args = ret.split(' ')
+                    if len(ret_args) > 1:
+                        output_vid_fn = str(ret_args[1])
                     else:
                         output_vid_fn = uni_file(writepath,'outvid',output_ext)
                     vw.release()
@@ -292,4 +293,4 @@ if args["reporting"]:
 
 vc.release()
 cv2.destroyAllWindows()
-vw.release()
+if args['writebookvideo']: vw.release()
