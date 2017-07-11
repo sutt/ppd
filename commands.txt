@@ -19,4 +19,8 @@ Keyboard Commands
         quit                    quit opt
         newbook [bookname]      new output book
         resetbook               dont record prev saved imgs
-        newvideo                [todo]
+        newvideo                writes to a new videofile
+
+
+Example for tracking
+    python fbf2.py --file outvid6.h264 --writebook --writebookinfo --interactive --reporting --track

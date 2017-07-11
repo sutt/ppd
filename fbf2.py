@@ -34,14 +34,15 @@ print 'starting script...'
 
 def tracking(frame):
     
-    greenLower = (29, 86, 6)
-    greenUpper = (64, 255, 255)
+    greenLower = (25,25,25)
+    greenUpper = (45,45,45)
     pts = deque(maxlen=64)
 
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
+    #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsv = blurred
+    
     mask = cv2.inRange(hsv, greenLower, greenUpper)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)

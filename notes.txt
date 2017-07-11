@@ -1,3 +1,24 @@
+Day 4 notes
+
+
+IPython utilities
+	
+	matplotlib
+
+		matplotlib need Pillow to do jpg's
+		Only know how to handle extensions: [u'png']; with Pillow installed matplotlib can handle more images
+
+	getting opencv on pi
+
+		http://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/
+
+		raspbian jessie
+
+		cv2.__version__ = 3.2.0
+			this is the latest version as of Jan 2017
+		
+		
+
 
 Summary of Day2 
 
