@@ -13,11 +13,12 @@ IPython utilities
 		http://www.pyimagesearch.com/2016/04/18/install-guide-raspberry-pi-3-raspbian-jessie-opencv-3/
 
 		raspbian jessie
-
+			last update 5/23/2016
+			
 		cv2.__version__ = 3.2.0
 			this is the latest version as of Jan 2017
 		
-		
+
 
 
 Summary of Day2 
