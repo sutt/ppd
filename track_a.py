@@ -15,8 +15,18 @@ def multi_plot(inp_imgs):
         plt.imshow(img)
         plt.show()
 
-def multi_hist(list_hists):
-    for x in list_hists:
+def multi_hist(l_hists = [], d_hists = {}, horiz = True ):
+    
+    h = 1 if horiz else 3
+    w = 3 if horiz else 1
+    f ,arrax = plt.subplots(h,w)
+    for i,clr in enumerate('bgr'):
+        arrax[i].hist(d_hists[clr])
+        arrax[i].set_title('color : '  + str(clr))
+    f.subplots_adjust(hspace=1)
+    plt.show()
+
+    for x in l_hists:
         plt.hist(x =x)
         plt.show()
 
@@ -156,9 +166,41 @@ def px_filter(val,img,mask):
             for h in range(hL) for w in range(wL)
             if mask[h,w] == val]
 
+
+def ball_vs_background(inp_masks,inp_imgs,show_hist = False, **kwargs):
+
+    d_on, d_off = {}, {}
+    
+    for clr in 'bgr':
+        d_on[clr]= []
+        d_off[clr]= []
+
+    for mask_img in zip(inp_masks,inp_imgs):
+
+        mask,img = mask_img[0], mask_img[1]
+        
+        on_img = px_filter(255,img,mask)
+        off_img = px_filter(0,img,mask)
+
+        on_pxs = px3clr_3px1clr(on_img)
+        off_pxs = px3clr_3px1clr(off_img)
+        
+        for i,clr in enumerate('bgr'):
+            d_on[clr].extend(on_pxs[i])
+            d_off[clr].extend(off_pxs[i])
+
+    if show_hist:
+        multi_hist(d_hists = d_on, horiz = kwargs.get('horiz', True))
+        multi_hist(d_hists = d_off, horiz = kwargs.get('horiz', True))
+
+    return d_on, d_off
+
+
 #bgr_my_img = flat_3clr(my_img)
 
-color_histo = []
+
+
+
 #for i in range(3):
 #    color_histo.append(bgr_my_img[i])
     
