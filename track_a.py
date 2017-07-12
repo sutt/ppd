@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import cv2
 import imutils
@@ -6,24 +7,32 @@ from matplotlib import image as mpimg
 
 from matplotlib import pyplot as plt
 
+#TODO - img_fn in order
 
+#TODO - color converter
 def multi_plot(inp_imgs):
     for img in inp_imgs:
         plt.imshow(img)
         plt.show()
 
-def transform1(frame):
+def multi_hist(list_hists):
+    for x in list_hists:
+        plt.hist(x =x)
+        plt.show()
+
+def transform1(frame, blur = 11, b_hsv = False):
     
     greenLower = (25,25,25)
     greenUpper = (45,45,45)
     pts = deque(maxlen=64)
 
     #frame = imutils.resize(frame, width=600)
-    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    out = cv2.GaussianBlur(frame, (blur, blur), 0)
     #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    hsv = blurred
+    #if b_hsv:
+    #    out = blurred
     
-    mask = cv2.inRange(hsv, greenLower, greenUpper)
+    mask = cv2.inRange(out, greenLower, greenUpper)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
     
@@ -52,7 +61,7 @@ def find_radius(mask):
         
     return radius
 
-def filter_success(min_radius = 10):
+def filter_success(radius = 10):
         return radius >= min_radius
             
 def draw_tracking1(x,y,radius,frame):
@@ -82,19 +91,28 @@ def batch_files(read_path):
     for f in files:
         if 'pic' in f:
             picfn.append(f)
-    print picfn
 
     fn_nums = map(lambda chars: int( chars.split('pic')[1].split('.')[0] ), picfn )
+    
     fn_nums.sort()
+    
     ordered_picfn = map( lambda c: "pic"+str(c)+".jpg", fn_nums)
+    print ordered_picfn
+    
 
     imgs = []
     for fn_i in ordered_picfn:
-        imgs.append( cv2.imread(readpath + '\\' + fn_i))
+        imgs.append( cv2.imread(read_path + '\\' + fn_i))
 
     return imgs
         
-    
+def batch_mask(imgs):    
+
+    masks = []
+    for _img in imgs:
+        masks.append(transform1(_img))
+    return masks
+
 def batch_track(imgs):    
 
     track_params = []
@@ -125,20 +143,26 @@ def batch(read_path):
     return tracked
 
 
-
-    
-
-
 def flat_3clr(pic):
     return [ tuple([pic[h,w,clr] for clr in range(3)]) for h in range(pic.shape[0]) for w in range(pic.shape[1]) ]
-      
-bgr_my_img = flat_3clr(my_img)
+
+def px3clr_3px1clr(list_pixels):
+        return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]
+
+
+def px_filter(val,img,mask):
+    hL,wL = img.shape[0], img.shape[1]  
+    return [ tuple( img[h,w,:] )
+            for h in range(hL) for w in range(wL)
+            if mask[h,w] == val]
+
+#bgr_my_img = flat_3clr(my_img)
 
 color_histo = []
-for i in range(3):
-    color_histo.append(bgr_my_img[i])
+#for i in range(3):
+#    color_histo.append(bgr_my_img[i])
     
-plt.hist(color_histo[0], bins = 255, range = (0,255))
-plt.show()
-plt.hist(color_histo[1], bins = 255, range = (0,255))
-plt.show()
+# plt.hist(color_histo[0], bins = 255, range = (0,255))
+# plt.show()
+# plt.hist(color_histo[1], bins = 255, range = (0,255))
+# plt.show()
