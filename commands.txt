@@ -8,6 +8,10 @@ Example for writing out a book
         --picsize width,300 (comma seperated for width="300px" attr in book's-img)
         --writebookvid  can use 'e' to output a video too
 
+Example with new data directories
+    python fbf2.py --file data/read/tc/ss5000.h264 --writepath data/write/example1 --createfile --picsubdir --writebook --writebookinfo --writebookvid --interactive --reporting
+
+
 Keyboard Commands
 
     d:      pause/play 
