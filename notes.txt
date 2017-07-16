@@ -1,3 +1,44 @@
+Day 5 notes
+
+	
+	
+	For using the VGA cable
+	http://elinux.org/R-Pi_configuration_file
+	http://elinux.org/RPiconfig
+
+		sudo nano /boot/config.txt
+		uncomment #hdmi_safe=1   [this is failsafe]
+		hdmi_mode=16 			[this works best Set monitor resolution to 1024x768 XGA 60 Hz (HDMI_DMT_XGA_60)]
+
+	
+	According to docs, up to 42-49 with full FOV
+		https://www.raspberrypi.org/blog/new-camera-mode-released/
+
+		1920×1080 1-30fps, video mode, 1080p30 cropped
+		1296×972 1-42fps, video mode, 4:3 aspect binned full FOV. Used for stills preview in raspistill.
+
+
+	using opencv on pi
+
+		get virtualenv, when you go to startx
+			export WORKON_HOME=$HOME/.virtualenvs
+			source /usr/local/bin/virtualenvwrapper.sh
+
+			-> need to save these to profile, see setup video
+
+		http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
+
+	misc
+
+		very interesting on YUV420 
+		http://picamera.readthedocs.io/en/release-1.10/recipes2.html
+
+		doing CV on smartphones
+		https://stackoverflow.com/questions/3550136/camera-iso-setting-shutter-speed
+			https://developer.android.com/reference/android/hardware/camera2/package-summary.html
+			https://github.com/PkmX/lcamera
+
+
 Day 4 notes
 
 
