@@ -1,7 +1,20 @@
 
 Day 6 notes
 
-	git config --list --show-origins
+	matplotlib install on rpi, 
+	
+		don't use pip! 
+		instead sudo apt-get install python-matplotlib
+		was breaking on from matplotlib import pyplot 
+		need to use pyplot.show() to show a figure
+
+
+	Git to set user for github
+
+		git config --global user.name "sutt"
+		git config --global user.email wsutton17@gmail.com
+		
+		git config --list --show-origins
 
 Day 5 notes
 
