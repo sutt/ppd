@@ -1,6 +1,10 @@
+
+Day 6 notes
+
+	git config --list --show-origins
+
 Day 5 notes
 
-	
 	
 	For using the VGA cable
 	http://elinux.org/R-Pi_configuration_file
