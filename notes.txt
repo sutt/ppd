@@ -5,7 +5,9 @@ Day 6 notes
 	hello world with rpi cam and cv realtime
 		http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
 
-		
+		test_image.py
+		test_video.py
+			but why? frame size rounded up to 1920x1080 in PiCameraResolutionRounded
 
 
 	matplotlib install on rpi, 
