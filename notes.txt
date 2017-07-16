@@ -1,12 +1,37 @@
 
 Day 6 notes
 
+
+	hello world with rpi cam and cv realtime
+		http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
+
+		
+
+
 	matplotlib install on rpi, 
 	
 		don't use pip! 
 		instead sudo apt-get install python-matplotlib
 		was breaking on from matplotlib import pyplot 
 		need to use pyplot.show() to show a figure
+
+		
+		
+		http://www.pyimagesearch.com/2015/08/24/resolved-matplotlib-figures-not-showing-up-or-displaying/
+
+			>>> import matplotlib
+			>>> matplotlib.get_backend()
+			'TkAgg'
+
+			$ sudo apt-get install tcl-dev tk-dev python-tk python3-tk
+
+			$ workon plotting
+			$ pip uninstall matplotlib
+			$ git clone https://github.com/matplotlib/matplotlib.git
+			$ cd matplotlib
+			$ python setup.py install
+
+
 
 
 	Git to set user for github
@@ -15,6 +40,11 @@ Day 6 notes
 		git config --global user.email wsutton17@gmail.com
 		
 		git config --list --show-origins
+
+		batch changing author information
+			https://help.github.com/articles/changing-author-info/
+
+		
 
 Day 5 notes
 
