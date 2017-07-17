@@ -7,7 +7,8 @@ from matplotlib import image as mpimg
 
 from matplotlib import pyplot as plt
 
-#TODO - img_fn in order
+def hello():
+    print 'world!'
 
 #TODO - color converter
 def multi_plot(inp_imgs):

@@ -1,6 +1,27 @@
 
+
+Day 7 notes
+
+	Reading ahead on streaming
+
+		"Encode a 5s camera stream and send the image data to stdout:"
+			-https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+
+		how to stream
+		http://www.raspberry-projects.com/pi/pi-hardware/raspberry-pi-camera/streaming-video-using-vlc-player
+
+		https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+
+		how to use vlc to stream over opencv stdout
+		https://stackoverflow.com/questions/36579542/sending-opencv-output-to-vlc-stream
+
+		
+
 Day 6 notes
 
+
+	> workon cv
+	> deactivate [to leave virtual env]
 
 	hello world with rpi cam and cv realtime
 		http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
@@ -12,12 +33,12 @@ Day 6 notes
 
 	matplotlib install on rpi, 
 	
-		don't use pip! 
+		don't use pip! or use setup.py from github for a virtualenv
 		instead sudo apt-get install python-matplotlib
 		was breaking on from matplotlib import pyplot 
 		need to use pyplot.show() to show a figure
 
-		
+		actually needed to use the following technique below to install in a virtualenv
 		
 		http://www.pyimagesearch.com/2015/08/24/resolved-matplotlib-figures-not-showing-up-or-displaying/
 
