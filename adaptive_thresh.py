@@ -1,4 +1,5 @@
 import os, sys, time
+import traceback
 import numpy as np
 import cv2
 import imutils
@@ -17,29 +18,49 @@ def transformA(img, blur = 11, b_hsv = False):
     if b_hsv: return cv2.cvtColor(out, cv2.COLOR_BGR2HSV)
     return out    
     
-def threshA(img, threshLo = (0,0,0), threshHigh = (255,255,255)):
-    return cv2.inRange(out, greenLower, greenUpper)
+def threshA(img, threshLo = (0,0,0), threshHi = (255,255,255)):
+    return cv2.inRange(out, threshLo, threshHi)
     
 def repairA(img, iterations = 2):
     img = cv2.erode(img, None, iterations=iterations)
-    mask = cv2.dilate(img, None, iterations=iteratins)
+    mask = cv2.dilate(img, None, iterations=iterations)
 
-def create_tracking_frame
+def create_tracking_frame():
+    pass
 
-vc = cv2.VideoCapture(args["file"])
-        while(vc.isOpened()):
-            try:
-                ret,frame = vc.read()
-                if ret:
-                    frames.append(frame)
-                    j += 1
-                else:
-                    print 'no ret num: ', str(j)
-                    vc.release()
-            except Exception as e:
-                print 'exception loading frames', e
+def crop_img(img, current_tracking_frame):
+    x,y,w,h = current_tracking_frame[0], current_tracking_frame[1], current_tracking_frame[2], current_tracking_frame[3]
+    return img[x:x+w,h:h+w,:]    
 
-crop_img(frame, current_tracking_frame)
+def initCam(cam_type,**kwargs):
+    if cam_type == 'cv_cam': 
+            return cv2.VideoCapture(kwargs.get('usb_num'),0)
+        elif cam_type == 'pi_cam: 
+            return 1
+        elif cam_type == 'file_cam': 
+            return  cv2.VideoCapture(kwargs.get('vid_file'),'')
+        else:
+            print 'No cam object creatable.'
+
+def setupCam(vc, cam_type, params):
+    # set ISO, shutter speed, fps, etc...
+    try:
+        pass
+    except Exception as e:
+        print 'Could not set cam params: ', str(e)
+        print traceback.format_exc()
+    return vc
+
+def getFrame(inp_cam, cam_type):
+        if cam_type == 'cv_cam': 
+            return inp_cam.read()
+        elif cam_type == 'pi_cam: 
+            return True, inp_cam
+        elif cam_type == 'file_cam': 
+            return inp_cam.read()
+        else:
+            print 'No frame read possible.'
+        
 
 def main():
 
@@ -47,23 +68,18 @@ def main():
     cam_params = 0
     h_img, w_img = cam_params[0], cam_params[1]
     
-    b_file_vid = False
-    b_picamera = False
-    b_cv_ccamera = True
+    cam_type = 'cv_cam'     # 'pi_cam' 'file_cam'
     
-    if b_file_vid:
-        vc = cv2.VideoCapture(args["file"])
-    elif b_cv_ccamera:
-        vc = cv2.VideoCapture(0)
-    else:
-        print 'couldnt find a videocam object'
+    vc = initCam(cam_type)
+    vc = setupCam(vc, cam_type = cam_type, params = cam_params)
 
     current_tracking_frame = (0,0,h_img, w_img)
-    time_last = time.time()
+
     b_tracking_frame = False
     b_drawTracking = False
-    
     #b_track_success = False
+
+    time_last = time.time()
 
     info_annotations = []
 
@@ -74,14 +90,7 @@ def main():
     while(vc.isOpened()):
 
         
-
-        if b_cv_ccamera:
-            ret, frame = vc.read()
-        elif: b_picamera:
-            frame = PiCamera()
-        elif:
-            ret, frame = vc.read()
-        
+        ret, frame = getFrame(vc, type = 'cv_cam')        
         if not(ret): break
 
         #if b_agenda:
@@ -141,7 +150,15 @@ def main():
             #need to close old ones
             #keep focus on cv windows though?
             #keep window positioning ?
-
+        
+        #Delay fps
+        if cam_type = 'file_cam':
+            if b_slow_for_fps:
+                current_frames_time = time.time() - time_last_frame 
+                sleep_time = current_frames_time - fps_time - epsilon_fps_time
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+                time_last_frame = time.time()
         # Logging
         if b_log:
             pass

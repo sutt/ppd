@@ -1,4 +1,17 @@
+Day 8 notes
 
+	Visual Studio Code preferences:
+
+		"workbench.activityBar.visible": false,
+		"workbench.statusBar.visible": false,
+		"workbench.editor.showTabs": true,
+		"editor.codeLens": false,
+		"window.zoomLevel": 0		
+		,"workbench.editor.enablePreview": false   #this stops file from opening as a preview
+		,"python.linting.pylintArgs": ["--errors-only"]    #these two stop all the squigly markings
+		,"python.linting.pylintEnabled": false				#these two stop all the squigly markings
+		,"editor.minimap.enabled": false					#fuckin minimap
+		,"workbench.iconTheme": "vs-minimal"				#keep it clean
 
 Day 7 notes
 
