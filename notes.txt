@@ -1,3 +1,10 @@
+Day 9 notes
+
+	imshow in a function within a loop, works
+		works with waitkey both inside and outside function
+
+	
+
 Day 8 notes
 
 	Visual Studio Code preferences:
