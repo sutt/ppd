@@ -159,7 +159,6 @@ def main():
         img_display = frame
 
         b_tracking_frame = True
-        #b_tracking_frame = False
         if b_tracking_frame:
             img_display = draw_tracking_frame(frame,x,y,radius)
 
@@ -175,6 +174,10 @@ def main():
         # #Histo processing
         # if b_histo:
         #     ball_vs_background()
+        b_hist_recct = True
+        if b_hist_rect:
+            pass
+            
 
         #Show Images
         #ret = showImages(frame, b_show_main_img = True)

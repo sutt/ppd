@@ -6,8 +6,30 @@ Day 9 notes
 	matplotlib redrawing
 
 		https://stackoverflow.com/questions/11874767/real-time-plotting-in-while-loop-with-matplotlib?noredirect=1&lq=1
+			
+			ali_m has a good answer using matplotlib.blit.
+			
+			output:
+				See the API Changes document (http://matplotlib.org/api/api_changes.html)
+				for more details.
+				ax.hold(True)
+				Blit = False, average FPS: 40.34
+				Blit = True, average FPS: 138.47
+
+				(according to release notes, hold=True is by default, if you want hold=False, just clear the axes/figure )
+
+			also note, this version use *G*TkAgg not TkAgg 
+				matplotlib.use('GTKAgg')
+				see this for forcing /deducing available backends
+					https://stackoverflow.com/questions/3285193/how-to-switch-backends-in-matplotlib-python
+
+			can you move window while program in session? no!
+				maybe set window positioning?
+				or use new backend?
 
 		
+		>>> matplotlib.__version__
+		'2.0.1'
 
 Day 8 notes
 
