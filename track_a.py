@@ -31,6 +31,27 @@ def multi_hist(l_hists = [], d_hists = {}, horiz = True ):
         plt.hist(x =x)
         plt.show()
 
+def multi_hist_live( f, arrax, l_hists = [], d_hists = {}, horiz = True ):
+    
+    h = 1 if horiz else 3
+    w = 3 if horiz else 1
+    f ,arrax = plt.subplots(h,w)
+    for i,clr in enumerate('bgr'):
+        arrax[i].hist(d_hists[clr])
+        arrax[i].set_title('color : '  + str(clr))
+    f.subplots_adjust(hspace=1)
+    #plt.show(block=False)
+    # plt.gcf().clear()
+    plt.clear()
+    for x in l_hists:
+        plt.hist(x =x)
+        # plt.draw()
+        # plt.pause(0.01)
+        
+    plt.draw()
+    plt.pause(0.01)
+    
+
 def transform1(frame, blur = 11, b_hsv = False):
     
     greenLower = (25,25,25)
@@ -58,7 +79,8 @@ def find_xy(mask):
         c = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
         
-    return (x,y)
+        return (x,y)
+    return 0,0
 
 def find_radius(mask):
 
@@ -68,9 +90,8 @@ def find_radius(mask):
     if len(cnts) > 0:
         c = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
-        
-        
-    return radius
+        return radius
+    return 0
 
 def filter_success(radius = 10):
         return radius >= min_radius
@@ -196,6 +217,33 @@ def ball_vs_background(inp_masks,inp_imgs,show_hist = False, **kwargs):
 
     return d_on, d_off
 
+def rect_vs_outside(inp_masks,inp_imgs,show_hist = False, **kwargs):
+    
+    d_on, d_off = {}, {}
+    
+    for clr in 'bgr':
+        d_on[clr]= []
+        d_off[clr]= []
+
+    for mask_img in zip(inp_masks,inp_imgs):
+
+        mask,img = mask_img[0], mask_img[1]
+        
+        on_img = px_filter(255,img,mask)
+        off_img = px_filter(0,img,mask)
+
+        on_pxs = px3clr_3px1clr(on_img)
+        off_pxs = px3clr_3px1clr(off_img)
+        
+        for i,clr in enumerate('bgr'):
+            d_on[clr].extend(on_pxs[i])
+            d_off[clr].extend(off_pxs[i])
+
+    if show_hist:
+        multi_hist_live(d_hists = d_on, horiz = kwargs.get('horiz', True))
+        multi_hist_live(d_hists = d_off, horiz = kwargs.get('horiz', True))
+
+    return d_on, d_off
 
 #bgr_my_img = flat_3clr(my_img)
 

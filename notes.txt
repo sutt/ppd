@@ -3,7 +3,11 @@ Day 9 notes
 	imshow in a function within a loop, works
 		works with waitkey both inside and outside function
 
-	
+	matplotlib redrawing
+
+		https://stackoverflow.com/questions/11874767/real-time-plotting-in-while-loop-with-matplotlib?noredirect=1&lq=1
+
+		
 
 Day 8 notes
 

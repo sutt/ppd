@@ -27,17 +27,22 @@ def repairA(img, iterations = 2):
     img = cv2.dilate(img, None, iterations=iterations)
     return img
 
-
-
 def crop_img(img, current_tracking_frame):
     x,y,w,h = current_tracking_frame[0], current_tracking_frame[1], current_tracking_frame[2], current_tracking_frame[3]
     return img[x:x+w,h:h+w,:]    
 
-def draw_tracking_frame(frame, x,y,radius):
-    print 'in here'
-    #return frame
-    cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 10)
-    return frame
+def draw_tracking_frame(img, x,y,radius):
+    cv2.circle(img, (int(x), int(y)), int(radius), (0, 255, 255), 10)
+    return img
+
+def draw_tracking(img, rect ):
+    cv2.rectangle(img, rect[0], rect[1], (0, 255, 255), 3)
+    return img
+
+def draw_annotations(img, info_annotations):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(img,'OpenCV',(10,10), font, 2,(255,255,255),2,cv2.LINE_AA)
+    return img
 
 def initCam(cam_type,**kwargs):
     if cam_type == 'cv_cam': 
@@ -84,7 +89,7 @@ def showImages(img_display,**kwargs):
     return 0
 
 def create_tracking_frame(**kwargs):
-    return (0,0,1,1)
+    return ((100,100),(300,300))
 
 def main():
 
@@ -98,9 +103,10 @@ def main():
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
 
     current_tracking_frame = (0,0,h_img, w_img)
+    current_tracking_frame = ((100,100),(300,300))
 
-    b_tracking_frame = False
-    b_drawTracking = False
+    b_tracking_frame = True
+    b_drawTracking = True
     #b_track_success = False
 
     time_last = time.time()
@@ -139,12 +145,14 @@ def main():
         # #LocateTrack, how many shapes are there?
         x,y = find_xy(mask)
         radius = find_radius(mask)
-        print x, ' ', y, ' ', radius
+        #print x, ' ', y, ' ', radius
+        
         # if b_tracking_frame:
         #     x,y,radius = decrop_track(h_img, w_img)
 
         # #Track successful?
         # b_track_success = filter_track()
+        # How many images of what radius are there?
         b_track_success = True
 
         #draw onto frame
@@ -154,14 +162,15 @@ def main():
         #b_tracking_frame = False
         if b_tracking_frame:
             img_display = draw_tracking_frame(frame,x,y,radius)
-        
-        #cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 10)
 
-        # if b_drawTracking and b_track_success:
-        #     img_display = draw_tracking(img_display,mask)
+        if b_drawTracking: # and b_track_success:
+            img_display = draw_tracking(img_display,current_tracking_frame)
 
-        # if b_annotate_img:
-        #     img_display = draw_annotations(img_display, info_annotations)
+        b_annotate_img = False
+        if b_annotate_img:
+            img_display = draw_annotations(img_display, info_annotations)       
+            
+
 
         # #Histo processing
         # if b_histo:
