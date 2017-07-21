@@ -23,6 +23,9 @@ Day 9 notes
 				see this for forcing /deducing available backends
 					https://stackoverflow.com/questions/3285193/how-to-switch-backends-in-matplotlib-python
 
+			this ought to solve it, an official recipe
+			https://matplotlib.org/examples/animation/histogram.html
+
 			can you move window while program in session? no!
 				maybe set window positioning?
 				or use new backend?
