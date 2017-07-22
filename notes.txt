@@ -1,3 +1,23 @@
+
+Day 10 notes
+
+	the key to matplotlib is to call plt.pause after:
+		ani = animation.FuncAnimation(...)
+		plt.show(False)
+		plt.pause()
+
+		does it have to be from the main thread?
+
+		can it have stuff occcur in between updates?
+
+		Nec: frames = None ? interval = X ?
+
+		window moveable?
+
+	also for c# matplotlib	
+		https://medium.com/@pavel.koryakin/matplotlib-python-module-using-from-c-6e98d75cf08e
+			https://github.com/ITGlobal/MatplotlibCS
+
 Day 9 notes
 
 	imshow in a function within a loop, works

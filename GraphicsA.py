@@ -74,8 +74,7 @@ class LiveHist():
     def get_figure_objects(self):
         return self.fig, self.ax
 
-    def animate_j(self,j):
-            # simulate new data coming in
+    def animate_j(self,j, inp_data):
         data = np.random.randn(1000)
         n, bins = np.histogram(data, 100)
         self.top[j] = self.bottom[j] + n
@@ -83,28 +82,33 @@ class LiveHist():
         self.verts[j][2::5, 1] = self.top[j]
         return [self.patch[j], ]
 
-    def animate_j_wrapper(self,i):   #,fargs):
-        j = random.randint(0, self.N - 1)
-        return self.animate_j(j)
+    def animate_j_wrapper(self,i,j,inp_data): 
+        return self.animate_j(j,inp_data)
+    
+    def show_plt(self,**kwargs):
+        print 'a'
+        plt.show(False)
+        plt.pause(5)
+        print 'b'
 
-    def update_figure(self, input, ax_ind = range(3), **kwargs):
+    def update_figure(self, inp_data, ax_ind = range(3), **kwargs):
         
         frames = kwargs.get('frames', 100)
-        print frames
-        ani = animation.FuncAnimation(self.fig
-                                    ,self.animate_j_wrapper 
-                                    ,frames = frames
-                                    ,repeat=False
-                                    ,interval = 100
-                                    ,blit=True)
-        
-        if kwargs.get('show',True):
-            print 'showing'
-            plt.show(False)
-            #plt.show(True)
-            #time.sleep(0.05)
-            print 'SHOWN'
+        pause_time = kwargs.get('epsilon', 0.03)
 
-        return self.fig
+        for j in ax_ind:
+            ani = animation.FuncAnimation(self.fig
+                                        ,self.animate_j_wrapper 
+                                        ,frames = frames
+                                        ,fargs = (j,inp_data[j])
+                                        ,repeat=False
+                                        ,blit=False) 
+                                        #,interval = 1
+                                        #save_count = 1 ? to preserve on blit 
+
+            if kwargs.get('show',True):
+                plt.show(False)
+                plt.pause(pause_time)
         
-        return ani
+        
+ #blit=True only updates 1 histo
