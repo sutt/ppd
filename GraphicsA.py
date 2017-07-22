@@ -70,13 +70,24 @@ class LiveHist():
 
         # SET GLOBALS FIRST TIME
         for h in range(self.N):
+            
+            if self.N > 1:
+                inp_ax = self.ax[h]
+            else:
+                inp_ax = self.ax
+
             ret = setup_hist(self.fig 
-                            ,self.ax[h]
+                            ,inp_ax
                             ,inp_bins = self.bins
                             ,x_lo = kwargs.get('x_lo',-1)
                             ,x_hi = kwargs.get('x_hi',256)
                             )
-            self.ax[h] = ret[0]
+            
+            if self.N > 1:
+                self.ax[h] = ret[0]
+            else:
+                self.ax = ret[0]
+
             self.top[h] = ret[1]
             self.bottom[h] = ret[2]
             self.n[h] = ret[3]
