@@ -1,35 +1,50 @@
 import matplotlib.pyplot as plt
-import time
+import time, random
 import matplotlib.patches as patches
 import matplotlib.path as path
 import matplotlib.animation as animation
+import numpy as np
 from GraphicsA import LiveHist
 
-lh_0 = LiveHist(h=1,w=3)
-print lh_0.N
 
-# print 'start with resize time'
-# lh_0.show_plt()
-# print 'done with resize time'
+def mock_color(n = 100, b_as_numpy = False ):
+    data = np.random.randn(n)
+    if not(b_as_numpy):
+        return data
+    else:
+        return np.array(data)
 
-#print 'update once'
-#lh_0.update_figure(1, ax_ind = range(3), frames = 1, show = True)
-#time.sleep(3)
-#print 'done with resize'
-# plt.show(False)
-# plt.pause(0.1)
-# for i in range(4):
-#     time.sleep(4)
-#     print i
+def mock_integer(n = 100, a=0,b=10):
+    return map(lambda x: random.randint(0,10),range(n))
+                
+def mock_bivariate(n1 = 25, n2 = 10,a = 0, b = 10 ):
+    data = []
+    for xx in range(3):
+        d = random.randint(a,b)
+        d2 = random.randint(a,b)
+        dd = [d] * n1
+        dd2 = [d2] * n2
+        dd3 = dd[:]
+        dd3.extend(dd2[:])
+        data.append( np.array(  dd3 ) )
+    return data
 
-#LET IT LOAD
-time.sleep(0.5)
-print 'GOING IN...'
+N = 3
+lh_0 = LiveHist(h=1,w=3, bins = 11, x_lo = -1, x_hi = 11)
 
+#lh_0.show_plt()        #Allow it to resize
+time.sleep(0.5)         #LET IT LOAD
 tic = time.time()
+
+
 for i in range(10):
+
+    data = map( lambda x: mock_integer( n = 50 * i), range(N) )
+
+    for h in range(len(data)):
+        print data[h][:min(5,len(data[h]))]
     
-    lh_0.update_figure( (1,1,1)
+    lh_0.update_figure( data
                         ,ax_ind = range(3)
                         ,frames = 1
                         ,show = True
@@ -37,33 +52,12 @@ for i in range(10):
     
     print 'DONE ', str(i)
 
+    if i == 5:
+        lh_0.set_xlim(-10,20)
+
 print 'time: ', str(time.time() - tic)
 
-# print 'resize 2'
-# time.sleep(1)
-# print 'end resize 2'
+time.sleep(10)
 
-# for i in range(10):
-    
-#     # frames = 1
-#     # ani = animation.FuncAnimation(lh_0.fig
-#     #                                 ,lh_0.animate_j_wrapper 
-#     #                                 ,frames = frames
-#     #                                 ,repeat=False
-#     #                                 ,interval = 100
-#     #                                 ,blit=False)
-    
-#     ret = lh_0.update_figure(1, ax_ind = range(3), frames = 1)
-#     #time.sleep(0.3)
-#     print 'DONE ', str(i)
-    
-#     # plt.show(False)
-#     # plt.pause(0.1)
-# time.sleep(2)
-# #plt.show(True)
-# print 'ENDING:...'
-# lh_0 = None
-# time.sleep(3)
-# print 'out'
-
-#so we need to call plt.show() from main thread?
+# so we need to call plt.show() from main thread? 
+    # no, just show(False); pause(t);
