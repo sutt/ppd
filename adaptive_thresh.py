@@ -1,14 +1,14 @@
-import os, sys, time, copy
+import os, sys, time, copy, random
 import traceback
 import numpy as np
 import cv2
 import imutils
 from collections import deque
 from matplotlib import image as mpimg
-
 from matplotlib import pyplot as plt
 
 from track_a import *
+from GraphicsA import LiveHist
 
 hello()
 
@@ -91,6 +91,16 @@ def showImages(img_display,**kwargs):
 def create_tracking_frame(**kwargs):
     return ((100,100),(300,300))
 
+def mock_gaussian(n = 100, **kwargs ):
+    z = np.random.randn(n)
+    u, var = kwargs.get('u',0), kwargs.get('var',1)
+    return map(lambda z_i: u + (z_i*var), z)
+    
+def rand_gauss_params():
+    u = random.randint(0,255)
+    var = random.randint(10,50)
+    return u, var
+
 def main():
 
     #Init and Params ---------------------------
@@ -112,6 +122,14 @@ def main():
     time_last = time.time()
 
     info_annotations = []
+
+    b_show_histos = True
+    if b_show_histos:
+        lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256)
+        NN = 3  #for 3 color
+        lh.show_plt(wait_time = 2)
+        last_hist_update = time.time()
+        hist_update_hz = 1
 
     #Loop --------------------------------------
     # this might have to be different between picam and cv-cam
@@ -174,10 +192,20 @@ def main():
         # #Histo processing
         # if b_histo:
         #     ball_vs_background()
-        b_hist_recct = True
-        if b_hist_rect:
-            pass
+        b_hist_rect = True
+        if b_hist_rect and b_show_histos:
             
+            if time.time() - last_hist_update > hist_update_hz:
+                u, var = rand_gauss_params()
+                data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NN) )
+                lh.update_figure( data
+                            ,ax_ind = range(NN)
+                            ,frames = 1
+                            ,show = True
+                            ,epsilon = .0001)
+                
+                print 'updated'
+                last_hist_update = time.time()
 
         #Show Images
         #ret = showImages(frame, b_show_main_img = True)
