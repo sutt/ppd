@@ -10,7 +10,12 @@ def setup_hist(fig, ax, inp_bins = 100,**kwargs):
     
     #data = np.random.randn(1000)
     print 'inp_bins: ', inp_bins
-    data = map(lambda x: random.randint(0,10),range(1000))
+    #data = map(lambda x: random.randint(0,10),range(1000))
+
+    z = np.random.randn(100)
+    u, var = 128, 30
+    data = map(lambda z_i: u + (z_i*var), z)
+
     n, bins = np.histogram(data, inp_bins)
 
     left = np.array(bins[:-1])
@@ -42,10 +47,13 @@ def setup_hist(fig, ax, inp_bins = 100,**kwargs):
     #ax.set_xlim(left[0] - 1, right[-1] + 1)
     x_lo, x_hi = kwargs.get('x_lo',-1), kwargs.get('x_hi',256)
     ax.set_xlim(x_lo, x_hi)
-    #ax.set_ylim(bottom.min(), top.max())
-    ax.set_ylim(-1, 200)
+    ax.set_ylim(bottom.min(), top.max())
+    #ax.set_ylim(-1, 200)
 
-    ax.set_title('Title.')
+    hist_num = kwargs.get('hist_num',-1)
+    if hist_num > -1 and hist_num < 3:
+        ax.set_title('color: '+ list('bgr')[hist_num] )
+        
 
     return ax, top, bottom, n, verts, patch
 
@@ -81,6 +89,7 @@ class LiveHist():
                             ,inp_bins = self.bins
                             ,x_lo = kwargs.get('x_lo',-1)
                             ,x_hi = kwargs.get('x_hi',256)
+                            ,hist_num = h
                             )
             
             if self.N > 1:
@@ -119,10 +128,11 @@ class LiveHist():
         return self.animate_j(j,inp_data)
     
     def show_plt(self,**kwargs):
-        print 'a'
+        wait_time = kwargs.get('wait_time',5)
+        print 'open for window moving for %f secs ...' % (wait_time)
         plt.show(False)
         plt.pause(5)
-        print 'b'
+        print 'finsihed with window moving time.'
 
     def clear_figure(self, **kwargs):
         plt.clf()
@@ -138,7 +148,7 @@ class LiveHist():
             #x_epsilon,y_epsilon = 1, 1
             #self.set_xlim( 0 - x_epsilon, x + x_epsilon)
             #self.set_ylim(0,inp_data.max() + y_epsilon)
-
+        
         for j in ax_ind:
             ani = animation.FuncAnimation(self.fig
                                         ,self.animate_j_wrapper 

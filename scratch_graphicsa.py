@@ -7,12 +7,15 @@ import numpy as np
 from GraphicsA import LiveHist
 
 
-def mock_color(n = 100, b_as_numpy = False ):
-    data = np.random.randn(n)
-    if not(b_as_numpy):
-        return data
-    else:
-        return np.array(data)
+def mock_gaussian(n = 100, **kwargs ):
+    z = np.random.randn(n)
+    u, var = kwargs.get('u',0), kwargs.get('var',1)
+    return map(lambda z_i: u + (z_i*var), z)
+    
+def rand_gauss_params():
+    u = random.randint(0,255)
+    var = random.randint(10,50)
+    return u, var
 
 def mock_integer(n = 100, a=0,b=10):
     return map(lambda x: random.randint(0,10),range(n))
@@ -29,17 +32,28 @@ def mock_bivariate(n1 = 25, n2 = 10,a = 0, b = 10 ):
         data.append( np.array(  dd3 ) )
     return data
 
-N = 1
-lh_0 = LiveHist(h=1,w=1, bins = 11, x_lo = -1, x_hi = 11)
+run_type = 'mockcolor'
 
-#lh_0.show_plt()        #Allow it to resize
-time.sleep(0.5)         #LET IT LOAD
+if run_type == 'simple':
+    N = 1
+    lh_0 = LiveHist(h=1,w=N, bins = 11, x_lo = -1, x_hi = 11)
+elif run_type == 'basic':
+    N = 3
+    lh_0 = LiveHist(h=1,w=N, bins = 11, x_lo = -1, x_hi = 11)
+elif run_type == 'mockcolor':
+    N = 3
+    lh_0 = LiveHist(h=1,w=N, bins = 30, x_lo = -1, x_hi = 256)
+
+
+lh_0.show_plt(wait_time = 2)        #Allow it to resize
+time.sleep(0.5)                     #LET IT LOAD
 tic = time.time()
 
 
 for i in range(100):
 
-    data = map( lambda x: mock_integer( n = 50 * i), range(N) )
+    u, var = rand_gauss_params()
+    data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(N) )
 
     for h in range(len(data)):
         print data[h][:min(5,len(data[h]))]
