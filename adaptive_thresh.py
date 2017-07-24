@@ -74,6 +74,10 @@ def getFrame(inp_cam, cam_type):
             print 'No frame read possible.'
         
 def showImages(img_display,**kwargs):
+    
+    if not(kwargs.get('dont_mirror',False)):
+        img_display = cv2.flip(img_display,1)
+
     if kwargs.get('b_show_main_img', False):
         cv2.imshow('display image', img_display)
         #plt.imshow(img_display, cvtColor)
@@ -84,8 +88,6 @@ def showImages(img_display,**kwargs):
     if kwargs.get('b_show_tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))
 
-    # if cv2.waitKey(1)== ord('q'):
-    #         return 1
     return 0
 
 def create_tracking_frame(**kwargs):
@@ -106,34 +108,33 @@ def main():
     #Init and Params ---------------------------
     cam_params = (640,480)
     h_img, w_img = cam_params[0], cam_params[1]
-    refresh = 1
+    waitKeyRefresh = 1
     cam_type = 'cv_cam'     # 'pi_cam' 'file_cam'
     
-    vc = initCam(cam_type)
-    vc = setupCam(vc, cam_type = cam_type, params = cam_params)
-
-    current_tracking_frame = (0,0,h_img, w_img)
     current_tracking_frame = ((100,100),(300,300))
-
     b_tracking_frame = True
+    b_tracking_frame_2 = False
+    b_histo
+    b_hist_rect = True
+    b_show_histos = True
+
     b_drawTracking = True
-    #b_track_success = False
 
     time_last = time.time()
 
     info_annotations = []
 
-    b_show_histos = True
+    
+    vc = initCam(cam_type)
+    vc = setupCam(vc, cam_type = cam_type, params = cam_params)
+
     if b_show_histos:
         lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256)
         NUM_COLORS = 3  
-        #lh.show_plt(wait_time = 2)
+        lh.show_plt(wait_time = 1)
         last_hist_update = time.time()
         hist_update_hz = 1      #.3 is on the borderline of usable
 
-    #Loop --------------------------------------
-    # this might have to be different between picam and cv-cam
-    # so make the inside of this a function
 
     while(vc.isOpened()):
 
@@ -141,39 +142,36 @@ def main():
         ret, frame = getFrame(vc, cam_type = 'cv_cam')        
         if not(ret): break
 
-        #if b_agenda:
-        #    time_passed = time.time() - time_last
-        #    ret_agenda = do_agenda(time_passed)
-        
-        #note: need to copy() numpy objects for not pass by ref
-        b_tracking_frame_2 = False
         if b_tracking_frame_2:
             current_tracking_frame = create_tracking_frame()
             img = crop_img(frame, current_tracking_frame)
         else:
             img = frame[:,:,:]
 
+        # THRESHOLD MASK
         img_p = transformA(img, b_hsv = True)
         Lo, Hi = (29, 86, 6), (64, 255, 255)
         mask = threshA(img_p, threshLo = Lo , threshHi = Hi )
         mask = repairA(mask, iterations = 2)
         
-        # # you could also crop after the track to see if there was one within
 
-        # #LocateTrack, how many shapes are there?
+        # LOCATE / TRACK
         x,y = find_xy(mask)
         radius = find_radius(mask)
         #print x, ' ', y, ' ', radius
         
         # if b_tracking_frame:
         #     x,y,radius = decrop_track(h_img, w_img)
-
-        # #Track successful?
         # b_track_success = filter_track()
-        # How many images of what radius are there?
         b_track_success = True
 
-        #draw onto frame
+        # HISTO_PROCESSING
+        if b_histo:
+            pass
+            #ball_vs_background()
+        
+
+        #DRAW ONTO FRAME
         img_display = frame
 
         b_tracking_frame = True
@@ -188,12 +186,8 @@ def main():
             img_display = draw_annotations(img_display, info_annotations)       
             
 
-
-        # #Histo processing
-        # if b_histo:
-        #     ball_vs_background()
-        b_hist_rect = True
-        if b_hist_rect and b_show_histos:
+        # SHOW HISTOS
+        if b_show_histos:
             
             if time.time() - last_hist_update > hist_update_hz:
                 u, var = rand_gauss_params()
@@ -204,17 +198,18 @@ def main():
                             ,show = True
                             ,epsilon = .0001)
                 last_hist_update = time.time()
+ 
+        #SHOW IMAGES
+        ret = showImages(img_display, b_show_main_img = True
+                        ,b_show_transformed_img = True
+                        ,img_p = mask)
+        
 
-        #Show Images
-        #ret = showImages(frame, b_show_main_img = True)
-        ret = showImages(img_display, b_show_main_img = True)
-        # if ret == 1:
-        #     break
-        if cv2.waitKey(refresh)== ord('q'):
+        if cv2.waitKey(waitKeyRefresh)== ord('q'):
             print 'quitting'
             break
         
-        #Delay fps
+        # DELAY FPS
         # if cam_type == 'file_cam':
         #     if b_slow_for_fps:
         #         current_frames_time = time.time() - time_last_frame 
@@ -222,7 +217,8 @@ def main():
         #         if sleep_time > 0:
         #             time.sleep(sleep_time)
         #         time_last_frame = time.time()
-        # # Logging
+        
+        # LOGGING
         # if b_log:
         #     pass
 

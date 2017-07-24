@@ -1,15 +1,27 @@
+#Tasks
 
 x take off delay for startup
+x preview-display horizontal mirroring
+x display other types of images  -> 2x cv windows?
 
-
+hist for the rect
 params for adapt thresh
 background histos
 adapt_thresh for saved videos
 optins for adapt thresh
+
+#Questions
+
+Locate / Track 
+    -  how many shapes are there?
+
+#Notes
 
 why current LiveHist is bad
     matplotlib window can't be moved after startup
     makes peview-display jittery
         could this be solved with threading?
     makes cvWaitkeys not responsive
+
+    solution is an html/js app in browser with http interface
 
