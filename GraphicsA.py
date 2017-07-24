@@ -47,8 +47,13 @@ def setup_hist(fig, ax, inp_bins = 100,**kwargs):
     #ax.set_xlim(left[0] - 1, right[-1] + 1)
     x_lo, x_hi = kwargs.get('x_lo',-1), kwargs.get('x_hi',256)
     ax.set_xlim(x_lo, x_hi)
-    ax.set_ylim(bottom.min(), top.max())
-    #ax.set_ylim(-1, 200)
+    
+    if kwargs.get('y_hi',-1) == -1:
+        y_lo, y_hi = 0 ,top.max()       #dyanmic sizing
+    else:
+        y_lo, y_hi = kwargs.get('y_lo',0), kwargs.get('y_hi',500)
+    ax.set_ylim(y_lo, y_hi)
+    
 
     hist_num = kwargs.get('hist_num',-1)
     if hist_num > -1 and hist_num < 3:
@@ -89,6 +94,8 @@ class LiveHist():
                             ,inp_bins = self.bins
                             ,x_lo = kwargs.get('x_lo',-1)
                             ,x_hi = kwargs.get('x_hi',256)
+                            ,y_lo = kwargs.get('y_lo',-1)
+                            ,y_hi = kwargs.get('y_hi',-1)
                             ,hist_num = h
                             )
             
@@ -162,6 +169,10 @@ class LiveHist():
             if kwargs.get('show',True):
                 plt.show(False)
                 plt.pause(pause_time)
+                
+
+        # if kwargs.get('show',True):
+        #     plt.pause(pause_time)
         
         
  #blit=True only updates 1 histo

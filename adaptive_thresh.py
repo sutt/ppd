@@ -130,7 +130,7 @@ def main():
     b_histo = True
     b_hist_rect = True
     b_show_histos = True
-
+    b_mock_hist_data = False
     b_drawTracking = True
 
     time_last = time.time()
@@ -142,7 +142,8 @@ def main():
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
 
     if b_show_histos:
-        lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256)
+        lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256
+                        ,y_lo = 0 ,y_hi = 5000)
         NUM_COLORS = 3  
         lh.show_plt(wait_time = 1)
         last_hist_update = time.time()
@@ -181,13 +182,7 @@ def main():
         # HISTO_PROCESSING
         if b_histo:
             rect_img = crop_img(frame.copy(), current_tracking_frame)
-            rect_histos = hist_from_img(rect_img)
-            
-            if len(rect_histos) == 3:
-                for h in rect_histos:
-                    print h[:min(5,len(h))]
-            else:
-                print rect_histos
+            hist_data = hist_from_img(rect_img)
             #data
             #ball_vs_background()
         
@@ -211,9 +206,10 @@ def main():
         if b_show_histos:
             
             if time.time() - last_hist_update > hist_update_hz:
-                u, var = rand_gauss_params()
-                data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
-                lh.update_figure( data
+                if b_mock_hist_data:
+                    u, var = rand_gauss_params()
+                    hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
+                lh.update_figure( hist_data
                             ,ax_ind = range(NUM_COLORS)
                             ,frames = 1
                             ,show = True
