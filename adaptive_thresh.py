@@ -126,10 +126,10 @@ def main():
     b_show_histos = True
     if b_show_histos:
         lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256)
-        NN = 3  #for 3 color
-        lh.show_plt(wait_time = 2)
+        NUM_COLORS = 3  
+        #lh.show_plt(wait_time = 2)
         last_hist_update = time.time()
-        hist_update_hz = 1
+        hist_update_hz = 1      #.3 is on the borderline of usable
 
     #Loop --------------------------------------
     # this might have to be different between picam and cv-cam
@@ -197,14 +197,12 @@ def main():
             
             if time.time() - last_hist_update > hist_update_hz:
                 u, var = rand_gauss_params()
-                data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NN) )
+                data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
                 lh.update_figure( data
-                            ,ax_ind = range(NN)
+                            ,ax_ind = range(NUM_COLORS)
                             ,frames = 1
                             ,show = True
                             ,epsilon = .0001)
-                
-                print 'updated'
                 last_hist_update = time.time()
 
         #Show Images
@@ -215,12 +213,6 @@ def main():
         if cv2.waitKey(refresh)== ord('q'):
             print 'quitting'
             break
-        #Show Histos
-        # if b_show_histos:
-        #     pass
-            #need to close old ones
-            #keep focus on cv windows though?
-            #keep window positioning ?
         
         #Delay fps
         # if cam_type == 'file_cam':
