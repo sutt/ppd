@@ -7,10 +7,22 @@ from collections import deque
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-from track_a import *
+from track_a import find_xy, find_radius
 from GraphicsA import LiveHist
 
-hello()
+#hello()
+
+def px3clr_3px1clr(list_pixels):
+    return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]
+
+def px_to_list(img):
+    hL,wL = img.shape[0], img.shape[1]  
+    return [ tuple( img[h,w,:] ) for h in range(hL) for w in range(wL) ]
+            
+def hist_from_img(inp_img):
+    list_px = px_to_list(inp_img)
+    on_pxs = px3clr_3px1clr(list_px)
+    return on_pxs
 
 def transformA(img, blur = 11, b_hsv = False):
     #frame = imutils.resize(frame, width=600)
@@ -28,8 +40,9 @@ def repairA(img, iterations = 2):
     return img
 
 def crop_img(img, current_tracking_frame):
-    x,y,w,h = current_tracking_frame[0], current_tracking_frame[1], current_tracking_frame[2], current_tracking_frame[3]
-    return img[x:x+w,h:h+w,:]    
+    x0,y0 = current_tracking_frame[0][0], current_tracking_frame[0][1]
+    x1,y1 = current_tracking_frame[1][0], current_tracking_frame[1][1]
+    return img[x0:x1,y0:y1,:]    
 
 def draw_tracking_frame(img, x,y,radius):
     cv2.circle(img, (int(x), int(y)), int(radius), (0, 255, 255), 10)
@@ -114,7 +127,7 @@ def main():
     current_tracking_frame = ((100,100),(300,300))
     b_tracking_frame = True
     b_tracking_frame_2 = False
-    b_histo
+    b_histo = True
     b_hist_rect = True
     b_show_histos = True
 
@@ -167,7 +180,15 @@ def main():
 
         # HISTO_PROCESSING
         if b_histo:
-            pass
+            rect_img = crop_img(frame.copy(), current_tracking_frame)
+            rect_histos = hist_from_img(rect_img)
+            
+            if len(rect_histos) == 3:
+                for h in rect_histos:
+                    print h[:min(5,len(h))]
+            else:
+                print rect_histos
+            #data
             #ball_vs_background()
         
 
