@@ -138,7 +138,7 @@ class LiveHist():
         wait_time = kwargs.get('wait_time',5)
         print 'open for window moving for %f secs ...' % (wait_time)
         plt.show(False)
-        plt.pause(5)
+        plt.pause(wait_time)
         print 'finsihed with window moving time.'
 
     def clear_figure(self, **kwargs):

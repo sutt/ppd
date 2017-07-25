@@ -3,10 +3,17 @@
 x take off delay for startup
 x preview-display horizontal mirroring
 x display other types of images  -> 2x cv windows?
+x hist for the rect
+x background histos
+x flip transformed image
 
-hist for the rect
 params for adapt thresh
-background histos
+show background_histos
+adaptive y_lim
+pull out np.histogram from updating function
+speed up histo proc:
+    keep it all numpy
+    only when updating
 adapt_thresh for saved videos
 optins for adapt thresh
 

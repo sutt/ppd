@@ -19,6 +19,14 @@ def px_to_list(img):
     hL,wL = img.shape[0], img.shape[1]  
     return [ tuple( img[h,w,:] ) for h in range(hL) for w in range(wL) ]
             
+def px_remove_crop(img, crop_params ):
+    x0,y0 = crop_params[0]
+    x1,y1 = crop_params[1]
+    hL,wL,cL = img.shape
+    return [ tuple( img[h,w,:] ) for h in range(hL) for w in range(wL) 
+                if ((h < y0) or (h > y1)) and
+                   ((w < x0) or (w > x1)) ]
+
 def hist_from_img(inp_img):
     list_px = px_to_list(inp_img)
     on_pxs = px3clr_3px1clr(list_px)
@@ -85,19 +93,26 @@ def getFrame(inp_cam, cam_type):
             return inp_cam.read()
         else:
             print 'No frame read possible.'
-        
+
+def flip_img(img,flip = True):
+    """return a non-copied image be default vertically flipped"""
+    if flip:
+        return cv2.flip(img,1)
+    else:
+        return img
+
 def showImages(img_display,**kwargs):
     
-    if not(kwargs.get('dont_mirror',False)):
-        img_display = cv2.flip(img_display,1)
+    b_flip = not(kwargs.get('dont_mirror',False))
 
     if kwargs.get('b_show_main_img', False):
-        cv2.imshow('display image', img_display)
-        #plt.imshow(img_display, cvtColor)
+        cv2.imshow('display image'
+                    ,flip_img(img_display, b_flip) )
     
     if kwargs.get('b_show_transformed_img', False):
-        cv2.imshow('transformed image', kwargs.get('img_p',None) )
-
+        cv2.imshow('transformed image'
+                    ,flip_img( kwargs.get('img_p',None), b_flip ) )
+                    
     if kwargs.get('b_show_tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))
 
@@ -127,9 +142,9 @@ def main():
     current_tracking_frame = ((100,100),(300,300))
     b_tracking_frame = True
     b_tracking_frame_2 = False
-    b_histo = True
+    b_histo = True     #takes 0.3 secs to process
     b_hist_rect = True
-    b_show_histos = True
+    b_show_histos = True   #takes 0.3 secs to process
     b_mock_hist_data = False
     b_drawTracking = True
 
@@ -143,16 +158,18 @@ def main():
 
     if b_show_histos:
         lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256
-                        ,y_lo = 0 ,y_hi = 5000)
+                        ,y_lo = 0 ,y_hi = 7000)
         NUM_COLORS = 3  
-        lh.show_plt(wait_time = 1)
+        lh.show_plt(wait_time = .2)
         last_hist_update = time.time()
         hist_update_hz = 1      #.3 is on the borderline of usable
 
 
     while(vc.isOpened()):
 
-        
+        print 'frame time: %f' % (time.time() - time_last)
+        time_last = time.time()
+
         ret, frame = getFrame(vc, cam_type = 'cv_cam')        
         if not(ret): break
 
@@ -181,16 +198,18 @@ def main():
 
         # HISTO_PROCESSING
         if b_histo:
+            
             rect_img = crop_img(frame.copy(), current_tracking_frame)
-            hist_data = hist_from_img(rect_img)
-            #data
-            #ball_vs_background()
+            rect_list_px = px_to_list(rect_img)
+            hist_data = px3clr_3px1clr(rect_list_px)
+            
+            backg_list_px = px_remove_crop(frame, current_tracking_frame)
+            hist_data2 = px3clr_3px1clr(backg_list_px)
         
 
         #DRAW ONTO FRAME
         img_display = frame
 
-        b_tracking_frame = True
         if b_tracking_frame:
             img_display = draw_tracking_frame(frame,x,y,radius)
 
@@ -209,7 +228,7 @@ def main():
                 if b_mock_hist_data:
                     u, var = rand_gauss_params()
                     hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
-                lh.update_figure( hist_data
+                lh.update_figure( hist_data2
                             ,ax_ind = range(NUM_COLORS)
                             ,frames = 1
                             ,show = True
