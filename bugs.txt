@@ -10,14 +10,20 @@ x params for adapt thresh
 
 show background_histos
 options
+proc histo only onshow
 adaptive y_lim
 pull out np.histogram from updating function
+
+change frame and get histo
+    write-out data
+
+adapt_thresh for saved videos
 
 speed up histo proc:
     keep it all numpy
     only when updating
-adapt_thresh for saved videos
-optins for adapt thresh
+    create tests, test data
+
 
 #Questions
 

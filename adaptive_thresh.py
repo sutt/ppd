@@ -12,7 +12,7 @@ from GraphicsA import LiveHist
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
-ap.add_argument("--show-histo", action="store_true")
+ap.add_argument("--showhisto", action="store_true")
 args = vars(ap.parse_args())
 
 def px3clr_3px1clr(list_pixels):
@@ -34,6 +34,7 @@ def hist_from_img(inp_img):
     list_px = px_to_list(inp_img)
     on_pxs = px3clr_3px1clr(list_px)
     return on_pxs
+
 
 def transformA(img, blur = 11, b_hsv = False):
     #frame = imutils.resize(frame, width=600)
@@ -134,6 +135,11 @@ def rand_gauss_params():
     var = random.randint(10,50)
     return u, var
 
+def mock_hist_data():
+    u, var = rand_gauss_params()
+    hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
+    return hist_data
+
 def main():
 
     #Init and Params ---------------------------
@@ -142,12 +148,12 @@ def main():
     cam_type = 'cv_cam'     # 'pi_cam' 'file_cam'
     
     current_tracking_frame = ((100,100),(300,300))
-    
+
     b_tracking_frame = True
     b_tracking_frame_2 = False
-    b_histo = args['show-histo']     #takes 0.3 secs to process
+    b_histo = args["showhisto"]     #takes 0.3 secs to process
     b_hist_rect = True
-    b_show_histos = args['show-histo']   #takes 0.3 secs to process
+    b_show_histos = args["showhisto"]  #takes 0.3 secs to process
     b_mock_hist_data = False
     b_drawTracking = True
     b_print_log = True
@@ -161,13 +167,7 @@ def main():
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
 
-    if b_show_histos:
-        lh = LiveHist(h=1,w=3, bins = 30, x_lo = -1, x_hi = 256
-                        ,y_lo = 0 ,y_hi = 7000)
-        NUM_COLORS = 3  
-        lh.show_plt(wait_time = .2)
-        last_hist_update = time.time()
-              #.3 is on the borderline of usable
+    livehist = None
 
 
     while(vc.isOpened()):
@@ -202,16 +202,6 @@ def main():
         # b_track_success = filter_track()
         b_track_success = True
 
-        # HISTO_PROCESSING
-        if b_histo:
-            
-            rect_img = crop_img(frame.copy(), current_tracking_frame)
-            rect_list_px = px_to_list(rect_img)
-            hist_data = px3clr_3px1clr(rect_list_px)
-            
-            backg_list_px = px_remove_crop(frame, current_tracking_frame)
-            hist_data2 = px3clr_3px1clr(backg_list_px)
-        
 
         #DRAW ONTO FRAME
         img_display = frame
@@ -227,18 +217,39 @@ def main():
             img_display = draw_annotations(img_display, info_annotations)       
             
 
-        # SHOW HISTOS
+        # PROC & SHOW HISTOS
         if b_show_histos:
             
+            if livehist == None:
+                NUM_COLORS = 3  #?
+                livehist = LiveHist( h = 1, w = 3, bins = 30
+                                     ,x_lo = -1, x_hi = 256
+                                    ,y_lo = 0 ,y_hi = 7000 )
+                
+                livehist.show_plt(wait_time = 2)
+
+                last_hist_update = time.time() - (hist_update_hz + 1)    #and process
+                
+            
             if time.time() - last_hist_update > hist_update_hz:
-                if b_mock_hist_data:
-                    u, var = rand_gauss_params()
-                    hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
-                lh.update_figure( hist_data2
+
+                # HISTO_PROCESSING
+                if b_histo:
+                    
+                    rect_img = crop_img(frame.copy(), current_tracking_frame)
+                    rect_list_px = px_to_list(rect_img)
+                    hist_data = px3clr_3px1clr(rect_list_px)
+                    
+                    backg_list_px = px_remove_crop(frame, current_tracking_frame)
+                    hist_data2 = px3clr_3px1clr(backg_list_px)
+                
+                
+                livehist.update_figure( hist_data
                             ,ax_ind = range(NUM_COLORS)
                             ,frames = 1
                             ,show = True
                             ,epsilon = .0001)
+                
                 last_hist_update = time.time()
  
         #SHOW IMAGES
@@ -251,6 +262,43 @@ def main():
             print 'quitting'
             break
         
+        if cv2.waitKey(waitKeyRefresh) == ord('o'):
+    
+            # options -----------------
+            while(True):
+                ret = raw_input('options ... show_histo, hide_histo, new_tracking_frame x0 y0 x1 y1, quit \n>')                
+
+                if ret == 'quit':
+                    break
+
+                elif ret[:10] == "show_histo":
+                    b_show_histos = True
+                    b_histo = True
+                
+                elif ret[:10] == "hide_histo":
+                    b_show_histos = False
+                    b_histo = False
+
+                elif ret[:18] == "new_tracking_frame":
+                    
+                    opt_args = ret.split(' ')
+                    if len(opt_args) > 1:
+                        try:
+                            x0,y0,x1,y1 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3]), int(opt_args[4])
+                            current_tracking_frame = ((x0,y0),(x1,y1))
+                            print 'changing tracking_frame to: ', str(current_tracking_frame)
+                        except:
+                            print 'could not set tracking_frame.'    
+                    else:
+                        print 'did not recognize length of tracking_frame input.'
+
+                else:
+                    print 'option <', str(ret),  '> not recognized'
+            
+            print 'quitting options...'
+            # /options ----------------
+
+
         # DELAY FPS
         # if cam_type == 'file_cam':
         #     if b_slow_for_fps:
