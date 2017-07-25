@@ -6,11 +6,13 @@ x display other types of images  -> 2x cv windows?
 x hist for the rect
 x background histos
 x flip transformed image
+x params for adapt thresh
 
-params for adapt thresh
 show background_histos
+options
 adaptive y_lim
 pull out np.histogram from updating function
+
 speed up histo proc:
     keep it all numpy
     only when updating

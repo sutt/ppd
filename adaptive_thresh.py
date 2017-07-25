@@ -1,4 +1,4 @@
-import os, sys, time, copy, random
+import os, sys, time, copy, random, argparse
 import traceback
 import numpy as np
 import cv2
@@ -10,7 +10,10 @@ from matplotlib import pyplot as plt
 from track_a import find_xy, find_radius
 from GraphicsA import LiveHist
 
-#hello()
+ap = argparse.ArgumentParser()
+ap.add_argument("--file", type=str, default="fps30.h264")
+ap.add_argument("--show-histo", action="store_true")
+args = vars(ap.parse_args())
 
 def px3clr_3px1clr(list_pixels):
     return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]
@@ -136,22 +139,24 @@ def main():
     #Init and Params ---------------------------
     cam_params = (640,480)
     h_img, w_img = cam_params[0], cam_params[1]
-    waitKeyRefresh = 1
     cam_type = 'cv_cam'     # 'pi_cam' 'file_cam'
     
     current_tracking_frame = ((100,100),(300,300))
+    
     b_tracking_frame = True
     b_tracking_frame_2 = False
-    b_histo = True     #takes 0.3 secs to process
+    b_histo = args['show-histo']     #takes 0.3 secs to process
     b_hist_rect = True
-    b_show_histos = True   #takes 0.3 secs to process
+    b_show_histos = args['show-histo']   #takes 0.3 secs to process
     b_mock_hist_data = False
     b_drawTracking = True
+    b_print_log = True
+
+    hist_update_hz = 1
+    waitKeyRefresh = 1
 
     time_last = time.time()
-
     info_annotations = []
-
     
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
@@ -162,13 +167,14 @@ def main():
         NUM_COLORS = 3  
         lh.show_plt(wait_time = .2)
         last_hist_update = time.time()
-        hist_update_hz = 1      #.3 is on the borderline of usable
+              #.3 is on the borderline of usable
 
 
     while(vc.isOpened()):
 
-        print 'frame time: %f' % (time.time() - time_last)
-        time_last = time.time()
+        if b_print_log:
+            print 'frame time: %.2f' % (time.time() - time_last)
+            time_last = time.time()
 
         ret, frame = getFrame(vc, cam_type = 'cv_cam')        
         if not(ret): break
