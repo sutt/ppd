@@ -13,6 +13,7 @@ from GraphicsA import LiveHist
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
 ap.add_argument("--showhisto", action="store_true")
+ap.add_argument("--showbackghisto", action="store_true")
 args = vars(ap.parse_args())
 
 def px3clr_3px1clr(list_pixels):
@@ -137,7 +138,7 @@ def rand_gauss_params():
 
 def mock_hist_data():
     u, var = rand_gauss_params()
-    hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(NUM_COLORS) )
+    hist_data = map( lambda x: mock_gaussian(n=100,u=u,var=var), range(3) )
     return hist_data
 
 def main():
@@ -154,9 +155,13 @@ def main():
     b_histo = args["showhisto"]     #takes 0.3 secs to process
     b_hist_rect = True
     b_show_histos = args["showhisto"]  #takes 0.3 secs to process
+    b_show_backg_histos = args["showbackghisto"]
     b_mock_hist_data = False
     b_drawTracking = True
     b_print_log = True
+
+    switch_new_ylim = True  #once, everytime new tracking frame is drawn
+    ylim_padding_mult = 1.4
 
     hist_update_hz = 1
     waitKeyRefresh = 1
@@ -221,8 +226,16 @@ def main():
         if b_show_histos:
             
             if livehist == None:
-                NUM_COLORS = 3  #?
-                livehist = LiveHist( h = 1, w = 3, bins = 30
+                
+                # INIT HISTO GUI
+                if args["showbackghisto"]:
+                    h,w = 1,6
+                    NUM_PLOTS = 6
+                else:
+                    h,w = 1,3
+                    NUM_PLOTS = 3
+
+                livehist = LiveHist( h = h, w = w, bins = 30
                                      ,x_lo = -1, x_hi = 256
                                     ,y_lo = 0 ,y_hi = 7000 )
                 
@@ -238,14 +251,26 @@ def main():
                     
                     rect_img = crop_img(frame.copy(), current_tracking_frame)
                     rect_list_px = px_to_list(rect_img)
-                    hist_data = px3clr_3px1clr(rect_list_px)
+                    hist_data_rect = px3clr_3px1clr(rect_list_px)
                     
                     backg_list_px = px_remove_crop(frame, current_tracking_frame)
-                    hist_data2 = px3clr_3px1clr(backg_list_px)
+                    hist_data_backg = px3clr_3px1clr(backg_list_px)
                 
-                
+                    hist_data = hist_data_rect[:]
+                    if args["showbackghisto"]:
+                        hist_data.extend(hist_data_backg)
+
+                # SHOW HISTOS
+                if switch_new_ylim:
+                    for hist_num in range(NUM_PLOTS):
+                        ymax = np.histogram( hist_data[hist_num] )[0].max()
+                        livehist.set_ylim(y_lo = 0, y_hi = 500 # ymax * ylim_padding_mult
+                                         ,ax_ind = range(hist_num))
+                        print ymax
+                    switch_new_ylim = False
+
                 livehist.update_figure( hist_data
-                            ,ax_ind = range(NUM_COLORS)
+                            ,ax_ind = range(NUM_PLOTS)
                             ,frames = 1
                             ,show = True
                             ,epsilon = .0001)

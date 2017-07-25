@@ -115,10 +115,10 @@ class LiveHist():
         for h in ax_ind:
             self.ax[h].set_xlim(x_lo,x_hi)
 
-    def set_ylim(self, x_lo, x_hi, **kwargs):
+    def set_ylim(self, y_lo, y_hi, **kwargs):
         ax_ind = kwargs.get('ax_ind',range(self.N) )
         for h in ax_ind:
-            self.ax[h].set_ylim(x_lo,x_hi)
+            self.ax[h].set_ylim(y_lo,y_hi)
 
     def get_figure_objects(self):
         return self.fig, self.ax

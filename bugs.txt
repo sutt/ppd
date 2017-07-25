@@ -7,15 +7,22 @@ x hist for the rect
 x background histos
 x flip transformed image
 x params for adapt thresh
+x options
+x proc histo only onshow
+x change frame and get histo
+x show background_histos
 
-show background_histos
-options
-proc histo only onshow
 adaptive y_lim
-pull out np.histogram from updating function
 
-change frame and get histo
-    write-out data
+> python adaptive_thresh.py --showbackghisto --showhisto
+
+make subplot 2 by 3 not 1 by 6
+pull out np.histogram from updating function
+options for backghisto
+
+organize function to imports and classes
+
+write-out data
 
 adapt_thresh for saved videos
 
