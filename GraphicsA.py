@@ -148,13 +148,8 @@ class LiveHist():
 
     def update_figure(self, inp_data, ax_ind = range(3), **kwargs):
         
-        frames = kwargs.get('frames', 100)
+        frames = kwargs.get('frames', 1)
         pause_time = kwargs.get('epsilon', 0.03)
-
-        #if adapt_xlim:
-            #x_epsilon,y_epsilon = 1, 1
-            #self.set_xlim( 0 - x_epsilon, x + x_epsilon)
-            #self.set_ylim(0,inp_data.max() + y_epsilon)
         
         for j in ax_ind:
             ani = animation.FuncAnimation(self.fig
@@ -165,14 +160,19 @@ class LiveHist():
                                         ,blit=False) 
                                         #,interval = 1
                                         #save_count = 1 ? to preserve on blit 
+                                        #blit=True only updates 1 histo
+
+            #wrong, inp_data is still not histo
+            if kwargs.get('adapt_xlim',False):
+                self.set_xlim( x_lo = 0, x_hi = inp_data[j].max(), ax_ind = (j,))
+            if kwargs.get('adapt_ylim',False):
+                self.set_xlim( y_lo = 0, y_hi = inp_data[j].max(), ax_ind = (j,))
 
             if kwargs.get('show',True):
                 plt.show(False)
                 plt.pause(pause_time)
-                
 
-        # if kwargs.get('show',True):
-        #     plt.pause(pause_time)
+    
+    def end_class():
+        pass
         
-        
- #blit=True only updates 1 histo

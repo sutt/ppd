@@ -11,8 +11,8 @@ x options
 x proc histo only onshow
 x change frame and get histo
 x show background_histos
-
-adaptive y_lim
+x adaptive y_lim
+x why doesnt the hard coded y_hi change for 6th plot?
 
 > python adaptive_thresh.py --showbackghisto --showhisto
 

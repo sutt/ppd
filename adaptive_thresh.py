@@ -14,6 +14,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
 ap.add_argument("--showhisto", action="store_true")
 ap.add_argument("--showbackghisto", action="store_true")
+ap.add_argument("--printlog", action="store_true")
 args = vars(ap.parse_args())
 
 def px3clr_3px1clr(list_pixels):
@@ -158,10 +159,10 @@ def main():
     b_show_backg_histos = args["showbackghisto"]
     b_mock_hist_data = False
     b_drawTracking = True
-    b_print_log = True
+    b_print_log = args["printlog"]
 
     switch_new_ylim = True  #once, everytime new tracking frame is drawn
-    ylim_padding_mult = 1.4
+    ylim_padding_mult = 1.0
 
     hist_update_hz = 1
     waitKeyRefresh = 1
@@ -259,14 +260,18 @@ def main():
                     hist_data = hist_data_rect[:]
                     if args["showbackghisto"]:
                         hist_data.extend(hist_data_backg)
+                        print len(hist_data)
 
                 # SHOW HISTOS
                 if switch_new_ylim:
                     for hist_num in range(NUM_PLOTS):
-                        ymax = np.histogram( hist_data[hist_num] )[0].max()
-                        livehist.set_ylim(y_lo = 0, y_hi = 500 # ymax * ylim_padding_mult
-                                         ,ax_ind = range(hist_num))
-                        print ymax
+                        
+                        y_hist = np.histogram( hist_data[hist_num] )[0]
+                        ymax = y_hist[1:].max()     #excluding bin0
+                                    
+                        livehist.set_ylim(y_lo = 0, y_hi = ymax * ylim_padding_mult
+                                         ,ax_ind = (hist_num,) )
+                        print str(hist_num), ': ', str(ymax), ' - ', str(np.histogram( hist_data[hist_num] )[0][0])
                     switch_new_ylim = False
 
                 livehist.update_figure( hist_data
