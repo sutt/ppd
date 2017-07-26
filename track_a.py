@@ -179,7 +179,7 @@ def flat_3clr(pic):
     return [ tuple([pic[h,w,clr] for clr in range(3)]) for h in range(pic.shape[0]) for w in range(pic.shape[1]) ]
 
 def px3clr_3px1clr(list_pixels):
-        return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]
+    return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]
 
 
 def px_filter(val,img,mask):
@@ -187,6 +187,13 @@ def px_filter(val,img,mask):
     return [ tuple( img[h,w,:] )
             for h in range(hL) for w in range(wL)
             if mask[h,w] == val]
+
+def px_to_list(img):
+    hL,wL = img.shape[0], img.shape[1]  
+    return [ tuple( img[h,w,:] ) for h in range(hL) for w in range(wL) ]
+            
+
+
 
 
 def ball_vs_background(inp_masks,inp_imgs,show_hist = False, **kwargs):
