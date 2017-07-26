@@ -15,20 +15,29 @@ x adaptive y_lim
 x why doesnt the hard coded y_hi change for 6th plot?
 x make subplot 2 by 3 not 1 by 6
 x make a reset of current_tracking_frame force a resize in histos
+x display a transform window
+x organize function to imports
 
 > python adaptive_thresh.py --showbackghisto --showhisto
 
-display a transform window
+large blocks to functions
+organize imports to and classes
+
 pull out np.histogram from updating function
 options for backghisto
 do a thresh on each histo
 display info in histo title
 
-organize function to imports and classes
+eval in options
 write-out data
+build mock images/videos for test
 adapt_thresh for saved videos
+3rd rgb-plot-pane rect before vs. current "background before ball was there"
 search_thresh
 do agenda
+zeromq messaging for log
+run on pi
+
 
 speed up histo proc:
     keep it all numpy
