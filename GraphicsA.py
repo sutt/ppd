@@ -1,4 +1,4 @@
-import random, time, os, sys
+import random, time, os, sys, traceback
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -136,8 +136,7 @@ class LiveHist():
         return self.fig, self.ax
 
     def animate_j(self,j, inp_data):
-        data = inp_data
-        n, bins = np.histogram(data, self.bins)
+        n, bins = inp_data
         self.top[j] = self.bottom[j] + n
         self.verts[j][1::5, 1] = self.top[j]
         self.verts[j][2::5, 1] = self.top[j]
@@ -160,30 +159,33 @@ class LiveHist():
 
     def update_figure(self, inp_data, ax_ind = range(3), **kwargs):
         
-        frames = kwargs.get('frames', 1)
-        pause_time = kwargs.get('epsilon', 0.03)
-        
-        for j in ax_ind:
-            ani = animation.FuncAnimation(self.fig
-                                        ,self.animate_j_wrapper 
-                                        ,frames = frames
-                                        ,fargs = (j,inp_data[j])
-                                        ,repeat=False
-                                        ,blit=False) 
-                                        #,interval = 1
-                                        #save_count = 1 ? to preserve on blit 
-                                        #blit=True only updates 1 histo
+        try:
+            frames = kwargs.get('frames', 1)
+            pause_time = kwargs.get('epsilon', 0.03)
+            
+            for j in ax_ind:
+                ani = animation.FuncAnimation(self.fig
+                                            ,self.animate_j_wrapper 
+                                            ,frames = frames
+                                            ,fargs = (j,inp_data[j])
+                                            ,repeat=False
+                                            ,blit=False) 
+                                            #,interval = 1
+                                            #save_count = 1 ? to preserve on blit 
+                                            #blit=True only updates 1 histo
 
-            #wrong, inp_data is still not histo
-            if kwargs.get('adapt_xlim',False):
-                self.set_xlim( x_lo = 0, x_hi = inp_data[j].max(), ax_ind = (j,))
-            if kwargs.get('adapt_ylim',False):
-                self.set_xlim( y_lo = 0, y_hi = inp_data[j].max(), ax_ind = (j,))
+                #wrong, inp_data is still not histo
+                if kwargs.get('adapt_xlim',False):
+                    self.set_xlim( x_lo = 0, x_hi = inp_data[j].max(), ax_ind = (j,))
+                if kwargs.get('adapt_ylim',False):
+                    self.set_xlim( y_lo = 0, y_hi = inp_data[j].max(), ax_ind = (j,))
 
-            if kwargs.get('show',True):
-                plt.show(False)
-                plt.pause(pause_time)
-
+                if kwargs.get('show',True):
+                    plt.show(False)
+                    plt.pause(pause_time)
+        except:
+            print 'DANGER'
+            #print(traceback.format_exc())
     
     def end_class():
         pass

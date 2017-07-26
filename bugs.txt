@@ -17,13 +17,16 @@ x make subplot 2 by 3 not 1 by 6
 x make a reset of current_tracking_frame force a resize in histos
 x display a transform window
 x organize function to imports
+x pull out np.histogram from updating function
+x large blocks to functions
 
 > python adaptive_thresh.py --showbackghisto --showhisto
 
-large blocks to functions
+options to a function
+    global modify from options-func
 organize imports to and classes
 
-pull out np.histogram from updating function
+
 options for backghisto
 do a thresh on each histo
 display info in histo title

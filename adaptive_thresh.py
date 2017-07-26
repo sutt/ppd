@@ -9,12 +9,13 @@ from matplotlib import pyplot as plt
 
 from Camera import initCam, setupCam, getFrame
 from GraphicsA import LiveHist
+from Methods import InitLiveHist, SwitchYLim
 from GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
-from GraphicsCV import showImages
+from GraphicsCV import ShowImages
 from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
 from ImgProcs import threshA, transformA, repairA
 from TrackA import find_xy, find_radius
-from Methods import InitLiveHist
+from Methods import imgToPx, pxToHist
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
@@ -30,16 +31,14 @@ def main():
 
     #INIT & PARAMS
     b_tracking_frame = True
-    b_tracking_frame_2 = False
     b_histo = args["showhisto"]     
     b_hist_rect = True
     b_show_histos = args["showhisto"]  
-    b_show_backg_histos = args["showbackghisto"]
+    b_histo_backg = args["showbackghisto"]
     b_mock_hist_data = False
     b_drawTracking = True
     b_print_log = args["printlog"]
 
-    ylim_padding_mult = 1.0
     hist_update_hz = 1
     waitKeyRefresh = 1
     current_tracking_frame = ((100,100),(200,200))
@@ -61,29 +60,18 @@ def main():
         ret, frame = getFrame(vc, cam_type = 'cv_cam')        
         if not(ret): break
 
-        if b_tracking_frame_2:
-            current_tracking_frame = create_tracking_frame()
-            img = crop_img(frame, current_tracking_frame)
-        else:
-            img = frame[:,:,:]
-
         # THRESHOLD MASK
-        img_t = transformA(img, b_hsv = True)
+        img_t = transformA(frame.copy(), b_hsv = True)
         Lo, Hi = (29, 86, 6), (64, 255, 255)
         img_mask = threshA(img_t, threshLo = Lo , threshHi = Hi )
         img_mask = repairA(img_mask, iterations = 2)
         
-        
         # LOCATE / TRACK
         x,y = find_xy(img_mask)
         radius = find_radius(img_mask)
-        #print x, ' ', y, ' ', radius
         
-        # if b_tracking_frame:
-        #     x,y,radius = decrop_track(h_img, w_img)
-        # b_track_success = filter_track()
+        # FILTER TRACK
         b_track_success = True
-
 
         #DRAW ONTO FRAME
         img_display = frame
@@ -103,40 +91,21 @@ def main():
         if b_show_histos:
             
             if livehist == None:
-                livehist = InitLiveHist(args["showbackghisto"])
-                NUM_PLOTS = 6
+                livehist = InitLiveHist(b_histo_backg)
                 last_hist_update = time.time() - (hist_update_hz + 1)    #and process
             
             if time.time() - last_hist_update > hist_update_hz:
 
-                # HISTO_PROCESSING
                 if b_histo:
-                    
-                    rect_img = crop_img(frame.copy(), current_tracking_frame)
-                    rect_list_px = px_to_list(rect_img)
-                    hist_data_rect = px3clr_3px1clr(rect_list_px)
-                    
-                    backg_list_px = px_remove_crop(frame, current_tracking_frame)
-                    hist_data_backg = px3clr_3px1clr(backg_list_px)
+                    px_data = imgToPx(frame, current_tracking_frame, ) ##frame should be img
+                    hist_data = pxToHist(px_data)
                 
-                    hist_data = hist_data_rect[:]
-                    if args["showbackghisto"]:
-                        hist_data.extend(hist_data_backg)
-
-                # SHOW HISTOS
                 if switch_new_ylim:
-                    for hist_num in range(NUM_PLOTS):
-                        
-                        y_hist = np.histogram( hist_data[hist_num] )[0]
-                        ymax = y_hist[1:].max()     #excluding bin0
-                                    
-                        livehist.set_ylim(y_lo = 0, y_hi = ymax * ylim_padding_mult
-                                         ,ax_ind = (hist_num,) )
-                        
+                    SwitchYLim(livehist, hist_data)
                     switch_new_ylim = False
 
                 livehist.update_figure( hist_data
-                            ,ax_ind = range(NUM_PLOTS)
+                            ,ax_ind = range(livehist.N)
                             ,frames = 1
                             ,show = True
                             ,epsilon = .0001)
@@ -144,7 +113,7 @@ def main():
                 last_hist_update = time.time()
  
         #SHOW IMAGES
-        ret = showImages(img_display, b_show_main_img = True
+        ret = ShowImages(img_display, b_show_main_img = True
                         ,b_show_transformed_img = True
                         ,img_t = img_t
                         ,b_show_mask_img = True
