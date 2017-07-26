@@ -117,10 +117,13 @@ def showImages(img_display,**kwargs):
     
     if kwargs.get('b_show_transformed_img', False):
         cv2.imshow('transformed image'
-                    ,flip_img( kwargs.get('img_p',None), b_flip ) )
+                    ,flip_img( kwargs.get('img_t',None), b_flip ) )
                     
     if kwargs.get('b_show_tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))
+
+    if kwargs.get('b_show_mask_img', False):
+        cv2.imshow('the ball',kwargs.get('img_m',None))
 
     return 0
 
@@ -192,15 +195,15 @@ def main():
             img = frame[:,:,:]
 
         # THRESHOLD MASK
-        img_p = transformA(img, b_hsv = True)
+        img_t = transformA(img, b_hsv = True)
         Lo, Hi = (29, 86, 6), (64, 255, 255)
-        mask = threshA(img_p, threshLo = Lo , threshHi = Hi )
-        mask = repairA(mask, iterations = 2)
+        img_mask = threshA(img_t, threshLo = Lo , threshHi = Hi )
+        img_mask = repairA(img_mask, iterations = 2)
         
-
+        
         # LOCATE / TRACK
-        x,y = find_xy(mask)
-        radius = find_radius(mask)
+        x,y = find_xy(img_mask)
+        radius = find_radius(img_mask)
         #print x, ' ', y, ' ', radius
         
         # if b_tracking_frame:
@@ -284,7 +287,10 @@ def main():
         #SHOW IMAGES
         ret = showImages(img_display, b_show_main_img = True
                         ,b_show_transformed_img = True
-                        ,img_p = mask)
+                        ,img_t = img_t
+                        ,b_show_mask_img = True
+                        ,img_m = img_mask
+                        )
         
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):
