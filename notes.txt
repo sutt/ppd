@@ -1,3 +1,10 @@
+Day 12 notes
+
+	global doenst go past that module
+	https://stackoverflow.com/questions/4693120/use-of-global-keyword-in-python
+
+		but this gives a hack around, a separate file, Globals.py, for init these
+		https://stackoverflow.com/questions/13034496/using-global-variables-between-files
 
 Day 10 notes
 

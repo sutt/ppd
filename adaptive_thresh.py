@@ -7,6 +7,7 @@ from collections import deque
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
+import Globals
 from Camera import initCam, setupCam, getFrame
 from GraphicsA import LiveHist
 from Methods import InitLiveHist, SwitchYLim
@@ -16,6 +17,7 @@ from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
 from ImgProcs import threshA, transformA, repairA
 from TrackA import find_xy, find_radius
 from Methods import imgToPx, pxToHist
+from Methods import Options
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
@@ -30,10 +32,12 @@ args = vars(ap.parse_args())
 def main():
 
     #INIT & PARAMS
+    Globals.init()
+    
     b_tracking_frame = True
-    b_histo = args["showhisto"]     
+    Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
-    b_show_histos = args["showhisto"]  
+    Globals.b_show_histos = args["showhisto"]  
     b_histo_backg = args["showbackghisto"]
     b_drawTracking = True
     b_print_log = args["printlog"]
@@ -87,7 +91,7 @@ def main():
             
 
         # PROC & SHOW HISTOS
-        if b_show_histos:
+        if Globals.b_show_histos:
             
             if livehist == None:
                 livehist = InitLiveHist(b_histo_backg)
@@ -95,7 +99,7 @@ def main():
             
             if time.time() - last_hist_update > hist_update_hz:
 
-                if b_histo:
+                if Globals.b_histo:
                     px_data = imgToPx(img_t, current_tracking_frame, ) ##frame should be img
                     hist_data = pxToHist(px_data)
                 
@@ -118,68 +122,27 @@ def main():
         
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):
-            print 'quitting'
+            print 'quitting cv loop'
             break
-        
         if cv2.waitKey(waitKeyRefresh) == ord('o'):
-    
-            # options -----------------
             while(True):
-                ret = raw_input('options ... show_histo, hide_histo, new_tracking_frame x0 y0 x1 y1, quit \n>')                
-
-                if ret == 'quit':
+                ret = Options()
+                if ret == 1: 
                     break
 
-                elif ret[:10] == "show_histo":
-                    b_show_histos = True
-                    b_histo = True
-                
-                elif ret[:10] == "hide_histo":
-                    b_show_histos = False
-                    b_histo = False
+        # if cam_type == 'file_cam' and b_slow_for_fps:
+            # DelayFPS(time_last, 30)
 
-                elif ret[:18] == "new_tracking_frame":
-                    
-                    opt_args = ret.split(' ')
-                    if len(opt_args) > 1:
-                        try:
-                            x0,y0,x1,y1 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3]), int(opt_args[4])
-                            current_tracking_frame = ((x0,y0),(x1,y1))
-                            print 'changing tracking_frame to: ', str(current_tracking_frame)
-                            switch_new_ylim = True
-                            print 'switching rect hist ylim'
-                        except:
-                            print 'could not set tracking_frame.'    
-                    else:
-                        print 'did not recognize length of tracking_frame input.'
-
-                else:
-                    print 'option <', str(ret),  '> not recognized'
-            
-            print 'quitting options...'
-            # /options ----------------
-
-
-        # DELAY FPS
-        # if cam_type == 'file_cam':
-        #     if b_slow_for_fps:
-        #         current_frames_time = time.time() - time_last_frame 
-        #         sleep_time = current_frames_time - fps_time - epsilon_fps_time
-        #         if sleep_time > 0:
-        #             time.sleep(sleep_time)
-        #         time_last_frame = time.time()
-        
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
+            print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
 
-        #Options -------------------------------------
-
-    #Cleanup -------------------
+    #CLEANUP
     vc.release()
     cv2.destroyAllWindows()
     #if args['writebookvideo']: vw.release()
 
+
 main()
-print 'exiting main'

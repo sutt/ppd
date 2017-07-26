@@ -4,7 +4,8 @@ import sys, os, time, copy
 import imutils
 from GraphicsA import LiveHist
 from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
-
+import Globals
+#from adaptive_thresh import b_show_histos, b_histo, current_tracking_frame
 
 def InitLiveHist(b_include_backg = True, **kwargs):
     h, w = (2,3) if b_include_backg else (1,3)
@@ -41,3 +42,48 @@ def pxToHist(px_data, **kwargs):
     """ return list of (n, bins) from list of px_array's """
     return map(lambda px_array: np.histogram(px_array,30), px_data)
 
+def Options(**kwargs):
+
+    ret = raw_input('options ... show_histo, hide_histo, new_tracking_frame x0 y0 x1 y1, quit \n>')                
+
+    if ret == 'quit':
+        print 'quitting options...'
+        return 1
+
+    elif ret[:10] == "show_histo":
+        Globals.b_show_histos = True
+        Globals.b_histo = True
+    
+    elif ret[:10] == "hide_histo":
+        Globals.b_show_histos = False
+        Globals.b_histo = False
+        print 'print changing: ', Globals.b_histo
+
+    elif ret[:18] == "new_tracking_frame":
+        
+        opt_args = ret.split(' ')
+        if len(opt_args) > 1:
+            try:
+                x0,y0,x1,y1 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3]), int(opt_args[4])
+                current_tracking_frame = ((x0,y0),(x1,y1))
+                print 'changing tracking_frame to: ', str(current_tracking_frame)
+                switch_new_ylim = True
+                print 'switching rect hist ylim'
+            except:
+                print 'could not set tracking_frame.'    
+        else:
+            print 'did not recognize length of tracking_frame input.'
+
+    else:
+        print 'option <', str(ret),'> not recognized'
+
+    return 0
+
+
+def DelayFPS(time_last_frame, fps_time):
+    epsilon_fps_time = 0
+    current_frames_time = time.time() - time_last_frame 
+    sleep_time = current_frames_time - fps_time - epsilon_fps_time
+    if sleep_time > 0:
+        time.sleep(sleep_time)
+    time_last_frame = time.time()    

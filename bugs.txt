@@ -19,11 +19,11 @@ x display a transform window
 x organize function to imports
 x pull out np.histogram from updating function
 x large blocks to functions
+x ptions to a function
+x global modify from options-func
 
 > python adaptive_thresh.py --showbackghisto --showhisto
 
-options to a function
-    global modify from options-func
 organize imports to and classes
 display transform and mask as smaller
 
