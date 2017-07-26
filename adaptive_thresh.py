@@ -14,6 +14,7 @@ from GraphicsCV import showImages
 from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
 from ImgProcs import threshA, transformA, repairA
 from TrackA import find_xy, find_radius
+from Methods import InitLiveHist
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
@@ -102,23 +103,9 @@ def main():
         if b_show_histos:
             
             if livehist == None:
-                
-                # INIT HISTO GUI
-                if args["showbackghisto"]:
-                    h,w = 2,3
-                    NUM_PLOTS = 6
-                else:
-                    h,w = 1,3
-                    NUM_PLOTS = 3
-
-                livehist = LiveHist( h = h, w = w, bins = 30
-                                    ,x_lo = -1, x_hi = 256
-                                    ,y_lo = 0 ,y_hi = 7000 )
-                
-                livehist.show_plt(wait_time = 2)
-
+                livehist = InitLiveHist(args["showbackghisto"])
+                NUM_PLOTS = 6
                 last_hist_update = time.time() - (hist_update_hz + 1)    #and process
-                
             
             if time.time() - last_hist_update > hist_update_hz:
 
