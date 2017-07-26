@@ -118,7 +118,8 @@ def main():
         #SHOW IMAGES
         ShowImages(  display_img = True,   img_d = img_display
                     ,transform_img = True, img_t = img_t
-                    ,mask_img = True,      img_m = img_mask )
+                    ,mask_img = True,      img_m = img_mask 
+                    ,resize = True)
         
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):

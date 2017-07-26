@@ -29,21 +29,35 @@ def flip_img(img,flip = True):
     else:
         return img
 
+def resize_img(img, resize, resize_dims = (640,480)):
+    """return a non-copied image resized"""
+    if resize:
+        return imutils.resize(img
+                             ,width = resize_dims[0]
+                             ,height =resize_dims[1] )
+    else:
+        return img
+
 def ShowImages(**kwargs):
     
     b_flip = not(kwargs.get('dont_mirror',False))
+    b_resize = kwargs.get('resize',False)
 
     if kwargs.get('display_img', False):
         cv2.imshow('display image'
                     ,flip_img( kwargs.get('img_d',None), b_flip ) )
     
     if kwargs.get('transform_img', False):
-        cv2.imshow('transform image'
-                    ,flip_img( kwargs.get('img_t',None), b_flip ) )
+        img = flip_img( kwargs.get('img_t',None), b_flip )
+        img = resize_img(img, b_resize, (320,240) )
+        cv2.imshow('transform image', img)
+                    
 
     if kwargs.get('mask_img', False):
-        cv2.imshow('mask image'
-                    ,flip_img( kwargs.get('img_m',None), b_flip ) )
+        img = flip_img( kwargs.get('img_m',None), b_flip )
+        img = resize_img(img, b_resize, (320,240) )
+        cv2.imshow('mask image', img)
+                    
 
     if kwargs.get('tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))
