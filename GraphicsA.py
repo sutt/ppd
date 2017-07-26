@@ -7,10 +7,6 @@ import matplotlib.animation as animation
 
 
 def setup_hist(fig, ax, inp_bins = 100,**kwargs):
-    
-    #data = np.random.randn(1000)
-    print 'inp_bins: ', inp_bins
-    #data = map(lambda x: random.randint(0,10),range(1000))
 
     z = np.random.randn(100)
     u, var = 128, 30
@@ -40,11 +36,10 @@ def setup_hist(fig, ax, inp_bins = 100,**kwargs):
 
     barpath = path.Path(verts, codes)
     patch = patches.PathPatch(
-        barpath, facecolor='green', edgecolor='yellow', alpha=0.5)
+        barpath, facecolor='blue', edgecolor='black', alpha=0.5)
     ax.add_patch(patch)
 
     #ax.set_xlim(left[0], right[-1])
-    #ax.set_xlim(left[0] - 1, right[-1] + 1)
     x_lo, x_hi = kwargs.get('x_lo',-1), kwargs.get('x_hi',256)
     ax.set_xlim(x_lo, x_hi)
     
@@ -54,12 +49,14 @@ def setup_hist(fig, ax, inp_bins = 100,**kwargs):
         y_lo, y_hi = kwargs.get('y_lo',0), kwargs.get('y_hi',500)
     ax.set_ylim(y_lo, y_hi)
     
-
     hist_num = kwargs.get('hist_num',-1)
-    if hist_num > -1 and hist_num < 3:
+    if kwargs.get('backg',False):
+        title1 = ['rect ','backg '][hist_num/3]
+        title2 = list('bgr')[hist_num % 3]
+        ax.set_title( title1 + title2 )
+    else:
         ax.set_title('color: '+ list('bgr')[hist_num] )
-        
-
+    
     return ax, top, bottom, n, verts, patch
 
 
@@ -68,10 +65,11 @@ class LiveHist():
     def __init__(self, **kwargs):
         
         h, w = kwargs.get('h',1), kwargs.get('w',1)
+        self.b_hw = True if ((h > 1) and (w > 1)) else False
         self.fig, self.ax = plt.subplots(h,w)
+        self.fig.subplots_adjust(hspace=0.3)
 
         self.bins = kwargs.get('bins',100)
-        print 'this hist has num bins: ', str(self.bins)
         self.N = h*w
         
         N = self.N
@@ -80,12 +78,18 @@ class LiveHist():
         self.n =      [None]*N
         self.verts =  [None]*N    
         self.patch =  [None]*N
-
+        
+        
         # SET GLOBALS FIRST TIME
         for h in range(self.N):
             
+            h_ind, w_ind = h / w , h % w
+
             if self.N > 1:
-                inp_ax = self.ax[h]
+                if self.b_hw:
+                    inp_ax = self.ax[h_ind][w_ind]
+                else:
+                    inp_ax = self.ax[h]
             else:
                 inp_ax = self.ax
 
@@ -97,10 +101,14 @@ class LiveHist():
                             ,y_lo = kwargs.get('y_lo',-1)
                             ,y_hi = kwargs.get('y_hi',-1)
                             ,hist_num = h
+                            ,backg = kwargs.get('backg',self.b_hw)
                             )
             
             if self.N > 1:
-                self.ax[h] = ret[0]
+                if self.b_hw:
+                    self.ax[h_ind][w_ind] = ret[0]
+                else:
+                    self.ax[h] = ret[0]
             else:
                 self.ax = ret[0]
 
@@ -118,7 +126,11 @@ class LiveHist():
     def set_ylim(self, y_lo, y_hi, **kwargs):
         ax_ind = kwargs.get('ax_ind',range(self.N) )
         for h in ax_ind:
-            self.ax[h].set_ylim(y_lo,y_hi)
+            if self.b_hw:
+                h_ind, w_ind = h / 3 , h % 3
+                self.ax[h_ind][w_ind].set_ylim(y_lo,y_hi)
+            else:
+                self.ax[h].set_ylim(y_lo,y_hi)
 
     def get_figure_objects(self):
         return self.fig, self.ax

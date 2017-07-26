@@ -149,7 +149,7 @@ def main():
     h_img, w_img = cam_params[0], cam_params[1]
     cam_type = 'cv_cam'     # 'pi_cam' 'file_cam'
     
-    current_tracking_frame = ((100,100),(300,300))
+    current_tracking_frame = ((100,100),(200,200))
 
     b_tracking_frame = True
     b_tracking_frame_2 = False
@@ -230,14 +230,14 @@ def main():
                 
                 # INIT HISTO GUI
                 if args["showbackghisto"]:
-                    h,w = 1,6
+                    h,w = 2,3
                     NUM_PLOTS = 6
                 else:
                     h,w = 1,3
                     NUM_PLOTS = 3
 
                 livehist = LiveHist( h = h, w = w, bins = 30
-                                     ,x_lo = -1, x_hi = 256
+                                    ,x_lo = -1, x_hi = 256
                                     ,y_lo = 0 ,y_hi = 7000 )
                 
                 livehist.show_plt(wait_time = 2)
@@ -260,7 +260,6 @@ def main():
                     hist_data = hist_data_rect[:]
                     if args["showbackghisto"]:
                         hist_data.extend(hist_data_backg)
-                        print len(hist_data)
 
                 # SHOW HISTOS
                 if switch_new_ylim:
@@ -271,7 +270,7 @@ def main():
                                     
                         livehist.set_ylim(y_lo = 0, y_hi = ymax * ylim_padding_mult
                                          ,ax_ind = (hist_num,) )
-                        print str(hist_num), ': ', str(ymax), ' - ', str(np.histogram( hist_data[hist_num] )[0][0])
+                        
                     switch_new_ylim = False
 
                 livehist.update_figure( hist_data
@@ -317,6 +316,8 @@ def main():
                             x0,y0,x1,y1 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3]), int(opt_args[4])
                             current_tracking_frame = ((x0,y0),(x1,y1))
                             print 'changing tracking_frame to: ', str(current_tracking_frame)
+                            switch_new_ylim = True
+                            print 'switching rect hist ylim'
                         except:
                             print 'could not set tracking_frame.'    
                     else:
