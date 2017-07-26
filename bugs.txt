@@ -25,7 +25,7 @@ x large blocks to functions
 options to a function
     global modify from options-func
 organize imports to and classes
-
+display transform and mask as smaller
 
 options for backghisto
 do a thresh on each histo

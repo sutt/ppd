@@ -29,21 +29,21 @@ def flip_img(img,flip = True):
     else:
         return img
 
-def ShowImages(img_display,**kwargs):
+def ShowImages(**kwargs):
     
     b_flip = not(kwargs.get('dont_mirror',False))
 
-    if kwargs.get('b_show_main_img', False):
+    if kwargs.get('display_img', False):
         cv2.imshow('display image'
-                    ,flip_img(img_display, b_flip) )
+                    ,flip_img( kwargs.get('img_d',None), b_flip ) )
     
-    if kwargs.get('b_show_transformed_img', False):
-        cv2.imshow('transformed image'
+    if kwargs.get('transform_img', False):
+        cv2.imshow('transform image'
                     ,flip_img( kwargs.get('img_t',None), b_flip ) )
 
-    if kwargs.get('b_show_mask_img', False):
-        cv2.imshow('image mask'
+    if kwargs.get('mask_img', False):
+        cv2.imshow('mask image'
                     ,flip_img( kwargs.get('img_m',None), b_flip ) )
 
-    if kwargs.get('b_show_tracked_img', False):
+    if kwargs.get('tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))

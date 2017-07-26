@@ -35,7 +35,6 @@ def main():
     b_hist_rect = True
     b_show_histos = args["showhisto"]  
     b_histo_backg = args["showbackghisto"]
-    b_mock_hist_data = False
     b_drawTracking = True
     b_print_log = args["printlog"]
 
@@ -79,7 +78,7 @@ def main():
         if b_tracking_frame:
             img_display = draw_tracking_frame(frame,x,y,radius)
 
-        if b_drawTracking: # and b_track_success:
+        if b_drawTracking:
             img_display = draw_tracking(img_display,current_tracking_frame)
 
         b_annotate_img = False
@@ -97,7 +96,7 @@ def main():
             if time.time() - last_hist_update > hist_update_hz:
 
                 if b_histo:
-                    px_data = imgToPx(frame, current_tracking_frame, ) ##frame should be img
+                    px_data = imgToPx(img_t, current_tracking_frame, ) ##frame should be img
                     hist_data = pxToHist(px_data)
                 
                 if switch_new_ylim:
@@ -113,12 +112,9 @@ def main():
                 last_hist_update = time.time()
  
         #SHOW IMAGES
-        ret = ShowImages(img_display, b_show_main_img = True
-                        ,b_show_transformed_img = True
-                        ,img_t = img_t
-                        ,b_show_mask_img = True
-                        ,img_m = img_mask
-                        )
+        ShowImages(  display_img = True,   img_d = img_display
+                    ,transform_img = True, img_t = img_t
+                    ,mask_img = True,      img_m = img_mask )
         
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):
