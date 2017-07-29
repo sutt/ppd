@@ -22,14 +22,11 @@ x large blocks to functions
 x ptions to a function
 x global modify from options-func
 x display transform and mask as smaller
+x need to get globals set in Options
+x pause on a picture for searching for thresh_params
 
-> python adaptive_thresh.py --showbackghisto --showhisto
-
-resolve ugly globals code
-need to get globals set in Options
-pause on a picture for searching for thresh_params
-
-organize imports to and classes
+print in raw_input with carriage return
+histo labeled hsv for hsv histos
 options for backghisto
 do a thresh on each histo
 display info in histo title
@@ -43,7 +40,15 @@ search_thresh
 do agenda
 zeromq messaging for log
 run on pi
+Q resolve ugly globals code
+Q organize imports to and classes
 
+> python adaptive_thresh.py --showbackghisto --showhisto
+
+> set_thresh 80 100 100 130 200 200
+150 130 90 200 210 200
+100 130 90 200 210 200
+0 130 90 100 210 200
 
 speed up histo proc:
     keep it all numpy

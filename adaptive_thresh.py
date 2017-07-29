@@ -42,12 +42,13 @@ def main():
     b_histo_backg = args["showbackghisto"]
     b_drawTracking = True
     b_print_log = args["printlog"]
-    b_show_puase_rect = False
+    Globals.b_show_puase_rect = False
 
     hist_update_hz = 1
     waitKeyRefresh = 1
     current_tracking_frame = ((100,100),(200,200))
     pause_rect = None
+    Globals.threshLo, Globals.threshHi = (29, 86, 6), (64, 255, 255)
 
     switch_new_ylim = True  
     time_last = time.time()
@@ -68,8 +69,9 @@ def main():
 
         # THRESHOLD MASK
         img_t = transformA(frame.copy(), b_hsv = True)
-        Lo, Hi = (29, 86, 6), (64, 255, 255)
-        img_mask = threshA(img_t, threshLo = Lo , threshHi = Hi )
+        img_mask = threshA(img_t 
+                            ,threshLo = Globals.threshLo 
+                            ,threshHi = Globals.threshHi )
         img_mask = repairA(img_mask, iterations = 2)
         
         # LOCATE / TRACK
@@ -105,7 +107,7 @@ def main():
 
                 if Globals.b_histo:
                     px_data = imgToPx(img_t, current_tracking_frame, ) ##frame should be img
-                    if b_show_puase_rect: 
+                    if Globals.b_show_puase_rect: 
                         px_data = imgToPx2(img_t, pause_rect, current_tracking_frame )
                     hist_data = pxToHist(px_data)
                 
@@ -125,7 +127,8 @@ def main():
         ShowImages(  display_img = True,   img_d = img_display
                     ,transform_img = True, img_t = img_t
                     ,mask_img = True,      img_m = img_mask 
-                    ,pause_rect = b_show_puase_rect, img_rect = pause_rect
+                    ,pause_rect = Globals.b_show_puase_rect
+                    ,img_rect = pause_rect
                     ,resize = True)
         
 
@@ -135,7 +138,7 @@ def main():
         if cv2.waitKey(waitKeyRefresh)== ord('p'):
             print 'taking picture of rect'
             pause_rect = crop_img(img_t.copy(), current_tracking_frame)
-            b_show_puase_rect = True
+            Globals.b_show_puase_rect = True
 
 
         if cv2.waitKey(waitKeyRefresh) == ord('o'):

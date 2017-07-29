@@ -75,6 +75,9 @@ def Options(**kwargs):
         Globals.b_histo = False
         print 'print changing: ', Globals.b_histo
 
+    elif ret[:12] == "unpause_rect":
+        Globals.b_show_puase_rect = False
+
     elif ret[:18] == "new_tracking_frame":
         
         opt_args = ret.split(' ')
@@ -89,6 +92,24 @@ def Options(**kwargs):
                 print 'could not set tracking_frame.'    
         else:
             print 'did not recognize length of tracking_frame input.'
+    
+    elif ret[:14] == "current_thresh":
+        print 'Lo: ', str(Globals.threshLo), ' Hi: ', str(Globals.threshHi)
+
+    elif ret[:10] == "set_thresh":
+        
+        opt_args = ret.split(' ')
+        if len(opt_args) > 1:
+            try:
+                b0,g0,r0 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3])
+                b1,g1,r1 = int(opt_args[4]), int(opt_args[5]),  int(opt_args[6])
+                Globals.threshLo = (b0,g0,r0)
+                Globals.threshHi = (b1,g1,r1)
+                print 'switching thresh to: ', str(Globals.threshLo),str(Globals.threshHi)
+            except:
+                print 'could not set thresh'    
+        else:
+            print 'did not recognize length of set_thresh'
 
     else:
         print 'option <', str(ret),'> not recognized'

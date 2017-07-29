@@ -2,8 +2,9 @@ Day 13 notes
 
 	in pxToImg, backg has a histo with rect removed:
 		-> so as objects move in and out of the rect, backg histo will change
-		
 
+	zero is excluded from the histo! 
+		So for hi-Hue values, you wont see it on your histo?
 
 Day 12 notes
 
