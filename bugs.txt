@@ -21,11 +21,14 @@ x pull out np.histogram from updating function
 x large blocks to functions
 x ptions to a function
 x global modify from options-func
+x display transform and mask as smaller
 
 > python adaptive_thresh.py --showbackghisto --showhisto
 
+resolve ugly globals code
+need to get globals set in Options
 organize imports to and classes
-display transform and mask as smaller
+
 
 options for backghisto
 do a thresh on each histo
