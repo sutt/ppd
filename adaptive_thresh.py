@@ -16,7 +16,7 @@ from GraphicsCV import ShowImages
 from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
 from ImgProcs import threshA, transformA, repairA
 from TrackA import find_xy, find_radius
-from Methods import imgToPx, pxToHist
+from Methods import imgToPx, pxToHist, imgToPx2
 from Methods import Options
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
@@ -25,6 +25,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
 ap.add_argument("--showhisto", action="store_true")
 ap.add_argument("--showbackghisto", action="store_true")
+ap.add_argument("--startuppause", action="store_true")
 ap.add_argument("--printlog", action="store_true")
 args = vars(ap.parse_args())
 
@@ -41,10 +42,12 @@ def main():
     b_histo_backg = args["showbackghisto"]
     b_drawTracking = True
     b_print_log = args["printlog"]
+    b_show_puase_rect = False
 
     hist_update_hz = 1
     waitKeyRefresh = 1
     current_tracking_frame = ((100,100),(200,200))
+    pause_rect = None
 
     switch_new_ylim = True  
     time_last = time.time()
@@ -94,13 +97,16 @@ def main():
         if Globals.b_show_histos:
             
             if livehist == None:
-                livehist = InitLiveHist(b_histo_backg)
+                livehist = InitLiveHist(b_histo_backg
+                                       ,b_pause = args["startuppause"])
                 last_hist_update = time.time() - (hist_update_hz + 1)    #and process
             
             if time.time() - last_hist_update > hist_update_hz:
 
                 if Globals.b_histo:
                     px_data = imgToPx(img_t, current_tracking_frame, ) ##frame should be img
+                    if b_show_puase_rect: 
+                        px_data = imgToPx2(img_t, pause_rect, current_tracking_frame )
                     hist_data = pxToHist(px_data)
                 
                 if switch_new_ylim:
@@ -119,12 +125,19 @@ def main():
         ShowImages(  display_img = True,   img_d = img_display
                     ,transform_img = True, img_t = img_t
                     ,mask_img = True,      img_m = img_mask 
+                    ,pause_rect = b_show_puase_rect, img_rect = pause_rect
                     ,resize = True)
         
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):
             print 'quitting cv loop'
             break
+        if cv2.waitKey(waitKeyRefresh)== ord('p'):
+            print 'taking picture of rect'
+            pause_rect = crop_img(img_t.copy(), current_tracking_frame)
+            b_show_puase_rect = True
+
+
         if cv2.waitKey(waitKeyRefresh) == ord('o'):
             while(True):
                 ret = Options()

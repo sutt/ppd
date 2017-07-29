@@ -61,3 +61,7 @@ def ShowImages(**kwargs):
 
     if kwargs.get('tracked_img', False):
         cv2.imshow('the ball',kwargs.get('on_pxs',None))
+
+    if kwargs.get('pause_rect', False):
+        img = flip_img( kwargs.get('img_rect',None), b_flip )
+        cv2.imshow('pause_rect', img)

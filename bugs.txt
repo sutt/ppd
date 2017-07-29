@@ -27,9 +27,9 @@ x display transform and mask as smaller
 
 resolve ugly globals code
 need to get globals set in Options
+pause on a picture for searching for thresh_params
+
 organize imports to and classes
-
-
 options for backghisto
 do a thresh on each histo
 display info in histo title

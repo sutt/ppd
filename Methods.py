@@ -11,7 +11,9 @@ def InitLiveHist(b_include_backg = True, **kwargs):
     h, w = (2,3) if b_include_backg else (1,3)
     livehist = LiveHist( h = h, w = w, bins = kwargs.get('bins', 30)
                         ,x_lo = -1, x_hi = 256 ,y_lo = 0 ,y_hi = 7000 )
-    livehist.show_plt(wait_time = 2)
+    wt = 2 if kwargs.get('b_pause',False) else 0.01
+    livehist.show_plt(wait_time = wt)
+
     return livehist
 
 def SwitchYLim(livehist, hist_data, exclude_zero = True ):
@@ -23,6 +25,20 @@ def SwitchYLim(livehist, hist_data, exclude_zero = True ):
                     
         livehist.set_ylim(y_lo = 0, y_hi = ymax, ax_ind = (hist_num,) )
                             
+def imgToPx2(img, pause_img, rect, include_backg = True):
+    """returns list of list of px's for each color, for both rect and backg"""
+    rect_img = pause_img.copy()
+    rect_list_px = px_to_list(rect_img)
+    px_data_rect = px3clr_3px1clr(rect_list_px)
+    
+    backg_list_px = px_remove_crop(img, rect)
+    px_data_backg = px3clr_3px1clr(backg_list_px)
+
+    px_data = px_data_rect[:]
+    if include_backg:
+        px_data.extend(px_data_backg)
+    return px_data
+
 
 def imgToPx(img, rect, include_backg = True):
     """returns list of list of px's for each color, for both rect and backg"""
