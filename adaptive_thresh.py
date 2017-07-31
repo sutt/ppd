@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 import Globals
 from Camera import initCam, setupCam, getFrame
 from GraphicsA import LiveHist
+from AppUtils import write_pic
 from Methods import InitLiveHist, SwitchYLim
 from GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
 from GraphicsCV import ShowImages
@@ -110,6 +111,9 @@ def main():
                     if Globals.b_show_puase_rect: 
                         px_data = imgToPx2(img_t, pause_rect, current_tracking_frame )
                     hist_data = pxToHist(px_data)
+                    # print '---------' 
+                    # print hist_data[0][0]
+                    # print '---------'
                 
                 if switch_new_ylim:
                     SwitchYLim(livehist, hist_data)
@@ -139,7 +143,10 @@ def main():
             print 'taking picture of rect'
             pause_rect = crop_img(img_t.copy(), current_tracking_frame)
             Globals.b_show_puase_rect = True
-
+        
+        if cv2.waitKey(waitKeyRefresh)== ord('l'):
+            print 'writing out'
+            write_pic(pause_rect)
 
         if cv2.waitKey(waitKeyRefresh) == ord('o'):
             while(True):
