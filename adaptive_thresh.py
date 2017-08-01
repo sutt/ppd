@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import Globals
 from Camera import initCam, setupCam, getFrame
 from GraphicsA import LiveHist
-from AppUtils import write_pic
+from AppUtils import write_pic, uni_dir, make_dir
 from Methods import InitLiveHist, SwitchYLim
 from GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
 from GraphicsCV import ShowImages
@@ -83,10 +83,10 @@ def main():
         b_track_success = True
 
         #DRAW ONTO FRAME
-        img_display = frame
+        img_display = frame.copy()
 
         if b_tracking_frame:
-            img_display = draw_tracking_frame(frame,x,y,radius)
+            img_display = draw_tracking_frame(img_display,x,y,radius)
 
         if b_drawTracking:
             img_display = draw_tracking(img_display,current_tracking_frame)
@@ -145,8 +145,21 @@ def main():
             Globals.b_show_puase_rect = True
         
         if cv2.waitKey(waitKeyRefresh)== ord('l'):
-            print 'writing out'
-            write_pic(pause_rect)
+            
+            writepath = "data/write/july"
+            output_dir = uni_dir(writepath)
+            make_dir(writepath + "/" + output_dir)
+            print 'writing out to: ', output_dir
+            
+            write_pic(frame
+                     ,name_base="img",path=output_dir)
+            write_pic(img_t
+                     ,name_base="img_t",path=output_dir)
+            write_pic(crop_img(frame.copy(), current_tracking_frame)
+                     ,name_base="rect",path=output_dir)
+            write_pic(crop_img(img_t.copy(), current_tracking_frame)
+                     ,name_base="rect_t",path=output_dir)
+            
 
         if cv2.waitKey(waitKeyRefresh) == ord('o'):
             while(True):

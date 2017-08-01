@@ -29,6 +29,12 @@ def uni_dir(inp_path,name="imgs",):
         else:
             return dn
 
+def make_dir(path):
+    try:
+        os.mkdir(path)
+    except:
+        print 'couldnt create new img subdir'
+
 def write_pic(img, **kwargs):
 
     if kwargs.get('path',False):
@@ -42,7 +48,8 @@ def write_pic(img, **kwargs):
             print 'couldnt create new img subdir'
 
     p = writepath + "/" + writepic_path
-    pic_name = uni_file(p ,name="pic",ext=".jpg")
+    name_base = kwargs.get("name_base", "pic")
+    pic_name = uni_file(p ,name=name_base,ext=".jpg")
 
     try:
         cv2.imwrite(pic_name,img)

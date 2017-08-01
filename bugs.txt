@@ -25,16 +25,19 @@ x display transform and mask as smaller
 x need to get globals set in Options
 x pause on a picture for searching for thresh_params
 
-write rect non-transform
-write all to same dir
-write other pics
-    full frame regular
-    full frame 
+x write rect non-transform
+xwrite all to same dir
+x write other pics
+
+frame isnt copied?  
+
+tranform and regular img track
 
 do a np.histo work on n
 threshold pct array
 expand and contract threshold
 
+waitkey switch statement
 
 print in raw_input with carriage return
 histo labeled hsv for hsv histos
