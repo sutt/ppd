@@ -76,7 +76,8 @@ def Options(**kwargs):
         print 'print changing: ', Globals.b_histo
 
     elif ret[:12] == "unpause_rect":
-        Globals.b_show_puase_rect = False
+        Globals.b_show_pause_rect = False
+        print 'allowing rect histos to change again'
 
     elif ret[:18] == "new_tracking_frame":
         
