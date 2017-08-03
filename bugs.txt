@@ -24,12 +24,11 @@ x global modify from options-func
 x display transform and mask as smaller
 x need to get globals set in Options
 x pause on a picture for searching for thresh_params
-
+x write-out pics
 x write rect non-transform
-xwrite all to same dir
+x write all to same dir
 x write other pics
-
-frame isnt copied?  
+x frame isnt copied?  
 
 tranform and regular img track
 
@@ -38,22 +37,24 @@ threshold pct array
 expand and contract threshold
 
 waitkey switch statement
-
+write out video
 print in raw_input with carriage return
 histo labeled hsv for hsv histos
 options for backghisto
 do a thresh on each histo
 display info in histo title
 
-eval in options
-write-out data
-build mock images/videos for test
 adapt_thresh for saved videos
+eval in options
 3rd rgb-plot-pane rect before vs. current "background before ball was there"
 search_thresh
 do agenda
 zeromq messaging for log
 run on pi
+
+#Questions
+
+Q does a switch statement make waitkey more responsive?
 Q resolve ugly globals code
 Q organize imports to and classes
 
