@@ -8,8 +8,8 @@ from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
 
-def load_images(dir_path,n = 1)
-    dir_path = "data/write/july/imgs17/"
+def load_images(dir_path,n = 1):
+    #dir_path = "data/write/july/imgs17/"
     ext = ".jpg"
     n = 1
     img = []

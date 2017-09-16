@@ -100,26 +100,18 @@ def main():
         patch[h] = ret[5]
 
     
-    def animate_j_wrapper(i):
+    def animate_j_wrapper(i,fargs):
         j = random.randint(0,N-1)
         return animate_j(j)
 
-    def animate_j_wrong(j):
-        for h in range(j):
-            ret = setup_hist(fig,ax[h])
-            ax[h] = ret[0]
-            top = ret[1]
-            bottom = ret[2]
-            n = ret[3]
-            verts[j] = ret[4]
-            patch[h] = ret[5]
-
-        return patch #[h]
     
     print 'GOING INTO LOOP'
 
-    ani = animation.FuncAnimation(fig, animate_j_wrapper, 
-                                    1, repeat=False, blit=True)
+
+    inp = 1
+    ani = animation.FuncAnimation(fig, animate_j_wrapper 
+                                    ,100
+                                    , repeat=False, blit=True)
     
     plt.show(False)  #neccesary for showing changes
 

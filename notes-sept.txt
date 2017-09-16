@@ -1,0 +1,10 @@
+
+up-and-running:
+    git basecamp
+    x what programs
+        adaptive_thresh.py
+    x run the programs
+
+warm-ups:
+
+larger-tasks:

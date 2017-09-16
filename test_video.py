@@ -5,12 +5,18 @@ import time
 import cv2
 import imutils
 from matplotlib import pyplot as plt
+import argparse
 
+ap = argparse.ArgumentParser()
+ap.add_argument("--picsize", type=int, default=30)
+ap.add_argument("--picsize", type=str, default="")
+ap.add_argument("--createfile", action="store_true")
+args = vars(ap.parse_args())
  
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
 camera.resolution = (640, 480)
-camera.framerate = 20
+camera.framerate = args["framerate"]
 rawCapture = PiRGBArray(camera, size=(640, 480))
  
 # allow the camera to warmup
