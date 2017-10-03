@@ -15,7 +15,7 @@ from Methods import InitLiveHist, SwitchYLim
 from GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
 from GraphicsCV import ShowImages
 from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
-from ImgProcs import threshA, transformA, repairA
+from ImgProcs import threshA, transformA, repairA, multi_thresh
 from TrackA import find_xy, find_radius
 from Methods import imgToPx, pxToHist, imgToPx2
 from Methods import Options
@@ -49,7 +49,11 @@ def main():
     waitKeyRefresh = 1
     Globals.current_tracking_frame = ((100,100),(200,200))
     pause_rect = None
-    Globals.threshLo, Globals.threshHi = (29, 86, 6), (64, 255, 255)
+    Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
+    #Globals.threshLoHsv, Globals.threshHiHsv = (29, 86, 6), (64, 255, 255)
+    Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
+    Globals.b_thresh_hsv = True
+    Globals.b_thresh_rgb = False
 
     switch_new_ylim = True  
     time_last = time.time()
@@ -70,9 +74,27 @@ def main():
 
         # THRESHOLD MASK
         img_t = transformA(frame.copy(), b_hsv = True)
-        img_mask = threshA(img_t 
-                            ,threshLo = Globals.threshLo 
-                            ,threshHi = Globals.threshHi )
+        
+        if Globals.b_thresh_hsv:
+            img_mask_hsv = threshA(img_t 
+                                ,threshLo = Globals.threshLoHsv 
+                                ,threshHi = Globals.threshHiHsv )
+        
+        if Globals.b_thresh_rgb:
+            img_mask_rgb = threshA(frame.copy() 
+                                ,threshLo = Globals.threshLoRgb 
+                                ,threshHi = Globals.threshHiRgb )
+        
+        if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
+            #TODO multi_thresh(hsv,rgb)
+            img_mask = img_mask_hsv
+        elif Globals.b_thresh_hsv:
+            img_mask = img_mask_hsv
+        elif Globals.b_thresh_rgb:
+            img_mask = img_mask_rgb
+        else:
+            print 'no thresholding booleans are set'
+        
         img_mask = repairA(img_mask, iterations = 2)
         
         # LOCATE / TRACK
@@ -109,7 +131,7 @@ def main():
                 if Globals.b_histo:
                     px_data = imgToPx(img_t, Globals.current_tracking_frame, ) ##frame should be img
                     if Globals.b_show_puase_rect: 
-                        px_data = imgToPx2(img_t, pause_rect, current_tracking_frame )
+                        px_data = imgToPx2(img_t, pause_rect, Globals.current_tracking_frame )
                         
                     hist_data = pxToHist(px_data)
                     

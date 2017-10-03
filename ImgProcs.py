@@ -20,3 +20,7 @@ def repairA(img, iterations = 2):
     img = cv2.erode(img, None, iterations=iterations)
     img = cv2.dilate(img, None, iterations=iterations)
     return img
+
+def multi_thresh(img1, img2):
+    return img1
+    return cv2.inRange(img, threshLo, threshHi)

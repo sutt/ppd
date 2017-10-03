@@ -95,18 +95,33 @@ def Options(**kwargs):
             print 'did not recognize length of tracking_frame input.'
     
     elif ret[:14] == "current_thresh":
-        print 'Lo: ', str(Globals.threshLo), ' Hi: ', str(Globals.threshHi)
+        print 'HSV thresh: ', str(Globals.b_thresh_hsv)
+        print 'Lo: ', str(Globals.threshLoHsv), ' Hi: ', str(Globals.threshHiHsv)
+        print 'RGB thresh: ', str(Globals.b_thresh_rgb)
+        print 'Lo: ', str(Globals.threshLoRgb), ' Hi: ', str(Globals.threshHiRgb)
 
     elif ret[:10] == "set_thresh":
         
         opt_args = ret.split(' ')
         if len(opt_args) > 1:
+            thresh_type = "hsv" if opt_args[1][:1] == "h" else "rgb"
+            print 'thresh type: %s' % thresh_type
+            pre = 1
             try:
-                b0,g0,r0 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3])
-                b1,g1,r1 = int(opt_args[4]), int(opt_args[5]),  int(opt_args[6])
-                Globals.threshLo = (b0,g0,r0)
-                Globals.threshHi = (b1,g1,r1)
-                print 'switching thresh to: ', str(Globals.threshLo),str(Globals.threshHi)
+                b0,g0,r0 = int(opt_args[pre+1]), int(opt_args[pre+2]),  int(opt_args[pre+3])
+                b1,g1,r1 = int(opt_args[pre+4]), int(opt_args[pre+5]),  int(opt_args[pre+6])
+                if thresh_type == "hsv":
+                    Globals.threshLoHsv = (b0,g0,r0)
+                    Globals.threshHiHsv = (b1,g1,r1)
+                else:
+                    Globals.threshLoRgb = (b0,g0,r0)
+                    Globals.threshHiRgb = (b1,g1,r1)
+                print 'switching thresh %s to: ' % str(thresh_type)
+                print str(Globals.threshLoHsv), ' ', str(Globals.threshHiHsv)
+                
+                Globals.b_show_puase_rect = False
+                print 'and turning off b_show_pause_rect'
+
             except:
                 print 'could not set thresh'    
         else:
@@ -117,6 +132,7 @@ def Options(**kwargs):
 
     return 0
 
+    
 
 def DelayFPS(time_last_frame, fps_time):
     epsilon_fps_time = 0
