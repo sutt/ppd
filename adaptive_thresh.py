@@ -47,7 +47,7 @@ def main():
 
     hist_update_hz = 1
     waitKeyRefresh = 1
-    current_tracking_frame = ((100,100),(200,200))
+    Globals.current_tracking_frame = ((100,100),(200,200))
     pause_rect = None
     Globals.threshLo, Globals.threshHi = (29, 86, 6), (64, 255, 255)
 
@@ -89,7 +89,7 @@ def main():
             img_display = draw_tracking_frame(img_display,x,y,radius)
 
         if b_drawTracking:
-            img_display = draw_tracking(img_display,current_tracking_frame)
+            img_display = draw_tracking(img_display,Globals.current_tracking_frame)
 
         b_annotate_img = False
         if b_annotate_img:
@@ -107,13 +107,12 @@ def main():
             if time.time() - last_hist_update > hist_update_hz:
 
                 if Globals.b_histo:
-                    px_data = imgToPx(img_t, current_tracking_frame, ) ##frame should be img
+                    px_data = imgToPx(img_t, Globals.current_tracking_frame, ) ##frame should be img
                     if Globals.b_show_puase_rect: 
                         px_data = imgToPx2(img_t, pause_rect, current_tracking_frame )
+                        
                     hist_data = pxToHist(px_data)
-                    # print '---------' 
-                    # print hist_data[0][0]
-                    # print '---------'
+                    
                 
                 if switch_new_ylim:
                     SwitchYLim(livehist, hist_data)
@@ -141,7 +140,7 @@ def main():
             break
         if cv2.waitKey(waitKeyRefresh)== ord('p'):
             print 'taking picture of rect'
-            pause_rect = crop_img(img_t.copy(), current_tracking_frame)
+            pause_rect = crop_img(img_t.copy(), Globals.current_tracking_frame)
             Globals.b_show_puase_rect = True
         
         if cv2.waitKey(waitKeyRefresh)== ord('l'):
@@ -155,9 +154,9 @@ def main():
                      ,name_base="img",path=output_dir)
             write_pic(img_t
                      ,name_base="img_t",path=output_dir)
-            write_pic(crop_img(frame.copy(), current_tracking_frame)
+            write_pic(crop_img(frame.copy(), Globals.current_tracking_frame)
                      ,name_base="rect",path=output_dir)
-            write_pic(crop_img(img_t.copy(), current_tracking_frame)
+            write_pic(crop_img(img_t.copy(), Globals.current_tracking_frame)
                      ,name_base="rect_t",path=output_dir)
             
 

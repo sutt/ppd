@@ -4,7 +4,35 @@ up-and-running:
     x what programs
         adaptive_thresh.py
     x run the programs
+        python adaptive_thresh.py --showhisto --showbackghisto
 
 warm-ups:
+    --startuppause doesnt work in any helpful way
 
-larger-tasks:
+    current_tracking_frame does not update from options
+
+
+
+do-agenda:
+
+    move the frame and underlying bounding box:
+        manually, and in a timed pattern
+        position and size
+
+    write out stuff:
+        -the raw video
+        -analytics on the histogram
+        -analytics on the mask success
+        -analytics on the size
+        -> need to structure the code to do read-old vs. real timed
+
+    analytics on the ball are from either freeze-frame or multi-frames
+     over some time period
+
+    the histos are for the box, also do the ball position
+
+    thresh on bgr and/or hsv
+
+
+
+    

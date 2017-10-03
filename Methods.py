@@ -85,8 +85,8 @@ def Options(**kwargs):
         if len(opt_args) > 1:
             try:
                 x0,y0,x1,y1 = int(opt_args[1]), int(opt_args[2]),  int(opt_args[3]), int(opt_args[4])
-                current_tracking_frame = ((x0,y0),(x1,y1))
-                print 'changing tracking_frame to: ', str(current_tracking_frame)
+                Globals.current_tracking_frame = ((x0,y0),(x1,y1))
+                print 'changing tracking_frame to: ', str(Globals.current_tracking_frame)
                 switch_new_ylim = True
                 print 'switching rect hist ylim'
             except:
