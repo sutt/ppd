@@ -127,6 +127,31 @@ def Options(**kwargs):
         else:
             print 'did not recognize length of set_thresh'
 
+    elif ret[:15] == "set_type_thresh":
+        
+        opt_args = ret.split(' ')
+        if len(opt_args) == 3:
+             
+            if str(opt_args[2]) == "True": thresh_bool = True
+            elif str(opt_args[2]) == "False": thresh_bool = False
+            else:
+                print 'no truth value in arguments'
+            
+            if str(opt_args[1]) == "hsv": thresh_type = 'hsv'
+            elif str(opt_args[1]) == "rgb": thresh_type = 'rgb'
+            else:
+                print 'no recognize thresh type in arguments'
+
+            if thresh_type == 'hsv':
+                Globals.b_thresh_hsv = thresh_bool
+            if thresh_type == 'rgb':
+                Globals.b_thresh_rgb = thresh_bool
+        
+            print 'changing thresh ' , str(thresh_type), ' to: ', str(thresh_bool)
+
+        else:
+            print 'not correct amount of arguments, try: set_thresh_type hsv True'
+
     else:
         print 'option <', str(ret),'> not recognized'
 
