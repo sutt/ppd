@@ -59,6 +59,7 @@ def main():
     time_last = time.time()
     info_annotations = []
     livehist = None
+    i = 0
 
     cam_params = (640,480)
     h_img, w_img = cam_params[0], cam_params[1]
@@ -70,6 +71,7 @@ def main():
     while(vc.isOpened()):
 
         ret, frame = getFrame(vc, cam_type = 'cv_cam')        
+        i += 1
         if not(ret): break
 
         # THRESHOLD MASK
@@ -112,7 +114,7 @@ def main():
         if b_drawTracking:
             img_display = draw_tracking(img_display,Globals.current_tracking_frame)
 
-        b_annotate_img = False
+        b_annotate_img = True
         if b_annotate_img:
             img_display = draw_annotations(img_display, info_annotations)       
             
@@ -191,6 +193,7 @@ def main():
             # DelayFPS(time_last, 30)
 
         # LOGGING
+        info_annotations.append(i)
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)

@@ -13,6 +13,13 @@ def hist_from_img(inp_img):
 def create_tracking_frame(**kwargs):
     return ((100,100),(300,300))
 
+def unique_file_name(dot_ext = ".jpg"):
+    name = ""
+    name_len = 6
+    name += map(str(random.uniform(1,9)), range(name_len))
+    name += dot_ext
+    return name
+
 def mock_gaussian(n = 100, **kwargs ):
     z = np.random.randn(n)
     u, var = kwargs.get('u',0), kwargs.get('var',1)

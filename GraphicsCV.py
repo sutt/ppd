@@ -18,8 +18,13 @@ def draw_tracking(img, rect ):
     return img
 
 def draw_annotations(img, info_annotations):
+    if len(info_annotations) == 0: return img
+    try:
+        disp_text = str(info_annotations.pop())
+    except:
+        disp_text = 'err'
     font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(img,'OpenCV',(10,10), font, 2,(255,255,255),2,cv2.LINE_AA)
+    cv2.putText(img,disp_text,(50,50), font, 2,(255,255,255),2,cv2.LINE_AA)
     return img
 
 def flip_img(img,flip = True):
