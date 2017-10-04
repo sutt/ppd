@@ -11,6 +11,12 @@ warm-ups:
 
     current_tracking_frame does not update from options
 
+cmds as of Oct 3:
+
+    in options:
+        >set_thresh hsv 0 0 0 100 100 100
+        >current_thresh
+        >unpause_rect   (after waitkey "p")
 
 
 do-agenda:
