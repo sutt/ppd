@@ -52,8 +52,8 @@ def main():
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
     #Globals.threshLoHsv, Globals.threshHiHsv = (29, 86, 6), (64, 255, 255)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
-    Globals.b_thresh_hsv = True
-    Globals.b_thresh_rgb = False
+    Globals.b_thresh_hsv = False
+    Globals.b_thresh_rgb = True
 
     switch_new_ylim = True  
     time_last = time.time()
@@ -86,8 +86,7 @@ def main():
                                 ,threshHi = Globals.threshHiRgb )
         
         if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
-            #TODO multi_thresh(hsv,rgb)
-            img_mask = img_mask_hsv
+            img_mask = multi_thresh(img_mask_hsv,img_mask_rgb)
         elif Globals.b_thresh_hsv:
             img_mask = img_mask_hsv
         elif Globals.b_thresh_rgb:

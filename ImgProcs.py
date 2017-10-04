@@ -21,6 +21,18 @@ def repairA(img, iterations = 2):
     img = cv2.dilate(img, None, iterations=iterations)
     return img
 
-def multi_thresh(img1, img2):
-    return img1
-    return cv2.inRange(img, threshLo, threshHi)
+def multi_thresh(img1, img2, b_And = True, b_Or = False):
+    
+    ret = img1.copy()
+    
+    for r in range(0, len(img1)):
+         for c in range(0,len(img1[0])):
+            
+            if b_And:
+                if img2[r][c] == 0:
+                    ret[r][c] = 0
+            elif b_Or:
+                if img2[r][c] == 1:
+                    ret[r][c] = 1
+
+    return ret
