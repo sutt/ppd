@@ -40,5 +40,30 @@ do-agenda:
     thresh on bgr and/or hsv
 
 
+adaptive-thresh:
 
+    Training
+
+        After collecting a couple images, apply a 95 thresh to each
+        then find out the 95 thresh for all the images.
+
+            you only need to collect the bare image itself
+            then the processing puts it through hsv, blur, etc
+
+            For pic_i:
+                min_color_x <= px_color_x <= max_color_x  | 95% of all px
+                thresh-pic_i-color_x = (min_color_x, max_color_x)
+
+            But it's an AND for all three
+    
+    Analysis
+        report how many things in the background fit the thresh, 
+         and what size. how about when you alter params like blur-size?
+
+        report what pct of pix within a tracked ball - the estimated circle"
+        are in the mask
+
+        report how many frames succesfully tracked the ball
+
+    
     
