@@ -198,7 +198,87 @@ def iter3(data, goal_pct = 0.95, epsilon = 0.005, max_iter = 10, log = False, st
             lo, hi = lo + f[0], hi + f[1]    
             
     return min_err
+
+
+def iter4(data, goal_pct = 0.95, epsilon = 0.005, max_iter = 10, 
+          log = False, steep = True, init_n = 20):
+    
+    """ move either hi or lo"""
+    LO, HI = 0, 255
+    lo, hi = px_range(data) 
+    
+    n = init_n
+    
+    #          err,pct_i,lo, hi, p, i      
+    min_err = (1.0, 1.0, lo, hi, 0, -1)
+    Log = []
+    
+    for i in range(0,max_iter):
+        
+        pct_i = pct_inrange(data, lo_hi = (lo,hi))
+        
+        p = (lo - LO) + (HI - hi)       #penalty
+        
+        err = abs( goal_pct - pct_i)    #best iter
+        if err <= min_err[0]:
+            min_err = (err, pct_i, lo, hi, p, i)
+
+        if log: Log.append((err, pct_i, lo, hi, p, i))
+
+        if (pct_i - epsilon) <= goal_pct <= (pct_i + epsilon):
+            break
+
+        if pct_i < goal_pct: 
+            break
+
+        #first check for lo or hi to not be great enough
+
+
+        if pct_i > goal_pct:
+            gradient_lo = pct_i - pct_inrange(data, lo_hi = (lo + 1,hi))
+            gradient_hi = pct_i - pct_inrange(data, lo_hi = (lo,hi - 1))
+            # take_low   (T)    (F)     NOT(XOR(L<H,STEEP))
+            #           Steep  Flat
+            # (T) L > H    T      F
+            # (F) L < H    F      T
+            take_lo = not( (gradient_lo > gradient_hi) != (steep) )
+            f = (1,0) if take_lo  else (0,-1)
+            lo, hi = lo + f[0], hi + f[1]    
             
+    return min_err
+            
+def iter5(data, lo, hi, pct_0, epsilon = 0.005, 
+          log = False, steep = True, init_n = 10):
+    
+    """ move either hi or lo"""
+    
+    LO, HI = 0, 255
+    lo, hi = lo, hi
+    p = (lo - LO) + (HI - hi)      
+
+    n = min(init_n, p)
+    b_solved = False
+
+    #          err,pct_i,lo, hi, p, i, j      
+    min_err = (1.0, 1.0, lo, hi, p, -1)
+    Log = []
+    
+    for j in (-1,1):
+        for i in range(1,n+1):
+                
+                lo, hi = lo + i*j, hi - i*j
+
+                pct_i = pct_inrange(data, lo_hi = (lo,hi))
+                
+                if pct_i < pct_0:
+                    min_err = (err, pct_i, lo, hi, p, i)
+                    b_solved = True
+
+                if log: Log.append((err, pct_i, lo, hi, p, i))
+
+                if b_solved: return min_err
+            
+    return min_err
 
 
 
@@ -219,31 +299,43 @@ if __name__ == "__main__":
     # output = iter2(img, goal_pct = 0.95, max_iter = 4, log=True, steep = False)
     # print 'SOLVED: ', str(output)
 
+    # img2 = read_img(p = "data/write/july/imgs17/rect1.jpg")
+    # d = px_data(img2)
+    
+    # output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False)
+    # print 'SOLVED: ', str(output)
+    # output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
+    # print 'SOLVED: ', str(output)
+
+    # output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False)
+    # print 'SOLVED: ', str(output)
+    # output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
+    # print 'SOLVED: ', str(output)
+
     img2 = read_img(p = "data/write/july/imgs17/rect1.jpg")
+    #img2 = read_img(p = "data/write/july/imgs17/img1.jpg")
     d = px_data(img2)
     
+    output = iter3(d[0], goal_pct = 0.95, max_iter = 100, log=False)
+    print 'SOLVED: ', str(output)
+    output = iter3(d[0], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
+    print 'SOLVED: ', str(output)
+    _err, _pct, _lo, _hi, _p, _i = output
+    print iter5(d[0],_lo,_hi,_pct)
+
     output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False)
     print 'SOLVED: ', str(output)
     output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
     print 'SOLVED: ', str(output)
+    _err, _pct, _lo, _hi, _p, _i = output
+    print iter5(d[1],_lo,_hi,_pct)
 
     output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False)
     print 'SOLVED: ', str(output)
     output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
     print 'SOLVED: ', str(output)
-
-    img2 = read_img(p = "data/write/july/imgs17/img1.jpg")
-    d = px_data(img2)
-    
-    output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False)
-    print 'SOLVED: ', str(output)
-    output = iter3(d[1], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
-    print 'SOLVED: ', str(output)
-
-    output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False)
-    print 'SOLVED: ', str(output)
-    output = iter3(d[2], goal_pct = 0.95, max_iter = 100, log=False, steep = False)
-    print 'SOLVED: ', str(output)
+    _err, _pct, _lo, _hi, _p, _i = output
+    print iter5(d[2],_lo,_hi,_pct)
 
     # output = iter3(d[1], goal_pct = 0.95, max_iter = 15, log=True)
     # print 'SOLVED: ', str(output)
