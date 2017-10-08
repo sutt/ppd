@@ -97,16 +97,37 @@ def iter6(img, clr = 0, goal_pct = 0.95, epsilon = 0.005, max_iter = 10,
             
     return min_err
 
+def print_results(data, full = False, round_places = 3, short = (1,2,3,4)):
+    r_data = map(lambda f: round(f,round_places),out)
+    if full:
+        return str(r_data)
+    short_data = [r_data[i] for i in range(len(r_data)) if i in short]
+    return str(short_data)
+
 if __name__ == "__main__":
 
     img = read_img(p = "data/write/july/imgs17/rect1.jpg")
 
-    out = iter6(img, clr = 0, log = True, max_iter = 5)
+    print 'DEMO: ----------------------'
+    out = iter6(img, clr = 0, log = True, max_iter = 5, steep = True)
+    print 'end demo ------------------- \n'
 
-    out = iter6(img, clr = 0, log = False, max_iter = 200, steep = True)
-    print 'Steep Decent: ', str(map(lambda f: round(f,3),out) )
-    out = iter6(img, clr = 0, log = False, max_iter = 200, steep = False)
-    print 'Flatt Decent: ', str(map(lambda f: round(f,3),out) )
+    clr = 0
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = True)
+    print 'Steep Decent: ', print_results(out)
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = False)
+    print 'Flatt Decent: ', print_results(out)
+
+    clr = 1
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = True)
+    print 'Steep Decent: ', print_results(out)
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = False)
+    print 'Flatt Decent: ', print_results(out)
+
+    clr = 2
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = True)
+    print 'Steep Decent: ', print_results(out)
+    out = iter6(img, clr = clr, log = False, max_iter = 200, steep = False)
+    print 'Flatt Decent: ', print_results(out)
 
 
-    
