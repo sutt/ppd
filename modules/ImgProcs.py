@@ -3,6 +3,8 @@ import traceback
 import numpy as np
 import cv2
 import imutils
+from ImgUtils import px3clr_3px1clr
+from ImgUtils import px_to_list
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
@@ -36,3 +38,17 @@ def multi_thresh(img1, img2, b_And = True, b_Or = False):
                     ret[r][c] = 1
 
     return ret
+
+
+def px_data(img):
+    return px3clr_3px1clr(px_to_list(img))
+
+def px_range(data):
+    return min(data), max(data)
+
+def pct_inrange_cv(img, lo, hi, total = 0):
+    t_mask = cv2.inRange(img, lo, hi )
+    t_i = np.sum( t_mask  ) / 255
+    if total == 0: total = len(img)*len(img[0])
+    pct_i = float(t_i) / float(total)
+    return pct_i

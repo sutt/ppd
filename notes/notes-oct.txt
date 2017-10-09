@@ -1,0 +1,29 @@
+10/9
+
+x   ScratchHist2 -> modules/IterThresh
+
+    How to get intellisense for cv2?
+
+    add a dedicated tests folder
+    add a dedicated /data/tests/
+                                /benchmarks
+                                /assets
+    
+    Write more tests for IterThresh
+    more tests for single clrs
+
+    Cleanup iter7
+    cleanup logging, from stdout printing, so it can be used in tests
+
+    Develop iter7 further:
+        penalty needs to not include intital px_inrange cutoff
+        more standardized return value
+        make threshLo threshHi print prettier
+
+
+TO-DO:
+
+    add a console that communicates without waitKey thrashing
+
+    add a unified way of calling into tests, resolving where data is, etc
+
