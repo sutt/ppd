@@ -1,3 +1,14 @@
+Day 15 notes:
+
+	how to get intellisense working with sibling sudbir imports?
+		seems to work from root/scratch/  into root/modules/:
+			from ..modules.ImgUtils import px3clr_3px1clr as three_color	
+
+	also do-able but intellisense doesnt work:
+
+		sys.path.insert(0, os.getcwd())
+		(when run from root)
+
 Day "14" notes
 	
 	start the debugger from the same root as you would from the shell

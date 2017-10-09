@@ -2,8 +2,12 @@ import os,sys, random, copy
 import cv2
 import numpy as np
 
-from modules.ImgUtils import px3clr_3px1clr as three_color
-from modules.ImgUtils import px_to_list
+#sys.path.append("./../")
+#sys.path.insert(0, os.getcwd())
+#print os.getcwd()
+from ..modules.ImgUtils import px3clr_3px1clr as three_color
+from ..modules.ImgUtils import px_to_list
+
 
 
 def read_img(p = "data/write/july/imgs17/img1.jpg"):
