@@ -2,8 +2,8 @@ import os,sys, random, copy
 import cv2
 import numpy as np
 
-from ImgUtils import px3clr_3px1clr as three_color
-from ImgUtils import px_to_list
+from modules.ImgUtils import px3clr_3px1clr as three_color
+from modules.ImgUtils import px_to_list
 
 
 def read_img(p = "data/write/july/imgs17/img1.jpg"):
@@ -138,10 +138,6 @@ def iter7(img, clrs = (0), goal_pct = 0.95, epsilon = 0.005, max_iter = 10,
     
     clr_lo = np.array( [cr[0] for cr in clr_range] )
     clr_hi = np.array( [cr[1] for cr in clr_range] )
-    
-    # clr_lo[i] = np.array([LO if clr != j else lo for j in range(3)])
-    # clr_hi[i] = np.array([HI if clr != j else hi for j in range(3)])
-
 
     min_err = (1.0, 1.0, lo, hi, 0, -1)
     Log = []

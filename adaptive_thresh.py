@@ -7,18 +7,18 @@ from collections import deque
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-import Globals
-from Camera import initCam, setupCam, getFrame
-from GraphicsA import LiveHist
-from AppUtils import write_pic, uni_dir, make_dir
-from Methods import InitLiveHist, SwitchYLim
-from GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
-from GraphicsCV import ShowImages
-from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
-from ImgProcs import threshA, transformA, repairA, multi_thresh
-from TrackA import find_xy, find_radius
-from Methods import imgToPx, pxToHist, imgToPx2
-from Methods import Options
+import modules.Globals as Globals
+from modules.Camera import initCam, setupCam, getFrame
+from modules.GraphicsA import LiveHist
+from modules.AppUtils import write_pic, uni_dir, make_dir
+from modules.Methods import InitLiveHist, SwitchYLim
+from modules.GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
+from modules.GraphicsCV import ShowImages
+from modules.ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
+from modules.ImgProcs import threshA, transformA, repairA, multi_thresh
+from modules.TrackA import find_xy, find_radius
+from modules.Methods import imgToPx, pxToHist, imgToPx2
+from modules.Methods import Options
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
