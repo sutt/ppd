@@ -17,12 +17,23 @@ x   ScratchHist2 -> modules/IterThresh
 
     Develop iter7 further:
         penalty needs to not include intital px_inrange cutoff
+        
         more standardized return value
         make threshLo threshHi print prettier
 
 
+BUGS:
+
+    single color shouldnt cutoff px_inrange 
+
+    single color doesnt work correctly above clr0
+
 TO-DO:
 
+    true gradient:
+        only look back N spaces on x_i if current cheapest X is more advanced by 
+        N-steps than x_i is
+    
     add a console that communicates without waitKey thrashing
 
     add a unified way of calling into tests, resolving where data is, etc

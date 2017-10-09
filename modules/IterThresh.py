@@ -7,26 +7,18 @@ from ImgProcs import px_data, px_range, pct_inrange_cv
 def iter7(img, clrs = (0), goal_pct = 0.95, epsilon = 0.005, max_iter = 10, 
           log = False, steep = True):
     
+    
+    CLRS = (0,1,2)
     LO, HI = 0, 255
 
-    clr_data = []
-    c0,c1,c2 = cv2.split(img)
-    clr_data.append(c0.flatten())
-    clr_data.append(c1.flatten())
-    clr_data.append(c2.flatten())
-
+    clr_data = [c.flatten() for c in cv2.split(img)]
     
-    #NEED to handle if not all clrs
-    clr_range = []
-    for c in clr_data:
-        lo, hi = px_range(c) 
-        clr_range.append( (lo,hi) )
+    clr_range = [px_range(c) for c in clr_data]
 
-    
     clr_lo = np.array( [cr[0] for cr in clr_range] )
     clr_hi = np.array( [cr[1] for cr in clr_range] )
 
-    min_err = (1.0, 1.0, lo, hi, 0, -1)
+    min_err = (1.0, 1.0, 0, 255, 0, -1)
     Log = []
     total = len(img)*len(img[0])
 
@@ -62,24 +54,30 @@ def iter7(img, clrs = (0), goal_pct = 0.95, epsilon = 0.005, max_iter = 10,
         if pct_i > goal_pct:
             
             gradient = []
-            for clr_i in clrs:
-                for side in ('lo', 'hi'):
-                    if side == 'lo':
-                        lo_delta = copy.copy(clr_lo)
-                        lo_delta[clr_i] += 1
-                        pir = pct_inrange_cv(img, lo_delta, clr_hi, total = total)
-                    if side == 'hi':
-                        hi_delta = copy.copy(clr_hi)
-                        hi_delta[clr_i] -= 1
-                        pir = pct_inrange_cv(img, clr_lo, hi_delta, total = total)
-                    gradient.append(pct_i - pir)
+            for clr_i in CLRS:
+                if not(clr_i in clrs):
+                    gradient.append(-2.0)
+                    gradient.append(-2.0)
+                else:
+                    for side in ('lo', 'hi'):
+                        if side == 'lo':
+                            lo_delta = copy.copy(clr_lo)
+                            lo_delta[clr_i] += 1
+                            pir = pct_inrange_cv(img, lo_delta, clr_hi, total = total)
+                        if side == 'hi':
+                            hi_delta = copy.copy(clr_hi)
+                            hi_delta[clr_i] -= 1
+                            pir = pct_inrange_cv(img, clr_lo, hi_delta, total = total)
+                        gradient.append(pct_i - pir)
             
             if log: print 'gradient: ', str(map(lambda f: round(f, 5), gradient)) 
             
             if steep:
-                gradient_ind = max( enumerate(gradient), key = lambda tup: tup[1])[0]
+                gradient_ind = max( enumerate(gradient), 
+                                    key = lambda tup: tup[1] if tup[1] != -2.0 else -2.0)[0]
             else:
-                gradient_ind =  min( enumerate(gradient), key = lambda tup: tup[1])[0]
+                gradient_ind =  min( enumerate(gradient), 
+                                    key = lambda tup: tup[1] if tup[1] != -2.0 else 2.0)[0]
 
             f_clr = gradient_ind / 2
             f_side = 'lo' if (gradient_ind % 2 == 0) else 'hi'
@@ -120,3 +118,12 @@ if __name__ == "__main__":
     print 'Steep 50pct: ', print_results2(out)
     out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, log = False, max_iter = 200, steep = False)
     print 'Flat 50pct: ', print_results2(out)
+
+    out = iter7(img, clrs = (0,), goal_pct = 0.50, log = False, max_iter = 200, steep = True)
+    print 'Color0 50pct: ', print_results2(out)
+    out = iter7(img, clrs = (1,), goal_pct = 0.50, log = False, max_iter = 200, steep = True)
+    print 'Color1 50pct: ', print_results2(out)
+    out = iter7(img, clrs = (0,1), goal_pct = 0.50, log = False, max_iter = 200, steep = True)
+    print 'Color1-2 Steep: ', print_results2(out)
+    out = iter7(img, clrs = (0,1), goal_pct = 0.50, log = False, max_iter = 200, steep = False)
+    print 'Color1-2 Flatt: ', print_results2(out)
