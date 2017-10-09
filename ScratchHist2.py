@@ -158,7 +158,11 @@ def iter7(img, clrs = (0), goal_pct = 0.95, epsilon = 0.005, max_iter = 10,
         
         pct_i = pct_inrange_cv(img, clr_lo, clr_hi, total = total)
         
-        p = (lo - LO) + (HI - hi)       
+        p = 0
+        for clr in clrs:
+            lo, hi = clr_lo[clr], clr_hi[clr]
+            p += (lo - LO) + (HI - hi)       
+        if log: print 'p: ', str(p)
         
         err = abs( goal_pct - pct_i)    
         if err <= min_err[0]:
@@ -178,18 +182,16 @@ def iter7(img, clrs = (0), goal_pct = 0.95, epsilon = 0.005, max_iter = 10,
             for clr_i in clrs:
                 for side in ('lo', 'hi'):
                     if side == 'lo':
-                        lo_delta = clr_lo[:]
+                        lo_delta = copy.copy(clr_lo)
                         lo_delta[clr_i] += 1
                         pir = pct_inrange_cv(img, lo_delta, clr_hi, total = total)
                     if side == 'hi':
-                        hi_delta = clr_hi[:]
+                        hi_delta = copy.copy(clr_hi)
                         hi_delta[clr_i] -= 1
                         pir = pct_inrange_cv(img, clr_lo, hi_delta, total = total)
                     gradient.append(pct_i - pir)
             
             if log: print 'gradient: ', str(map(lambda f: round(f, 5), gradient)) 
-            if log: print 'pct_i: ', str(pct_i)
-            if log: print 'pir:   ', str(pir) 
             
             if steep:
                 gradient_ind = max( enumerate(gradient), key = lambda tup: tup[1])[0]
@@ -251,7 +253,7 @@ if __name__ == "__main__":
     out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, log = False, max_iter = 100, steep = False)
     print 'Flat 90pct: ', print_results2(out)
 
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, log = False, max_iter = 100, steep = True)
+    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, log = False, max_iter = 200, steep = True)
     print 'Steep 50pct: ', print_results2(out)
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, log = False, max_iter = 100, steep = False)
+    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, log = False, max_iter = 200, steep = False)
     print 'Flat 50pct: ', print_results2(out)
