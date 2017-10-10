@@ -60,7 +60,8 @@ class Gradient:
         data = []
         data.extend(self.data['lo'])
         data.extend(self.data['hi'])
-        data_t = [i_v for i_v in enumerate(data) if (i_v[0] / 2) in self.clrs]
+        data_t = [i_v for i_v in enumerate(data) ]
+        data_t = filter( lambda i_v: (i_v[0] % 3) in self.clrs, data_t)
         
         if steep == True:
             ind = max( data_t, key = lambda tup: tup[1])[0]
@@ -101,14 +102,7 @@ class Log:
     def get_data(self):
         return copy.deepcopy(self.data)
         
-        
-    def printout(self):
-        print 'INIT: ------------'
-        # print 'total pxs: %i' % total
-        # print 'color range: \n', "\n".join( map(lambda x: str(x), clr_range) )
-        # print 'clr_lo: ', str(clr_lo)
-        # print 'clr_hi: ', str(clr_hi)
-    
+
 
 
 def iter7(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
@@ -236,36 +230,55 @@ if __name__ == "__main__":
     p = "../data/write/july/imgs17/img1.jpg"
     img = cv2.imread(p)
 
+    ## Steep Vs. Flat
     
     out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True 
                 ,max_iter = 100, steep = True)
-
     print 'Steep 90pct: ', print_results3(out, round_places = 5)
-
-    print 'Debug:----------------- \n', 
+    print 'Debug:------------------------ \n', 
     print print_debug(out[2], full = False, short = (1,3,4,5,6))
     print '\n'
     
-    
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.96, b_log = True
-                ,max_iter = 15, steep = False)
-    
+    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)
     print 'Flat 90pct: ', print_results3(out, round_places = 5)
-
-    print 'Debug:----------------- \n', 
-    print print_debug(out[2], full = False, short = (1,3,4,5,6))
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
+
+    ## How far you can go with the Ball
 
     p = "../data/write/july/imgs17/rect1.jpg"
     img = cv2.imread(p)
     
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.96, b_log = True
-                ,max_iter = 15, steep = False)
-    
-    print 'Flat 90pct: ', print_results3(out, round_places = 5)
+    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)    
+    print 'Flat 90 on Ball: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 30 to 35) -------- \n', 
+    print print_debug(out[2][30:35], full = False, short = (1,3,4,5,6))
+    print '\n'
 
-    print 'Debug:----------------- \n', 
-    print print_debug(out[2], full = False, short = (1,3,4,5,6))
+    ## Seperate Colors
+
+    out = iter7(img, clrs = (0,), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)    
+    print 'Color0 90 on Ball: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
+    print '\n'
+
+    out = iter7(img, clrs = (1,), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)    
+    print 'Color1 90 on Ball: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
+    print '\n'
+
+    out = iter7(img, clrs = (2,), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)    
+    print 'Color2 90 on Ball: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
     
     a = """
