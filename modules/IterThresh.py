@@ -173,17 +173,6 @@ def iter7(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
 
 if __name__ == "__main__":
 
-    def print_results2(data, full = False, round_places = 3, short = (1,2,3,4)):
-        r_data = []
-        for d in data:
-            try:
-                r_data.append( round(d,round_places) )
-            except:
-                r_data.append( d )
-        if full:
-            return str(r_data)
-        short_data = [r_data[i] for i in range(len(r_data)) if i in short]
-        return str(short_data)
 
     def print_results3(data, full = False, round_places = 3, short = (1,2,3,4,5)):
         r_data = []
@@ -227,11 +216,13 @@ if __name__ == "__main__":
 
     #RUN TESTS -------------------------------------------------
 
+
+
+    ## Steep Vs. Flat
+
     p = "../data/write/july/imgs17/img1.jpg"
     img = cv2.imread(p)
 
-    ## Steep Vs. Flat
-    
     out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True 
                 ,max_iter = 100, steep = True)
     print 'Steep 90pct: ', print_results3(out, round_places = 5)
@@ -280,24 +271,12 @@ if __name__ == "__main__":
     print 'Debug: (iters 0 to 5) -------- \n', 
     print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
+
+    out = iter7(img, clrs = (0,2), goal_pct = 0.90, b_log = True
+                ,max_iter = 300, steep = False)    
+    print 'Color-0and2 90 on Ball: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
+    print '\n'
     
-    a = """
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = False, max_iter = 100, steep = True)
-    print 'Steep 90pct: ', str(out)
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = False, max_iter = 100, steep = False)
-    print 'Flat 90pct: ', print_results2(out)
-
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, b_log = False, max_iter = 200, steep = True)
-    print 'Steep 50pct: ', print_results2(out)
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.50, b_log = False, max_iter = 200, steep = False)
-    print 'Flat 50pct: ', print_results2(out)
-
-    out = iter7(img, clrs = (0,), goal_pct = 0.50, b_log = False, max_iter = 200, steep = True)
-    print 'Color0 50pct: ', print_results2(out)
-    out = iter7(img, clrs = (1,), goal_pct = 0.50, b_log = False, max_iter = 200, steep = True)
-    print 'Color1 50pct: ', print_results2(out)
-    out = iter7(img, clrs = (0,1), goal_pct = 0.50, b_log = False, max_iter = 200, steep = True)
-    print 'Color1-2 Steep: ', print_results2(out)
-    out = iter7(img, clrs = (0,1), goal_pct = 0.50, b_log = False, max_iter = 200, steep = False)
-    print 'Color1-2 Flatt: ', print_results2(out)
-    """
+    
