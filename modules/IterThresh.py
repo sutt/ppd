@@ -103,9 +103,25 @@ class Log:
         return copy.deepcopy(self.data)
         
 
+def combine_threshes(data, liberal = True ):
+    if len(data) < 1:
+        print 'not any data in log'
+        return (  np.array( [0,0,0], dtype = 'uint8' ),
+                  np.array( [255,255,255], dtype = 'uint8' ) )
+    else:
+        _lo, _hi = [[255,255,255], [0,0,0]]
+        for row in data:
+            lo, hi = row[0], row[1]
+            for i,clr in enumerate(lo):
+                if clr < _lo[i]: _lo[i] = clr
+            for i,clr in enumerate(hi):
+                if clr > _hi[i]: _hi[i] = clr
+    return ( np.array( _lo, dtype = 'uint8') 
+            ,np.array( _hi, dtype = 'uint8') )
 
 
-def iter7(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
+
+def iterThreshA(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
               ,epsilon = 0.005, max_iter = (255*3), b_log = False):
     
     CLRS = (0,1,2)
@@ -169,7 +185,8 @@ def iter7(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
     if log.b_log: errLog.add_log(log.get_data())
     return errLog.get_data()
 
-
+def iterThreshWrapper(img,**kwargs):
+    pass
 
 if __name__ == "__main__":
 
@@ -213,7 +230,6 @@ if __name__ == "__main__":
             r_data.append(temp_row)
         return "\n".join([str(s) for s in r_data])
 
-
     #RUN TESTS -------------------------------------------------
 
 
@@ -223,14 +239,14 @@ if __name__ == "__main__":
     p = "../data/write/july/imgs17/img1.jpg"
     img = cv2.imread(p)
 
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True 
+    out = iterThreshA(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True 
                 ,max_iter = 100, steep = True)
     print 'Steep 90pct: ', print_results3(out, round_places = 5)
     print 'Debug:------------------------ \n', 
     print print_debug(out[2], full = False, short = (1,3,4,5,6))
     print '\n'
     
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)
     print 'Flat 90pct: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 0 to 5) -------- \n', 
@@ -242,7 +258,7 @@ if __name__ == "__main__":
     p = "../data/write/july/imgs17/rect1.jpg"
     img = cv2.imread(p)
     
-    out = iter7(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (0,1,2), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)    
     print 'Flat 90 on Ball: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 30 to 35) -------- \n', 
@@ -251,32 +267,44 @@ if __name__ == "__main__":
 
     ## Seperate Colors
 
-    out = iter7(img, clrs = (0,), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (0,), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)    
     print 'Color0 90 on Ball: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 0 to 5) -------- \n', 
     print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
 
-    out = iter7(img, clrs = (1,), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (1,), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)    
     print 'Color1 90 on Ball: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 0 to 5) -------- \n', 
     print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
 
-    out = iter7(img, clrs = (2,), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (2,), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)    
     print 'Color2 90 on Ball: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 0 to 5) -------- \n', 
     print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
 
-    out = iter7(img, clrs = (0,2), goal_pct = 0.90, b_log = True
+    out = iterThreshA(img, clrs = (0,2), goal_pct = 0.90, b_log = True
                 ,max_iter = 300, steep = False)    
     print 'Color-0and2 90 on Ball: ', print_results3(out, round_places = 5)
     print 'Debug: (iters 0 to 5) -------- \n', 
     print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
     print '\n'
+
+    #standard output
+    out = iterThreshA(img, clrs = (0,2), goal_pct = 0.90, b_log = False
+                ,max_iter = 300, steep = False)    
+    print 'b_log=F pretty out: ', print_results3(out, round_places = 5)
+    print 'standard out', str(out)
+    print '\n'
     
-    
+    d = []
+    d.append( ((100,100,100),(200,200,200)))
+    d.append( ((100,99,100),(200,20,205)))
+    d.append( ((98,102,100),(200,200,20)))
+    out = combine_threshes(d)
+    print 'combined_thresh: ', str(out)

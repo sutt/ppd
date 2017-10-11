@@ -19,6 +19,7 @@ from modules.ImgProcs import threshA, transformA, repairA, multi_thresh
 from modules.TrackA import find_xy, find_radius
 from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
+from modules.IterThresh import iterThreshA, combine_threshes
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
@@ -47,13 +48,22 @@ def main():
 
     hist_update_hz = 1
     waitKeyRefresh = 1
-    Globals.current_tracking_frame = ((100,100),(200,200))
+    
+    rect_size = 50
+    xy = (100,100)
+    xy2 = (xy[0] + rect_size, xy[1] + rect_size)  #(200,200)
+    Globals.current_tracking_frame = (xy,xy2)
+    
     pause_rect = None
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
     #Globals.threshLoHsv, Globals.threshHiHsv = (29, 86, 6), (64, 255, 255)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
     Globals.b_thresh_hsv = False
     Globals.b_thresh_rgb = True
+
+    Globals.thresh_pct = 0.95   # 0.98
+    b_thresh_log = True
+    Globals.thresh_log = []
 
     switch_new_ylim = True  
     time_last = time.time()
@@ -148,7 +158,18 @@ def main():
                             ,epsilon = .0001)
                 
                 last_hist_update = time.time()
- 
+
+        # ITER THRESH
+        if ((i+1) % 60 == 0) and False:
+            
+            img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+            out_thresh = iterThreshA(img_crop
+                                    ,goal_pct = Globals.thresh_pct
+                                    ,steep = False)
+            Globals.threshLoRgb = np.array( out_thresh[1][3], dtype = 'uint8' )
+            Globals.threshHiRgb = np.array( out_thresh[1][4], dtype = 'uint8' )
+            print 'newThresh: \n', str(Globals.threshLoRgb), str(Globals.threshHiRgb)
+
         #SHOW IMAGES
         ShowImages(  display_img = True,   img_d = img_display
                     ,transform_img = True, img_t = img_t
@@ -166,8 +187,26 @@ def main():
             pause_rect = crop_img(img_t.copy(), Globals.current_tracking_frame)
             Globals.b_show_puase_rect = True
         
-        if cv2.waitKey(waitKeyRefresh)== ord('l'):
+        if cv2.waitKey(waitKeyRefresh)== ord('t'):
+            print 'starting iter-thresh: \n'
+            img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+            out_thresh = iterThreshA( img_crop
+                                      ,goal_pct = Globals.thresh_pct 
+                                      ,steep = False)
+            _lo , _hi = out_thresh[1][3], out_thresh[1][4]
+            print 'new thresh: ', str(_lo), str(_hi)
+            if b_thresh_log:
+                Globals.thresh_log.append( (_lo,_hi))
+                _lo, _hi = combine_threshes(Globals.thresh_log)
+                print 'combined log \n', str(_lo), str(_hi)
+                
+            Globals.threshLoRgb = np.array( _lo , dtype = 'uint8' )
+            Globals.threshHiRgb = np.array( _hi, dtype = 'uint8' )
+            print 'Globals set: ', str(Globals.threshLoRgb), str(Globals.threshHiRgb)
             
+
+        if cv2.waitKey(waitKeyRefresh)== ord('l'):
+
             writepath = "data/write/july"
             output_dir = uni_dir(writepath)
             make_dir(writepath + "/" + output_dir)

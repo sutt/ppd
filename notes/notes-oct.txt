@@ -24,9 +24,13 @@ x   ScratchHist2 -> modules/IterThresh
 
 BUGS:
 
-    single color shouldnt cutoff px_inrange 
+    x   single color shouldnt cutoff px_inrange 
 
-    single color doesnt work correctly above clr0
+    x   single color doesnt work correctly above clr0
+
+    x   create a key to save the picture and do IterThresh
+
+    do multiple iterThreshes
 
 TO-DO:
 
