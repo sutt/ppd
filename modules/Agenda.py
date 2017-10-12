@@ -1,0 +1,50 @@
+import sys, os, random, time, copy
+import Globals
+
+def tf_gen(xy = (100,100), square_size = 50):
+    xy2 = (xy[0] + square_size, xy[1] + square_size)
+    return (xy,xy2)
+
+def corners(img_wh, margins = 150, size = 50):
+    w,h = img_wh[0], img_wh[1] 
+    ret = []
+    pad = margins + size
+    # ret.append( ((w - pad, h - pad), size) )
+    # ret.append( ((pad, h - pad), size) )
+    # ret.append( ((pad, pad), size) )
+    # ret.append( ((w - pad, pad), size) )
+    
+    ret.append( ((w - pad, h - pad), size) )
+    ret.append( ((margins, h - pad), size) )
+    ret.append( ((margins, margins), size) )
+    ret.append( ((w - pad, margins), size) )
+
+    return ret[:]
+
+data = [ ((100,100), 50)
+        ,((200,100), 50)
+        ,((100,200), 50)
+        ]
+
+class AgendaA:
+
+    def __init__(self, img_wh = (640,480)):
+        self.seq_ind = 0
+        self.img_wh = (640,480)
+        #self.track_frame_routine = copy.deepcopy(data) 
+        self.track_frame_routine = corners(img_wh = self.img_wh
+                                        ,margins = 50, size = 50) 
+        #print 
+
+    def do_agenda(self, **kwargs):
+        print 'AGENDA'
+        routine = self.track_frame_routine
+        len_routine = len(routine)
+        #print 'AGENDA, length: ', str(len_routine)
+        if len_routine - 1 < self.seq_ind:
+            print 'Routine at End. Seq num: ', str(self.seq_ind)
+        else:
+            d = routine[self.seq_ind]
+            Globals.current_tracking_frame = tf_gen(xy = d[0],square_size = d[1] )
+            print 'New Tracking Frame: ', str(Globals.current_tracking_frame)
+            self.seq_ind += 1

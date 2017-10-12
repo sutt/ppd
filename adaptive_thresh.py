@@ -20,6 +20,7 @@ from modules.TrackA import find_xy, find_radius
 from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
 from modules.IterThresh import iterThreshA, combine_threshes
+from modules.Agenda import AgendaA
 #from MiscUtils import hist_from_img, create_tracking_frame
 #from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
@@ -29,6 +30,8 @@ ap.add_argument("--showhisto", action="store_true")
 ap.add_argument("--showbackghisto", action="store_true")
 ap.add_argument("--startuppause", action="store_true")
 ap.add_argument("--printlog", action="store_true")
+ap.add_argument("--agenda", action="store_true")
+
 args = vars(ap.parse_args())
 
 
@@ -50,13 +53,12 @@ def main():
     waitKeyRefresh = 1
     
     rect_size = 50
-    xy = (100,100)
+    xy = (500,400)
     xy2 = (xy[0] + rect_size, xy[1] + rect_size)  #(200,200)
-    Globals.current_tracking_frame = (xy,xy2)
+    Globals.current_tracking_frame = ((10,20),(50, 60)) #(xy,xy2)
     
     pause_rect = None
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
-    #Globals.threshLoHsv, Globals.threshHiHsv = (29, 86, 6), (64, 255, 255)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
     Globals.b_thresh_hsv = False
     Globals.b_thresh_rgb = True
@@ -70,10 +72,14 @@ def main():
     info_annotations = []
     livehist = None
     i = 0
-
+    
     cam_params = (640,480)
     h_img, w_img = cam_params[0], cam_params[1]
     cam_type = 'cv_cam'   # 'pi_cam','file_cam'
+
+    b_agenda = args["agenda"]
+    sw_agenda = False
+    if b_agenda: agenda = AgendaA(img_wh = cam_params)
 
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
@@ -189,12 +195,15 @@ def main():
         
         if cv2.waitKey(waitKeyRefresh)== ord('t'):
             print 'starting iter-thresh: \n'
+
             img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+
             out_thresh = iterThreshA( img_crop
                                       ,goal_pct = Globals.thresh_pct 
                                       ,steep = False)
             _lo , _hi = out_thresh[1][3], out_thresh[1][4]
             print 'new thresh: ', str(_lo), str(_hi)
+            
             if b_thresh_log:
                 Globals.thresh_log.append( (_lo,_hi))
                 _lo, _hi = combine_threshes(Globals.thresh_log)
@@ -203,7 +212,10 @@ def main():
             Globals.threshLoRgb = np.array( _lo , dtype = 'uint8' )
             Globals.threshHiRgb = np.array( _hi, dtype = 'uint8' )
             print 'Globals set: ', str(Globals.threshLoRgb), str(Globals.threshHiRgb)
-            
+            sw_agenda = True
+        
+        if cv2.waitKey(waitKeyRefresh)== ord('a'):    
+            sw_agenda = True
 
         if cv2.waitKey(waitKeyRefresh)== ord('l'):
 
@@ -230,6 +242,12 @@ def main():
 
         # if cam_type == 'file_cam' and b_slow_for_fps:
             # DelayFPS(time_last, 30)
+
+        if b_agenda:
+            
+            if sw_agenda:
+                agenda.do_agenda()
+                sw_agenda = False
 
         # LOGGING
         info_annotations.append(i)
