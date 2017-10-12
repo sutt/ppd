@@ -30,15 +30,35 @@ BUGS:
 
     x   create a key to save the picture and do IterThresh
 
-    do multiple iterThreshes
+    x   do multiple iterThreshes
+
+
 
 TO-DO:
 
+    Need evaluation of Thresh Module:
+        A. Eval on static images
+            1. TP and FN of captured rect_imgs
+            2. TN and FP of img outside rect_img
+                -> need a part of agenda that just does sample data
+
+        B. Eval on live video of N-seconds:
+            How many frames captured a ball out of total?
+            How many frames captured a ball when there was none?
+            -> this can go into fbf.py util to assess errors
+
+    Add MultipleMasks: RGB and HSV
+
+    Add a way to assess how many objects are found in mask given the thresh
+        -> allows
+
+    add a console/ or gui that communicates without waitKey thrashing
+    
     true gradient:
         only look back N spaces on x_i if current cheapest X is more advanced by 
         N-steps than x_i is
     
-    add a console that communicates without waitKey thrashing
+    
 
     add a unified way of calling into tests, resolving where data is, etc
 
