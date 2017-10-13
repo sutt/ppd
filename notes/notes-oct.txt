@@ -36,6 +36,12 @@ BUGS:
 
 TO-DO:
 
+    example multi_thresh
+        write and save rect files
+        combine the rects
+
+    add a timer after each keypress
+
     Need evaluation of Thresh Module:
         A. Eval on static images
             1. TP and FN of captured rect_imgs

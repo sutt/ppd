@@ -21,8 +21,6 @@ from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
 from modules.IterThresh import iterThreshA, combine_threshes
 from modules.Agenda import AgendaA
-#from MiscUtils import hist_from_img, create_tracking_frame
-#from MiscUtils import mock_gaussian, rand_gauss_params, mock_hist_data
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
@@ -31,6 +29,7 @@ ap.add_argument("--showbackghisto", action="store_true")
 ap.add_argument("--startuppause", action="store_true")
 ap.add_argument("--printlog", action="store_true")
 ap.add_argument("--agenda", action="store_true")
+ap.add_argument("--agendatimer", action="store_true")
 
 args = vars(ap.parse_args())
 
@@ -79,7 +78,13 @@ def main():
 
     b_agenda = args["agenda"]
     sw_agenda = False
-    if b_agenda: agenda = AgendaA(img_wh = cam_params)
+    if b_agenda: 
+        agenda = AgendaA(img_wh = cam_params)
+        b_agenda_timer = args["agendatimer"]
+        sw_reset_agenda_timer = False
+        next_agenda_time = time.time() + 999999.9
+
+
 
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
@@ -243,11 +248,32 @@ def main():
         # if cam_type == 'file_cam' and b_slow_for_fps:
             # DelayFPS(time_last, 30)
 
+        
+        # AGENDA
         if b_agenda:
-            
+        
+            if b_agenda_timer:
+                if (sw_agenda == False) and sw_reset_agenda_timer:
+                    next_agenda_time = time.time() + 3.0
+                    sw_reset_agenda_timer = False
+
+                elif time.time() > next_agenda_time:
+                    sw_agenda = True
+                    
             if sw_agenda:
-                agenda.do_agenda()
+                img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+                
+                agenda.log_rect_imgs(img_crop)
+                agenda.write_rect_files(img_crop)
+                agenda.do_rect_move()
+                
+                if (agenda.seq_end) and not(agenda.b_calcd_combined):
+                    _lo, _hi = agenda.combine_threshes()
+                    agenda.apply_thresh(_lo,_hi)
+
                 sw_agenda = False
+                if b_agenda_timer: sw_reset_agenda_timer = True
+
 
         # LOGGING
         info_annotations.append(i)

@@ -49,8 +49,11 @@ def write_pic(img, **kwargs):
 
     p = writepath + "/" + writepic_path
     name_base = kwargs.get("name_base", "pic")
-    pic_name = uni_file(p ,name=name_base,ext=".jpg")
-
+    if kwargs.get('randomize',True):
+        pic_name = uni_file(p ,name=name_base,ext=".jpg")
+    else:
+        pic_name = str(name_base) + ".jpg"
+    
     try:
         cv2.imwrite(pic_name,img)
     except:
