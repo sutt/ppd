@@ -23,6 +23,10 @@ def repairA(img, iterations = 2):
     img = cv2.dilate(img, None, iterations=iterations)
     return img
 
+def multi_thresh_cv(img1, img2, b_And = True, b_Or = False):
+    return cv2.bitwise_and(img1,img2)
+    
+
 def multi_thresh(img1, img2, b_And = True, b_Or = False):
     
     ret = img1.copy()

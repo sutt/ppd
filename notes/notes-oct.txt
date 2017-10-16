@@ -32,15 +32,32 @@ BUGS:
 
     x   do multiple iterThreshes
 
+        pylinting is active in modules/Methods but not other files?
 
+CMDS:
+
+    >python adaptive_thresh.py --agenda --agendatimer
+
+        this allows agenda to change rect every 3 seconds
+        then it combines threshes at the end
 
 TO-DO:
 
-    example multi_thresh
+    x   example multi_thresh
         write and save rect files
         combine the rects
 
-    add a timer after each keypress
+    x   add a timer after each keypress
+
+            add the countdown time on annotations
+            display all rect img's collected in html
+
+    
+    x    Add MultipleMasks: RGB and HSV
+    x    find a way to combine masks in opencv layer
+         Now, make agenda do a thresh for rgb and combine them
+
+
 
     Need evaluation of Thresh Module:
         A. Eval on static images
@@ -53,8 +70,7 @@ TO-DO:
             How many frames captured a ball when there was none?
             -> this can go into fbf.py util to assess errors
 
-    Add MultipleMasks: RGB and HSV
-
+    
     Add a way to assess how many objects are found in mask given the thresh
         -> allows
 

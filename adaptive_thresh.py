@@ -15,7 +15,7 @@ from modules.Methods import InitLiveHist, SwitchYLim
 from modules.GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
 from modules.GraphicsCV import ShowImages
 from modules.ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
-from modules.ImgProcs import threshA, transformA, repairA, multi_thresh
+from modules.ImgProcs import threshA, transformA, repairA, multi_thresh_cv
 from modules.TrackA import find_xy, find_radius
 from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
@@ -110,7 +110,7 @@ def main():
                                 ,threshHi = Globals.threshHiRgb )
         
         if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
-            img_mask = multi_thresh(img_mask_hsv,img_mask_rgb)
+            img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
         elif Globals.b_thresh_hsv:
             img_mask = img_mask_hsv
         elif Globals.b_thresh_rgb:
