@@ -32,7 +32,11 @@ BUGS:
 
     x   do multiple iterThreshes
 
-        pylinting is active in modules/Methods but not other files?
+    x   pylinting is active in modules/Methods but not other files?
+
+        ImgProcs.transformA applies a GaussianBlur as part of mask
+        but iterThresh and histo do not use this transformed image
+        Does ShowImages display a blurred hsv?
 
 CMDS:
 
@@ -55,7 +59,7 @@ TO-DO:
     
     x    Add MultipleMasks: RGB and HSV
     x    find a way to combine masks in opencv layer
-         Now, make agenda do a thresh for rgb and combine them
+    x    Now, make agenda do a thresh for rgb and combine them
 
 
 

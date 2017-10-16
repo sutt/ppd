@@ -80,7 +80,7 @@ def main():
     b_agenda = args["agenda"]
     sw_agenda = False
     if b_agenda: 
-        agenda = AgendaA(img_wh = cam_params)
+        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = True)
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
         next_agenda_time = time.time() + 999999.9
@@ -268,9 +268,17 @@ def main():
                 agenda.write_rect_files(img_crop)
                 agenda.do_rect_move()
                 
-                if (agenda.seq_end) and not(agenda.b_calcd_combined):
-                    _lo, _hi = agenda.combine_threshes()
-                    agenda.apply_thresh(_lo,_hi)
+                if (agenda.seq_end) and not(agenda.sw_calcd_combined):
+                    
+                    if agenda.b_rgb_thresh:
+                        _lo, _hi = agenda.combine_threshes()
+                        agenda.print_logs()
+                        agenda.apply_thresh(_lo,_hi)
+
+                    if agenda.b_hsv_thresh:
+                        _lo, _hi = agenda.combine_threshes(thresh_type = 'hsv')
+                        agenda.print_logs()
+                        agenda.apply_thresh(_lo,_hi, thresh_type = 'hsv')
 
                 sw_agenda = False
                 if b_agenda_timer: sw_reset_agenda_timer = True

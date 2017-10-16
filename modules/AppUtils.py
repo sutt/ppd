@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import imutils
 
-writepath = "data/write/july"
+writepath = "data/write/oct"
 
 def uni_file(inp_path,name="output",ext=".h264"):
     files = os.listdir(inp_path)
