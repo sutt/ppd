@@ -41,7 +41,7 @@ def routineA(img_wh = (640,480), **kwargs):
 def routineB(img_wh = (640,480), **kwargs):
     ret = []
     ret.extend( middle( img_wh,size = 80) )
-    ret.extend( corners(img_wh,margins = 100, size = 80) )
+    ret.extend( corners(img_wh,margins = 100, size = 50) )
     return ret
 
 data = [ ((100,100), 50)

@@ -21,6 +21,7 @@ from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
 from modules.IterThresh import iterThreshA, combine_threshes
 from modules.Agenda import AgendaA
+from modules.Agenda import middle, corners, tf_gen
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
@@ -51,10 +52,10 @@ def main():
     hist_update_hz = 1
     waitKeyRefresh = 1
     
-    rect_size = 50
-    xy = (500,400)
-    xy2 = (xy[0] + rect_size, xy[1] + rect_size)  #(200,200)
-    Globals.current_tracking_frame = ((10,20),(50, 60)) #(xy,xy2)
+    mid_xy = middle( (640,480), size = 80)[0][0]
+    print mid_xy
+    _tf = tf_gen(xy = mid_xy, square_size = 80)
+    Globals.current_tracking_frame = (_tf[0],_tf[1]) #(xy,xy2)
     
     pause_rect = None
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
