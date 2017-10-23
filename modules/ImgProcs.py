@@ -56,3 +56,6 @@ def pct_inrange_cv(img, lo, hi, total = 0):
     if total == 0: total = len(img)*len(img[0])
     pct_i = float(t_i) / float(total)
     return pct_i
+
+
+

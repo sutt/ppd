@@ -1,3 +1,39 @@
+1022
+
+    doing iterThreshB which makes threshold more lenient based on background-image
+
+    Finally, need to do another Agenda element:
+        - A box that records a quick video where the ball "always is", thus each frames
+          should have a tracking success, helping us identify FalseNeg's
+        - an iterThreshC that makes the threshold wider to satisfy any frames missing
+        - these occur at different locations and different size bouding boxes
+        - need a real time indicator if a frame is missed
+
+        Could be image 9th's, 1 each
+
+    And also an Agenda element that records a video where the ball never is, helping
+    us identify FalsePositives
+
+    Ultimately, this can lead to differnet threshes in different parts of the image
+
+        for x/y there are segments, but also for "z", distance from camera ...
+
+            applying mutliple_threses to image, then filtering for radius size
+                e.g. small/distant balls have thresh_a 
+                     and large/close balls have thresh_b
+
+    
+
+10/19
+
+    Redo Iter7 using penalty as the criterion
+
+        as a function of (radius_current (distance))
+        "largest radius object | thresh-i"
+
+    need to modularize the thresh function
+    and the count
+
 10/9
 
 x   ScratchHist2 -> modules/IterThresh

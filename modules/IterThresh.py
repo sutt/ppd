@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 from ImgProcs import px_data, px_range, pct_inrange_cv
+from TrackA import shapes_seen
 
 
 class F:
@@ -12,6 +13,7 @@ class F:
         self.threshHi = [255,255,255]
         self.clrs = clrs
         self.p = 0
+        self.x_end = [True] * 6
 
     def get_threshLo(self, **kwargs):
         if kwargs.get('np',False): 
@@ -31,9 +33,28 @@ class F:
         self.p = sum(self.threshLo) - sum(self.threshHi) + (255*3)
         return self.p
         
+    def get_x_end(self):
+        return copy.copy(self.x_end)
+
+    def set_delta_widen(self, side, clr, val = 1):
+        if side == 'lo': 
+            if self.threshLo[clr] > 0:
+                self.threshLo[clr] -= val
+        if side == 'hi': 
+            if self.threshHi[clr] < 255:
+                self.threshHi[clr] += val
+
     def set_delta(self, side, clr, val = 1):
-        if side == 'lo': self.threshLo[clr] += val
-        if side == 'hi': self.threshHi[clr] -= val
+        if side == 'lo': 
+            if self.x_end[0 + clr]:
+                self.threshLo[clr] += val
+            if self.threshLo[clr] == 0:
+                self.x_end[0 + clr] = False
+        if side == 'hi': 
+            if self.x_end[3 + clr]:
+                self.threshHi[clr] -= val
+            if self.threshHi[clr] == 255:
+                self.x_end[3 + clr] = False
 
 class Gradient:
     
@@ -56,7 +77,29 @@ class Gradient:
         data.extend(self.data['hi'])
         return data
 
-    def get_best(self, steep = True):
+    def get_best(self, steep = True, x_end = [True]*6):
+        data = []
+        data.extend(self.data['lo'])
+        data.extend(self.data['hi'])
+        data_t = [i_v for i_v in enumerate(data) ]
+        data_t = [data_t[i] for i in range(6) if x_end[i] ]
+        data_t = filter( lambda i_v: (i_v[0] % 3) in self.clrs, data_t)
+
+        if steep == True:
+            ind = max( data_t, key = lambda tup: tup[1])[0]
+        else:
+            ind = min( data_t, key = lambda tup: tup[1])[0]
+        
+        g_clr = ind % 3
+        g_side = 'lo' if (ind / 3 == 0) else 'hi'
+        return (g_side,g_clr)
+
+    def get_best_random(self, steep = True):
+        g_side = str(['lo','hi'][int(random.uniform(0,1))])
+        g_clr = int(random.uniform(0,2))
+        return (g_side,g_clr)
+    
+    def get_best2(self, steep = True):
         data = []
         data.extend(self.data['lo'])
         data.extend(self.data['hi'])
@@ -75,8 +118,10 @@ class Gradient:
 
 class ErrLog:
     
-    def __init__(self):
-        self.min_err = 1.0  #everything is less than 1.0
+    def __init__(self, **kwargs):
+        self.min_err = float(kwargs.get('init_err',1.0))  #everything is less than 1.0
+        self.max_rad = 0
+        self.total_contours = 0
         self.misc = 1
         self.log = None
     def update(self, err, misc):
@@ -184,6 +229,87 @@ def iterThreshA(img, clrs = (0,1,2), goal_pct = 0.95, steep = True
                     
     if log.b_log: errLog.add_log(log.get_data())
     return errLog.get_data()
+
+def tracked_shapes(img, thresh, b_max_radius = True):
+    
+    s = shapes_seen(img, thresh, blur = 11, repair_iters = 0, b_ret_radius = True, b_ret_area = False)
+
+    if len(s) == 0:
+        return 0
+    if b_max_radius:
+        max_s = max(s)
+        return max_s
+    return 0
+
+
+def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2), 
+                e_goal = 10.0, steep = True, epsilon = 1.0, 
+                max_iter = (255*3), b_log = False):
+    
+    """ this one uses a penalty as a function of background-img and amount of contours
+    that are found in the background image"""
+    
+    CLRS = (0,1,2)
+
+    clr_data = [c.flatten() for c in cv2.split(img)]
+    clr_range = [px_range(c) for c in clr_data]
+
+    f = F(clrs = clrs)
+    for clr_i in CLRS:
+        if clr_i in clrs:
+            f.set_thresh(side = 'lo', clr = clr_i, val = init_thresh[0][clr_i] )
+            f.set_thresh(side = 'hi', clr = clr_i, val = init_thresh[1][clr_i] )
+
+    errLog = ErrLog(init_err = e_goal)
+    gradient = Gradient(clrs = clrs)
+    log = Log(b_log)
+
+    for _t in range(0,max_iter):
+        
+        e_i = tracked_shapes(img, (f.get_threshLo(np=True), f.get_threshHi(np=True)))
+        
+        err = abs(e_goal - e_i)    
+        if err < errLog.get_min_err():
+            misc = (_t, e_i, err, f.get_threshLo(), f.get_threshHi(), f.get_penalty())
+            errLog.update(err, misc)
+            print 'updated!'
+
+        if (e_i - epsilon) <= e_goal <= (e_i + epsilon):
+            break
+
+        if e_i > e_goal: 
+            break
+
+        if e_i < e_goal:
+            
+            gradient.reset()
+            
+            for clr_i in CLRS:
+                if clr_i in clrs:
+                    for side in ('lo', 'hi'):
+                        
+                        f_prime = copy.deepcopy(f)
+                        f_prime.set_delta(side = side, clr = clr_i, val = -1)
+                        
+                        e_prime = tracked_shapes(img, 
+                                  ( f_prime.get_threshLo(np=True) 
+                                   ,f_prime.get_threshHi(np=True) ) 
+                                   )
+                                            
+                        gradient.set(side = side, clr = clr_i, val = e_prime - e_i)
+            
+            gradient_ind = gradient.get_best(steep = steep, x_end = f.get_x_end() )
+            
+            if log.b_log: 
+                log.update( (_t, e_i, err, f.get_threshLo(), f.get_threshHi()
+                            ,gradient.get_data(), gradient_ind, f.get_penalty() 
+                           ) ) 
+
+            f.set_delta(side = gradient_ind[0], clr = gradient_ind[1], val = -1)
+            
+    if log.b_log: errLog.add_log(log.get_data())
+    return errLog.get_data()
+
 
 def iterThreshWrapper(img,**kwargs):
     pass
@@ -307,4 +433,19 @@ if __name__ == "__main__":
     d.append( ((100,99,100),(200,20,205)))
     d.append( ((98,102,100),(200,200,20)))
     out = combine_threshes(d)
-    print 'combined_thresh: ', str(out)
+    print 'combined_thresh: ', str(out), '\n'
+
+    img_p  = "C:/Users/wsutt/Desktop/files/ppd/ppd/data/write/july/imgs21/img1.jpg"
+    back_img = cv2.imread(img_p)
+
+    out = iterThreshB(back_img.copy(), init_thresh =  [[25, 97, 22], [70, 150, 82]],
+                        clrs = (0,1,2), e_goal = 10.0, b_log = True
+                        ,max_iter = 300, steep = False)    
+    # print str(out)[:20]
+    print 'example iterThreshB 90 on Background: ', print_results3(out, round_places = 5)
+    print 'Debug: (iters 0 to 5) -------- \n', 
+    print print_debug(out[2][:5], full = False, short = (1,3,4,5,6))
+    len_debug = len(out[2])
+    print 'length of debug out: ', str(len_debug)
+    print print_debug(out[2][len_debug-10:len_debug], full = False, short = (1,3,4,5,6))
+    print '\n'
