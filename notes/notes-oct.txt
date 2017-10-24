@@ -1,7 +1,22 @@
+10/24
+
+        Repair intellisense
+        
+        get b_thresh_xxx into args
+
+        AgendaBase class which can be inherited by A, B, etc
+
+        Need that GUI with real-time sliders
+            quick toggle for now
+
+        Track code modularized
+            share track code with IterThresh
+
+
 10/23
 
-    randomize helpds increment thresh randomly between 6 choices,
-    when all have a zero gradient
+    x   randomize helpds increment thresh randomly between 6 choices,
+        when all have a zero gradient
 
     gradient.randomize = True 
     [10.04998, 0.04998, [0, 88, 0], [76, 255, 106], 416.0]

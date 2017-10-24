@@ -57,6 +57,7 @@ class AgendaA:
         self.img_wh = (640,480)
         self.track_frame_routine = routineB()
         self.rect_log = []
+        self.backg_log = []
         self.seq_end = False
         self.sw_calcd_combined = False
         self.b_rgb_thresh = bool(kwargs.get('b_rgb_thresh', True))
@@ -74,8 +75,10 @@ class AgendaA:
         routine = self.track_frame_routine
         len_routine = len(routine)
         if len_routine - 1 < self.seq_ind:
+            if not(self.seq_end):
+                print 'Routine at End. Seq num: ', str(self.seq_ind)
             self.seq_end = True
-            print 'Routine at End. Seq num: ', str(self.seq_ind)
+            
         else:
             d = routine[self.seq_ind]
             Globals.current_tracking_frame = tf_gen(xy = d[0],square_size = d[1] )
@@ -89,6 +92,13 @@ class AgendaA:
 
     def log_rect_imgs(self, img, **kwargs):
         self.rect_log.append(img)
+
+    def write_backg_files(self, img, fname = "backg", **kwargs):
+        fname = str(fname) + str(self.seq_ind)
+        write_pic(img, name_base = fname, path=self.output_dir)
+
+    def log_backg_imgs(self, img, **kwargs):
+        self.backg_log.append(img)
         
     def combine_threshes(self, thresh_type = 'rgb', **kwargs):
         print 'starting combine thresh on : %s ' % thresh_type

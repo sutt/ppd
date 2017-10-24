@@ -54,7 +54,6 @@ def main():
     waitKeyRefresh = 1
     
     mid_xy = middle( (640,480), size = 80)[0][0]
-    print mid_xy
     _tf = tf_gen(xy = mid_xy, square_size = 80)
     Globals.current_tracking_frame = (_tf[0],_tf[1]) #(xy,xy2)
     
@@ -64,9 +63,7 @@ def main():
     Globals.b_thresh_hsv = True
     Globals.b_thresh_rgb = False
 
-    Globals.thresh_pct = args["pctthresh"]  #0.95   # 0.98
-    print type(Globals.thresh_pct)
-    print Globals.thresh_pct
+    Globals.thresh_pct = args["pctthresh"]  #0.95
     b_thresh_log = True
     Globals.thresh_log = []
 
@@ -100,9 +97,7 @@ def main():
         i += 1
         if not(ret): break
 
-        # THRESHOLD MASK
-        
-        
+        # THRESHOLD MASK    
         if Globals.b_thresh_hsv:
             img_t = transformA(frame.copy(), b_hsv = True)
             img_mask_hsv = threshA(img_t 
@@ -132,8 +127,6 @@ def main():
         # LOCATE / TRACK
         x,y = find_xy(img_mask)
         radius = find_radius(img_mask)
-        
-        # FILTER TRACK
         b_track_success = True
 
         #DRAW ONTO FRAME
