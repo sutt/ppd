@@ -77,7 +77,7 @@ class Gradient:
         data.extend(self.data['hi'])
         return data
 
-    def get_best(self, steep = True, x_end = [True]*6):
+    def get_best(self, steep = True, x_end = [True]*6, randomize = False):
         data = []
         data.extend(self.data['lo'])
         data.extend(self.data['hi'])
@@ -86,10 +86,23 @@ class Gradient:
         data_t = filter( lambda i_v: (i_v[0] % 3) in self.clrs, data_t)
 
         if steep == True:
-            ind = max( data_t, key = lambda tup: tup[1])[0]
+            _max_iv = max( data_t, key = lambda tup: tup[1])
+            ind = _max_iv[0]
         else:
-            ind = min( data_t, key = lambda tup: tup[1])[0]
+            _min_iv = min( data_t, key = lambda tup: tup[1])
+            ind = _min_iv[0]
         
+        if randomize:
+            if steep == True:
+                _max_inds = filter(lambda i_v: i_v[1] == _max_iv[1], data_t )
+                if len(_max_inds) > 1:
+                    ind = random.sample(_max_inds,1)[0][0]
+            else:
+                _min_inds = filter(lambda i_v: i_v[1] == _min_iv[1], data_t )
+                if len(_min_inds) > 1:
+                    ind = random.sample(_min_inds,1)[0][0]
+
+
         g_clr = ind % 3
         g_side = 'lo' if (ind / 3 == 0) else 'hi'
         return (g_side,g_clr)
@@ -99,21 +112,6 @@ class Gradient:
         g_clr = int(random.uniform(0,2))
         return (g_side,g_clr)
     
-    def get_best2(self, steep = True):
-        data = []
-        data.extend(self.data['lo'])
-        data.extend(self.data['hi'])
-        data_t = [i_v for i_v in enumerate(data) ]
-        data_t = filter( lambda i_v: (i_v[0] % 3) in self.clrs, data_t)
-        
-        if steep == True:
-            ind = max( data_t, key = lambda tup: tup[1])[0]
-        else:
-            ind = min( data_t, key = lambda tup: tup[1])[0]
-        
-        g_clr = ind % 3
-        g_side = 'lo' if (ind / 3 == 0) else 'hi'
-        return (g_side,g_clr)
     
 
 class ErrLog:
@@ -272,7 +270,6 @@ def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2
         if err < errLog.get_min_err():
             misc = (_t, e_i, err, f.get_threshLo(), f.get_threshHi(), f.get_penalty())
             errLog.update(err, misc)
-            print 'updated!'
 
         if (e_i - epsilon) <= e_goal <= (e_i + epsilon):
             break
@@ -298,7 +295,8 @@ def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2
                                             
                         gradient.set(side = side, clr = clr_i, val = e_prime - e_i)
             
-            gradient_ind = gradient.get_best(steep = steep, x_end = f.get_x_end() )
+            gradient_ind = gradient.get_best(steep = steep, x_end = f.get_x_end()
+                                            ,randomize = False)
             
             if log.b_log: 
                 log.update( (_t, e_i, err, f.get_threshLo(), f.get_threshHi()
