@@ -31,6 +31,7 @@ ap.add_argument("--startuppause", action="store_true")
 ap.add_argument("--printlog", action="store_true")
 ap.add_argument("--agenda", action="store_true")
 ap.add_argument("--agendatimer", action="store_true")
+ap.add_argument("--pctthresh", type=float, default=0.95)
 
 args = vars(ap.parse_args())
 
@@ -63,7 +64,9 @@ def main():
     Globals.b_thresh_hsv = False
     Globals.b_thresh_rgb = True
 
-    Globals.thresh_pct = 0.95   # 0.98
+    Globals.thresh_pct = args["pctthresh"]  #0.95   # 0.98
+    print type(Globals.thresh_pct)
+    print Globals.thresh_pct
     b_thresh_log = True
     Globals.thresh_log = []
 
@@ -80,7 +83,7 @@ def main():
     b_agenda = args["agenda"]
     sw_agenda = False
     if b_agenda: 
-        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = True)
+        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = False)
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
         next_agenda_time = time.time() + 999999.9
@@ -278,6 +281,7 @@ def main():
                     if agenda.b_hsv_thresh:
                         _lo, _hi = agenda.combine_threshes(thresh_type = 'hsv')
                         agenda.print_logs()
+                        print 'setting hsv'
                         agenda.apply_thresh(_lo,_hi, thresh_type = 'hsv')
 
                 sw_agenda = False

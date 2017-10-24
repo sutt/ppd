@@ -121,7 +121,7 @@ class AgendaA:
         elif thresh_type == 'hsv':
             Globals.threshLoHsv = np.array( lo , dtype = 'uint8' )
             Globals.threshHiHsv = np.array( hi, dtype = 'uint8' )
-            print 'Globals RGB set: ', str(Globals.threshLoHsv), str(Globals.threshHiHsv)
+            print 'Globals HSV set: ', str(Globals.threshLoHsv), str(Globals.threshHiHsv)
         else:
             print 'Couldnt find thresh_type to set global thresh'
 
