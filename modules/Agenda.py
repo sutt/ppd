@@ -59,7 +59,7 @@ class AgendaA:
         self.rect_log = []
         self.seq_end = False
         self.sw_calcd_combined = False
-        self.b_rgb_thresh = kwargs.get('b_rgb_thresh', True)
+        self.b_rgb_thresh = bool(kwargs.get('b_rgb_thresh', True))
         self.b_hsv_thresh = bool(kwargs.get('b_hsv_thresh', False))
         self.b_log_combine_proc = True
         self.combine_proc_log = []
@@ -98,6 +98,7 @@ class AgendaA:
             if thresh_type == 'hsv':
                 img = transformA(img.copy(), blur = 1, b_hsv = True)
 
+            #transformA(frame, blur > 0) -> img_t
             out_thresh = iterThreshA( img
                                       ,goal_pct = Globals.thresh_pct 
                                       ,steep = False)

@@ -61,8 +61,8 @@ def main():
     pause_rect = None
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
-    Globals.b_thresh_hsv = False
-    Globals.b_thresh_rgb = True
+    Globals.b_thresh_hsv = True
+    Globals.b_thresh_rgb = False
 
     Globals.thresh_pct = args["pctthresh"]  #0.95   # 0.98
     print type(Globals.thresh_pct)
@@ -83,7 +83,8 @@ def main():
     b_agenda = args["agenda"]
     sw_agenda = False
     if b_agenda: 
-        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = False)
+        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = Globals.b_thresh_hsv
+                        ,b_rgb_thresh = Globals.b_thresh_rgb)
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
         next_agenda_time = time.time() + 999999.9
@@ -100,17 +101,22 @@ def main():
         if not(ret): break
 
         # THRESHOLD MASK
-        img_t = transformA(frame.copy(), b_hsv = True)
+        
         
         if Globals.b_thresh_hsv:
+            img_t = transformA(frame.copy(), b_hsv = True)
             img_mask_hsv = threshA(img_t 
                                 ,threshLo = Globals.threshLoHsv 
                                 ,threshHi = Globals.threshHiHsv )
         
         if Globals.b_thresh_rgb:
-            img_mask_rgb = threshA(frame.copy() 
+            img_t = transformA(frame.copy())
+            img_mask_rgb = threshA(img_t 
                                 ,threshLo = Globals.threshLoRgb 
                                 ,threshHi = Globals.threshHiRgb )
+
+        if True: #Globals.b_thresh_hsv:
+            img_t = transformA(frame.copy(), b_hsv = True)
         
         if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
             img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
@@ -265,7 +271,7 @@ def main():
                     sw_agenda = True
                     
             if sw_agenda:
-                img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+                img_crop = crop_img(img_t.copy(), Globals.current_tracking_frame)
                 
                 agenda.log_rect_imgs(img_crop)
                 agenda.write_rect_files(img_crop)
