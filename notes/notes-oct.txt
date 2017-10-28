@@ -1,6 +1,20 @@
+10/28
+
+    notes:
+
+        currently, middle image is taken twice?
+        currently, it keeps logging rects every 3 seconds        
+        
+    todo:
+        combine_threshes strict
+        add a blur before solves
+        add a countdown on display
+
 10/24
 
         Repair intellisense
+
+        clean up draw_tracking vs draw_tracking
         
         get b_thresh_xxx into args
 

@@ -41,18 +41,18 @@ def main():
     #INIT & PARAMS
     Globals.init()
     
-    b_tracking_frame = True
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
     Globals.b_show_histos = args["showhisto"]  
     b_histo_backg = args["showbackghisto"]
+    switch_new_ylim = True  
+    livehist = None
+    
+    b_tracking_frame = True
     b_drawTracking = True
-    b_print_log = args["printlog"]
+    b_annotate_img = True
     Globals.b_show_puase_rect = False
 
-    hist_update_hz = 1
-    waitKeyRefresh = 1
-    
     mid_xy = middle( (640,480), size = 80)[0][0]
     _tf = tf_gen(xy = mid_xy, square_size = 80)
     Globals.current_tracking_frame = (_tf[0],_tf[1]) #(xy,xy2)
@@ -67,10 +67,11 @@ def main():
     b_thresh_log = True
     Globals.thresh_log = []
 
-    switch_new_ylim = True  
+    b_print_log = args["printlog"]
+    hist_update_hz = 1
+    waitKeyRefresh = 1
     time_last = time.time()
     info_annotations = []
-    livehist = None
     i = 0
     
     cam_params = (640,480)
@@ -85,7 +86,6 @@ def main():
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
         next_agenda_time = time.time() + 999999.9
-
 
 
     vc = initCam(cam_type)
@@ -138,7 +138,7 @@ def main():
         if b_drawTracking:
             img_display = draw_tracking(img_display,Globals.current_tracking_frame)
 
-        b_annotate_img = True
+        
         if b_annotate_img:
             img_display = draw_annotations(img_display, info_annotations)       
             
@@ -262,8 +262,15 @@ def main():
 
                 elif time.time() > next_agenda_time:
                     sw_agenda = True
+
+                else:
+                    _temp = round(next_agenda_time - time.time(), 1)
+                    if _temp < 10: _temp = "*" * int(_temp * 2)
+                    info_annotations.append(_temp)
                     
             if sw_agenda:
+                #bug - not img_t, frame.
+                #bug do a blur
                 img_crop = crop_img(img_t.copy(), Globals.current_tracking_frame)
                 
                 agenda.log_rect_imgs(img_crop)
@@ -288,7 +295,7 @@ def main():
 
 
         # LOGGING
-        info_annotations.append(i)
+        #info_annotations.append(i)
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)

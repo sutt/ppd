@@ -103,6 +103,7 @@ class AgendaA:
     def combine_threshes(self, thresh_type = 'rgb', **kwargs):
         print 'starting combine thresh on : %s ' % thresh_type
         threshes = []
+        
         for img in self.rect_log:
             
             if thresh_type == 'hsv':
