@@ -12,3 +12,4 @@ def init():
     global b_thresh_hsv
     global thresh_pct
     global thresh_log
+    global gui_pass1

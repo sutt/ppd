@@ -6,6 +6,8 @@ import imutils
 from collections import deque
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
+import Tkinter as tk
+import threading
 
 import modules.Globals as Globals
 from modules.Camera import initCam, setupCam, getFrame
@@ -22,6 +24,7 @@ from modules.Methods import Options
 from modules.IterThresh import iterThreshA, combine_threshes
 from modules.Agenda import AgendaA
 from modules.Agenda import middle, corners, tf_gen
+from modules.GuiA import GuiA
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
@@ -90,6 +93,8 @@ def main():
 
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
+
+    gui = GuiA()
 
     while(vc.isOpened()):
 
@@ -300,6 +305,7 @@ def main():
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
+
 
     #CLEANUP
     vc.release()
