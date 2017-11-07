@@ -6,9 +6,19 @@
         currently, it keeps logging rects every 3 seconds        
         
     todo:
-        combine_threshes strict
-        add a blur before solves
-        add a countdown on display
+            combine_threshes strict
+            add a blur before solves
+            add repair after threshing
+        x   add a countdown on display
+
+            add tracking class, for comparing roundness.
+                how to handle
+
+            multi-thresh stringency levels
+
+    bugs:
+
+        saving rects from img_t (a hsv transform)
 
 10/24
 

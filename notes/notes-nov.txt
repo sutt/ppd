@@ -1,0 +1,9 @@
+11/5
+
+get a basecamp on git
+
+get the gui you have now working
+
+write some tests for iterThresh so that it has a benchmark to compare
+
+add x-space class to iterthresh

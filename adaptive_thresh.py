@@ -43,7 +43,7 @@ def main():
 
     #INIT & PARAMS
     Globals.init()
-    
+    Globals.gui_pass1 = 0
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
     Globals.b_show_histos = args["showhisto"]  
@@ -306,7 +306,9 @@ def main():
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
 
-
+        # print 'RGB: ', str(Globals.b_thresh_rgb)
+        # print 'HSV: ', str(Globals.b_thresh_hsv)
+        # print Globals.gui_pass1
     #CLEANUP
     vc.release()
     cv2.destroyAllWindows()
