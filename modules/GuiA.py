@@ -31,7 +31,7 @@ def build_gui_a(root):
     
     label = tk.Label(root, text="RGB Thresh:").pack()
     v = tk.IntVar()
-    #TODO - set default values here
+    v.set(int(Globals.b_thresh_rgb))
     def set_rgb_thresh_bool():
         Globals.b_thresh_rgb = bool(v.get())
 
@@ -48,7 +48,7 @@ def build_gui_a(root):
 
     tk.Label(root, text="HSV Thresh:").pack()    
     v2 = tk.IntVar()
-    #TODO - set default values here
+    v2.set(int(Globals.b_thresh_hsv))
     def set_hsv_thresh_bool():
         Globals.b_thresh_hsv = bool(v2.get())
 
