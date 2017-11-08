@@ -125,7 +125,9 @@ def main():
         elif Globals.b_thresh_rgb:
             img_mask = img_mask_rgb
         else:
-            print 'no thresholding booleans are set'
+            pass
+            #print 'no thresholding booleans are set'
+
         
         img_mask = repairA(img_mask, iterations = 2)
         
