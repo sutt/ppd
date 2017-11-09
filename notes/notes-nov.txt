@@ -8,7 +8,7 @@ write some tests for iterThresh so that it has a benchmark to compare
 
 add x-space class to iterthresh
 
-11/7
+11/8
 
 do iter thresh for both hsv and rgb
 
@@ -19,4 +19,55 @@ x   quit button
 x   why doesnt rgb thresh get set?
     because intialize agenda(b_thresh_rgb) is before loop
 
-fix img_t saving
+x   fix img_t saving
+
+11/9
+
+    init Agenda from gui, with 
+
+    reset threshes
+
+    display threshes on gui
+
+    gui section for displays
+        toggle on transform with a blur
+        toggle on repair for mask
+        what else?
+
+    bug: Traceback (most recent call last):
+        File "adaptive_thresh.py", line 332, in <module>
+            main()
+        File "adaptive_thresh.py", line 125, in main
+            img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
+        UnboundLocalError: local variable 'img_mask_hsv' referenced before assignment
+
+    is this because Globals.b_thresh_hsv is not True on line 110 before it
+    comes to?
+
+TODO:
+
+    Big Refactoring:
+
+        Rip out waitkey functionality, anything need to stay?
+        
+        Agenda further abstracted into it's own module
+
+        Histos ripped out into their own module
+
+        rename IterThresh class as Solves
+
+        add LoggingA for printing messages and warnings
+
+    Next: more refactoring for tracking into a module: 
+        both threshold mask section + tracking can be called by one functionality
+
+    Ultimately: adaptive thresh should only follow 
+                            - frame manipulation in/out
+                            - parameter input, output, solving
+                            - very basic control flow for displays and guis
+
+    Other things:
+
+        iterThreshB needs to be called
+
+        img down-sizing needs to be opened up to manipulation
