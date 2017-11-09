@@ -65,8 +65,8 @@ def main():
     pause_rect = None
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
-    Globals.b_thresh_hsv = True
-    Globals.b_thresh_rgb = False
+    Globals.b_thresh_hsv = False
+    Globals.b_thresh_rgb = True
 
     Globals.thresh_pct = args["pctthresh"]  #0.95
     b_thresh_log = True
@@ -86,7 +86,8 @@ def main():
     b_agenda = args["agenda"]
     sw_agenda = False
     if b_agenda: 
-        agenda = AgendaA(img_wh = cam_params, b_hsv_thresh = Globals.b_thresh_hsv
+        agenda = AgendaA(img_wh = cam_params
+                        ,b_hsv_thresh = Globals.b_thresh_hsv
                         ,b_rgb_thresh = Globals.b_thresh_rgb)
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
@@ -280,7 +281,7 @@ def main():
             if sw_agenda:
                 #bug - not img_t, frame.
                 #bug do a blur
-                img_crop = crop_img(img_t.copy(), Globals.current_tracking_frame)
+                img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
                 
                 agenda.log_rect_imgs(img_crop)
                 agenda.write_rect_files(img_crop)
@@ -289,6 +290,7 @@ def main():
                 if (agenda.seq_end) and not(agenda.sw_calcd_combined):
                     
                     if agenda.b_rgb_thresh:
+                        print 'setting rgb'
                         _lo, _hi = agenda.combine_threshes()
                         agenda.print_logs()
                         agenda.apply_thresh(_lo,_hi)

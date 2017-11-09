@@ -12,6 +12,11 @@ add x-space class to iterthresh
 
 do iter thresh for both hsv and rgb
 
-have a gui trigger agenda
+x   have a gui trigger agenda
 
 x   quit button
+
+x   why doesnt rgb thresh get set?
+    because intialize agenda(b_thresh_rgb) is before loop
+
+fix img_t saving
