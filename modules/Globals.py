@@ -13,3 +13,4 @@ def init():
     global thresh_pct
     global thresh_log
     global gui_pass1
+    global gui_cmd_quit

@@ -44,6 +44,7 @@ def main():
     #INIT & PARAMS
     Globals.init()
     Globals.gui_pass1 = 0
+    Globals.gui_cmd_quit = False
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
     Globals.b_show_histos = args["showhisto"]  
@@ -307,6 +308,9 @@ def main():
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
+
+        if Globals.gui_cmd_quit:
+            break
 
         # print 'RGB: ', str(Globals.b_thresh_rgb)
         # print 'HSV: ', str(Globals.b_thresh_hsv)

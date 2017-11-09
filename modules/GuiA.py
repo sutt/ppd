@@ -6,6 +6,9 @@ import Globals
 def random_pass():
     Globals.gui_pass1 = int(random.uniform(0,10))
 
+def quit_program():
+    Globals.gui_cmd_quit = True
+
 def build_dialog_1(root, input_global):
     
     v = tk.IntVar
@@ -67,6 +70,9 @@ def build_gui_a(root):
 
     tk.Button(root, text = 'random digit print',
                         command = random_pass).pack()
+
+    tk.Button(root, text = 'quit!',
+                        command = quit_program).pack()
     return root
 
 class GuiA(threading.Thread):
