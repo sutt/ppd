@@ -6,7 +6,10 @@ import Globals
 def random_pass():
     Globals.gui_pass1 = int(random.uniform(0,10))
 
-def quit_program():
+def cmd_sw_agenda():
+    Globals.gui_cmd_sw_agenda = True
+
+def cmd_quit():
     Globals.gui_cmd_quit = True
 
 def build_dialog_1(root, input_global):
@@ -68,11 +71,11 @@ def build_gui_a(root):
 
     #root = build_dialog_1(root, Globals.b_thresh_hsv)
 
-    tk.Button(root, text = 'random digit print',
-                        command = random_pass).pack()
+    tk.Button(root, text = 'start agenda',
+                        command = cmd_sw_agenda).pack()
 
     tk.Button(root, text = 'quit!',
-                        command = quit_program).pack()
+                        command = cmd_quit).pack()
     return root
 
 class GuiA(threading.Thread):

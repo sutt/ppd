@@ -45,6 +45,7 @@ def main():
     Globals.init()
     Globals.gui_pass1 = 0
     Globals.gui_cmd_quit = False
+    Globals.gui_cmd_sw_agenda = False
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
     Globals.b_show_histos = args["showhisto"]  
@@ -308,6 +309,12 @@ def main():
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
+
+        
+        #GUI Globals invoked
+        if Globals.gui_cmd_sw_agenda:
+            sw_agenda = True
+            Globals.gui_cmd_sw_agenda = False
 
         if Globals.gui_cmd_quit:
             break
