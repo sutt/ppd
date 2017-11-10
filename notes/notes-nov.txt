@@ -34,15 +34,15 @@ x   fix img_t saving
         toggle on repair for mask
         what else?
 
-    bug: Traceback (most recent call last):
+    x   bug: Traceback (most recent call last):
         File "adaptive_thresh.py", line 332, in <module>
             main()
         File "adaptive_thresh.py", line 125, in main
             img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
         UnboundLocalError: local variable 'img_mask_hsv' referenced before assignment
 
-    is this because Globals.b_thresh_hsv is not True on line 110 before it
-    comes to?
+    x   is this because Globals.b_thresh_hsv is not True on line 110 before it
+        comes to?
 
 TODO:
 

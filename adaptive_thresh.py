@@ -155,8 +155,6 @@ def main():
         if b_drawTracking:
             img_display = draw_tracking(img_display,Globals.current_tracking_frame)
 
-
-        
         if b_annotate_img:
             img_display = draw_annotations(img_display, info_annotations)       
             
