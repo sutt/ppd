@@ -25,6 +25,7 @@ from modules.IterThresh import iterThreshA, combine_threshes
 from modules.Agenda import AgendaA
 from modules.Agenda import middle, corners, tf_gen
 from modules.GuiA import GuiA
+from modules.LoggingA import Log
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default="fps30.h264")
@@ -72,6 +73,7 @@ def main():
     b_thresh_log = True
     Globals.thresh_log = []
 
+    log = Log()
     b_print_log = args["printlog"]
     hist_update_hz = 1
     waitKeyRefresh = 1
@@ -87,8 +89,8 @@ def main():
     sw_agenda = False
     if b_agenda: 
         agenda = AgendaA(img_wh = cam_params
-                        ,b_hsv_thresh = Globals.b_thresh_hsv
-                        ,b_rgb_thresh = Globals.b_thresh_rgb)
+                        ,b_hsv_thresh = True
+                        ,b_rgb_thresh = True)
         b_agenda_timer = args["agendatimer"]
         sw_reset_agenda_timer = False
         next_agenda_time = time.time() + 999999.9
@@ -106,6 +108,7 @@ def main():
         if not(ret): break
 
         # THRESHOLD MASK    
+        img_mask_hsv, img_mask_rgb = None, None
         if Globals.b_thresh_hsv:
             img_t = transformA(frame.copy(), b_hsv = True)
             img_mask_hsv = threshA(img_t 
@@ -121,23 +124,27 @@ def main():
         if True: #Globals.b_thresh_hsv:
             img_t = transformA(frame.copy(), b_hsv = True)
         
+        img_mask = None
         if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
-            img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
+            if not(img_mask_hsv is None) and not(img_mask_rgb is None):
+                img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
         elif Globals.b_thresh_hsv:
             img_mask = img_mask_hsv
         elif Globals.b_thresh_rgb:
             img_mask = img_mask_rgb
         else:
-            pass
-            #print 'no thresholding booleans are set'
-
+            log.log("MSG_NO_THRESHES")
         
-        img_mask = repairA(img_mask, iterations = 2)
+        if not(img_mask is None):
+            b_mask_img = True
+            img_mask = repairA(img_mask, iterations = 2)
         
-        # LOCATE / TRACK
-        x,y = find_xy(img_mask)
-        radius = find_radius(img_mask)
-        b_track_success = True
+            # LOCATE / TRACK
+            x,y = find_xy(img_mask)
+            radius = find_radius(img_mask)
+            b_track_success = True
+        else:
+            b_mask_img = False
 
         #DRAW ONTO FRAME
         img_display = frame.copy()
@@ -147,6 +154,7 @@ def main():
 
         if b_drawTracking:
             img_display = draw_tracking(img_display,Globals.current_tracking_frame)
+
 
         
         if b_annotate_img:
@@ -197,7 +205,7 @@ def main():
         #SHOW IMAGES
         ShowImages(  display_img = True,   img_d = img_display
                     ,transform_img = True, img_t = img_t
-                    ,mask_img = True,      img_m = img_mask 
+                    ,mask_img = b_mask_img,      img_m = img_mask 
                     ,pause_rect = Globals.b_show_puase_rect
                     ,img_rect = pause_rect
                     ,resize = True)
@@ -279,7 +287,6 @@ def main():
                     info_annotations.append(_temp)
                     
             if sw_agenda:
-                #bug - not img_t, frame.
                 #bug do a blur
                 img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
                 
@@ -320,10 +327,12 @@ def main():
 
         if Globals.gui_cmd_quit:
             break
-
+        
+        # DEBUGGING
         # print 'RGB: ', str(Globals.b_thresh_rgb)
         # print 'HSV: ', str(Globals.b_thresh_hsv)
         # print Globals.gui_pass1
+    
     #CLEANUP
     vc.release()
     cv2.destroyAllWindows()
