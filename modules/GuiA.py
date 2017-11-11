@@ -75,31 +75,29 @@ def build_thresh_gui(typ, fr):
     sf2.pack(side=tk.TOP)
     add_cmd_btns(typ, sv, sf2)
 
+def update_b_thresh(typ, v):
+    if typ == 'rgb':
+        Globals.b_thresh_rgb == bool(v)
+    if typ == 'hsv':
+        Globals.b_thresh_hsv == bool(v)
 
+def build_radio_opt(fr, typ):
     
-
-def build_dialog_1(root, input_global):
+    v = tk.IntVar()
     
-    v = tk.IntVar
-    v = int(input_global)
+    if typ == 'rgb':
+        v.set(int(Globals.b_thresh_rgb))
+    if typ == 'hsv':
+        v.set(int(Globals.b_thresh_hsv))
 
-    def update_func():
-        input_global = bool(v)
+    tk.Radiobutton(fr, text="Off",variable=v,value=0,
+            command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
 
-    tk.Radiobutton(root, 
-            text="Off",
-            variable=v, 
-            value=0,
-            command=update_func).pack(anchor=tk.W)
-    tk.Radiobutton(root, 
-            text="On",
-            variable=v, 
-            value=1,
-            command=update_func).pack(anchor=tk.W)
+    tk.Radiobutton(fr, text="On",variable=v, value=1,
+            command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
 
-    return root
 
-def build_gui_b(root):
+def build_gui_a(root):
     
     f1 = tk.Frame(root)
     f1.pack(side = tk.TOP)
@@ -115,155 +113,25 @@ def build_gui_b(root):
 
     label = tk.Label(f2, text="RGB Thresh:").pack()
     
-    v = tk.IntVar()
-    v.set(int(Globals.b_thresh_rgb))
-    def set_rgb_thresh_bool():
-        Globals.b_thresh_rgb = bool(v.get())
-
-    tk.Radiobutton(f2, 
-            text="Off",
-            variable=v, 
-            value=0,
-            command=set_rgb_thresh_bool).pack(side=tk.LEFT)
-    tk.Radiobutton(f2, 
-            text="On",
-            variable=v, 
-            value=1,
-            command=set_rgb_thresh_bool).pack(side=tk.LEFT)
+    build_radio_opt(f2, typ = 'rgb')
 
     f3 = tk.Frame(root)
     f3.pack(anchor=tk.W)
     build_thresh_gui(typ='rgb',fr = f3)
 
-    # tk.Label(f3, text="Current Thresh:").pack(side=tk.TOP)    
+    f4 = tk.Frame(root)
+    f4.pack(side = tk.TOP)
 
-    # # sv1 = [tk.StringVar() for i in range(6)]
-    # sv = generate_sv()
+    label = tk.Label(f4, text="HSV Thresh:").pack()
     
-    # # def set_gui_to_thresh():
-    # #     _thresh = []
-    # #     for i in range(6):
-    # #         _val = Globals.threshLoRgb[i/2] if (i % 2 == 0) else Globals.threshHiRgb[i/2]
-    # #         _thresh.append(_val)
-    # #     for i in range(6):
-    # #         sv1[i].set(_thresh[i])
+    build_radio_opt(f4, typ = 'hsv')
 
-    # set_gui_to_thresh(type='rgb',sv_t = sv )
-
-    # # sf1 = [tk.Frame(f3) for i in range(3)]
-    # sf = generate_sf()
-    # pack_sf(sf)
-    # # for _sf in sf1:
-    # #     _sf.pack(side=tk.TOP)
-
-    # for clr_i in range(3):
-    #     txt_i =  [tk.Entry(sf1[clr_i],textvariable = sv1[clr_i*2 + i] 
-    #                        ,width = 4).pack(side=tk.LEFT) 
-    #              for i in range(2)]
-
-    # f3d = tk.Frame(f3)
-    # f3d.pack(side=tk.TOP)
-
-    # tk.Button(f3d, text = 'refresh',
-    #           command = set_gui_to_thresh).pack(side=tk.LEFT)
-    
-    # def set_thresh_from_gui():
-    #     _threshLo = []
-    #     _threshHi = []
-    #     for clr_i in range(3):
-    #         for i in range(2):
-    #             if i == 0:
-    #                 _threshLo.append(int(sv1[clr_i*2 + i].get()))
-    #             else:
-    #                 _threshHi.append(int(sv1[clr_i*2 + i].get()))
-    #     print 'threshLo ', str(_threshLo)
-    #     print 'threshHi ', str(_threshHi)
-    #     Globals.threshLoRgb = np.array( _threshLo, dtype = 'uint8' )
-    #     Globals.threshHiRgb = np.array( _threshHi, dtype = 'uint8' )
-
-    
-    # # TODO - add set_thresh_from_gui
-    # tk.Button(f3d, text = 'set',
-    #           command = set_thresh_from_gui).pack(side=tk.LEFT)
+    f4 = tk.Frame(root)
+    f4.pack(anchor=tk.W)
+    build_thresh_gui(typ='hsv',fr = f4)
 
     return root
 
-def build_gui_a(root):
-    
-    tk.Button(root, text = 'start agenda',
-                        command = cmd_sw_agenda).pack()
-
-    tk.Button(root, text = 'quit!',
-                        command = cmd_quit).pack()
-    
-    label = tk.Label(root, text="RGB Thresh:").pack()
-    v = tk.IntVar()
-    v.set(int(Globals.b_thresh_rgb))
-    def set_rgb_thresh_bool():
-        Globals.b_thresh_rgb = bool(v.get())
-
-    tk.Radiobutton(root, 
-            text="Off",
-            variable=v, 
-            value=0,
-            command=set_rgb_thresh_bool).pack(anchor=tk.W)
-    tk.Radiobutton(root, 
-            text="On",
-            variable=v, 
-            value=1,
-            command=set_rgb_thresh_bool).pack(anchor=tk.W)
-
-    tk.Label(root, text="Blue/Green/Red:").pack(anchor=tk.W)    
-
-    rgb1_strvar = tk.StringVar()
-    rgb2_strvar = tk.StringVar()
-    rgb3_strvar = tk.StringVar()
-    rgb1_strvar.set(str(Globals.threshLoRgb[0]))    
-    def set_rgb_cmd():
-        Globals.gui_pass1 = int(rgb1_strvar.get())
-
-    LF1 = tk.Frame(root).pack(anchor = tk.W)
-
-    tk.Entry(LF1,textvariable = rgb1_strvar 
-            , width = 4).pack(anchor=tk.W)
-    tk.Entry(LF1,textvariable = rgb2_strvar 
-            , width = 4).pack(anchor = tk.W)
-    tk.Entry(LF1,textvariable = rgb3_strvar 
-            , width = 4).pack(anchor = tk.W)
-    
-    # tk.Entry(root,textvariable = rgb1_strvar 
-    #         , width = 4).pack(side = tk.LEFT)
-    # tk.Entry(root,textvariable = rgb2_strvar 
-    #         , width = 4).pack(side = tk.LEFT)
-    # tk.Entry(root,textvariable = rgb3_strvar 
-    #         , width = 4).pack(side = tk.LEFT)
-
-    # tk.Entry(root,textvariable = rgb2_strvar).pack(anchor = tk.E)
-            
-
-    tk.Button(root, text = 'set rgb thresh',
-                        command = set_rgb_cmd).pack(anchor = tk.W)
-
-    tk.Label(root, text="HSV Thresh:").pack()    
-    v2 = tk.IntVar()
-    v2.set(int(Globals.b_thresh_hsv))
-    def set_hsv_thresh_bool():
-        Globals.b_thresh_hsv = bool(v2.get())
-
-    tk.Radiobutton(root, 
-            text="Off",
-            variable=v2, 
-            value=0,
-            command=set_hsv_thresh_bool).pack(anchor=tk.W)
-    tk.Radiobutton(root, 
-            text="On",
-            variable=v2, 
-            value=1,
-            command=set_hsv_thresh_bool).pack(anchor=tk.W)
-
-    #root = build_dialog_1(root, Globals.b_thresh_hsv)
-
-    return root
 
 class GuiA(threading.Thread):
     
@@ -277,5 +145,5 @@ class GuiA(threading.Thread):
     def run(self):
         self.root = tk.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
-        self.root = build_gui_b(self.root)
+        self.root = build_gui_a(self.root)
         self.root.mainloop()
