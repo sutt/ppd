@@ -48,7 +48,19 @@ x   fix img_t saving
 
     smaller initial tracking_frame
 
-    bug? hsv b_thresh is not responsing to gui
+    x   bug? hsv b_thresh is not responsing to gui
+
+    Agenda from gui
+        init
+        reset
+        thresh_pct
+        run combine_thresh
+        output combine_thresh
+        set thresh from output combine_thresh
+        run iterThreshB
+        set thresh from iterThreshB
+    
+    Access the IR camera?
 
 TODO:
 

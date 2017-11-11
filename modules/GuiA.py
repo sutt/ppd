@@ -12,8 +12,13 @@ def cmd_sw_agenda():
 def cmd_quit():
     Globals.gui_cmd_quit = True
 
+def cmd_set_thresh_pct(sv):
+    Globals.thresh_pct = round(float(sv.get()),3)
+
+def cmd_gui_combine_threeshes():
+    pass
 # Helper Utils for build_thresh_gui
-# sv: stringvar, sf: subframe, fr: frame
+# sv: stringvar, sf: subframe, fr: frame, v: intvar
 
 def generate_sv():
     return [tk.StringVar() for i in range(6)]
@@ -87,8 +92,6 @@ def generate_radio_v():
     
 def build_radio_opt(v,fr, typ):
     
-    # v = tk.IntVar()
-    
     if typ == 'rgb':
         v.set(int(Globals.b_thresh_rgb))
     if typ == 'hsv':
@@ -106,12 +109,55 @@ def build_gui_a(root):
     f1 = tk.Frame(root)
     f1.pack(side = tk.TOP)
 
-    tk.Button(f1, text = 'start agenda',
-                        command = cmd_sw_agenda).pack()
-
     tk.Button(f1, text = 'quit!',
                         command = cmd_quit).pack()
+
+    #AGENDA
+    f1a = tk.Frame(root)
+    f1a.pack(side = tk.TOP)
     
+    tk.Label(f1a, text="Agenda Cmds:").pack(side=tk.TOP)
+
+    f1a1 = tk.Frame(f1a)
+    f1a1.pack(side = tk.TOP)
+
+    tk.Button(f1a1, text = 'next step',
+                        command = cmd_sw_agenda).pack(side=tk.LEFT)
+
+    tk.Button(f1a1, text = 'reset',
+                        command = cmd_sw_agenda).pack(side=tk.LEFT)
+
+    f1a2 = tk.Frame(f1a)
+    f1a2.pack(side = tk.TOP)
+
+    tk.Label(f1a2, text="thresh pct:").pack(side=tk.LEFT)
+
+    sv_tp = tk.StringVar()
+    sv_tp.set(str(Globals.thresh_pct))
+    tk.Entry(f1a2,textvariable = sv_tp, width = 6 ).pack(side=tk.LEFT)
+
+    tk.Button(f1a2, text = 'set', command = lambda: cmd_set_thresh_pct(sv_tp)
+                ).pack(side=tk.LEFT)
+
+    f1a3 = tk.Frame(f1a)
+    f1a3.pack(side = tk.TOP)
+
+    tk.Button(f1a3, text = 'run iterA', 
+                    command = cmd_gui_combine_threeshes
+                    ).pack(side=tk.LEFT)
+    
+    f1a3a = tk.Frame(f1a)
+    f1a3a.pack(side = tk.TOP)
+
+    sv_t1 = tk.StringVar()
+    tk.Entry(f1a3a,textvariable = sv_tp, width = 20 ).pack(side=tk.LEFT)
+    tk.Button(f1a3a, text = 'set', 
+                    command = cmd_gui_combine_threeshes
+                    ).pack(side=tk.LEFT)
+                    #TODO - add function
+                    #TODO - make this function set thresh section below
+
+    #THRESHES
     f2 = tk.Frame(root)
     f2.pack(side = tk.TOP)
 
