@@ -25,9 +25,9 @@ x   fix img_t saving
 
     init Agenda from gui, with 
 
-    reset threshes
+    x   reset threshes
 
-    display threshes on gui
+    x   display threshes on gui
 
     gui section for displays
         toggle on transform with a blur
@@ -43,6 +43,12 @@ x   fix img_t saving
 
     x   is this because Globals.b_thresh_hsv is not True on line 110 before it
         comes to?
+
+11/11
+
+    smaller initial tracking_frame
+
+    bug? hsv b_thresh is not responsing to gui
 
 TODO:
 
