@@ -220,7 +220,6 @@ def main():
 
 
         # LOGGING
-        #info_annotations.append(i)
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
@@ -238,8 +237,8 @@ def main():
         # DEBUGGING
         #print str(Globals.threshLoRgb), ' ', str(Globals.threshHiRgb)
         #print str(Globals.threshLoHsv), ' ', str(Globals.threshHiHsv)
-        print 'RGB-b: ', str(Globals.b_thresh_rgb)
-        print 'HSV-b: ', str(Globals.b_thresh_hsv)
+        # print 'RGB-b: ', str(Globals.b_thresh_rgb)
+        # print 'HSV-b: ', str(Globals.b_thresh_hsv)
     
     #CLEANUP
     vc.release()

@@ -77,13 +77,17 @@ def build_thresh_gui(typ, fr):
 
 def update_b_thresh(typ, v):
     if typ == 'rgb':
-        Globals.b_thresh_rgb == bool(v)
+        Globals.b_thresh_rgb = bool(v.get())
     if typ == 'hsv':
-        Globals.b_thresh_hsv == bool(v)
-
-def build_radio_opt(fr, typ):
+        Globals.b_thresh_hsv = bool(v.get())
     
-    v = tk.IntVar()
+        
+def generate_radio_v():
+    return tk.IntVar()
+    
+def build_radio_opt(v,fr, typ):
+    
+    # v = tk.IntVar()
     
     if typ == 'rgb':
         v.set(int(Globals.b_thresh_rgb))
@@ -113,7 +117,8 @@ def build_gui_a(root):
 
     label = tk.Label(f2, text="RGB Thresh:").pack()
     
-    build_radio_opt(f2, typ = 'rgb')
+    v_rgb = generate_radio_v()
+    build_radio_opt(v_rgb, f2, typ = 'rgb')
 
     f3 = tk.Frame(root)
     f3.pack(anchor=tk.W)
@@ -124,7 +129,8 @@ def build_gui_a(root):
 
     label = tk.Label(f4, text="HSV Thresh:").pack()
     
-    build_radio_opt(f4, typ = 'hsv')
+    v_hsv = generate_radio_v()
+    build_radio_opt(v_hsv, f4, typ = 'hsv')
 
     f4 = tk.Frame(root)
     f4.pack(anchor=tk.W)
