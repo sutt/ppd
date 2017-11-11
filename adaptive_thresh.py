@@ -330,6 +330,7 @@ def main():
         # print 'RGB: ', str(Globals.b_thresh_rgb)
         # print 'HSV: ', str(Globals.b_thresh_hsv)
         # print Globals.gui_pass1
+        print str(Globals.threshLoRgb), ' ', str(Globals.threshHiRgb)
     
     #CLEANUP
     vc.release()
