@@ -139,24 +139,36 @@ def build_gui_a(root):
     tk.Button(f1a2, text = 'set', command = lambda: cmd_set_thresh_pct(sv_tp)
                 ).pack(side=tk.LEFT)
 
-    f1a3 = tk.Frame(f1a)
-    f1a3.pack(side = tk.TOP)
+    # f1a3 = tk.Frame(f1a)
+    # f1a3.pack(side = tk.TOP)
 
-    tk.Button(f1a3, text = 'run iterA', 
+    tk.Button(f1a2, text = 'run iterA', 
                     command = cmd_gui_combine_threeshes
                     ).pack(side=tk.LEFT)
     
     f1a3a = tk.Frame(f1a)
     f1a3a.pack(side = tk.TOP)
 
+    tk.Label(f1a3a, text="output rgb:").pack(side=tk.LEFT)
+
     sv_t1 = tk.StringVar()
-    tk.Entry(f1a3a,textvariable = sv_tp, width = 20 ).pack(side=tk.LEFT)
+    tk.Entry(f1a3a,textvariable = sv_t1, width = 20 ).pack(side=tk.LEFT)
     tk.Button(f1a3a, text = 'set', 
                     command = cmd_gui_combine_threeshes
                     ).pack(side=tk.LEFT)
                     #TODO - add function
                     #TODO - make this function set thresh section below
 
+    f1a3b = tk.Frame(f1a)
+    f1a3b.pack(side = tk.TOP)
+
+    tk.Label(f1a3b, text="output hsv:").pack(side=tk.LEFT)
+
+    sv_t2 = tk.StringVar()
+    tk.Entry(f1a3b,textvariable = sv_t2, width = 20 ).pack(side=tk.LEFT)
+    tk.Button(f1a3b, text = 'set', 
+                    command = cmd_gui_combine_threeshes
+                    ).pack(side=tk.LEFT)
     #THRESHES
     f2 = tk.Frame(root)
     f2.pack(side = tk.TOP)

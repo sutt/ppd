@@ -62,6 +62,14 @@ x   fix img_t saving
     
     Access the IR camera?
 
+    Only create the folder when you actually run an agenda
+
+11/12
+
+    is liberal = True mean the_combined is wider than every individual_thresh?
+
+    add second thresh output section to gui
+
 TODO:
 
     Big Refactoring:

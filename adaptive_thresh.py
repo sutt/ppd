@@ -74,7 +74,7 @@ def main():
     Globals.thresh_log = []
 
     log = Log()
-    b_print_log = args["printlog"]
+    b_print_log = args["printlog"]  #TODO - move this to Log
     hist_update_hz = 1
     waitKeyRefresh = 1
     time_last = time.time()
@@ -124,6 +124,7 @@ def main():
         if True: #Globals.b_thresh_hsv:
             img_t = transformA(frame.copy(), b_hsv = True)
         
+        #TODO - make this a function
         img_mask = None
         if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
             if not(img_mask_hsv is None) and not(img_mask_rgb is None):
@@ -147,6 +148,7 @@ def main():
             b_mask_img = False
 
         #DRAW ONTO FRAME
+        #TODO - make this a function
         img_display = frame.copy()
 
         if b_tracking_frame:
@@ -169,14 +171,6 @@ def main():
                     ,resize = True)
         
 
-        if cv2.waitKey(waitKeyRefresh)== ord('q'):
-            print 'quitting cv loop'
-            break
-        
-        # if cam_type == 'file_cam' and b_slow_for_fps:
-            # DelayFPS(time_last, 30)
-
-        
         # AGENDA
         if b_agenda:
         
@@ -218,14 +212,19 @@ def main():
                 sw_agenda = False
                 if b_agenda_timer: sw_reset_agenda_timer = True
 
-
+        # if cam_type == 'file_cam' and b_slow_for_fps:
+            # DelayFPS(time_last, 30)
+        
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
 
-        
+        if cv2.waitKey(waitKeyRefresh)== ord('q'):
+            print 'quitting cv loop'
+            break
+
         #GUI GLOBALS GET/SET
         if Globals.gui_cmd_sw_agenda:
             sw_agenda = True
@@ -239,6 +238,7 @@ def main():
         #print str(Globals.threshLoHsv), ' ', str(Globals.threshHiHsv)
         # print 'RGB-b: ', str(Globals.b_thresh_rgb)
         # print 'HSV-b: ', str(Globals.b_thresh_hsv)
+        # print Globals.thresh_pct
     
     #CLEANUP
     vc.release()
