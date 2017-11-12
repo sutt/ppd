@@ -47,23 +47,28 @@ def main():
     Globals.gui_pass1 = 0
     Globals.gui_cmd_quit = False
     Globals.gui_cmd_sw_agenda = False
+    Globals.gui_cmd_reset_agenda = False
+    Globals.gui_cmd_combine = False
+    
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
     Globals.b_show_histos = args["showhisto"]  
     b_histo_backg = args["showbackghisto"]
     switch_new_ylim = True  
     livehist = None
+    hist_update_hz = 1
     
     b_tracking_frame = True
     b_drawTracking = True
     b_annotate_img = True
     Globals.b_show_puase_rect = False
 
+    # TODO - one clean function here
     mid_xy = middle( (640,480), size = 80)[0][0]
     _tf = tf_gen(xy = mid_xy, square_size = 80)
     Globals.current_tracking_frame = (_tf[0],_tf[1]) #(xy,xy2)
     
-    pause_rect = None
+    pause_rect = None       # TODO - deprecated? this is "4th display"
     Globals.threshLoHsv, Globals.threshHiHsv = (30,100,100), (100,200,200)
     Globals.threshLoRgb, Globals.threshHiRgb = (29, 86, 6), (64, 255, 255)
     Globals.b_thresh_hsv = False
@@ -75,7 +80,6 @@ def main():
 
     log = Log()
     b_print_log = args["printlog"]  #TODO - move this to Log
-    hist_update_hz = 1
     waitKeyRefresh = 1
     time_last = time.time()
     info_annotations = []
@@ -86,20 +90,20 @@ def main():
     cam_type = 'cv_cam'   # 'pi_cam','file_cam'
 
     b_agenda = args["agenda"]
-    sw_agenda = False
+    Globals.sw_agenda = False
     if b_agenda: 
-        agenda = AgendaA(img_wh = cam_params
-                        ,b_hsv_thresh = True
-                        ,b_rgb_thresh = True)
-        b_agenda_timer = args["agendatimer"]
-        sw_reset_agenda_timer = False
-        next_agenda_time = time.time() + 999999.9
+        agenda = AgendaA()
+        # b_agenda_timer = args["agendatimer"]
+        # sw_reset_agenda_timer = False
+        # next_agenda_time = time.time() + 999999.9
 
 
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
-
-    gui = GuiA()
+    
+    b_gui = True
+    if b_gui:
+        gui = GuiA()
 
     while(vc.isOpened()):
 
@@ -173,62 +177,65 @@ def main():
 
         # AGENDA
         if b_agenda:
+            
+            if Globals.gui_cmd_reset_agenda:
+                Globals.gui_cmd_reset_agenda = False
+                agenda = AgendaA()
         
-            if b_agenda_timer:
-                if (sw_agenda == False) and sw_reset_agenda_timer:
-                    next_agenda_time = time.time() + 3.0
-                    sw_reset_agenda_timer = False
+            # agenda.timer()
+            
+            # if b_agenda_timer:
+            #     if (sw_agenda == False) and sw_reset_agenda_timer:
+            #         next_agenda_time = time.time() + 3.0
+            #         sw_reset_agenda_timer = False
 
-                elif time.time() > next_agenda_time:
-                    sw_agenda = True
+            #     elif time.time() > next_agenda_time:
+            #         sw_agenda = True
 
-                else:
-                    _temp = round(next_agenda_time - time.time(), 1)
-                    if _temp < 10: _temp = "*" * int(_temp * 2)
-                    info_annotations.append(_temp)
+            #     else:
+            #         _temp = round(next_agenda_time - time.time(), 1)
+            #         if _temp < 10: _temp = "*" * int(_temp * 2)
+            #         info_annotations.append(_temp)
                     
-            if sw_agenda:
-                #bug do a blur
+            if Globals.sw_agenda:
+                
+                sw_agenda = False
+
                 img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
                 
                 agenda.log_rect_imgs(img_crop)
                 agenda.write_rect_files(img_crop)
                 agenda.do_rect_move()
                 
-                if (agenda.seq_end) and not(agenda.sw_calcd_combined):
+            if Globals.gui_cmd_combine:
                     
-                    if agenda.b_rgb_thresh:
-                        print 'setting rgb'
-                        _lo, _hi = agenda.combine_threshes()
-                        agenda.print_logs()
-                        agenda.apply_thresh(_lo,_hi)
+                Globals.gui_cmd_combine = False
 
-                    if agenda.b_hsv_thresh:
-                        _lo, _hi = agenda.combine_threshes(thresh_type = 'hsv')
-                        agenda.print_logs()
-                        print 'setting hsv'
-                        agenda.apply_thresh(_lo,_hi, thresh_type = 'hsv')
+                if agenda.b_rgb_thresh:
+                    print 'setting rgb'
+                    _lo, _hi = agenda.combine_threshes()
+                    agenda.print_logs()
+                    agenda.apply_thresh(_lo,_hi)
 
-                sw_agenda = False
-                if b_agenda_timer: sw_reset_agenda_timer = True
+                if agenda.b_hsv_thresh:
+                    _lo, _hi = agenda.combine_threshes(thresh_type = 'hsv')
+                    agenda.print_logs()
+                    print 'setting hsv'
 
-        # if cam_type == 'file_cam' and b_slow_for_fps:
-            # DelayFPS(time_last, 30)
-        
+                    agenda.apply_thresh(_lo,_hi, thresh_type = 'hsv')
+                if True:
+                    pass
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
 
-        if cv2.waitKey(waitKeyRefresh)== ord('q'):
-            print 'quitting cv loop'
-            break
+        # if cam_type == 'file_cam' and b_slow_for_fps:
+            # DelayFPS(time_last, 30)
 
-        #GUI GLOBALS GET/SET
-        if Globals.gui_cmd_sw_agenda:
-            sw_agenda = True
-            Globals.gui_cmd_sw_agenda = False
+        if cv2.waitKey(waitKeyRefresh)== ord('q'):
+            break
 
         if Globals.gui_cmd_quit:
             break

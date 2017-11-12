@@ -14,4 +14,6 @@ def init():
     global thresh_log
     global gui_pass1
     global gui_cmd_quit
-    global gui_cmd_sw_agenda
+    global sw_agenda
+    global gui_cmd_combine
+    global gui_cmd_reset_agenda

@@ -145,6 +145,10 @@ class AgendaA:
         else:
             print 'couldnt find the log to print.'
 
+    def apply_agenda_threshes(self):
+        pass
+        
+
 
 if __name__ == "__main__":
     

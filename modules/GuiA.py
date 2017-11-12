@@ -5,19 +5,22 @@ import Tkinter as tk
 import Globals
 
 
-
-def cmd_sw_agenda():
-    Globals.gui_cmd_sw_agenda = True
-
 def cmd_quit():
     Globals.gui_cmd_quit = True
+
+def cmd_sw_agenda():
+    Globals.sw_agenda = True
+
+def cmd_gui_reset_agenda():
+    Globals.gui_cmd_reset_agenda = True
 
 def cmd_set_thresh_pct(sv):
     Globals.thresh_pct = round(float(sv.get()),3)
 
-def cmd_gui_combine_threeshes():
-    pass
-# Helper Utils for build_thresh_gui
+def cmd_gui_combine():
+    Globals.gui_cmd_combine = True
+
+# Helper Utils for build_thresh_gui ------------------------
 # sv: stringvar, sf: subframe, fr: frame, v: intvar
 
 def generate_sv():
@@ -139,13 +142,12 @@ def build_gui_a(root):
     tk.Button(f1a2, text = 'set', command = lambda: cmd_set_thresh_pct(sv_tp)
                 ).pack(side=tk.LEFT)
 
-    # f1a3 = tk.Frame(f1a)
-    # f1a3.pack(side = tk.TOP)
-
     tk.Button(f1a2, text = 'run iterA', 
-                    command = cmd_gui_combine_threeshes
+                    command = cmd_gui_combine
                     ).pack(side=tk.LEFT)
     
+
+    #OUTPUT BOXES
     f1a3a = tk.Frame(f1a)
     f1a3a.pack(side = tk.TOP)
 
@@ -156,8 +158,6 @@ def build_gui_a(root):
     tk.Button(f1a3a, text = 'set', 
                     command = cmd_gui_combine_threeshes
                     ).pack(side=tk.LEFT)
-                    #TODO - add function
-                    #TODO - make this function set thresh section below
 
     f1a3b = tk.Frame(f1a)
     f1a3b.pack(side = tk.TOP)

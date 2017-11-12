@@ -66,19 +66,31 @@ x   fix img_t saving
 
 11/12
 
-    is liberal = True mean the_combined is wider than every individual_thresh?
+    x   add second thresh output section to gui
 
-    add second thresh output section to gui
+    refactor Agenda
+
+    add cmds to set thresh
+
+    have runIterThreshA call the functionality
+
+    add cmd for reset Agenda
+
+    add liberal checkbox on gui for combine_thresh
+        is liberal = True mean the_combined is wider than every individual_thresh?
 
 TODO:
 
     Big Refactoring:
 
-        Rip out waitkey functionality, anything need to stay?
+    x   Rip out waitkey functionality, anything need to stay?
         
         Agenda further abstracted into it's own module
 
-        Histos ripped out into their own module
+        Agenda do random moves
+
+    x   Histos ripped out into their own module
+            add them back in tho?
 
         rename IterThresh class as Solves
 
@@ -91,6 +103,17 @@ TODO:
                             - frame manipulation in/out
                             - parameter input, output, solving
                             - very basic control flow for displays and guis
+
+    frame <- device/file
+        |
+        |
+        img_t <- transformA:
+                    - gaussianBlur
+                    - HSV
+            |
+            |
+            mask <- threshold
+                    - and
 
     Other things:
 
