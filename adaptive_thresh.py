@@ -49,6 +49,8 @@ def main():
     Globals.gui_cmd_sw_agenda = False
     Globals.gui_cmd_reset_agenda = False
     Globals.gui_cmd_combine = False
+    Globals.gui_cmd_set_rgb = False
+    Globals.gui_cmd_set_hsv = False
     
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
@@ -183,48 +185,28 @@ def main():
                 agenda = AgendaA()
         
             # agenda.timer()
-            
-            # if b_agenda_timer:
-            #     if (sw_agenda == False) and sw_reset_agenda_timer:
-            #         next_agenda_time = time.time() + 3.0
-            #         sw_reset_agenda_timer = False
-
-            #     elif time.time() > next_agenda_time:
-            #         sw_agenda = True
-
-            #     else:
-            #         _temp = round(next_agenda_time - time.time(), 1)
-            #         if _temp < 10: _temp = "*" * int(_temp * 2)
-            #         info_annotations.append(_temp)
                     
             if Globals.sw_agenda:
                 
                 sw_agenda = False
-
                 img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
-                
                 agenda.log_rect_imgs(img_crop)
                 agenda.write_rect_files(img_crop)
                 agenda.do_rect_move()
                 
             if Globals.gui_cmd_combine:
-                    
                 Globals.gui_cmd_combine = False
+                agenda.run_combine()
+                if b_gui: agenda.update_gui()
 
-                if agenda.b_rgb_thresh:
-                    print 'setting rgb'
-                    _lo, _hi = agenda.combine_threshes()
-                    agenda.print_logs()
-                    agenda.apply_thresh(_lo,_hi)
+            if Globals.gui_cmd_set_rgb:
+                Globals.gui_cmd_set_rgb = False
+                agenda.apply_thresh_2('rgb')
 
-                if agenda.b_hsv_thresh:
-                    _lo, _hi = agenda.combine_threshes(thresh_type = 'hsv')
-                    agenda.print_logs()
-                    print 'setting hsv'
-
-                    agenda.apply_thresh(_lo,_hi, thresh_type = 'hsv')
-                if True:
-                    pass
+            if Globals.gui_cmd_set_hsv:
+                Globals.gui_cmd_set_hsv = False
+                agenda.apply_thresh_2('hsv')
+                
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)

@@ -64,12 +64,28 @@ class AgendaA:
         self.b_hsv_thresh = bool(kwargs.get('b_hsv_thresh', False))
         self.b_log_combine_proc = True
         self.combine_proc_log = []
+        self.temp_thresh_rgb = None
+        self.temp_thresh_hsv = None
 
         writepath = "data/write/oct"
         output_dir = uni_dir(writepath)
         self.output_dir = uni_dir(writepath)
         make_dir(writepath + "/" + output_dir)
 
+    def timer(self):
+        pass
+            # if b_agenda_timer:
+            #     if (sw_agenda == False) and sw_reset_agenda_timer:
+            #         next_agenda_time = time.time() + 3.0
+            #         sw_reset_agenda_timer = False
+
+            #     elif time.time() > next_agenda_time:
+            #         sw_agenda = True
+
+            #     else:
+            #         _temp = round(next_agenda_time - time.time(), 1)
+            #         if _temp < 10: _temp = "*" * int(_temp * 2)
+            #         info_annotations.append(_temp)
 
     def do_rect_move(self, **kwargs):
         routine = self.track_frame_routine
@@ -137,6 +153,20 @@ class AgendaA:
         else:
             print 'Couldnt find thresh_type to set global thresh'
 
+    def apply_thresh_2(self, thresh_type = 'rgb'):
+        if thresh_type == 'rgb':
+            lo, hi = self.temp_thresh_rgb[0], self.temp_thresh_rgb[1]
+            Globals.threshLoRgb = np.array( lo , dtype = 'uint8' )
+            Globals.threshHiRgb = np.array( hi, dtype = 'uint8' )
+            print 'Globals RGB set: ', str(Globals.threshLoRgb), str(Globals.threshHiRgb)
+        elif thresh_type == 'hsv':
+            lo, hi = self.temp_thresh_hsv[0], self.temp_thresh_hsv[1]
+            Globals.threshLoHsv = np.array( lo , dtype = 'uint8' )
+            Globals.threshHiHsv = np.array( hi, dtype = 'uint8' )
+            print 'Globals HSV set: ', str(Globals.threshLoHsv), str(Globals.threshHiHsv)
+        else:
+            print 'Couldnt find thresh_type to set global thresh'
+
     def print_logs(self, log_type = 'combine_proc'):
 
         if log_type == 'combine_proc':
@@ -144,6 +174,21 @@ class AgendaA:
             print out
         else:
             print 'couldnt find the log to print.'
+
+    def run_combine(self):
+        
+        _lo, _hi = self.combine_threshes(thresh_type = 'rgb')
+        self.print_logs()
+        self.temp_thresh_rgb = [_lo, _hi]
+
+        _lo, _hi = self.combine_threshes(thresh_type = 'hsv')
+        self.print_logs()
+        self.temp_thresh_hsv = [_lo, _hi]
+        #self.apply_thresh(_lo,_hi, thresh_type = 'hsv')
+
+    def update_gui(self):
+        Globals.sv_t1.set(str(self.temp_thresh_rgb))
+
 
     def apply_agenda_threshes(self):
         pass

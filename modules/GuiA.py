@@ -20,6 +20,12 @@ def cmd_set_thresh_pct(sv):
 def cmd_gui_combine():
     Globals.gui_cmd_combine = True
 
+def cmd_gui_set_rgb():
+    Globals.gui_cmd_set_rgb = True
+
+def cmd_gui_set_hsv():
+    Globals.gui_cmd_set_hsv = True
+
 # Helper Utils for build_thresh_gui ------------------------
 # sv: stringvar, sf: subframe, fr: frame, v: intvar
 
@@ -153,10 +159,11 @@ def build_gui_a(root):
 
     tk.Label(f1a3a, text="output rgb:").pack(side=tk.LEFT)
 
-    sv_t1 = tk.StringVar()
-    tk.Entry(f1a3a,textvariable = sv_t1, width = 20 ).pack(side=tk.LEFT)
+    
+    Globals.sv_t1 = tk.StringVar()
+    tk.Entry(f1a3a,textvariable = Globals.sv_t1, width = 20 ).pack(side=tk.LEFT)
     tk.Button(f1a3a, text = 'set', 
-                    command = cmd_gui_combine_threeshes
+                    command = cmd_gui_set_rgb
                     ).pack(side=tk.LEFT)
 
     f1a3b = tk.Frame(f1a)
@@ -167,7 +174,7 @@ def build_gui_a(root):
     sv_t2 = tk.StringVar()
     tk.Entry(f1a3b,textvariable = sv_t2, width = 20 ).pack(side=tk.LEFT)
     tk.Button(f1a3b, text = 'set', 
-                    command = cmd_gui_combine_threeshes
+                    command = cmd_gui_set_hsv
                     ).pack(side=tk.LEFT)
     #THRESHES
     f2 = tk.Frame(root)

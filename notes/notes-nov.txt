@@ -86,6 +86,8 @@ TODO:
     x   Rip out waitkey functionality, anything need to stay?
         
         Agenda further abstracted into it's own module
+    x       sw_agenda to Global
+            .timer()
 
         Agenda do random moves
 
