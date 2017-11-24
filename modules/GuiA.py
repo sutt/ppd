@@ -10,6 +10,8 @@ class GlobeGui():
     def __init__(self):
         self.sv_rgb = None
         self.sv_hsv = None
+        self.sv_output_rgb = None
+        self.sv_output_hsv = None
 
     def generate_sv(self, typ):
         if typ == 'rgb':
@@ -17,17 +19,23 @@ class GlobeGui():
         if typ == 'hsv':
             self.sv_hsv =  [tk.StringVar() for i in range(6)]
 
+    def generate_sv_output(self,typ):
+        if typ == 'rgb':
+            self.sv_output_rgb =  tk.StringVar()
+        if typ == 'hsv':
+            self.sv_output_hsv =  tk.StringVar()
+
+    def get_sv_output(self,typ):
+        if typ == 'rgb':
+            return self.sv_output_rgb
+        if typ == 'hsv':
+            return self.sv_output_hsv
+
     def get_sv(self,typ):
         if typ == 'rgb':
             return self.sv_rgb
         if typ == 'hsv':
             return self.sv_hsv
-
-    def set_sv(self,sv,typ):
-        if typ == 'rgb':
-            self.sv_rgb = sv
-        if typ == 'hsv':
-            self.sv_hsv = sv
 
     def set_gui_to_thresh(self,typ):
         _thresh = []
@@ -42,6 +50,10 @@ class GlobeGui():
                 self.sv_rgb[i].set(_thresh[i])
             elif typ == 'hsv':
                 self.sv_hsv[i].set(_thresh[i])
+
+    def set_gui_to_output(self, threshes):
+        self.sv_output_rgb.set("".join([str(_t.tolist()) for _t in threshes[0]]))
+        self.sv_output_hsv.set("".join([str(_t.tolist()) for _t in threshes[1]]))
 
 globeGui = GlobeGui()
 
@@ -201,9 +213,9 @@ def build_gui_a(root):
 
     tk.Label(f1a3a, text="output rgb:").pack(side=tk.LEFT)
 
-    
-    Globals.sv_t1 = tk.StringVar()
-    tk.Entry(f1a3a,textvariable = Globals.sv_t1, width = 20 ).pack(side=tk.LEFT)
+    globeGui.generate_sv_output(typ = 'rgb')
+    sv_t1 = globeGui.get_sv_output(typ = 'rgb')
+    tk.Entry(f1a3a,textvariable = sv_t1, width = 24 ).pack(side=tk.LEFT)
     tk.Button(f1a3a, text = 'set', 
                     command = cmd_gui_set_rgb
                     ).pack(side=tk.LEFT)
@@ -212,12 +224,14 @@ def build_gui_a(root):
     f1a3b.pack(side = tk.TOP)
 
     tk.Label(f1a3b, text="output hsv:").pack(side=tk.LEFT)
-
-    sv_t2 = tk.StringVar()
-    tk.Entry(f1a3b,textvariable = sv_t2, width = 20 ).pack(side=tk.LEFT)
+    
+    globeGui.generate_sv_output(typ = 'hsv')
+    sv_t2 = globeGui.get_sv_output(typ = 'hsv')
+    tk.Entry(f1a3b,textvariable = sv_t2, width = 24 ).pack(side=tk.LEFT)
     tk.Button(f1a3b, text = 'set', 
                     command = cmd_gui_set_hsv
                     ).pack(side=tk.LEFT)
+    
     #THRESHES
     f2 = tk.Frame(root)
     f2.pack(side = tk.TOP)

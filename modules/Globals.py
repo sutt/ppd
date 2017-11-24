@@ -19,4 +19,3 @@ def init():
     global gui_cmd_reset_agenda
     global gui_cmd_set_rgb
     global gui_cmd_set_hsv
-    global sv_t1

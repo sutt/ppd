@@ -11,15 +11,22 @@ test and debug agenda reset
 
 two pictures from initial center_tracking frame, make it one
 x set the gui from a output_rgb_set
-    extend to hsv
-    refactor globeGui
+    x extend to hsv
+    x refactor globeGui
     refactor gui to eliminate extraneous
-    
-print output as values
-verify that thresh_pct is different
+
+x print output as values
+x little wider display
+x update gui-hsv-output after runIterThreshA
+
+x verify that thresh_pct is different
 better printout for solves
     less verbose
     have outcome stats display
+
+Proof-of-Concept: do iterThresh with 1 training image, then multiple training images
+    -> better perf?
+
 
 do the tracking without resize
 find a way to know if it sees anything and what width?

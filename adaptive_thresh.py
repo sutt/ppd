@@ -197,7 +197,9 @@ def main():
             if Globals.gui_cmd_combine:
                 Globals.gui_cmd_combine = False
                 agenda.run_combine()
-                if b_gui: agenda.update_gui()
+                if b_gui:
+                    temp_thresh = agenda.get_temp_threshes()
+                    gui.globeGui.set_gui_to_output(temp_thresh)
 
             if Globals.gui_cmd_set_rgb:
                 Globals.gui_cmd_set_rgb = False
@@ -207,7 +209,8 @@ def main():
             if Globals.gui_cmd_set_hsv:
                 Globals.gui_cmd_set_hsv = False
                 agenda.apply_thresh_2('hsv')
-                
+                gui.globeGui.set_gui_to_thresh(typ = 'hsv')
+
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)

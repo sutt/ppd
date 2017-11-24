@@ -186,9 +186,8 @@ class AgendaA:
         self.temp_thresh_hsv = [_lo, _hi]
         #self.apply_thresh(_lo,_hi, thresh_type = 'hsv')
 
-    def update_gui(self):
-        Globals.sv_t1.set(str(self.temp_thresh_rgb))
-
+    def get_temp_threshes(self):
+        return (self.temp_thresh_rgb, self.temp_thresh_hsv)
 
     def apply_agenda_threshes(self):
         pass
