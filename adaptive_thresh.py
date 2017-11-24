@@ -188,7 +188,7 @@ def main():
                     
             if Globals.sw_agenda:
                 
-                sw_agenda = False
+                Globals.sw_agenda = False
                 img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
                 agenda.log_rect_imgs(img_crop)
                 agenda.write_rect_files(img_crop)

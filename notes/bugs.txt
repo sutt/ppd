@@ -2,7 +2,8 @@
 
 11/24
 
-agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
+x agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
+test and debug agenda reset
 
 
 x take off delay for startup
