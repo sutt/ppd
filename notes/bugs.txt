@@ -1,5 +1,10 @@
 #Tasks
 
+11/24
+
+agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
+
+
 x take off delay for startup
 x preview-display horizontal mirroring
 x display other types of images  -> 2x cv windows?

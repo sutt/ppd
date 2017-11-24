@@ -68,13 +68,13 @@ x   fix img_t saving
 
     x   add second thresh output section to gui
 
-    refactor Agenda
+    x   refactor Agenda
 
-    add cmds to set thresh
+    x   add cmds to set thresh
 
-    have runIterThreshA call the functionality
+    x   have runIterThreshA call the functionality
 
-    add cmd for reset Agenda
+    x   add cmd for reset Agenda
 
     add liberal checkbox on gui for combine_thresh
         is liberal = True mean the_combined is wider than every individual_thresh?
@@ -85,11 +85,17 @@ TODO:
 
     x   Rip out waitkey functionality, anything need to stay?
         
-        Agenda further abstracted into it's own module
+    x   Agenda further abstracted into it's own module
     x       sw_agenda to Global
-            .timer()
-
+            
+        Agenda.timer() + info_annotations
         Agenda do random moves
+
+        Agenda refactored bugs
+            sw_agenda too fast
+            print logs too much
+
+
 
     x   Histos ripped out into their own module
             add them back in tho?
