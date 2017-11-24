@@ -4,6 +4,9 @@
 
 x agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
 test and debug agenda reset
+    it does create a new folder in write_dir for each agenda
+
+two pictures from initial center_tracking frame, make it one
 
 
 x take off delay for startup

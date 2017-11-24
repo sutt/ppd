@@ -134,7 +134,7 @@ def build_gui_a(root):
                         command = cmd_sw_agenda).pack(side=tk.LEFT)
 
     tk.Button(f1a1, text = 'reset',
-                        command = cmd_sw_agenda).pack(side=tk.LEFT)
+                        command = cmd_gui_reset_agenda).pack(side=tk.LEFT)
 
     f1a2 = tk.Frame(f1a)
     f1a2.pack(side = tk.TOP)
