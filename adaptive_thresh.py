@@ -51,6 +51,7 @@ def main():
     Globals.gui_cmd_combine = False
     Globals.gui_cmd_set_rgb = False
     Globals.gui_cmd_set_hsv = False
+    Globals.gui_cmd_expand = False
     
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
@@ -199,14 +200,24 @@ def main():
                     temp_thresh = agenda.get_temp_threshes()
                     gui.globeGui.set_gui_to_output(temp_thresh)
 
+            if Globals.gui_cmd_expand:
+                Globals.gui_cmd_expand = False
+                agenda.log_backg_img(img = frame.copy())
+                agenda.write_backg_files(img = frame.copy())
+                print 'expansssssssionn to: ', str(Globals.max_width_to_expand)
+                agenda.run_expand()
+                if b_gui:
+                    temp_thresh = agenda.get_temp_threshes()
+                    gui.globeGui.set_gui_to_output(temp_thresh)
+
             if Globals.gui_cmd_set_rgb:
                 Globals.gui_cmd_set_rgb = False
-                agenda.apply_thresh_2('rgb')
+                agenda.apply_thresh_from_temp('rgb')
                 gui.globeGui.set_gui_to_thresh(typ = 'rgb')
 
             if Globals.gui_cmd_set_hsv:
                 Globals.gui_cmd_set_hsv = False
-                agenda.apply_thresh_2('hsv')
+                agenda.apply_thresh_from_temp('hsv')
                 gui.globeGui.set_gui_to_thresh(typ = 'hsv')
 
         # LOGGING

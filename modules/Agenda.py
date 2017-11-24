@@ -5,7 +5,7 @@ from AppUtils import write_pic
 from AppUtils import make_dir
 from AppUtils import uni_dir
 from IterThresh import combine_threshes
-from IterThresh import iterThreshA
+from IterThresh import iterThreshA, iterThreshB
 from ImgProcs import transformA
 
 
@@ -110,13 +110,47 @@ class AgendaA:
     def log_rect_imgs(self, img, **kwargs):
         self.rect_log.append(img)
 
+    def log_backg_img(self, img, **kwargs):
+        self.backg_log.append(img) 
+
     def write_backg_files(self, img, fname = "backg", **kwargs):
         fname = str(fname) + str(self.seq_ind)
         write_pic(img, name_base = fname, path=self.output_dir)
 
-    def log_backg_imgs(self, img, **kwargs):
-        self.backg_log.append(img)
+    @staticmethod
+    def np_convert(data):
+        return np.array( data, dtype = 'uint8') 
         
+    def expand_thresh(self, img, thresh_type = 'hsv', **kwargs):
+
+        if thresh_type == 'rgb':
+            init_thresh = [ Globals.threshLoRgb, Globals.threshHiRgb ]
+        if thresh_type == 'hsv':
+            init_thresh = [ Globals.threshLoHsv, Globals.threshHiHsv ]
+            img = transformA(img.copy(), blur = 1, b_hsv = True)
+
+        print 'starting iterThreshB with init thresh: ', str(init_thresh)
+        print 'expanding to width: ', str(Globals.max_width_to_expand)
+
+        out_thresh = iterThreshB(img, init_thresh,
+                        clrs = (0,1,2), e_goal = Globals.max_width_to_expand
+                        ,b_log = False
+                        ,max_iter = 200, steep = False)
+                        #,quick_return = True)    
+        
+        try:
+            print 'len of out: ', str(len(out_thresh))
+            print out_thresh
+            _lo, _hi  = out_thresh[1][3], out_thresh[1][4]
+        except:
+            print 'no expansion possible to that width'
+            _lo, _hi = init_thresh[0], init_thresh[1]
+        
+        _lo, _hi = self.np_convert(_lo), self.np_convert(_hi) 
+        
+        print 'lo/hi: ', str(_lo), ' ', str(_hi)
+        return _lo, _hi
+    
     def combine_threshes(self, thresh_type = 'rgb', **kwargs):
         print 'starting combine thresh on : %s ' % thresh_type
         print 'running iterThresA at : %f ' % Globals.thresh_pct
@@ -154,7 +188,7 @@ class AgendaA:
         else:
             print 'Couldnt find thresh_type to set global thresh'
 
-    def apply_thresh_2(self, thresh_type = 'rgb'):
+    def apply_thresh_from_temp(self, thresh_type = 'rgb'):
         if thresh_type == 'rgb':
             lo, hi = self.temp_thresh_rgb[0], self.temp_thresh_rgb[1]
             Globals.threshLoRgb = np.array( lo , dtype = 'uint8' )
@@ -176,16 +210,24 @@ class AgendaA:
         else:
             print 'couldnt find the log to print.'
 
+    def run_expand(self):
+        
+        backg_img = self.backg_log.pop()
+
+        _lo,_hi = self.expand_thresh(backg_img, thresh_type = 'rgb')
+        self.temp_thresh_rgb = [_lo, _hi]
+
+        _lo,_hi = self.expand_thresh(backg_img, thresh_type = 'hsv')
+        self.temp_thresh_hsv = [_lo, _hi]
+    
     def run_combine(self):
         
         _lo, _hi = self.combine_threshes(thresh_type = 'rgb')
         self.print_logs()
         self.temp_thresh_rgb = [_lo, _hi]
-
         _lo, _hi = self.combine_threshes(thresh_type = 'hsv')
         self.print_logs()
         self.temp_thresh_hsv = [_lo, _hi]
-        #self.apply_thresh(_lo,_hi, thresh_type = 'hsv')
 
     def get_temp_threshes(self):
         return (self.temp_thresh_rgb, self.temp_thresh_hsv)

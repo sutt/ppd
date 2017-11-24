@@ -69,8 +69,14 @@ def cmd_gui_reset_agenda():
 def cmd_set_thresh_pct(sv):
     Globals.thresh_pct = round(float(sv.get()),3)
 
+def cmd_set_max_width(sv):
+    Globals.max_width_to_expand = int(sv.get())
+
 def cmd_gui_combine():
     Globals.gui_cmd_combine = True
+
+def cmd_gui_expand():
+    Globals.gui_cmd_expand = True
 
 def cmd_gui_set_rgb():
     Globals.gui_cmd_set_rgb = True
@@ -204,6 +210,23 @@ def build_gui_a(root):
 
     tk.Button(f1a2, text = 'run iterA', 
                     command = cmd_gui_combine
+                    ).pack(side=tk.LEFT)
+
+    f1a3 = tk.Frame(f1a)
+    f1a3.pack(side = tk.TOP)
+
+    tk.Label(f1a3, text="max width:").pack(side=tk.LEFT)
+
+    Globals.max_width_to_expand = 10
+    sv_tp2 = tk.StringVar()
+    sv_tp2.set(str(Globals.max_width_to_expand))
+    tk.Entry(f1a3,textvariable = sv_tp2, width = 6 ).pack(side=tk.LEFT)
+
+    tk.Button(f1a3, text = 'set', command = lambda: cmd_set_max_width(sv_tp2)
+                ).pack(side=tk.LEFT)
+
+    tk.Button(f1a3, text = 'run iterb', 
+                    command = cmd_gui_expand
                     ).pack(side=tk.LEFT)
     
 

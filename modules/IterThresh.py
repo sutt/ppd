@@ -242,7 +242,7 @@ def tracked_shapes(img, thresh, b_max_radius = True):
 
 def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2), 
                 e_goal = 10.0, steep = True, epsilon = 1.0, 
-                max_iter = (255*3), b_log = False):
+                max_iter = (255*3), b_log = False, **kwargs):
     
     """ this one uses a penalty as a function of background-img and amount of contours
     that are found in the background image"""
@@ -267,9 +267,10 @@ def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2
         e_i = tracked_shapes(img, (f.get_threshLo(np=True), f.get_threshHi(np=True)))
         
         err = abs(e_goal - e_i)    
-        if err < errLog.get_min_err():
-            misc = (_t, e_i, err, f.get_threshLo(), f.get_threshHi(), f.get_penalty())
-            errLog.update(err, misc)
+        #if err < errLog.get_min_err():
+        misc = (_t, e_i, err, f.get_threshLo(), f.get_threshHi(), f.get_penalty())
+        errLog.update(err, misc)
+        
 
         if (e_i - epsilon) <= e_goal <= (e_i + epsilon):
             break
@@ -305,6 +306,9 @@ def iterThreshB(img, init_thresh = ((126,126,126),(127,127,127)) , clrs = (0,1,2
 
             f.set_delta(side = gradient_ind[0], clr = gradient_ind[1], val = -1)
             
+    if kwargs.get('quick_return', False):
+        return errLog.pop()
+
     if log.b_log: errLog.add_log(log.get_data())
     return errLog.get_data()
 

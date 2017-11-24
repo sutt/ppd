@@ -19,3 +19,5 @@ def init():
     global gui_cmd_reset_agenda
     global gui_cmd_set_rgb
     global gui_cmd_set_hsv
+    global max_width_to_expand
+    global gui_cmd_expand
