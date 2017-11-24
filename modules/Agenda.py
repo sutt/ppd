@@ -119,6 +119,8 @@ class AgendaA:
         
     def combine_threshes(self, thresh_type = 'rgb', **kwargs):
         print 'starting combine thresh on : %s ' % thresh_type
+        print 'running iterThresA at : %f ' % Globals.thresh_pct
+        self.combine_proc_log = []
         threshes = []
         
         for img in self.rect_log:
@@ -126,7 +128,6 @@ class AgendaA:
             if thresh_type == 'hsv':
                 img = transformA(img.copy(), blur = 1, b_hsv = True)
 
-            #transformA(frame, blur > 0) -> img_t
             out_thresh = iterThreshA( img
                                       ,goal_pct = Globals.thresh_pct 
                                       ,steep = False)
@@ -134,12 +135,11 @@ class AgendaA:
             _lo , _hi = out_thresh[1][3], out_thresh[1][4]
             threshes.append((_lo,_hi))
 
-        if self.b_log_combine_proc:
-            self.combine_proc_log.append(threshes)
+        self.combine_proc_log.extend(threshes[:])
 
         self.sw_calcd_combined = True
         
-        all_lo, all_hi = combine_threshes(threshes)
+        all_lo, all_hi = combine_threshes(threshes, liberal = True)
         return all_lo, all_hi
     
     def apply_thresh(self, lo, hi, thresh_type = 'rgb'):
