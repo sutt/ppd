@@ -135,12 +135,9 @@ class AgendaA:
         out_thresh = iterThreshB(img, init_thresh,
                         clrs = (0,1,2), e_goal = Globals.max_width_to_expand
                         ,b_log = False
-                        ,max_iter = 200, steep = False)
-                        #,quick_return = True)    
+                        ,max_iter = 300, steep = False)
         
         try:
-            print 'len of out: ', str(len(out_thresh))
-            print out_thresh
             _lo, _hi  = out_thresh[1][3], out_thresh[1][4]
         except:
             print 'no expansion possible to that width'

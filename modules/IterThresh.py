@@ -46,15 +46,16 @@ class F:
 
     def set_delta(self, side, clr, val = 1):
         if side == 'lo': 
-            if self.x_end[0 + clr]:
-                self.threshLo[clr] += val
             if self.threshLo[clr] == 0:
                 self.x_end[0 + clr] = False
+            if self.x_end[0 + clr]:
+                self.threshLo[clr] += val
         if side == 'hi': 
-            if self.x_end[3 + clr]:
-                self.threshHi[clr] -= val
             if self.threshHi[clr] == 255:
                 self.x_end[3 + clr] = False
+            if self.x_end[3 + clr]:
+                self.threshHi[clr] -= val
+            
 
 class Gradient:
     
