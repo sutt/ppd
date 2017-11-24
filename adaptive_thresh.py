@@ -202,6 +202,7 @@ def main():
             if Globals.gui_cmd_set_rgb:
                 Globals.gui_cmd_set_rgb = False
                 agenda.apply_thresh_2('rgb')
+                gui.globeGui.set_gui_to_thresh(typ = 'rgb')
 
             if Globals.gui_cmd_set_hsv:
                 Globals.gui_cmd_set_hsv = False

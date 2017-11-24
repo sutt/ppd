@@ -3,10 +3,29 @@
 11/24
 
 x agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
+
 test and debug agenda reset
-    it does create a new folder in write_dir for each agenda
+    x  it does create a new folder in write_dir for each agenda
+    x  does it reset for a new color ball? yes.
+    it takes the first img after reset from the last old_pos for tracking_frame
 
 two pictures from initial center_tracking frame, make it one
+x set the gui from a output_rgb_set
+    extend to hsv
+    refactor globeGui
+    refactor gui to eliminate extraneous
+    
+print output as values
+verify that thresh_pct is different
+better printout for solves
+    less verbose
+    have outcome stats display
+
+do the tracking without resize
+find a way to know if it sees anything and what width?
+    "is it seeing the ball way out there? What's the furthest it can see the ball?"
+
+
 
 
 x take off delay for startup

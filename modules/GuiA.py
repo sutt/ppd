@@ -5,6 +5,46 @@ import Tkinter as tk
 import Globals
 
 
+class GlobeGui():
+
+    def __init__(self):
+        self.sv_rgb = None
+        self.sv_hsv = None
+
+    def generate_sv(self, typ):
+        if typ == 'rgb':
+            self.sv_rgb =  [tk.StringVar() for i in range(6)]
+        if typ == 'hsv':
+            self.sv_hsv =  [tk.StringVar() for i in range(6)]
+
+    def get_sv(self,typ):
+        if typ == 'rgb':
+            return self.sv_rgb
+        if typ == 'hsv':
+            return self.sv_hsv
+
+    def set_sv(self,sv,typ):
+        if typ == 'rgb':
+            self.sv_rgb = sv
+        if typ == 'hsv':
+            self.sv_hsv = sv
+
+    def set_gui_to_thresh(self,typ):
+        _thresh = []
+        for i in range(6):
+            if typ == 'rgb':
+                _val = Globals.threshLoRgb[i/2] if (i % 2 == 0) else Globals.threshHiRgb[i/2]
+            elif typ == 'hsv':
+                _val = Globals.threshLoHsv[i/2] if (i % 2 == 0) else Globals.threshHiHsv[i/2]
+            _thresh.append(_val)
+        for i in range(6):
+            if typ == 'rgb':
+                self.sv_rgb[i].set(_thresh[i])
+            elif typ == 'hsv':
+                self.sv_hsv[i].set(_thresh[i])
+
+globeGui = GlobeGui()
+
 def cmd_quit():
     Globals.gui_cmd_quit = True
 
@@ -22,6 +62,7 @@ def cmd_gui_combine():
 
 def cmd_gui_set_rgb():
     Globals.gui_cmd_set_rgb = True
+    #globeGui.set_gui_to_thresh(typ = 'rgb')
 
 def cmd_gui_set_hsv():
     Globals.gui_cmd_set_hsv = True
@@ -80,7 +121,8 @@ def set_thresh_from_gui(typ, sv):
 
 def build_thresh_gui(typ, fr):
     tk.Label(fr, text="Current Thresh:").pack(side=tk.TOP)
-    sv = generate_sv()
+    globeGui.generate_sv(typ = typ)
+    sv = globeGui.get_sv(typ = typ)
     set_gui_to_thresh(typ = typ ,sv = sv)
     sf = generate_sf(fr)
     pack_sf(sf)
@@ -209,6 +251,7 @@ class GuiA(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.start()
+        self.globeGui = globeGui
 
     def callback(self):
         self.root.quit()
