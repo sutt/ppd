@@ -7,9 +7,9 @@ x agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?
 test and debug agenda reset
     x  it does create a new folder in write_dir for each agenda
     x  does it reset for a new color ball? yes.
-    it takes the first img after reset from the last old_pos for tracking_frame
+    x it takes the first img after reset from the last old_pos for tracking_frame
 
-two pictures from initial center_tracking frame, make it one
+x two pictures from initial center_tracking frame, make it one
 x set the gui from a output_rgb_set
     x extend to hsv
     x refactor globeGui
@@ -24,8 +24,9 @@ better printout for solves
     less verbose
     have outcome stats display
 
-Proof-of-Concept: do iterThresh with 1 training image, then multiple training images
-    -> better perf?
+x Proof-of-Concept: do iterThresh with 1 training image, then multiple training images
+x better perf? - yes
+x at least wider thresh? -yes
 
 
 do the tracking without resize

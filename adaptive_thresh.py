@@ -95,10 +95,7 @@ def main():
     Globals.sw_agenda = False
     if b_agenda: 
         agenda = AgendaA()
-        # b_agenda_timer = args["agendatimer"]
-        # sw_reset_agenda_timer = False
-        # next_agenda_time = time.time() + 999999.9
-
+        agenda.do_rect_move()
 
     vc = initCam(cam_type)
     vc = setupCam(vc, cam_type = cam_type, params = cam_params)
@@ -183,6 +180,7 @@ def main():
             if Globals.gui_cmd_reset_agenda:
                 Globals.gui_cmd_reset_agenda = False
                 agenda = AgendaA()
+                agenda.do_rect_move()
         
             # agenda.timer()
                     

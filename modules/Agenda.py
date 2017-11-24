@@ -41,7 +41,7 @@ def routineA(img_wh = (640,480), **kwargs):
 
 def routineB(img_wh = (640,480), **kwargs):
     ret = []
-    ret.extend( middle( img_wh,size = 80) )
+    ret.extend( middle( img_wh,size = 50) )
     ret.extend( corners(img_wh,margins = 100, size = 50) )
     return ret
 
@@ -54,7 +54,7 @@ class AgendaA:
 
     def __init__(self, img_wh = (640,480), **kwargs):
         self.seq_ind = 0
-        self.img_wh = (640,480)
+        self.img_wh = img_wh
         self.track_frame_routine = routineB()
         self.rect_log = []
         self.backg_log = []
@@ -71,6 +71,7 @@ class AgendaA:
         output_dir = uni_dir(writepath)
         self.output_dir = uni_dir(writepath)
         make_dir(writepath + "/" + output_dir)
+
 
     def timer(self):
         pass
