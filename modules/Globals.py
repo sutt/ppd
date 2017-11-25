@@ -21,3 +21,5 @@ def init():
     global gui_cmd_set_hsv
     global max_width_to_expand
     global gui_cmd_expand
+    global param_tracking_blur
+    global param_tracking_repair_iters

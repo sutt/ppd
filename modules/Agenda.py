@@ -127,7 +127,8 @@ class AgendaA:
             init_thresh = [ Globals.threshLoRgb, Globals.threshHiRgb ]
         if thresh_type == 'hsv':
             init_thresh = [ Globals.threshLoHsv, Globals.threshHiHsv ]
-            img = transformA(img.copy(), blur = 1, b_hsv = True)
+            img = transformA(img.copy(), blur = Globals.param_tracking_blur
+                            , b_hsv = True)
 
         print 'starting iterThreshB with init thresh: ', str(init_thresh)
         print 'expanding to width: ', str(Globals.max_width_to_expand)
@@ -157,7 +158,8 @@ class AgendaA:
         for img in self.rect_log:
             
             if thresh_type == 'hsv':
-                img = transformA(img.copy(), blur = 1, b_hsv = True)
+                img = transformA(img.copy(), blur = Globals.param_tracking_blur
+                                , b_hsv = True)
 
             out_thresh = iterThreshA( img
                                       ,goal_pct = Globals.thresh_pct 

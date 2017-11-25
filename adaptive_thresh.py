@@ -78,6 +78,8 @@ def main():
     Globals.b_thresh_rgb = True
 
     Globals.thresh_pct = args["pctthresh"]  #0.95
+    Globals.param_tracking_blur = 11
+    Globals.param_tracking_repair_iters = 2
     b_thresh_log = True
     Globals.thresh_log = []
 
@@ -114,19 +116,20 @@ def main():
         # THRESHOLD MASK    
         img_mask_hsv, img_mask_rgb = None, None
         if Globals.b_thresh_hsv:
-            img_t = transformA(frame.copy(), b_hsv = True)
+            img_t = transformA(frame.copy(), b_hsv = True, blur = Globals.param_tracking_blur)
             img_mask_hsv = threshA(img_t 
                                 ,threshLo = Globals.threshLoHsv 
                                 ,threshHi = Globals.threshHiHsv )
         
         if Globals.b_thresh_rgb:
-            img_t = transformA(frame.copy())
+            img_t = transformA(frame.copy(), Globals.param_tracking_blur)
             img_mask_rgb = threshA(img_t 
                                 ,threshLo = Globals.threshLoRgb 
                                 ,threshHi = Globals.threshHiRgb )
 
         if True: #Globals.b_thresh_hsv:
-            img_t = transformA(frame.copy(), b_hsv = True)
+            img_t = transformA(frame.copy(), b_hsv = Globals.b_thresh_hsv
+                                ,blur = Globals.param_tracking_blur)
         
         #TODO - make this a function
         img_mask = None
@@ -142,7 +145,7 @@ def main():
         
         if not(img_mask is None):
             b_mask_img = True
-            img_mask = repairA(img_mask, iterations = 2)
+            img_mask = repairA(img_mask, iterations = Globals.param_tracking_repair_iters)
         
             # LOCATE / TRACK
             x,y = find_xy(img_mask)

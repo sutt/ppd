@@ -22,16 +22,12 @@ x have outcome stats display
 x Proof-of-Concept: do iterThresh with 1 training image, then multiple training images
 x better perf? - yes
 x at least wider thresh? -yes
+x call iterThreshB from gui
+x tracking params from gui
+x agenda.combine_threshes: transformA(img.copy(), blur = 1, b_hsv = True)
 
-
-call iterThreshB from gui
-
-
-tracking params from gui
 
 tracking success displayed to output
-
-agenda.combine_threshes: transformA(img.copy(), blur = 1, b_hsv = True)
 
 do the tracking without resize
 find a way to know if it sees anything and what width?

@@ -12,6 +12,8 @@ class GlobeGui():
         self.sv_hsv = None
         self.sv_output_rgb = None
         self.sv_output_hsv = None
+        self.sv_track_blur = None
+        self.sv_track_repair_iters = None
 
     def generate_sv(self, typ):
         if typ == 'rgb':
@@ -25,6 +27,12 @@ class GlobeGui():
         if typ == 'hsv':
             self.sv_output_hsv =  tk.StringVar()
 
+    def generate_sv_track_blur(self):
+        self.sv_track_blur = tk.StringVar()
+        
+    def generate_sv_track_repair_iters(self):
+        self.sv_track_repair_iters = tk.StringVar()
+
     def get_sv_output(self,typ):
         if typ == 'rgb':
             return self.sv_output_rgb
@@ -36,6 +44,12 @@ class GlobeGui():
             return self.sv_rgb
         if typ == 'hsv':
             return self.sv_hsv
+    
+    def get_sv_track_blur(self):
+        return self.sv_track_blur
+
+    def get_sv_track_repair_iters(self):
+        return self.sv_track_repair_iters
 
     def set_gui_to_thresh(self,typ):
         _thresh = []
@@ -54,6 +68,15 @@ class GlobeGui():
     def set_gui_to_output(self, threshes):
         self.sv_output_rgb.set("".join([str(_t.tolist()) for _t in threshes[0]]))
         self.sv_output_hsv.set("".join([str(_t.tolist()) for _t in threshes[1]]))
+
+    def set_gui_to_track_blur(self,blur_amt):
+        if ((int(blur_amt) % 2) == 0):
+            print 'blur_amt ', str(blur_amt), ' is even. must be odd' 
+            return
+        self.sv_track_blur.set( blur_amt)
+
+    def set_gui_to_track_repair_iters(self, iters_amt):
+        self.sv_track_repair_iters.set(str(iters_amt))
 
 globeGui = GlobeGui()
 
@@ -154,8 +177,16 @@ def update_b_thresh(typ, v):
         Globals.b_thresh_rgb = bool(v.get())
     if typ == 'hsv':
         Globals.b_thresh_hsv = bool(v.get())
-    
-        
+
+def set_track_blur_from_gui(blur_amt):
+    if ((int(blur_amt) % 2) == 0):
+            print 'blur_amt ', str(blur_amt), ' is even. must be odd' 
+            return
+    Globals.param_tracking_blur = int(blur_amt)
+
+def set_track_repair_iters_from_gui(iters_amt):
+    Globals.param_tracking_repair_iters = int(iters_amt)
+
 def generate_radio_v():
     return tk.IntVar()
     
@@ -279,6 +310,29 @@ def build_gui_a(root):
     f4 = tk.Frame(root)
     f4.pack(anchor=tk.W)
     build_thresh_gui(typ='hsv',fr = f4)
+
+    #TRACKING PARAMS
+    f5 = tk.Frame(root)
+    f5.pack(anchor=tk.W)
+    
+    tk.Label(f5, text="tracking blur:").pack(side=tk.LEFT)
+    globeGui.generate_sv_track_blur()
+    sv_tb = globeGui.get_sv_track_blur()
+    tk.Entry(f5,textvariable = sv_tb, width = 8 ).pack(side=tk.LEFT)
+    globeGui.set_gui_to_track_blur(str(Globals.param_tracking_blur))
+    tk.Button(f5, text = 'set', 
+                  command = lambda: set_track_blur_from_gui(sv_tb.get()  )
+                    ).pack(side=tk.LEFT)
+    
+    tk.Label(f5, text="repair iters:").pack(side=tk.LEFT)
+    globeGui.generate_sv_track_repair_iters()
+    sv_ri = globeGui.get_sv_track_repair_iters()
+    tk.Entry(f5,textvariable = sv_ri, width = 8 ).pack(side=tk.LEFT)
+    globeGui.set_gui_to_track_repair_iters(str(Globals.param_tracking_repair_iters))
+    tk.Button(f5, text = 'set', 
+                  command = lambda: set_track_repair_iters_from_gui(sv_ri.get()  )
+                    ).pack(side=tk.LEFT)
+
 
     return root
 
