@@ -177,6 +177,10 @@ def update_b_thresh(typ, v):
         Globals.b_thresh_rgb = bool(v.get())
     if typ == 'hsv':
         Globals.b_thresh_hsv = bool(v.get())
+    if typ == 'display_info':
+        Globals.gui_track_success = bool(v.get())
+    if typ == 'display_big_circle':
+        Globals.gui_big_tracking_circle = bool(v.get())
 
 def set_track_blur_from_gui(blur_amt):
     if ((int(blur_amt) % 2) == 0):
@@ -196,6 +200,10 @@ def build_radio_opt(v,fr, typ):
         v.set(int(Globals.b_thresh_rgb))
     if typ == 'hsv':
         v.set(int(Globals.b_thresh_hsv))
+    if typ == 'display_info':
+        v.set(int(0)) 
+    if typ == 'display_big_circle':
+        v.set(int(0)) 
 
     tk.Radiobutton(fr, text="Off",variable=v,value=0,
             command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
@@ -333,6 +341,21 @@ def build_gui_a(root):
                   command = lambda: set_track_repair_iters_from_gui(sv_ri.get()  )
                     ).pack(side=tk.LEFT)
 
+    #DISPLAY PARAMS
+    f6 = tk.Frame(root)
+    f6.pack(anchor=tk.W)
+
+    f6a = tk.Frame(f6)
+    f6a.pack(side = tk.TOP)
+    tk.Label(f6a, text="display info:").pack(side=tk.LEFT)
+    v_display_info = generate_radio_v()
+    build_radio_opt(v_display_info, f6a, typ = 'display_info')
+
+    f6b = tk.Frame(f6)
+    f6b.pack(side = tk.TOP)
+    tk.Label(f6b, text="display mask big circle:").pack(side=tk.LEFT)
+    v_display_big_circle = generate_radio_v()
+    build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
 
     return root
 

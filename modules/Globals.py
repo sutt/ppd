@@ -23,3 +23,5 @@ def init():
     global gui_cmd_expand
     global param_tracking_blur
     global param_tracking_repair_iters
+    global gui_track_success
+    global gui_big_tracking_circle

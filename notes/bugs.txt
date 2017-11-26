@@ -26,8 +26,22 @@ x call iterThreshB from gui
 x tracking params from gui
 x agenda.combine_threshes: transformA(img.copy(), blur = 1, b_hsv = True)
 
+iterThreshB outputs initthresh? Not exactly but still seems sketchy
 
-tracking success displayed to output
+Show-How-Far-You-Can-See-Ball
+x tracking success displayed to output
+x display shows wide circle around putative ball
+also diagnose iterThreshB on 
+also display radius and num_of_cnts_found on display
+
+Most important:
+
+    Resize
+
+    File_Cam
+
+
+Can do an iterthreshB agenda creating a mask where there are FP's?
 
 do the tracking without resize
 find a way to know if it sees anything and what width?

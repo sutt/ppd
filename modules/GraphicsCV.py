@@ -9,8 +9,11 @@ from matplotlib import pyplot as plt
 
 
 
-def draw_tracking_frame(img, x,y,radius):
-    cv2.circle(img, (int(x), int(y)), int(radius), (0, 255, 255), 10)
+def draw_tracking_frame(img, x,y,radius, **kwargs):
+    if kwargs.get('one_color',False):
+        cv2.circle(img, (int(x), int(y)), int(radius), (255), 10)
+    else:
+        cv2.circle(img, (int(x), int(y)), int(radius), (0, 255, 255), 10)
     return img
 
 def draw_tracking(img, rect ):

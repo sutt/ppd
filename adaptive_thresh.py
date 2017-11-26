@@ -21,7 +21,7 @@ from modules.ImgProcs import threshA, transformA, repairA, multi_thresh_cv
 from modules.TrackA import find_xy, find_radius
 from modules.Methods import imgToPx, pxToHist, imgToPx2
 from modules.Methods import Options
-from modules.IterThresh import iterThreshA, combine_threshes
+from modules.IterThresh import iterThreshA, iterThreshB, combine_threshes
 from modules.Agenda import AgendaA
 from modules.Agenda import middle, corners, tf_gen
 from modules.GuiA import GuiA
@@ -52,6 +52,8 @@ def main():
     Globals.gui_cmd_set_rgb = False
     Globals.gui_cmd_set_hsv = False
     Globals.gui_cmd_expand = False
+    Globals.gui_track_success = False
+    Globals.gui_big_tracking_circle = False
     
     Globals.b_histo = args["showhisto"]     
     b_hist_rect = True
@@ -126,10 +128,6 @@ def main():
             img_mask_rgb = threshA(img_t 
                                 ,threshLo = Globals.threshLoRgb 
                                 ,threshHi = Globals.threshHiRgb )
-
-        if True: #Globals.b_thresh_hsv:
-            img_t = transformA(frame.copy(), b_hsv = Globals.b_thresh_hsv
-                                ,blur = Globals.param_tracking_blur)
         
         #TODO - make this a function
         img_mask = None
@@ -143,6 +141,8 @@ def main():
         else:
             log.log("MSG_NO_THRESHES")
         
+        b_track_success = False
+
         if not(img_mask is None):
             b_mask_img = True
             img_mask = repairA(img_mask, iterations = Globals.param_tracking_repair_iters)
@@ -150,12 +150,24 @@ def main():
             # LOCATE / TRACK
             x,y = find_xy(img_mask)
             radius = find_radius(img_mask)
-            b_track_success = True
+            
+            if radius > 0:
+                b_track_success = True
         else:
             b_mask_img = False
 
+
         #DRAW ONTO FRAME
-        #TODO - make this a function
+
+        img_t = transformA(frame.copy(), b_hsv = Globals.b_thresh_hsv
+                    ,blur = Globals.param_tracking_blur)
+
+        if Globals.gui_track_success:
+            info_annotations.append(b_track_success)
+            b_annotate_img = True
+        else:
+            b_annotate_img = False
+        
         img_display = frame.copy()
 
         if b_tracking_frame:
@@ -167,7 +179,8 @@ def main():
         if b_annotate_img:
             img_display = draw_annotations(img_display, info_annotations)       
             
-
+        if Globals.gui_big_tracking_circle and b_track_success:
+            img_mask = draw_tracking_frame(img_mask,x,y,radius + 10, one_color = True)  
 
         #SHOW IMAGES
         ShowImages(  display_img = True,   img_d = img_display
