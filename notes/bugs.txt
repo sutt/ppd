@@ -1,5 +1,22 @@
 #Tasks
 
+
+12/2
+
+find all camera sizes
+hello world on the pi-camera
+
+12/1
+
+working well at 10 feet
+1280p
+rgb: (orange ball) [  0  96 192] [ 88 232 255]
+blur 11, repair 2
+
+green sharpie:  [ 15 106  86] [ 81 171 148]
+
+increasing thresh_pct > 0.95 helps with motion blur
+
 11/24
 
 x agenda nextstep triggers them all - sw_ not reset?, or gui firing too much?

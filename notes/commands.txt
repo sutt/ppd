@@ -1,4 +1,17 @@
 
+
+12/2
+
+>python test_vid_sizes.py --cam_num 0
+
+12/1
+
+>python writevid1.py --showvid --time 10
+
+>python fbf2.py --file output2.avi --interactive
+
+
+
 Example for writing out a book
     python fbf2.py --file t6/ss5000.h264 --writebook --writebookinfo --interactive --reporting
 
