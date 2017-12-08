@@ -10,7 +10,7 @@ def initCam(cam_type,**kwargs):
     elif cam_type == 'pi_cam': 
         return 1
     elif cam_type == 'file_cam': 
-        return  cv2.VideoCapture(kwargs.get('vid_file'),'')
+        return  cv2.VideoCapture(kwargs.get('vid_file'))
     else:
         print 'No cam object creatable.'
 

@@ -159,10 +159,12 @@ def Options(**kwargs):
 
     
 
-def DelayFPS(time_last_frame, fps_time):
-    epsilon_fps_time = 0
+def DelayFPS(time_last_frame, fps_hz):
+    fps_time = 1.0/float(fps_hz)
     current_frames_time = time.time() - time_last_frame 
-    sleep_time = current_frames_time - fps_time - epsilon_fps_time
+    sleep_time = fps_time - current_frames_time
     if sleep_time > 0:
         time.sleep(sleep_time)
-    time_last_frame = time.time()    
+    return 0
+    
+

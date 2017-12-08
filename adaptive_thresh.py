@@ -13,7 +13,7 @@ import modules.Globals as Globals
 from modules.Camera import initCam, setupCam, getFrame
 from modules.GraphicsA import LiveHist
 from modules.AppUtils import write_pic, uni_dir, make_dir
-from modules.Methods import InitLiveHist, SwitchYLim
+from modules.Methods import InitLiveHist, SwitchYLim, DelayFPS
 from modules.GraphicsCV import draw_tracking_frame, draw_tracking, draw_annotations
 from modules.GraphicsCV import ShowImages
 from modules.ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
@@ -36,6 +36,9 @@ ap.add_argument("--printlog", action="store_true")
 ap.add_argument("--agenda", action="store_true")
 ap.add_argument("--agendatimer", action="store_true")
 ap.add_argument("--pctthresh", type=float, default=0.95)
+ap.add_argument("--filecam", type=str, default="")
+ap.add_argument("--fps_hz", type=str, default="30") #converted to int
+
 
 args = vars(ap.parse_args())
 
@@ -94,7 +97,9 @@ def main():
     
     cam_params = (640,480)
     h_img, w_img = cam_params[0], cam_params[1]
-    cam_type = 'cv_cam'   # 'pi_cam','file_cam'
+    cam_type = 'file_cam'  #'cv_cam'   # 'pi_cam','file_cam'
+    b_slow_for_fps = True
+
 
     b_agenda = args["agenda"]
     Globals.sw_agenda = False
@@ -102,8 +107,9 @@ def main():
         agenda = AgendaA()
         agenda.do_rect_move()
 
-    vc = initCam(cam_type)
-    vc = setupCam(vc, cam_type = cam_type, params = cam_params)
+    vc = initCam(cam_type, vid_file = args["filecam"])
+    if args["filecam"] == "":
+        vc = setupCam(vc, cam_type = cam_type, params = cam_params)
     
     b_gui = True
     if b_gui:
@@ -238,14 +244,16 @@ def main():
                 agenda.apply_thresh_from_temp('hsv')
                 gui.globeGui.set_gui_to_thresh(typ = 'hsv')
 
+        
+        if cam_type == 'file_cam' and b_slow_for_fps:
+            DelayFPS(time_last, int(args["fps_hz"]))
+            time_last = time.time()
+            
         # LOGGING
         if b_print_log:
             print 'frame time: %.2f' % (time.time() - time_last)
             print 'b_show_histos: ', str(Globals.b_show_histos)
             time_last = time.time()
-
-        # if cam_type == 'file_cam' and b_slow_for_fps:
-            # DelayFPS(time_last, 30)
 
         if cv2.waitKey(waitKeyRefresh)== ord('q'):
             break

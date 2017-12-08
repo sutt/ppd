@@ -1,5 +1,10 @@
 #Tasks
 
+12/8
+
+add options for camera capture size
+add filecam
+
 
 12/2
 

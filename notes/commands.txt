@@ -1,4 +1,8 @@
 
+12/8
+
+>python adaptive_thresh.py --agenda --filecam output5.avi --fps_hz 20
+
 
 12/2
 
