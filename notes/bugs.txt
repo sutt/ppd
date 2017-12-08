@@ -3,8 +3,8 @@
 12/8
 
 add options for camera capture size
-add filecam
-
+x add filecam
+add outer loop to reset camera
 
 12/2
 

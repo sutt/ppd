@@ -91,187 +91,192 @@ def main():
     log = Log()
     b_print_log = args["printlog"]  #TODO - move this to Log
     waitKeyRefresh = 1
-    time_last = time.time()
     info_annotations = []
-    i = 0
-    
-    cam_params = (640,480)
-    h_img, w_img = cam_params[0], cam_params[1]
-    cam_type = 'file_cam'  #'cv_cam'   # 'pi_cam','file_cam'
     b_slow_for_fps = True
-
-
-    b_agenda = args["agenda"]
-    Globals.sw_agenda = False
-    if b_agenda: 
-        agenda = AgendaA()
-        agenda.do_rect_move()
-
-    vc = initCam(cam_type, vid_file = args["filecam"])
-    if args["filecam"] == "":
-        vc = setupCam(vc, cam_type = cam_type, params = cam_params)
     
     b_gui = True
     if b_gui:
         gui = GuiA()
 
-    while(vc.isOpened()):
+    #OUTER LOOP - to reset camera
+    while(not(Globals.gui_cmd_quit)):
 
-        ret, frame = getFrame(vc, cam_type = 'cv_cam')        
-        i += 1
-        if not(ret): break
+        #cam_params = (640,480)
+        cam_params = (1280,720)
+        #cam_params = (1920,1080)
+        h_img, w_img = cam_params[0], cam_params[1]
+        cam_type = 'cv_cam'   # 'pi_cam','file_cam'
 
-        if i == 1: print frame.shape
+        b_agenda = args["agenda"]
+        Globals.sw_agenda = False
+        if b_agenda: 
+            agenda = AgendaA(img_wh = cam_params)
+            agenda.do_rect_move()
 
-        # THRESHOLD MASK    
-        img_mask_hsv, img_mask_rgb = None, None
-        if Globals.b_thresh_hsv:
-            img_t = transformA(frame.copy(), b_hsv = True, blur = Globals.param_tracking_blur)
-            img_mask_hsv = threshA(img_t 
-                                ,threshLo = Globals.threshLoHsv 
-                                ,threshHi = Globals.threshHiHsv )
+        vc = initCam(cam_type, vid_file = args["filecam"])
+        if args["filecam"] == "":
+            vc = setupCam(vc, cam_type = cam_type, params = cam_params)
         
-        if Globals.b_thresh_rgb:
-            img_t = transformA(frame.copy(), Globals.param_tracking_blur)
-            img_mask_rgb = threshA(img_t 
-                                ,threshLo = Globals.threshLoRgb 
-                                ,threshHi = Globals.threshHiRgb )
-        
-        #TODO - make this a function
-        img_mask = None
-        if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
-            if not(img_mask_hsv is None) and not(img_mask_rgb is None):
-                img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
-        elif Globals.b_thresh_hsv:
-            img_mask = img_mask_hsv
-        elif Globals.b_thresh_rgb:
-            img_mask = img_mask_rgb
-        else:
-            log.log("MSG_NO_THRESHES")
-        
-        b_track_success = False
+        time_last = time.time()
+        i = 0
 
-        if not(img_mask is None):
-            b_mask_img = True
-            img_mask = repairA(img_mask, iterations = Globals.param_tracking_repair_iters)
-        
-            # LOCATE / TRACK
-            x,y = find_xy(img_mask)
-            radius = find_radius(img_mask)
+        while(vc.isOpened()):
+
+            ret, frame = getFrame(vc, cam_type = 'cv_cam')        
+            i += 1
+            if not(ret): break
+
+            if i == 1: print frame.shape
+
+            # THRESHOLD MASK    
+            img_mask_hsv, img_mask_rgb = None, None
+            if Globals.b_thresh_hsv:
+                img_t = transformA(frame.copy(), b_hsv = True, blur = Globals.param_tracking_blur)
+                img_mask_hsv = threshA(img_t 
+                                    ,threshLo = Globals.threshLoHsv 
+                                    ,threshHi = Globals.threshHiHsv )
             
-            if radius > 0:
-                b_track_success = True
-        else:
-            b_mask_img = False
-
-
-        #DRAW ONTO FRAME
-
-        img_t = transformA(frame.copy(), b_hsv = Globals.b_thresh_hsv
-                    ,blur = Globals.param_tracking_blur)
-
-        if Globals.gui_track_success:
-            info_annotations.append(b_track_success)
-            b_annotate_img = True
-        else:
-            b_annotate_img = False
-        
-        img_display = frame.copy()
-
-        if b_tracking_frame:
-            img_display = draw_tracking_frame(img_display,x,y,radius)
-
-        if b_drawTracking:
-            img_display = draw_tracking(img_display,Globals.current_tracking_frame)
-
-        if b_annotate_img:
-            img_display = draw_annotations(img_display, info_annotations)       
+            if Globals.b_thresh_rgb:
+                img_t = transformA(frame.copy(), Globals.param_tracking_blur)
+                img_mask_rgb = threshA(img_t 
+                                    ,threshLo = Globals.threshLoRgb 
+                                    ,threshHi = Globals.threshHiRgb )
             
-        if Globals.gui_big_tracking_circle and b_track_success:
-            img_mask = draw_tracking_frame(img_mask,x,y,radius + 10, one_color = True)  
-
-        #SHOW IMAGES
-        ShowImages(  display_img = True,   img_d = img_display
-                    ,transform_img = True, img_t = img_t
-                    ,mask_img = b_mask_img,      img_m = img_mask 
-                    ,pause_rect = Globals.b_show_puase_rect
-                    ,img_rect = pause_rect
-                    ,resize = True)
-        
-
-        # AGENDA
-        if b_agenda:
+            #TODO - make this a function
+            img_mask = None
+            if Globals.b_thresh_hsv and  Globals.b_thresh_rgb:
+                if not(img_mask_hsv is None) and not(img_mask_rgb is None):
+                    img_mask = multi_thresh_cv(img_mask_hsv,img_mask_rgb)
+            elif Globals.b_thresh_hsv:
+                img_mask = img_mask_hsv
+            elif Globals.b_thresh_rgb:
+                img_mask = img_mask_rgb
+            else:
+                log.log("MSG_NO_THRESHES")
             
-            if Globals.gui_cmd_reset_agenda:
-                Globals.gui_cmd_reset_agenda = False
-                agenda = AgendaA()
-                agenda.do_rect_move()
-        
-            # agenda.timer()
+            b_track_success = False
+
+            if not(img_mask is None):
+                b_mask_img = True
+                img_mask = repairA(img_mask, iterations = Globals.param_tracking_repair_iters)
+            
+                # LOCATE / TRACK
+                x,y = find_xy(img_mask)
+                radius = find_radius(img_mask)
+                
+                if radius > 0:
+                    b_track_success = True
+            else:
+                b_mask_img = False
+
+
+            #DRAW ONTO FRAME
+
+            img_t = transformA(frame.copy(), b_hsv = Globals.b_thresh_hsv
+                        ,blur = Globals.param_tracking_blur)
+
+            if Globals.gui_track_success:
+                info_annotations.append(b_track_success)
+                b_annotate_img = True
+            else:
+                b_annotate_img = False
+            
+            img_display = frame.copy()
+
+            if b_tracking_frame:
+                img_display = draw_tracking_frame(img_display,x,y,radius)
+
+            if b_drawTracking:
+                img_display = draw_tracking(img_display,Globals.current_tracking_frame)
+
+            if b_annotate_img:
+                img_display = draw_annotations(img_display, info_annotations)       
+                
+            if Globals.gui_big_tracking_circle and b_track_success:
+                img_mask = draw_tracking_frame(img_mask,x,y,radius + 10, one_color = True)  
+
+            #SHOW IMAGES
+            ShowImages(  display_img = True,   img_d = img_display
+                        ,transform_img = True, img_t = img_t
+                        ,mask_img = b_mask_img,      img_m = img_mask 
+                        ,pause_rect = Globals.b_show_puase_rect
+                        ,img_rect = pause_rect
+                        ,resize = True)
+            
+
+            # AGENDA
+            if b_agenda:
+                
+                if Globals.gui_cmd_reset_agenda:
+                    Globals.gui_cmd_reset_agenda = False
+                    agenda = AgendaA(img_wh = cam_params)
+                    agenda.do_rect_move()
+            
+                # agenda.timer()
+                        
+                if Globals.sw_agenda:
                     
-            if Globals.sw_agenda:
-                
-                Globals.sw_agenda = False
-                img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
-                agenda.log_rect_imgs(img_crop)
-                agenda.write_rect_files(img_crop)
-                agenda.do_rect_move()
-                
-            if Globals.gui_cmd_combine:
-                Globals.gui_cmd_combine = False
-                agenda.run_combine()
-                if b_gui:
-                    temp_thresh = agenda.get_temp_threshes()
-                    gui.globeGui.set_gui_to_output(temp_thresh)
+                    Globals.sw_agenda = False
+                    img_crop = crop_img(frame.copy(), Globals.current_tracking_frame)
+                    agenda.log_rect_imgs(img_crop)
+                    agenda.write_rect_files(img_crop)
+                    agenda.do_rect_move()
+                    
+                if Globals.gui_cmd_combine:
+                    Globals.gui_cmd_combine = False
+                    agenda.run_combine()
+                    if b_gui:
+                        temp_thresh = agenda.get_temp_threshes()
+                        gui.globeGui.set_gui_to_output(temp_thresh)
 
-            if Globals.gui_cmd_expand:
-                Globals.gui_cmd_expand = False
-                agenda.log_backg_img(img = frame.copy())
-                agenda.write_backg_files(img = frame.copy())
-                print 'expansssssssionn to: ', str(Globals.max_width_to_expand)
-                agenda.run_expand()
-                if b_gui:
-                    temp_thresh = agenda.get_temp_threshes()
-                    gui.globeGui.set_gui_to_output(temp_thresh)
+                if Globals.gui_cmd_expand:
+                    Globals.gui_cmd_expand = False
+                    agenda.log_backg_img(img = frame.copy())
+                    agenda.write_backg_files(img = frame.copy())
+                    print 'expansssssssionn to: ', str(Globals.max_width_to_expand)
+                    agenda.run_expand()
+                    if b_gui:
+                        temp_thresh = agenda.get_temp_threshes()
+                        gui.globeGui.set_gui_to_output(temp_thresh)
 
-            if Globals.gui_cmd_set_rgb:
-                Globals.gui_cmd_set_rgb = False
-                agenda.apply_thresh_from_temp('rgb')
-                gui.globeGui.set_gui_to_thresh(typ = 'rgb')
+                if Globals.gui_cmd_set_rgb:
+                    Globals.gui_cmd_set_rgb = False
+                    agenda.apply_thresh_from_temp('rgb')
+                    gui.globeGui.set_gui_to_thresh(typ = 'rgb')
 
-            if Globals.gui_cmd_set_hsv:
-                Globals.gui_cmd_set_hsv = False
-                agenda.apply_thresh_from_temp('hsv')
-                gui.globeGui.set_gui_to_thresh(typ = 'hsv')
+                if Globals.gui_cmd_set_hsv:
+                    Globals.gui_cmd_set_hsv = False
+                    agenda.apply_thresh_from_temp('hsv')
+                    gui.globeGui.set_gui_to_thresh(typ = 'hsv')
 
-        
-        if cam_type == 'file_cam' and b_slow_for_fps:
-            DelayFPS(time_last, int(args["fps_hz"]))
-            time_last = time.time()
             
-        # LOGGING
-        if b_print_log:
-            print 'frame time: %.2f' % (time.time() - time_last)
-            print 'b_show_histos: ', str(Globals.b_show_histos)
-            time_last = time.time()
+            if cam_type == 'file_cam' and b_slow_for_fps:
+                DelayFPS(time_last, int(args["fps_hz"]))
+                time_last = time.time()
 
-        if cv2.waitKey(waitKeyRefresh)== ord('q'):
-            break
+            # LOGGING
+            if b_print_log:
+                print 'frame time: %.2f' % (time.time() - time_last)
+                print 'b_show_histos: ', str(Globals.b_show_histos)
+                time_last = time.time()
 
-        if Globals.gui_cmd_quit:
-            break
+            if cv2.waitKey(waitKeyRefresh)== ord('q'):
+                break
+
+            if Globals.gui_cmd_quit:
+                break
+            
+            # DEBUGGING
+            #print str(Globals.threshLoRgb), ' ', str(Globals.threshHiRgb)
+            #print str(Globals.threshLoHsv), ' ', str(Globals.threshHiHsv)
+            # print 'RGB-b: ', str(Globals.b_thresh_rgb)
+            # print 'HSV-b: ', str(Globals.b_thresh_hsv)
+            # print Globals.thresh_pct
         
-        # DEBUGGING
-        #print str(Globals.threshLoRgb), ' ', str(Globals.threshHiRgb)
-        #print str(Globals.threshLoHsv), ' ', str(Globals.threshHiHsv)
-        # print 'RGB-b: ', str(Globals.b_thresh_rgb)
-        # print 'HSV-b: ', str(Globals.b_thresh_hsv)
-        # print Globals.thresh_pct
-    
-    #CLEANUP
-    vc.release()
-    cv2.destroyAllWindows()
-    #if args['writebookvideo']: vw.release()
+        #CLEANUP
+        vc.release()
+        cv2.destroyAllWindows()
+        #if args['writebookvideo']: vw.release()
 
 
 main()

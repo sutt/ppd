@@ -55,7 +55,7 @@ class AgendaA:
     def __init__(self, img_wh = (640,480), **kwargs):
         self.seq_ind = 0
         self.img_wh = img_wh
-        self.track_frame_routine = routineB()
+        self.track_frame_routine = routineB(img_wh = img_wh)
         self.rect_log = []
         self.backg_log = []
         self.seq_end = False
