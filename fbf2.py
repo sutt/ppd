@@ -11,7 +11,9 @@ import numpy as np
 ap = argparse.ArgumentParser()
 
 ap.add_argument("--file", type=str, default="fps30.h264")
-ap.add_argument("--writepath", type=str, default="'C:\\Users\\wsutt\\Desktop\\files\\ppd\\ppd\\data\\write")
+#ap.add_argument("--writepath", type=str, default="'C:\\Users\\wsutt\\Desktop\\files\\ppd\\ppd\\data\\write")
+#ap.add_argument("--writepath", type=str, default="C:\\Users\\wsutt\\Desktop\\files\\ppd\\ppd\\data\\write")
+ap.add_argument("--writepath", type=str, default=os.getcwd())
 ap.add_argument("--createfile", action="store_true")
 ap.add_argument("--writebook", action="store_true")
 ap.add_argument("--picsubdir", action="store_true")
@@ -129,24 +131,26 @@ except Exception as e:
 
 
 #setup writing dir's and objects ---------
-writepath0 = str(args["writepath"])
-writepath0 = filter(lambda c: c.isalnum() or c == "/", writepath0)
-print writepath0
+if False:
+    writepath0 = str(args["writepath"])
+    writepath0 = filter(lambda c: c.isalnum() or c == "/", writepath0)
+    print writepath0
 
-try:
-    os.listdir(writepath0)
-except:
-    if args["createfile"]:
-        try:
-            os.mkdir(writepath0)
-            print 'creating new dir'
-        except:
-            print 'couldnt create dir', str(writepath0)
+    try:
+        os.listdir(writepath0)
+    except:
+        if args["createfile"]:
+            try:
+                os.mkdir(writepath0)
+                print 'creating new dir'
+            except:
+                print 'couldnt create dir', str(writepath0)
 
 
-writepath = writepath0
-default_book = uni_file(writepath,name="book",ext=".html")
-current_book = default_book
+    writepath = writepath0
+
+    default_book = uni_file(writepath,name="book",ext=".html")
+    current_book = default_book
 
 if args['writebookvideo']:
     
@@ -218,6 +222,7 @@ shape1 = 0
 
 # Loop 
 vc = cv2.VideoCapture(args["file"])
+print 'here'
 while(vc.isOpened()):
     
     # For-each frame
