@@ -4,6 +4,9 @@
 
 >python test_vid_sizes.py --cam_num 0
 
+raspistill [-rot 270] [-vf] [-hf] -t 0 -p 200,200,640,480 -w 640 -h 480
+
+
 12/1
 
 >python writevid1.py --showvid --time 10

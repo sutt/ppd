@@ -52,8 +52,9 @@ def ShowImages(**kwargs):
     b_resize = kwargs.get('resize',False)
 
     if kwargs.get('display_img', False):
-        cv2.imshow('display image'
-                    ,flip_img( kwargs.get('img_d',None), b_flip ) )
+        img = resize_img(kwargs.get('img_d',None), b_resize, (640,480) )
+        img = flip_img(img, b_flip)
+        cv2.imshow('display image', img )
     
     if kwargs.get('transform_img', False):
         img = flip_img( kwargs.get('img_t',None), b_flip )

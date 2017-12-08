@@ -115,6 +115,8 @@ def main():
         i += 1
         if not(ret): break
 
+        if i == 1: print frame.shape
+
         # THRESHOLD MASK    
         img_mask_hsv, img_mask_rgb = None, None
         if Globals.b_thresh_hsv:
