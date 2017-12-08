@@ -181,6 +181,12 @@ def update_b_thresh(typ, v):
         Globals.gui_track_success = bool(v.get())
     if typ == 'display_big_circle':
         Globals.gui_big_tracking_circle = bool(v.get())
+    if typ == 'camera_num':
+        Globals.gui_camera_num = int(v.get())
+        Globals.gui_camera_reset = True
+    if typ == 'camera_size_enum':
+        Globals.gui_camera_size_enum = int(v.get())
+        Globals.gui_camera_reset = True
 
 def set_track_blur_from_gui(blur_amt):
     if ((int(blur_amt) % 2) == 0):
@@ -211,6 +217,22 @@ def build_radio_opt(v,fr, typ):
     tk.Radiobutton(fr, text="On",variable=v, value=1,
             command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
 
+def build_radio_opt_multi(v,fr, typ, texts):
+    
+    if typ == 'camera_num':
+        v.set(int(Globals.gui_camera_num))
+    if typ == 'camera_size':
+        v.set(int(Globals.gui_camera_size_enum))
+
+
+    tk.Radiobutton(fr, text=texts[0],variable=v,value=0,
+            command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
+
+    tk.Radiobutton(fr, text=texts[1],variable=v, value=1,
+            command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
+
+    tk.Radiobutton(fr, text=texts[2],variable=v, value=2,
+            command=lambda: update_b_thresh(typ,v)).pack(side=tk.LEFT)
 
 def build_gui_a(root):
     
@@ -356,6 +378,30 @@ def build_gui_a(root):
     tk.Label(f6b, text="display mask big circle:").pack(side=tk.LEFT)
     v_display_big_circle = generate_radio_v()
     build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
+
+    f6b = tk.Frame(f6)
+    f6b.pack(side = tk.TOP)
+    tk.Label(f6b, text="display mask big circle:").pack(side=tk.LEFT)
+    v_display_big_circle = generate_radio_v()
+    build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
+
+    #CAMERA PARAMS
+    f7 = tk.Frame(root)
+    f7.pack(anchor=tk.W)
+
+    f7a = tk.Frame(f7)
+    f7a.pack(side = tk.TOP)
+    tk.Label(f7a, text="camera num:").pack(side=tk.LEFT)
+    v_camera_num = generate_radio_v()
+    build_radio_opt_multi(v_camera_num, f7a, typ = 'camera_num' 
+                         ,texts = ["0","1","2"])
+
+    f7b = tk.Frame(f7)
+    f7b.pack(side = tk.TOP)
+    tk.Label(f7b, text="camera size:").pack(side=tk.LEFT)
+    v_camera_num = generate_radio_v()
+    build_radio_opt_multi(v_display_info, f7b, typ = 'camera_size_enum' 
+                         ,texts = ["640","1280","1920"])
 
     return root
 

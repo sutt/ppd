@@ -25,3 +25,6 @@ def init():
     global param_tracking_repair_iters
     global gui_track_success
     global gui_big_tracking_circle
+    global gui_camera_num
+    global gui_camera_size_enum
+    global gui_camera_reset

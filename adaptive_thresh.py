@@ -94,6 +94,9 @@ def main():
     info_annotations = []
     b_slow_for_fps = True
     
+    Globals.gui_camera_num = 0
+    Globals.gui_camera_size_enum = 0
+
     b_gui = True
     if b_gui:
         gui = GuiA()
@@ -101,9 +104,10 @@ def main():
     #OUTER LOOP - to reset camera
     while(not(Globals.gui_cmd_quit)):
 
-        #cam_params = (640,480)
-        cam_params = (1280,720)
-        #cam_params = (1920,1080)
+        Globals.gui_camera_reset = False
+
+        cam_params = [(640,480),(1280,720),(1920,1080)][Globals.gui_camera_size_enum]
+        
         h_img, w_img = cam_params[0], cam_params[1]
         cam_type = 'cv_cam'   # 'pi_cam','file_cam'
 
@@ -113,7 +117,9 @@ def main():
             agenda = AgendaA(img_wh = cam_params)
             agenda.do_rect_move()
 
-        vc = initCam(cam_type, vid_file = args["filecam"])
+        vc = initCam(cam_type, vid_file = args["filecam"]
+                     ,usb_num = Globals.gui_camera_num ) 
+
         if args["filecam"] == "":
             vc = setupCam(vc, cam_type = cam_type, params = cam_params)
         
@@ -264,6 +270,9 @@ def main():
                 break
 
             if Globals.gui_cmd_quit:
+                break
+
+            if Globals.gui_camera_reset:
                 break
             
             # DEBUGGING
