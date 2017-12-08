@@ -5,6 +5,10 @@
 x add options for camera capture size
 x add filecam
 x add outer loop to reset camera
+dont mirror camera_usb=1
+record a video
+write a small utility that calculates fps from time in video
+
 
 12/2
 

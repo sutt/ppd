@@ -202,12 +202,15 @@ def main():
                 img_mask = draw_tracking_frame(img_mask,x,y,radius + 10, one_color = True)  
 
             #SHOW IMAGES
+            dont_mirror = True if Globals.gui_camera_num == 1 else False
+
             ShowImages(  display_img = True,   img_d = img_display
                         ,transform_img = True, img_t = img_t
                         ,mask_img = b_mask_img,      img_m = img_mask 
                         ,pause_rect = Globals.b_show_puase_rect
                         ,img_rect = pause_rect
-                        ,resize = True)
+                        ,resize = True
+                        ,dont_mirror = dont_mirror)
             
 
             # AGENDA
