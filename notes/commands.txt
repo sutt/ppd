@@ -1,4 +1,54 @@
 
+12/10
+
+
+
+a 1 second latency on flask:
+https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
+
+    this is eliminated by specifying the ip explicitly instead of "localhost" in url:
+        C:\Users\wsutt\Desktop\files\ppd\ppd\scratch>python client1.py
+    ->  time:  0.00799989700317  [for whole 4mb image]
+        bytes img_a:  9037043
+        bytes img_a2:  9037043
+        img_b shape:  (2464, 3280, 3)
+        getsizeof img_b:  24245824
+        time:  9.28199982643
+
+ffmpeg:    
+C:\Users\wsutt\Downloads\ffmpeg-20171209-f20c8f6-win64-static\bin>ffmpeg -f h264 -i ../../60secondvid.h264  ../../60test.mp4
+
+using flask render_template, chrome browser:
+4.2MB JPG in 312ms
+
+using using flask send_file, python requests
+1.0 secs
+
+[from git bash]
+export FLASK_APP=flask-server.py
+flask run
+
+python client1.py
+
+12/9
+
+raspivid -w 640 -h480 -fps 30 -o 60secondvid.h264 -t 60000
+
+on the rpi >ifconfig  (under eth0)
+169.254.11.244
+and it pings from laptop
+
+Ethernet
+Autoconfiguration IPv4 Address. . : 169.254.80.108(Preferred)
+
+192.168.56.255        ff-ff-ff-ff-ff-ff     static
+
+Wifi IP
+IPv4 Address. . . . . . . . . . . : 10.0.0.123(Preferred)
+
+>pscp pi@10.0.0.129:Desktop/camera1/vid1.h264 myvid.h264
+pscp pi@192.168.43.243:Desktop/camera1/vid1.h264 myvid.h264
+
 12/8
 
 >python adaptive_thresh.py --agenda --filecam output5.avi --fps_hz 20
