@@ -21,14 +21,14 @@ def full_image():
     r = requests.get('http://127.0.0.1:5000/pic/', stream=True)
     t1 = time.time()
     print 'time: ', str(t1 - t0)
-
+    print r.content[:100]
     t0 = time.time()
 
-    img_a = Image.open(r.raw)
-    print 'bytes img_a: ', str(get_image_bytes(img_a))
+    # img_a = Image.open(r.raw)
+    # print 'bytes img_a: ', str(get_image_bytes(img_a))
 
-    img_a2 = img_a.convert('RGB')
-    print 'bytes img_a2: ', str(get_image_bytes(img_a))
+    # img_a2 = img_a.convert('RGB')
+    # print 'bytes img_a2: ', str(get_image_bytes(img_a))
 
 def mini_image():
 
