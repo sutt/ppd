@@ -1,3 +1,4 @@
+from __future__ import print_function # In python 2.7
 import time,os,sys,random
 from flask import Flask
 from flask import send_file
@@ -11,7 +12,7 @@ camera = PiCamera()
 rawCapture = PiRGBArray(camera)
 
 time.sleep(.1)
-print 'camera ready...'
+print('camera ready...', file = sys.stderr)
 
 @app.route('/')
 def hello_world():
@@ -37,11 +38,12 @@ def take_pic():
         camera.capture(rawCapture,format="bgr")    
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
-        time.sleep(.1)
+        time.sleep(1)
     except:
-        print 'nah'
+        print('nah',  file = sys.stderr)
     t1 = time.time()
-    print 'time: ', str(t1 - t0)
+    out_str = 'time: ' + str(t1 - t0)
+    print out_str
     fn = "static/img1.jpg"
     return send_file(fn, mimetype="img/jpg")
 
