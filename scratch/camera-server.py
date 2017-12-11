@@ -1,5 +1,5 @@
 from __future__ import print_function # In python 2.7
-import time,os,sys,random
+import time,os,sys,random, cv2
 from flask import Flask
 from flask import send_file
 from flask import render_template
