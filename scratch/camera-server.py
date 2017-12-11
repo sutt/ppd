@@ -43,7 +43,7 @@ def take_pic():
         print('nah',  file = sys.stderr)
     t1 = time.time()
     out_str = 'time: ' + str(t1 - t0)
-    print out_str
+    print(out_str, file=sys.stderr)
     fn = "static/img1.jpg"
     return send_file(fn, mimetype="img/jpg")
 
