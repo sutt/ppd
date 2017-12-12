@@ -40,8 +40,8 @@ def take_pic():
             camera.capture(rawCapture,format="bgr")    
             t1 = time.time()
             t.append(t1 - t0)
-        for _ in t:
-            print _
+        for _t in t:
+            print(_t, file=sys.stderr)
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
         #time.sleep(1)
