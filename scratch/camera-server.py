@@ -38,7 +38,7 @@ def take_pic():
         camera.capture(rawCapture,format="bgr")    
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
-        time.sleep(1)
+        #time.sleep(1)
     except Exception as e:
         print(e.message,  file = sys.stderr)
     t1 = time.time()
