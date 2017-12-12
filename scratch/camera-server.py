@@ -33,11 +33,15 @@ def ret_html():
 
 @app.route('/take/')
 def take_pic():
-    t0 = time.time()
+    t = []
     try:
         for i in range(10):
+            t0 = time.time()
             camera.capture(rawCapture,format="bgr")    
-        t1 = time.time()
+            t1 = time.time()
+            t.append(t1 - t0)
+        for _ in t:
+            print _
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
         #time.sleep(1)
