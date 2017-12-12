@@ -35,7 +35,9 @@ def ret_html():
 def take_pic():
     t0 = time.time()
     try:
-        camera.capture(rawCapture,format="bgr")    
+        for i in range(10):
+            camera.capture(rawCapture,format="bgr")    
+        t1 = time.time()
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
         #time.sleep(1)
