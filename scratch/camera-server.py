@@ -9,7 +9,9 @@ from picamera import PiCamera
 app = Flask(__name__)
 
 camera = PiCamera()
-rawCapture = PiRGBArray(camera)
+camera.start_preview()
+time.sleep(2)
+#rawCapture = PiRGBArray(camera)
 
 time.sleep(.1)
 print('camera ready...', file = sys.stderr)
@@ -34,14 +36,18 @@ def ret_html():
 @app.route('/take/')
 def take_pic():
     t = []
+    fs = []
+    for i in range(10):
+        fs.append(open('static/pic' + i + '.jpg', 'wb'))
+    
     try:
         for i in range(10):
             t0 = time.time()
-            camera.capture(rawCapture,format="bgr")    
+            camera.capture(fs[i])
             t1 = time.time()
             t.append(t1 - t0)
         for _t in t:
-            print(_t, file=sys.stderr)
+            print(str(_t), file=sys.stderr)
         image = rawCapture.array
         cv2.imwrite("static/img1.jpg",image)
         #time.sleep(1)
@@ -50,6 +56,7 @@ def take_pic():
     t1 = time.time()
     out_str = 'time: ' + str(t1 - t0)
     print(out_str, file=sys.stderr)
-    fn = "static/img1.jpg"
+    fn = "static/pic1.jpg"
+    f[0].close()
     return send_file(fn, mimetype="img/jpg")
 
