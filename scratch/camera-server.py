@@ -38,7 +38,8 @@ def take_pic():
     t = []
     fs = []
     for i in range(10):
-        fs.append(open('static/pic' + i + '.jpg', 'wb'))
+        fn = 'static/pic' + str(i) + '.jpg'
+        fs.append(open(fn, 'wb'))
     
     try:
         for i in range(10):
