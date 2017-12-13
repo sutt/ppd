@@ -13,7 +13,7 @@ camera = PiCamera(resolution=(1280, 720), framerate=30)
 #camera.start_preview()
 camera.iso = 100
 # Wait for the automatic gain control to settle
-sleep(2)
+time.sleep(2)
 # Now fix the values
 camera.shutter_speed = camera.exposure_speed
 camera.exposure_mode = 'off'
