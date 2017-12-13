@@ -100,9 +100,11 @@ def take_pic3():
 @app.route('/take4/')
 def take_pic4():
     t0 = time.time()
+    print('START', file=sys.stderr)
     for i in  range(10):
-        camera.capture(my_stream,'jpeg')
-        my_stream.flush()
+        camera.capture(my_stream,format = 'jpeg')
+        print('taken', file=sys.stderr)
+        #my_stream.flush()
     t1 = time.time()
     _t = t1- t0
     print(_t, file=sys.stderr)
