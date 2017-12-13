@@ -12,8 +12,8 @@ app = Flask(__name__)
 #camera = PiCamera(resolution=(1280, 720), framerate=30)
 camera = PiCamera()
 camera.resolution = (640, 480)
-        camera.start_preview()
-        time.sleep(2)
+camera.start_preview()
+
 #camera = PiCamera()
 camera.start_preview()
 #camera.iso = 100
