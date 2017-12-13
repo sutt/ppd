@@ -113,7 +113,7 @@ def take_pic4():
 
 @app.route('/take5/')
 def take_pic5():
-    with picamera.PiCamera() as camera:
+    with PiCamera() as camera:
         camera.resolution = (640, 480)
         camera.start_preview()
         time.sleep(2)
