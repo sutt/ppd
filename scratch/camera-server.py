@@ -102,6 +102,7 @@ def take_pic4():
     t0 = time.time()
     for i in  range(10):
         camera.capture(my_stream,'jpeg')
+        my_stream.flush()
     t1 = time.time()
     _t = t1- t0
     print(_t, file=sys.stderr)
