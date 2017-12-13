@@ -122,6 +122,6 @@ def take_pic5():
             'image%03d.jpg' % i
             for i in range(120)
             ), use_video_port=True)
-        print('Captured 120 images at %.2ffps' % (120 / (time.time() - start)), file=sys.stderr))
+        print('Captured 120 images at %.2ffps' % (120 / (time.time() - start), file=sys.stderr)))
         camera.stop_preview()
     return 'done.'
