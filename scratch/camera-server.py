@@ -5,6 +5,7 @@ from flask import send_file
 from flask import render_template
 from picamera.array import PiRGBArray
 from picamera import PiCamera
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -20,6 +21,8 @@ camera.exposure_mode = 'off'
 g = camera.awb_gains
 camera.awb_mode = 'off'
 camera.awb_gains = g
+
+my_stream = BytesIO
 
 time.sleep(2)
 #rawCapture = PiRGBArray(camera)
@@ -93,3 +96,12 @@ def take_pic3():
     _t = t1- t0
     print(_t, file=sys.stderr)
     return 'done.'
+
+@app.route('/take4/')
+def take_pic4():
+    t0 = time.time()
+    for i in  range(10):
+        camera.capture(my_stream,'jpeg')
+    t1 = time.time()
+    _t = t1- t0
+    print(_t, file=sys.stderr)
