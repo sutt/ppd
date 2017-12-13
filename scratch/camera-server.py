@@ -8,12 +8,21 @@ from picamera import PiCamera
 
 app = Flask(__name__)
 
-camera = PiCamera()
-camera.start_preview()
+camera = PiCamera(resolution=(1280, 720), framerate=30)
+#camera = PiCamera()
+#camera.start_preview()
+camera.iso = 100
+# Wait for the automatic gain control to settle
+sleep(2)
+# Now fix the values
+camera.shutter_speed = camera.exposure_speed
+camera.exposure_mode = 'off'
+g = camera.awb_gains
+camera.awb_mode = 'off'
+camera.awb_gains = g
+
 time.sleep(2)
 #rawCapture = PiRGBArray(camera)
-
-time.sleep(.1)
 print('camera ready...', file = sys.stderr)
 
 @app.route('/')
@@ -49,8 +58,8 @@ def take_pic():
             t.append(t1 - t0)
         for _t in t:
             print(str(_t), file=sys.stderr)
-        image = rawCapture.array
-        cv2.imwrite("static/img1.jpg",image)
+        #image = rawCapture.array
+        #cv2.imwrite("static/img1.jpg",image)
         #time.sleep(1)
     except Exception as e:
         print(e.message,  file = sys.stderr)
@@ -61,3 +70,26 @@ def take_pic():
     f[0].close()
     return send_file(fn, mimetype="img/jpg")
 
+@app.route('/take2/')
+def take_pic2():
+    
+    t = []
+    # Set ISO to the desired value
+    for i in range(10):
+        t0 = time.time()
+        camera.capture('static/out1.jpg')
+        t1 = time.time()
+        t.append(t1-t0)
+    for _t in t:
+        print(_t, file=sys.stderr)
+    return 'done'
+    
+
+@app.route('/take3/')
+def take_pic3():
+    t0 = time.time()
+    camera.capture_sequence(['image%02d.jpg' % i for i in range(10)])
+    t1 = time.time()
+    _t = t1- t0
+    print(_t, file=sys.stderr)
+    return 'done.'
