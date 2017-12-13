@@ -9,18 +9,22 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-camera = PiCamera(resolution=(1280, 720), framerate=30)
+#camera = PiCamera(resolution=(1280, 720), framerate=30)
+camera = PiCamera()
+camera.resolution = (640, 480)
+        camera.start_preview()
+        time.sleep(2)
 #camera = PiCamera()
-#camera.start_preview()
-camera.iso = 100
+camera.start_preview()
+#camera.iso = 100
 # Wait for the automatic gain control to settle
 time.sleep(2)
 # Now fix the values
-camera.shutter_speed = camera.exposure_speed
-camera.exposure_mode = 'off'
-g = camera.awb_gains
-camera.awb_mode = 'off'
-camera.awb_gains = g
+#camera.shutter_speed = camera.exposure_speed
+#camera.exposure_mode = 'off'
+#g = camera.awb_gains
+#camera.awb_mode = 'off'
+#camera.awb_gains = g
 
 my_stream = BytesIO
 
