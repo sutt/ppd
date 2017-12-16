@@ -27,9 +27,8 @@ time.sleep(2)
 #camera.awb_gains = g
 
 my_stream = BytesIO
-
+rawCapture = PiRGBArray(camera)
 time.sleep(2)
-#rawCapture = PiRGBArray(camera)
 print('camera ready...', file = sys.stderr)
 
 @app.route('/')
@@ -65,16 +64,17 @@ def take_pic():
             t.append(t1 - t0)
         for _t in t:
             print(str(_t), file=sys.stderr)
-        #image = rawCapture.array
-        #cv2.imwrite("static/img1.jpg",image)
-        #time.sleep(1)
+        camera.capture(rawCapture, format="bgr")
+        image = rawCapture.array
+        cv2.imwrite("static/img1.jpg",image)
+        time.sleep(1)
     except Exception as e:
         print(e.message,  file = sys.stderr)
     t1 = time.time()
     out_str = 'time: ' + str(t1 - t0)
     print(out_str, file=sys.stderr)
-    fn = "static/pic1.jpg"
-    f[0].close()
+    fn = "static/img1.jpg"
+    fs[0].close()
     return send_file(fn, mimetype="img/jpg")
 
 @app.route('/take2/')
@@ -126,6 +126,7 @@ def take_pic5():
             'image%03d.jpg' % i
             for i in range(120)
             ), use_video_port=True)
+        print('done.', file=sys.stderr)
         print('Captured 120 images at %.2ffps' % (120 / (time.time() - start)), file=sys.stderr)
         camera.stop_preview()
     return 'done.'
