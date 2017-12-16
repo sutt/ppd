@@ -9,27 +9,64 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-#camera = PiCamera(resolution=(1280, 720), framerate=30)
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.start_preview()
+class Camera():
+    
+    def __init__(self,**kwargs):
+        self.camera = PiCamera(resolution=(640,480))
+        self.pause_time = 2
+        self.rawCapture = PiRGBArray(self.camera)
 
-#camera = PiCamera()
-camera.start_preview()
-#camera.iso = 100
-# Wait for the automatic gain control to settle
-time.sleep(2)
-# Now fix the values
-#camera.shutter_speed = camera.exposure_speed
-#camera.exposure_mode = 'off'
-#g = camera.awb_gains
-#camera.awb_mode = 'off'
-#camera.awb_gains = g
+        if kwargs.get('start_preview',False):
+            self.camera.start_preview()
+            time.sleep(self.pause_time)
+            
+        time.sleep(self.pause_time)
+        print('camera ready...', file = sys.stderr)
+
+    def set_resolution(self, w, h):
+        self.camera.resolution = (w,h)
+
+    def get_resoltuion(self):
+        """We don't know how to do this"""
+        return self.camera.resolution
+
+    def set_fps(self, fps):
+        self.camera.fps = fps
+
+    def configure_basic(self):
+        self.set_resolution(w = 640, h = 480)
+        
+        time.sleep(self.pause_time)
+        print('camera configured...', file=sys.stderr)
+        
+        
+
+cam = Camera()
+cam.configure_basic()
 
 my_stream = BytesIO
-rawCapture = PiRGBArray(camera)
-time.sleep(2)
-print('camera ready...', file = sys.stderr)
+
+print('Launching Flask...', file = sys.stderr)
+
+
+@app.route('/camclass/')
+def cam_class():
+    fn = "static/camclass.jpg"
+    t0 = time.time()
+    try:
+        cam.camera.capture(cam.rawCapture, format="bgr")
+        image = cam.rawCapture.array
+        cv2.imwrite(fn,image)
+        time.sleep(1)
+    except Exception as e:
+        print(e.message,  file = sys.stderr)
+    
+    t1 = time.time()
+    out_str = 'time: ' + str(t1 - t0)
+    print(out_str, file=sys.stderr)
+    return send_file(fn, mimetype="img/jpg")
+
+
 
 @app.route('/')
 def hello_world():
@@ -170,3 +207,22 @@ def take_pic5():
         print('Captured 120 images at %.2ffps' % (120 / (time.time() - start)), file=sys.stderr)
         camera.stop_preview()
     return 'done.'
+
+@app.route('/take6/')
+def take_pic6():
+    with PiCamera() as camera:
+        camera.resolution = (640, 480)
+        camera.framerate = 60
+        camera.start_preview()
+        time.sleep(2)
+        start = time.time()
+        camera.capture_sequence((
+            'static/image%03d.jpg' % i
+            for i in range(120)
+            ), use_video_port=True)
+        print('done.', file=sys.stderr)
+        print('Captured 120 images at %.2ffps' % (120 / (time.time() - start)), file=sys.stderr)
+        camera.stop_preview()
+    return send_file('static/image119.jpg', mimetype='img/jpg')
+
+    

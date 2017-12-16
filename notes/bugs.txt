@@ -2,10 +2,27 @@
 
 12/16
 
-Create a git basecamp
+x Create a git basecamp
 
-Verfiy camera.capture_sequence speed
-    extend to verify the final image is saved
+x Find a way to ftp or scp from laptop -> rpi
+    got filezilla 3.29
+    sitemanager:
+        use port 22
+        saved as pi_wifi_1
+
+x Verfiy camera.capture_sequence speed
+x    extend to verify the final image is saved
+x    verfied at 29.5 fps, using video port, 640
+
+x Can you  get a faster capture_sequence ?
+x    by altering fps and exposure? YES but FOV is limited.
+        at request 60fps, we get 58
+            Captured 120 images at 58.63fps
+            10.0.0.123 - - [16/Dec/2017 19:15:42] "GET /take6/ HTTP/1.1" 200 -
+
+     by threading?
+
+add an argparse for client
 
 Verfiy Ethernet throughput speed
 
@@ -30,6 +47,7 @@ Build simple recipes and benchmarks collection
         configure requests
         and capture requests
 
+Find a way to do X11 on pi
 
 
 12/12
