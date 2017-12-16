@@ -1,3 +1,5 @@
+from __future__ import print_function # In python 2.7
+import sys
 from flask import Flask
 from flask import send_file
 from flask import render_template
@@ -18,6 +20,7 @@ def get_pic(ij):
 
 @app.route('/browser/')
 def ret_html():
+    print('hey', file = sys.stderr)
     return render_template('img_temp.html')
 
 #app.run(host="127.0.0.1", port=5000, threaded=True)

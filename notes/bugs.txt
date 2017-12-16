@@ -1,19 +1,66 @@
 #Tasks
 
+12/16
+
+Create a git basecamp
+
+Verfiy camera.capture_sequence speed
+    extend to verify the final image is saved
+
+Verfiy Ethernet throughput speed
+
+Build a bach script for ops
+    workon cv
+    export FLASK_APP=camera-server.py
+    flask run --host=0.0.0.0
+
+Build simple recipes and benchmarks collection
+    send an already saved image
+        wifi vs ethernet
+    send a bunch of tiny images
+        wifi vs ethernet
+    
+    basic responses
+        send text
+        send img
+        send a stream
+        send data in the url
+
+    build a global Camera class in camera-server.py
+        configure requests
+        and capture requests
+
+
+
+12/12
+https://stackoverflow.com/questions/29065624/using-with-inside-a-thread-in-python-picamera-opencv
+
+12/10
+
+why doesnt iterThreshA change for RGB on set_thresh decrease? But HSV does?
+
+try simple flask on rpi, record time
+    local server time
+    ethernet connected time
+    compare against SimpleHTTPServer
+
+how to get flask threaded=True to run?
+
+
 12/8
 
 x add options for camera capture size
 x add filecam
 x add outer loop to reset camera
-dont mirror camera_usb=1
+x dont mirror camera_usb=1
 record a video
 write a small utility that calculates fps from time in video
 
 
 12/2
 
-find all camera sizes
-hello world on the pi-camera
+x find all camera sizes
+x hello world on the pi-camera
 
 12/1
 

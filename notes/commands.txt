@@ -1,6 +1,17 @@
 
 12/10
 
+[on rpi; in bash]
+>workon cv
+    (gets us cv2 virtualenv)
+
+rpi -> laptop [4.4MB jpg]
+over wifi
+time:  0.0340001583099
+
+broken pipe on flask server: need to uprgrade to wsgi of gunicorn:
+    https://stackoverflow.com/questions/37962925/flask-app-get-ioerror-errno-32-broken-pipe
+    https://stackoverflow.com/questions/12591760/flask-broken-pipe-with-requests
 
 
 a 1 second latency on flask:
@@ -26,7 +37,7 @@ using using flask send_file, python requests
 
 [from git bash]
 export FLASK_APP=flask-server.py
-flask run
+flask run [--host=0.0.0.0 (this enables outside access)]
 
 python client1.py
 
