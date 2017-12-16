@@ -48,6 +48,46 @@ def get_pic(ij):
 def ret_html():
     return render_template('img_temp.html')
 
+@app.route('/takeverysimple/')
+def take_very_simple():
+    
+    t0 = time.time()
+    try:
+        camera.capture('static/verysimple.jpg')
+        time.sleep(1)
+    except Exception as e:
+        print(e.message,  file = sys.stderr)
+    
+    t1 = time.time()
+    out_str = 'time: ' + str(t1 - t0)
+    print(out_str, file=sys.stderr)
+    
+    fn = "static/verysimple.jpg"
+    return send_file(fn, mimetype="img/jpg")
+
+
+
+
+@app.route('/takesimple/')
+def take_simple():
+    
+    t0 = time.time()
+    try:
+        camera.capture(rawCapture, format="bgr")
+        image = rawCapture.array
+        cv2.imwrite("static/simple.jpg",image)
+        time.sleep(1)
+    except Exception as e:
+        print(e.message,  file = sys.stderr)
+    
+    t1 = time.time()
+    out_str = 'time: ' + str(t1 - t0)
+    print(out_str, file=sys.stderr)
+    
+    fn = "static/simple.jpg"
+    return send_file(fn, mimetype="img/jpg")
+
+
 @app.route('/take/')
 def take_pic():
     t = []
