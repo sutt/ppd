@@ -1,4 +1,13 @@
 
+12/16
+
+[on laptop]
+    >python laptop-server.py --noprint
+
+[in putty on pi]
+    >python pi-client.py --videoport --ip 169.254.80.108  --nodisplay --silenttimer --runtime 30 --bigger
+
+
 12/10
 
 [on rpi; in bash]

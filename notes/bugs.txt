@@ -2,6 +2,20 @@
 
 12/16
 
+check the individual times of streaming. Can you read more quickly right at the beginning?
+
+dont print out, does that save time?
+
+x can we read faster if we skip processing? kinda not
+
+different thread to read and record?
+
+Add the streaming to adaptive_thresh
+
+
+
+12/16
+
 x Create a git basecamp
 
 x Find a way to ftp or scp from laptop -> rpi
@@ -22,9 +36,9 @@ x    by altering fps and exposure? YES but FOV is limited.
 
      by threading?
 
-add an argparse for client
+x add an argparse for client
 
-Verfiy Ethernet throughput speed
+x Verfiy Ethernet throughput speed
 
 Build a bach script for ops
     workon cv
