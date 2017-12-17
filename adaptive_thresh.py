@@ -96,6 +96,7 @@ def main():
     
     Globals.gui_camera_num = 0
     Globals.gui_camera_size_enum = 0
+    Globals.gui_picamera_enum = 0
 
     b_gui = True
     if b_gui:
@@ -116,21 +117,26 @@ def main():
         if b_agenda: 
             agenda = AgendaA(img_wh = cam_params)
             agenda.do_rect_move()
+        
+        if Globals.gui_picamera_enum > 0:
+            cam_type = 'pi_cam'
+            vc = initCam('pi_cam')
+        else:   
+            vc = initCam(cam_type, vid_file = args["filecam"]
+                        ,usb_num = Globals.gui_camera_num ) 
 
-        vc = initCam(cam_type, vid_file = args["filecam"]
-                     ,usb_num = Globals.gui_camera_num ) 
-
-        if args["filecam"] == "":
+        if args["filecam"] == "" and not(Globals.gui_picamera_enum):
             vc = setupCam(vc, cam_type = cam_type, params = cam_params)
         
         time_last = time.time()
         i = 0
 
-        while(vc.isOpened()):
+        # while(vc.isOpened()):
+        while(True):
 
-            ret, frame = getFrame(vc, cam_type = 'cv_cam')        
-            i += 1
+            ret, frame = getFrame(vc, cam_type = cam_type)        
             if not(ret): break
+            i += 1
 
             if i == 1: print frame.shape
 
@@ -236,6 +242,8 @@ def main():
                     agenda.run_combine()
                     if b_gui:
                         temp_thresh = agenda.get_temp_threshes()
+                        print 'SUT'
+                        print temp_thresh
                         gui.globeGui.set_gui_to_output(temp_thresh)
 
                 if Globals.gui_cmd_expand:
@@ -288,6 +296,9 @@ def main():
         #CLEANUP
         vc.release()
         cv2.destroyAllWindows()
+        
+        #vc.connection.close()
+        #vc.server_socket.close()
         #if args['writebookvideo']: vw.release()
 
 

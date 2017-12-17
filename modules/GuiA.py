@@ -187,6 +187,9 @@ def update_b_thresh(typ, v):
     if typ == 'camera_size_enum':
         Globals.gui_camera_size_enum = int(v.get())
         Globals.gui_camera_reset = True
+    if typ == 'picamera_enum':
+        Globals.gui_picamera_enum = int(v.get())
+        Globals.gui_camera_reset = True
 
 def set_track_blur_from_gui(blur_amt):
     if ((int(blur_amt) % 2) == 0):
@@ -222,6 +225,8 @@ def build_radio_opt_multi(v,fr, typ, texts):
     if typ == 'camera_num':
         v.set(int(Globals.gui_camera_num))
     if typ == 'camera_size':
+        v.set(int(Globals.gui_camera_size_enum))
+    if typ == 'picamera_num':
         v.set(int(Globals.gui_camera_size_enum))
 
 
@@ -379,11 +384,11 @@ def build_gui_a(root):
     v_display_big_circle = generate_radio_v()
     build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
 
-    f6b = tk.Frame(f6)
-    f6b.pack(side = tk.TOP)
-    tk.Label(f6b, text="display mask big circle:").pack(side=tk.LEFT)
-    v_display_big_circle = generate_radio_v()
-    build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
+    # f6b = tk.Frame(f6)
+    # f6b.pack(side = tk.TOP)
+    # tk.Label(f6b, text="display mask big circle:").pack(side=tk.LEFT)
+    # v_display_big_circle = generate_radio_v()
+    # build_radio_opt(v_display_big_circle, f6b, typ = 'display_big_circle')
 
     #CAMERA PARAMS
     f7 = tk.Frame(root)
@@ -402,6 +407,13 @@ def build_gui_a(root):
     v_camera_num = generate_radio_v()
     build_radio_opt_multi(v_display_info, f7b, typ = 'camera_size_enum' 
                          ,texts = ["640","1280","1920"])
+
+    f7c = tk.Frame(f7)
+    f7c.pack(side = tk.TOP)
+    tk.Label(f7c, text="picamera:").pack(side=tk.LEFT)
+    v_picamera_num = generate_radio_v()
+    build_radio_opt_multi(v_picamera_num, f7c, typ = 'picamera_enum' 
+                         ,texts = ["off","on main","on sub"])
 
     return root
 

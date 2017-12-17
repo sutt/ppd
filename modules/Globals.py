@@ -28,3 +28,4 @@ def init():
     global gui_camera_num
     global gui_camera_size_enum
     global gui_camera_reset
+    global gui_picamera_enum
