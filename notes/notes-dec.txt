@@ -17,6 +17,8 @@ Manuals:
 
 Interesting:
     https://github.com/osmaa/pinymotion
+    https://courses.cit.cornell.edu/ece5990/ECE5990_Spring16_FinalProjects/hj424_ww424/index.html
+    
 
 Now we're doing 14FPS preview at 640 over ethernet
 Now we're doing 10FPS preview at 1280 over ethernet

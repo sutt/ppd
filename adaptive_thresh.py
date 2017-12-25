@@ -38,6 +38,7 @@ ap.add_argument("--agendatimer", action="store_true")
 ap.add_argument("--pctthresh", type=float, default=0.95)
 ap.add_argument("--filecam", type=str, default="")
 ap.add_argument("--fps_hz", type=str, default="30") #converted to int
+ap.add_argument("--picamera", type=str, default="0") #converted to int; 1=main-dsiplay, 2=side-dsiplay
 
 
 args = vars(ap.parse_args())
@@ -95,6 +96,7 @@ def main():
     b_slow_for_fps = True
     
     Globals.gui_camera_num = 0
+    Globals.gui_picamera_enum = int(args["picamera"])
     Globals.gui_camera_size_enum = 0
     Globals.gui_picamera_enum = 0
 
@@ -118,24 +120,35 @@ def main():
             agenda = AgendaA(img_wh = cam_params)
             agenda.do_rect_move()
         
-        if Globals.gui_picamera_enum > 0:
+        b_side_cam = False
+        if Globals.gui_picamera_enum == 1:
             cam_type = 'pi_cam'
             vc = initCam('pi_cam')
+        elif Globals.gui_picamera_enum == 2:
+            vc2 = initCam('pi_cam')
+            b_side_cam = True
+            #vc was released after break from while-loop, re-init it
+            vc = initCam(cam_type = 'cv_cam',usb_num = Globals.gui_camera_num ) 
         else:   
             vc = initCam(cam_type, vid_file = args["filecam"]
                         ,usb_num = Globals.gui_camera_num ) 
 
-        if args["filecam"] == "" and not(Globals.gui_picamera_enum):
+        if args["filecam"] == "" and (Globals.gui_picamera_enum != 2):
             vc = setupCam(vc, cam_type = cam_type, params = cam_params)
         
         time_last = time.time()
         i = 0
 
-        # while(vc.isOpened()):
-        while(True):
-
+        while(vc.isOpened()):
+            
             ret, frame = getFrame(vc, cam_type = cam_type)        
             if not(ret): break
+
+            frame2 = 0
+            if b_side_cam:
+                ret2, frame2 = getFrame(vc2, cam_type = 'pi_cam')        
+                if not(ret2): break
+
             i += 1
 
             if i == 1: print frame.shape
@@ -191,7 +204,7 @@ def main():
                 info_annotations.append(b_track_success)
                 b_annotate_img = True
             else:
-                b_annotate_img = False
+                b_annotate_img = False  #This is wrong?
             
             img_display = frame.copy()
 
@@ -216,7 +229,9 @@ def main():
                         ,pause_rect = Globals.b_show_puase_rect
                         ,img_rect = pause_rect
                         ,resize = True
-                        ,dont_mirror = dont_mirror)
+                        ,dont_mirror = dont_mirror
+                        ,b_side_cam = b_side_cam
+                        ,side_frame = frame2)
             
 
             # AGENDA

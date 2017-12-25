@@ -56,7 +56,12 @@ def ShowImages(**kwargs):
         img = flip_img(img, b_flip)
         cv2.imshow('display image', img )
     
-    if kwargs.get('transform_img', False):
+    if kwargs.get('b_side_cam', False):
+        img = flip_img( kwargs.get('side_frame',None), b_flip )
+        img = resize_img(img, b_resize, (320,240) )
+        cv2.imshow('transform image', img)
+        
+    elif kwargs.get('transform_img', False):
         img = flip_img( kwargs.get('img_t',None), b_flip )
         img = resize_img(img, b_resize, (320,240) )
         cv2.imshow('transform image', img)

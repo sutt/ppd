@@ -1,5 +1,30 @@
 #Tasks
 
+12/17
+
+x Picamera working without errors
+doesnt timeout here:
+    Traceback (most recent call last):
+    File "adaptive_thresh.py", line 314, in <module>
+        main()
+    File "adaptive_thresh.py", line 126, in main
+        vc = initCam('pi_cam')
+    File "C:\Users\wsutt\Desktop\files\ppd\ppd\modules\Camera.py", line 51, in initCam
+        return MyPiCamera()
+    File "C:\Users\wsutt\Desktop\files\ppd\ppd\modules\Camera.py", line 18, in __init__
+        self.connection = self.server_socket.accept()[0].makefile('rb')
+    File "C:\Python27\lib\socket.py", line 206, in accept
+        sock, addr = self._sock.accept()
+    KeyboardInterrupt
+Picamera init cmd arg
+Picamera set params
+Picamera rotate controls
+Picamera as a secondary camera
+
+print FPS to cmdline
+
+
+
 12/16
 
 check the individual times of streaming. Can you read more quickly right at the beginning?
@@ -11,7 +36,6 @@ x can we read faster if we skip processing? kinda not
 different thread to read and record?
 
 Add the streaming to adaptive_thresh
-
 
 
 12/16

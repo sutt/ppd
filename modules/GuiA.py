@@ -226,8 +226,8 @@ def build_radio_opt_multi(v,fr, typ, texts):
         v.set(int(Globals.gui_camera_num))
     if typ == 'camera_size':
         v.set(int(Globals.gui_camera_size_enum))
-    if typ == 'picamera_num':
-        v.set(int(Globals.gui_camera_size_enum))
+    if typ == 'picamera_enum':
+        v.set(int(Globals.gui_picamera_enum))
 
 
     tk.Radiobutton(fr, text=texts[0],variable=v,value=0,

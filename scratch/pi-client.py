@@ -6,6 +6,7 @@ import picamera
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--ip", type=str, default='10.0.0.123')
+ap.add_argument("--port", type=str, default='8000')
 ap.add_argument("--runtime", type=str, default='30')
 ap.add_argument("--videoport", action="store_true")
 ap.add_argument("--skipper", action="store_true")
@@ -18,7 +19,7 @@ args = vars(ap.parse_args())
 # Connect a client socket to my_server:8000 (change my_server to the
 # hostname of your server)
 client_socket = socket.socket()
-client_socket.connect((args["ip"], 8000))
+client_socket.connect((args["ip"], int(args["port"])))
 print 'connected'
 i=0
 fps_mod = 8
