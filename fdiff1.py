@@ -2,17 +2,23 @@ import cv2
 import argparse
 import os, sys, time
 import numpy as np
+from vidwriter import VidWriter
+from miscutils import uniqueFn
 
-# NOTES:
 
-# TODOS:
-# track the main diff as in adapt_thresh:
-    # true/false there is some diff
-    # "big circle" location
+'''
+TODOS
+[x] insert unqiueFn and VidWriter
+[x] change savedir
+[ ] need to use lossless compression because its such fine detail
+[ ] track the main diff as in adapt_thresh:
+    [ ] true/false there is some diff
+    [ ] "big circle" location
+'''
 
 #ARGS
 default_file = "output13.avi"
-default_savedir = "data/write/july2018/"
+default_savedir = "data/july2018/misc/"
 # default_savedir = "c:/users/wsutt/desktop/files/ppd/ppd/scratch/"
 
 ap = argparse.ArgumentParser()
@@ -20,31 +26,25 @@ ap.add_argument("--file", type=str, default=default_file)
 ap.add_argument("--show", action="store_true")
 ap.add_argument("--save", action="store_true")
 ap.add_argument("--savedir", type=str, default=default_savedir)
+ap.add_argument("--codec", default="h264")
+ap.add_argument("--ext", default = "h264")
 args = vars(ap.parse_args())
 
 #SAVE/WRITE-OUT
 if args["save"]:
-    #TODO - make this a module
-    i = 0
-    files = os.listdir(args["savedir"])
-    while(True):
-        i += 1
-        fn = "testoutput" + str(i)
-        fn += ".h264" 
-        # fn += ".avi" 
-            
-        if fn in files:
-            continue
-        else:
-            fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
-            # fourcc = cv2.VideoWriter_fourcc("M","P","4"," ")
-            # fourcc = -1
-            outfps = 30
-            outshape = (640,480)
-            save_fn = args["savedir"] + fn
-            output = cv2.VideoWriter(save_fn,fourcc,outfps,outshape)    
-            print '\n saving diff vid: ', str(save_fn), '\n'
-            break
+    
+    fn = uniqueFn(  fn_base = "diff"
+                    ,fn_dir = args["savedir"]
+                    ,fn_ext = "avi" #args["ext"]
+                    )
+    
+    vw = VidWriter( savefn = args["savedir"] + fn)
+                    # ,fourcc = "x264" #args["codec"]
+                    # ,outfps = 50
+                    # )
+
+    print '\n saving diff vid: ', args["savedir"] + fn, '\n'
+
 
 #INIT-INPUT
 cap = cv2.VideoCapture(args["file"])
@@ -62,8 +62,9 @@ while(cap.isOpened()):
 
     #SAVE
     if args["save"]:
-        frame_diff_color = cv2.cvtColor(frame_diff, cv2.COLOR_GRAY2BGR)
-        output.write(frame_diff_color)
+        # frame_diff_color = cv2.cvtColor(frame_diff, cv2.COLOR_GRAY2BGR)
+        # vw.write(frame_diff_color)
+        vw.write(frame_diff)
     
     #SHOW
     if args["show"]:
@@ -82,6 +83,6 @@ while(cap.isOpened()):
 cap.release()
 cv2.destroyAllWindows()
 try:
-    output.release()
+    vw.release()
 except:
     pass

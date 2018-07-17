@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import argparse
 import os, sys, time
+from miscutils import uniqueFn
+from vidwriter import VidWriter
 
 '''
 TODOS
@@ -14,7 +16,8 @@ TODOS
     short guid as opposed to date time helps with CLI input
 [ ] better default on save directory
 [ ] add a way to add notes meta-data e.g. "green ball, poor lighting"
-
+[x] insert unqiueFn and VidWriter
+[x] change savedir
 '''
 
 
@@ -29,8 +32,10 @@ ap.add_argument("--setgain", action="store_true", default=False)
 ap.add_argument("--logfps", action="store_true", default=False)
 ap.add_argument("--toggleframe", action="store_true", default=False)
 
-ap.add_argument("--codec", default="")
-ap.add_argument("--ext", default = ".avi")
+ap.add_argument("--codec", default="h264")
+ap.add_argument("--ext", default = "avi")
+
+ap.add_argument("--savedir", default="data/july2018/misc/")
 	
 ap.add_argument("--time",  default=3)
 
@@ -61,28 +66,23 @@ _params = [_fw,_fh,_fps,_fourcc]
 if args["setcam"]:
     # outshape = (1920,1080)
     outshape = (1080,960)
-    #outfps = 1000    
     outfps = 30
 else:
     outshape = (640,480)
     outfps = 30
-#outshape = (640,480)
+    
 
 #WriteVideo
 if args["dontsave"]:
-    
-    i = 0
-    files = os.listdir(os.getcwd())
-    while(True):
-        i += 1
-        fn = "output" + str(i)
-        fn += args["ext"] 
-            
-        if fn in files:
-            continue
-        else:
-            out = cv2.VideoWriter(fn,fourcc,outfps,outshape)    
-            break
+
+    fn = uniqueFn(  fn_base = "output"
+                    ,fn_dir = args["savedir"]
+                    ,fn_ext = args["ext"]
+                    )
+    print fn
+    out = VidWriter( savefn = args["savedir"] + fn
+                    ,fourcc = args["codec"]
+                    )
 
 
 #Caemra Object            
@@ -164,4 +164,5 @@ try:
 except:
     print 'no out to release'
     
-print fn, ": ", str(os.path.getsize(fn) / (1000)), " kb"
+pfn = str(args["savedir"]) + fn
+print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"

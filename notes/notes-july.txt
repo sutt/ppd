@@ -1,6 +1,12 @@
 
 7/17
 
+When we even save frames as jpg's we're compressing from 
+what a "live" real-time processing is seeing. Need to save the 
+uncompressed image. 
+    Or at least view a diff between image and uncompressed
+
+
 Video Codecs
     Lossless compression video?
     
