@@ -3,6 +3,21 @@ import cv2
 import argparse
 import os, sys, time
 
+'''
+TODOS
+[ ] change frame size
+[ ] do a preview and have a start/stop button
+[ ] store meta-data
+[ ] write/log meta-data
+    maybe we store vidname as (short) guid and then thats the 
+    primary key for meta-data lookup 
+    short guid as opposed to date time helps with CLI input
+[ ] better default on save directory
+[ ] add a way to add notes meta-data e.g. "green ball, poor lighting"
+
+'''
+
+
 ap = argparse.ArgumentParser()
 ap.add_argument("--showvid", action="store_true", default=False)
 ap.add_argument("--showsize", action="store_true", default=False)
@@ -55,6 +70,7 @@ else:
 
 #WriteVideo
 if args["dontsave"]:
+    
     i = 0
     files = os.listdir(os.getcwd())
     while(True):

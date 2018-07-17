@@ -1,4 +1,10 @@
 
+7/17
+
+>python writevid1.py --time 5 
+
+>pytest -vv vidwriter.py
+
 12/16
 
 [on laptop]
