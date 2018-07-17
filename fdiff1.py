@@ -4,22 +4,16 @@ import os, sys, time
 import numpy as np
 
 # NOTES:
-# need to put h264.dll in path, specifically in scratch/
-# h264 is worse than avi correct?
-# is this validated by smaller file size?
-# is this what happens when ball appears not to move b/w several frames?
-
 
 # TODOS:
-# write out diffs
 # track the main diff as in adapt_thresh:
     # true/false there is some diff
     # "big circle" location
 
 #ARGS
-default_file = "../output13.avi"
-# default_savedir = "../data/write/july2018/"
-default_savedir = "c:/users/wsutt/desktop/files/ppd/ppd/scratch/"
+default_file = "output13.avi"
+default_savedir = "data/write/july2018/"
+# default_savedir = "c:/users/wsutt/desktop/files/ppd/ppd/scratch/"
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--file", type=str, default=default_file)
