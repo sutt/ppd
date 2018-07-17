@@ -10,6 +10,33 @@ build PROCESSES!
 
 writevid1.py | fbf2.py  | fdiff1.py
 
+need a summary utility to display file-size, recording-length, frame-size, etc..
+    and this should run like 'ls' for all files in directory
+need a comparison in size of vid and size of frame between different encoding schemes
+need a module for writing a video
+need a module for displaying a video
+
+[ ] how to eliminate the "windows popup" codec request before writevid1 runs?
+    appears to happen for .avi but not h264
+    does it happen on mp4?
+
+[ ] need to be able to record different size vids in writevid.py
+[ ] set different frame rates
+    [ ] verify different frame rates
+
+[ ] get cv2 intellisense in vscode
+[x] why can't I write out h264 in fdiff1?
+    because theres no h264.dll on /data/ path
+    [x] try from main ppd/ path - yes, works
+    [ ] what happens when you import modules
+
+[ ] build unique-fn module
+  
+
+
+
+
+
 7/9
 
 I need to build a list of tasks and start executing:
