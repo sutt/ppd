@@ -1,0 +1,152 @@
+import cv2
+import types
+
+def VidWriter(savefn
+              ,fourcc=None
+              ,outfps=None
+              ,outshape=None
+              ,ext=None
+            ):
+    '''
+        return a cv2 VideoWriter Object
+        with default, or specified arguments
+
+        savefn:     relative path to save directory
+        fourcc:     VideoWriter_fourcc or string
+        outfps:     int
+        outshape:   (w,h)
+        ext:        str, if used will append to filename
+    '''
+    
+    if fourcc is None:
+        _fourcc = -1
+    
+    elif type(fourcc) == types.StringType:
+        
+        if str.lower(fourcc) in ("h264", "x264"):
+            _fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
+        elif str.lower(fourcc) == "mp4":
+            _fourcc = cv2.VideoWriter_fourcc("M","P","4"," ")
+        else:
+            try:
+                c = [fourcc[i] if len(fourcc) >= i else " "
+                        for i in range(3)
+                    ]
+                _fourcc = cv2.VideoWriter_fourcc(c[0],c[1],c[2],c[3])
+            except:
+                print 'fourcc type ', str(fourcc), ' not recognized.'
+                _fourcc = -1
+
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # fourcc = cv2.VideoWriter_fourcc(*'H264')
+
+    else:
+        _fourcc = fourcc
+    
+    if outfps is None:
+        _outfps = 30
+    else:
+        _outfps = outfps
+
+    if outshape is None:
+        _outshape = (640,480)
+    else:
+        _outshape = outshape
+
+    if ext is None:
+        _savefn = savefn
+    else:
+        _savefn = savefn + "." + ext
+
+    return cv2.VideoWriter(_savefn,_fourcc,_outfps,_outshape)    
+
+
+def test_vidwriter_basic_1():
+    
+    import os
+
+    input_staging_dir = "data/test/vidwriter/input/"
+    output_staging_dir = "data/test/vidwriter/output/"
+    
+    #Setup
+    output_files = os.listdir(output_staging_dir)
+    for output_file in output_files:
+        os.remove(output_staging_dir + output_file)
+    assert len(os.listdir(output_staging_dir)) == 0
+
+    NUM_IMGS = 3
+    input_fns = [ input_staging_dir + "testimg" + str(i) + ".jpg"
+                  for i in range(NUM_IMGS)
+                ]
+    input_imgs = [cv2.imread(input_fns[i])
+                    for i in range(NUM_IMGS)
+                 ]
+    assert len(input_imgs) == NUM_IMGS
+
+    for i in range(NUM_IMGS):
+        assert input_imgs[i].shape == (480,640,3)
+
+    #Actions
+    fn = output_staging_dir + "testvid.avi"
+    vw = VidWriter(fn)
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+
+    fn = output_staging_dir + "testvid.h264"
+    vw = VidWriter(fn, fourcc = "h264")
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+
+    fn = output_staging_dir + "testvid.mp4"
+    vw = VidWriter(fn, fourcc = "mp4")
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+
+    fn = output_staging_dir + "testfourcc.h264"
+    my_fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
+    vw = VidWriter(fn, fourcc = my_fourcc)
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+
+    fn = output_staging_dir + "testext"
+    vw = VidWriter(fn, fourcc = "h264", ext="h264")
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+
+    fn = output_staging_dir + "testext.2"
+    vw = VidWriter(fn, ext="avi")
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
+    
+    
+    #Verify
+    output_files = os.listdir(output_staging_dir)
+    assert "testvid.avi" in output_files
+    assert "testvid.h264" in output_files
+    # assert "testvid.mp4" in output_files
+    assert "testfourcc.h264" in output_files
+    assert "testext.h264" in output_files
+    assert "testext.2.avi" in output_files
+
+    fn = output_staging_dir + "testvid.avi"
+    assert os.path.getsize(fn) > 0
+    fn = output_staging_dir + "testvid.h264"
+    assert os.path.getsize(fn) > 0
+    # fn = output_staging_dir + "testvid.mp4"
+    # assert os.path.getsize(fn) > 0
+    fn = output_staging_dir + "testfourcc.h264"
+    assert os.path.getsize(fn) > 0
+    fn = output_staging_dir + "testext.h264"
+    assert os.path.getsize(fn) > 0
+    fn = output_staging_dir + "testext.2.avi"
+    assert os.path.getsize(fn) > 0
+
+def test_videowriter_dif_sizes():
+    pass
+    #outfps and outsize are varied here
