@@ -1,5 +1,79 @@
 #Tasks
 
+
+7/17
+
+build PROCESSES!
+    well documented
+    well tested
+    that work together
+
+writevid1.py | fbf2.py  | fdiff1.py
+
+7/9
+
+I need to build a list of tasks and start executing:
+I want an example of laptop/pi picture working
+then I really want to test that optical flow thing
+This seems helpful: fast tracking in opencv
+    https://www.youtube.com/watch?v=X6rPdRZzgjg
+    https://github.com/osmaa/pinymotion/blob/master/pinymotion.py
+
+Questions:
+how to play .avi's?
+how to play h264's?
+how to send h264/other-format over stream?
+
+
+
+
+General Thoughts:
+This is a process problem, not a beautiful code problem. Since we don't know how the solution looks at the beginning, we need the processes to iterate there.
+
+Remember, the idea was to use two cameras for mo-cap: one for noticing diffs quickly, the other for precisely locating ball
+
+
+Worskapce Discoveries:
+notes/commands.txt has pi-server instructions
+notes/notes-dec.txt has concise and useful info
+
+
+7/7
+
+build high-level todos
+re-run and record main commands
+
+High Level Todos:
+
+Need to build a script that saves videos
+Need to create a variety of videos:
+    very distant ball
+    bouncing ball, 
+        different backgrounds
+        different fps
+    different cameras
+    different cam params
+Need to create meta data for each recording
+Need to build library of videos and frames
+A way to run algos onto all test-vids
+Need to create unit tests for functionality?
+Build a sqlite db that stores settings for thresh levels
+    and track-algo params
+Do a bunch of exploratory analysis beyond simple-thresh
+    optical flow
+    edge detection
+    circle recognition
+Rethink the approach to bounding box: create a circle and add
+the area not included as color to absorb
+"Find some positive": expand the thresh range to search for a 
+small ball
+
+Common Commands:
+how to connect ot rpi over socket?
+what flags make a difference on adaptive_thresh
+fbf works? is valuable tho?
+
+
 12/17
 
 x Picamera working without errors

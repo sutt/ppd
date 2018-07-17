@@ -1,3 +1,10 @@
 *.dll
 *.pyc
 data/
+*.bz
+*.bz2
+Untitled*.ipynb
+*.jpg
+*.mp4
+*.avi
+*.h264
