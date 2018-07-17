@@ -16,7 +16,7 @@ need a comparison in size of vid and size of frame between different encoding sc
 need a module for writing a video
 need a module for displaying a video
 
-[ ] how to eliminate the "windows popup" codec request before writevid1 runs?
+[x] how to eliminate the "windows popup" codec request before writevid1 runs?
     appears to happen for .avi but not h264
     does it happen on mp4?
 
@@ -25,14 +25,39 @@ need a module for displaying a video
     [ ] verify different frame rates
 
 [ ] get cv2 intellisense in vscode
+    [x] it works in ipython
 [x] why can't I write out h264 in fdiff1?
     because theres no h264.dll on /data/ path
     [x] try from main ppd/ path - yes, works
     [ ] what happens when you import modules
 
+Modules:
 [ ] build unique-fn module
+[ ] build a set cam params module
+[ ] build a show video with time-sleep lag
 
+Scripts:
+[ ] build a vid probe util
+[ ] build a help function for each script
+[ ] build a current_params script which writes current-default-meta-data to meta-data-db on writevid1
+[ ] commands.txt becomes a way to run multiple scripts together
+[ ] rewrite fbf
+
+Analysises:
+[ ] relative size of different codecs
+    [ ] for arbitrary videos
+    [ ] for vids with just a moving ball
+    [ ] half-way between: a person moving and a ball bouncing
+    [ ] what does the rpi send best?
+
+Smaller Tasks:
 [ ] import vidwriter:VidWriter into main scripts
+
+[ ] Try Codecs
+    [ ] XVID
+    [ ] mp4
+    [ ] MJPG
+    [ ] Lossless
 
 [x] organize video data
 [ ] sync data folder with drive
@@ -40,6 +65,13 @@ need a module for displaying a video
 [ ] how to use cursor on opencv windows?
     [ ] to select a region, see fast-tracking video example
     [ ] to select a region to zoom
+
+[x] try out test_vid_sizes
+For all three cameras (laptop 1 + 2) & webcam (c920):
+(640, 480)   True
+(1280, 720)   True
+(1280, 960)   False
+(1920, 1080)   True
 
 Idea: _CVT_ the fdiff frames to a color close to the ball, then do a diff
         which will let us maximize the diff for only the ball
