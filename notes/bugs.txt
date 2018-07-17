@@ -54,6 +54,7 @@ Smaller Tasks:
 [x] import vidwriter:VidWriter into main scripts
 [ ] get all the available codecs by prompt then VidWriter.getcodec()
 [ ] variable framesize for videowriter
+[ ] uniqueFn implement ext=None
 
 [ ] Try Codecs
     [ ] XVID

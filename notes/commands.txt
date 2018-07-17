@@ -3,7 +3,9 @@
 
 >python fdiff1.py --file data/july2018/training_july16/cv_laptop_green.avi --show --save
 
->python writevid1.py --time 5 
+>python writevid1.py --savedir data/misc/
+
+>pytest -vv miscutils.py
 
 >pytest -vv vidwriter.py
 
