@@ -19,13 +19,14 @@ def VidWriter(savefn
     '''
     
     if fourcc is None:
-        _fourcc = -1
+        _fourcc = -1    #change from prompt
     
     elif type(fourcc) == types.StringType:
         
         if str.lower(fourcc) in ("h264", "x264"):
             _fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
         elif str.lower(fourcc) == "mp4":
+            #TODO - get this to work
             _fourcc = cv2.VideoWriter_fourcc("M","P","4"," ")
         else:
             try:
@@ -38,7 +39,6 @@ def VidWriter(savefn
                 _fourcc = -1
 
         # fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        # fourcc = cv2.VideoWriter_fourcc(*'H264')
 
     else:
         _fourcc = fourcc
@@ -63,6 +63,9 @@ def VidWriter(savefn
 
 def test_vidwriter_basic_1():
     
+    #TODO - get MP4 format to work
+    #TODO - get rid of prompt for codec, must specify fourcc
+
     import os
 
     input_staging_dir = "data/test/vidwriter/input/"

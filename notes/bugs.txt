@@ -31,6 +31,18 @@ need a module for displaying a video
     [ ] what happens when you import modules
 
 [ ] build unique-fn module
+
+[ ] import vidwriter:VidWriter into main scripts
+
+[x] organize video data
+[ ] sync data folder with drive
+
+[ ] how to use cursor on opencv windows?
+    [ ] to select a region, see fast-tracking video example
+    [ ] to select a region to zoom
+
+Idea: _CVT_ the fdiff frames to a color close to the ball, then do a diff
+        which will let us maximize the diff for only the ball
   
 
 

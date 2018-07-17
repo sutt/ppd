@@ -1,0 +1,19 @@
+
+7/17
+
+Lossless compression video?
+
+OpenCV questions with "ping pong"
+    http://answers.opencv.org/questions/scope:all/sort:activity-desc/page:1/query:ping%20pong/
+    http://answers.opencv.org/question/92131/calculate-the-object-distance-from-camera/
+    http://answers.opencv.org/question/119635/can-haar-or-cascade-classifiers-be-accurate-enough-in-detecting-object-size/
+    http://answers.opencv.org/question/176656/need-to-make-a-tracker-that-detects-ping-pong-balls-and-then-display-a-color-on-the-right-side-of-the-screen-corresponding-to-where-the-ping-pong-ball/
+    http://answers.opencv.org/question/191798/covariance-matrices-for-kalman-filter/
+    http://answers.opencv.org/question/193147/arduino-opencv-project-tracker-ball/
+
+    Interesting ideas:
+         you take a picture of your ball at a known distance, then you can solve the equation for the unknown constant, and then use that in all your future calculations. Measure carefully, or better yet, take multiple pictures at different known distances and average the results together.
+
+Good Motion Tracker with frame-diff:
+    https://www.dropbox.com/s/67gtew15zn2rpun/motionTracking.cpp?dl=0
+
