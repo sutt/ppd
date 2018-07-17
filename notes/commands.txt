@@ -1,6 +1,8 @@
 
 7/17
 
+>python fdiff1.py --file data/july2018/training_july16/cv_laptop_green.avi --show --save
+
 >python writevid1.py --time 5 
 
 >pytest -vv vidwriter.py
