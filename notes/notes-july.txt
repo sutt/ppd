@@ -9,6 +9,25 @@ uncompressed image.
 
 Video Codecs
     Lossless compression video?
+    http://answers.opencv.org/question/12959/videowriter-fourcc-1-works-but-cv_fourcccram-does-not/
+    http://www.free-codecs.com/download/k_lite_codec_pack.htm
+    http://www.fourcc.org/codecs.php
+        Cincepak = CVID
+
+    https://sites.google.com/site/projectsafran/learning-material/c-and-opencv-2-2/opencv-video-format
+        AVI
+        'DIB '
+        RGB(A)
+        Uncompressed RGB, 24 or 32 bit
+        AVI
+        'I420'
+        RAW I420
+        Uncompressed YUV, 4:2:0 chroma subsampled
+        AVI
+        'IYUV'
+        RAW I420
+        identical to I420
+
     
     https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html
         In Fedora: DIVX, XVID, MJPG, X264, WMV1, WMV2. (XVID is more preferable. MJPG results in high size video. X264 gives very small size video)

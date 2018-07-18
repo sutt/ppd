@@ -1,4 +1,5 @@
 import os
+import random
 
 def uniqueFn(fn_base
             ,fn_dir = None
@@ -13,8 +14,8 @@ def uniqueFn(fn_base
                     different fn_base start back at fn_base1.ext
         fn_dir:     path to directory
                     (if None, uses current dir)
-        fn_ext:     the extension
-                    (NOT IMPLEMENTED if None, considers all fns in dir w/o ext)
+        fn_ext:     the extension w/o dot
+                    (if None, considers all fns in dir w/o ext)
         method:     str - "increment" or "guid"
         guid_digits:int - number of chars in guid
     '''
@@ -25,11 +26,21 @@ def uniqueFn(fn_base
         _dir = os.getcwd() if fn_dir is None else fn_dir
         files = os.listdir(_dir)
         
+        if fn_ext is None:
+            def rm_ext(f):
+                ind_dot = f[::-1].find(".")
+                if ind_dot == -1:
+                    return f
+                else:
+                    return f[:-(ind_dot+1)]
+            files = [rm_ext(f) for f in files]
+        
         while(True):
             i += 1
             fn = str(fn_base) + str(i)
-            fn += "."
-            fn += fn_ext 
+            if fn_ext is not None:
+                fn += "."
+                fn += fn_ext 
                 
             if i > 99999:
                 print 'problem in uniqueFn, more than 100k files'
@@ -40,8 +51,24 @@ def uniqueFn(fn_base
                 return fn
     
     if method == "guid":
-        print 'not implemented yet'
-        return "12345678." + fn_ext
+        
+        letters = 'abcdefghijklmnopqrstuvwxyz'
+        numbers = '0123456789'
+        chars = letters + numbers
+
+        guid_base = [str( chars[
+                        random.sample(range(len(chars)-1),1)[0]
+                          ] )
+                     for _ in range(guid_digits)
+                    ]
+        guid_base = "".join(guid_base)
+
+        fn = fn_base + guid_base
+        if fn_ext is not None:
+            fn += "."
+            fn += fn_ext
+
+        return fn
 
 
 
@@ -126,6 +153,55 @@ def test_uniqueFn_4():
     assert newFn == NEW_FN
 
 def test_uniqueFn_5():
-    ''' test increment method with ext=None '''
+    ''' test increment method with ext=None 
+        file contents: a1.txt, a2.txt, a1.bmp, a2.bmp, a3.bmp
+    '''
+    TEST_DIR = "data/test/uniquefn/test5/"
+
+    newFn = uniqueFn(fn_base="a", fn_dir = TEST_DIR, fn_ext=None)
+
+    assert newFn == "a4"
+
+def test_uniqueFn_6():
+    ''' test increment method with ext=None and multi-dot file names
+        file contents: a1.txt, a2.txt, a.diff.1.bmp, a.a2.bmp, a3.bmp
+    '''
+    TEST_DIR = "data/test/uniquefn/test6/"
+
+    newFn = uniqueFn(fn_base="a", fn_dir = TEST_DIR, fn_ext=None)
+
+    assert newFn == "a4"
+
+
+def test_uniqueFn_7():
+    ''' test guid method '''
+    import copy
+
+    results = []
+    
+    N = 20
+    for trial in range(N):
+
+        results.append(
+            uniqueFn("", method="guid", fn_ext="txt")
+        )
+    
+    assert len(results) == N
+
+    assert all(map(lambda fn: len(fn) == 6+1+3, results))
+
+    for i in range(len(results)):
+        
+        _results2 = copy.copy(results)
+        _results2.pop(i)
+        elem = results[i]
+
+        assert len(_results2) == N - 1
+        
+        assert elem not in _results2
+
+        
+
+
 
     

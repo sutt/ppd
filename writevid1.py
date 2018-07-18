@@ -79,7 +79,7 @@ if args["dontsave"]:
                     ,fn_dir = args["savedir"]
                     ,fn_ext = args["ext"]
                     )
-    print fn
+    
     out = VidWriter( savefn = args["savedir"] + fn
                     ,fourcc = args["codec"]
                     )

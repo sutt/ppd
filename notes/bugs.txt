@@ -32,7 +32,7 @@ need a module for displaying a video
     [ ] what happens when you import modules
 
 Modules:
-[ ] build unique-fn module
+[x] build unique-fn module
 [ ] build a set cam params module
 [ ] build a show video with time-sleep lag
 
@@ -54,7 +54,7 @@ Smaller Tasks:
 [x] import vidwriter:VidWriter into main scripts
 [ ] get all the available codecs by prompt then VidWriter.getcodec()
 [ ] variable framesize for videowriter
-[ ] uniqueFn implement ext=None
+[x] uniqueFn implement ext=None
 
 [ ] Try Codecs
     [ ] XVID
