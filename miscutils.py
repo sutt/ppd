@@ -18,6 +18,11 @@ def uniqueFn(fn_base
                     (if None, considers all fns in dir w/o ext)
         method:     str - "increment" or "guid"
         guid_digits:int - number of chars in guid
+
+        ----------------------------------------------------------
+        fn = uniqueFn(  fn_base = "output"
+                        ,fn_dir = args["savedir"]
+                        ,fn_ext = args["ext"] )
     '''
 
     if method == "increment":

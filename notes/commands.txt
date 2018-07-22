@@ -1,4 +1,15 @@
 
+7/18
+
+>python test_video_sizes.py --cam_num 0
+
+For all three cameras (laptop 1 + 2) & webcam (c920):
+(640, 480)      True
+(1280, 720)     True
+(1280, 960)     False
+(1920, 1080)    True
+
+
 7/17
 
 >python fdiff1.py --file data/july2018/training_july16/cv_laptop_green.avi --show --save
