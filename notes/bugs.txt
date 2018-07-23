@@ -1,5 +1,26 @@
 #Tasks
 
+7/18
+
+[x] basecamp on writevid1, remove cruft
+
+[ ] build some tests for writevid1
+
+[x] build change framesize for writevid1
+    [x] toggleframe?
+    [x] need to change framesize on VidWrite
+
+[ ] camnum arg on writevid1
+
+[ ] put setgain / getcam into camprobe util
+    two tests:
+     1. setgain prop, see if when you get props it has changed 
+     2. take two picture with diff gain and see if one is darker
+
+Other Tasks
+[ ] What are commands to check version of opencv, numpy, python, etc
+
+
 
 7/17
 

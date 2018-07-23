@@ -9,13 +9,15 @@ def VidWriter(savefn
             ):
     '''
         return a cv2 VideoWriter Object
-        with default, or specified arguments
 
         savefn:     relative path to save directory
         fourcc:     VideoWriter_fourcc or string
         outfps:     int
         outshape:   (w,h)
         ext:        str, if used will append to filename
+
+        vw = VidWriter( savefn = args["savedir"] + fn
+                        ,fourcc = args["codec"])
     '''
     
     if fourcc is None:

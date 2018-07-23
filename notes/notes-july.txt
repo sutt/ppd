@@ -1,4 +1,12 @@
 
+
+7/18
+
+Curft and notes:
+#Logitech Video I420 works
+#default:-466162819.0
+#divx, xvid, h264, x264, mjpg, wmv?
+
 7/17
 
 When we even save frames as jpg's we're compressing from 
