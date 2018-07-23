@@ -10,7 +10,7 @@
     [x] toggleframe?
     [x] need to change framesize on VidWrite
 
-[ ] camnum arg on writevid1
+[x] camnum arg on writevid1
 
 [ ] put setgain / getcam into camprobe util
     two tests:
@@ -19,6 +19,8 @@
 
 Other Tasks
 [ ] What are commands to check version of opencv, numpy, python, etc
+[ ] Separate ReadingFrames from WritingFrames which could make FPS higher (?)
+
 
 
 
