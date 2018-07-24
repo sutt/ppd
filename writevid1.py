@@ -42,6 +42,7 @@ def main(
             ,frame_size = (640,480)
             ,savedir = ""
             ,ext = ""
+            ,input_fn = None
             ,b_codec = False
             ,b_save = True
             ,b_show = False
@@ -60,6 +61,9 @@ def main(
                         ,fn_dir = savedir
                         ,fn_ext = ext
                         )
+        
+        if input_fn is not None:
+            fn = input_fn
 
         fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
 
@@ -142,12 +146,15 @@ if __name__ == "__main__":
     ap.add_argument("--bcodec", action="store_true", default=False)
     ap.add_argument("--codec", type=str, default="h264")
     ap.add_argument("--ext", default = "avi")
+    ap.add_argument("--inputfn", type=str, default = "")
     ap.add_argument("--savedir", default="data/july2018/misc/")
     ap.add_argument("--time",  default=5)
     ap.add_argument("--camnum", type=str, default=0)
     args = vars(ap.parse_args())
 
     #PARSE
+    input_fn = None if args["inputfn"] is None else args["inputfn"]
+
     if args["framesize"] != "":    
         try:
             str_frame_size = str(args["framesize"])
@@ -166,6 +173,7 @@ if __name__ == "__main__":
             ,frame_size =   frame_size
             ,savedir =      args["savedir"]
             ,ext =          args["ext"]
+            ,input_fn =     args["inputfn"]
             ,b_codec =      args["bcodec"]
             ,b_save =       not(args["dryrun"])
             ,b_show =       args["showvid"]

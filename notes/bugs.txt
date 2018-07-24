@@ -1,5 +1,10 @@
 #Tasks
 
+7/24
+
+[ ] test input_fn
+[ ] Build Tests
+
 7/19
 
 [x] bug - Why does writevid1.py at framesize 1280,720 get read by VLC correctly? 
