@@ -7,13 +7,24 @@ from vidwriter import VidWriter
 
 '''
 EXAMPLES
->python writevid1.py
->python writevid1.py --showvid
+>python writevid1.py            (basic, record a video for 5 seconds)
+>python writevid1.py --time 10 --savedir data/aug2018/misc/
+>python writevid1.py --framesize 1280,720
+>python writevid1.py --framesize 1920,1080
+>python writevid1.py --logfps   (print each frame and )
+>python writevid1.py --dryrun
+    (dryrun dont record the video)
+>python writevid1.py --bcodec
+    (bcodec creates a windows prompt of vid-save-codec choice)
 
 
 TODOS
-[x] change frame size
+[x] why not prompt for -1 ?
+[x] dont check file when not saving
+[ ] add a gui   
+[ ] add a help page
 [ ] do a preview and have a start/stop button
+[ ] use logfps for easy start logging vid-info
 [ ] warmup time
 [ ] store meta-data
 [ ] write/log meta-data
@@ -22,8 +33,6 @@ TODOS
     short guid as opposed to date time helps with CLI input
 [ ] better default on save directory
 [ ] add a way to add notes meta-data e.g. "green ball, poor lighting"
-[x] insert unqiueFn and VidWriter
-[x] change savedir
 '''
 
 
@@ -42,12 +51,6 @@ def main(
     '''
         Record a Video, and Save to Disk.
     '''
-    
-    
-    if b_codec:     #TODO - better, not a bool
-        fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
-    else:
-        fourcc = -1
 
     if b_save:
 
@@ -57,9 +60,11 @@ def main(
                         ,fn_dir = savedir
                         ,fn_ext = ext
                         )
-        
-        out = VidWriter( savefn = args["savedir"] + fn
-                        ,fourcc = args["codec"]
+
+        fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
+
+        out = VidWriter( savefn = savedir + fn
+                        ,fourcc = fourcc
                         ,outshape = frame_size
                         )
 
@@ -116,11 +121,12 @@ def main(
     except:
         print 'no out to release'
         
-    pfn = str(savedir) + fn
-    print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
+    if b_save:
+        pfn = str(savedir) + fn
+        print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
 
     if b_logfps:
-        print 'done with i = ', str(i)
+        print 'numFrames recorded = ', str(i)
 
 
 
@@ -133,10 +139,11 @@ if __name__ == "__main__":
     ap.add_argument("--dryrun", action="store_true", default=False)
     ap.add_argument("--logfps", action="store_true", default=False)
     ap.add_argument("--framesize", type=str, default="")
-    ap.add_argument("--codec", default="h264")
+    ap.add_argument("--bcodec", action="store_true", default=False)
+    ap.add_argument("--codec", type=str, default="h264")
     ap.add_argument("--ext", default = "avi")
     ap.add_argument("--savedir", default="data/july2018/misc/")
-    ap.add_argument("--time",  default=3)
+    ap.add_argument("--time",  default=5)
     ap.add_argument("--camnum", type=str, default=0)
     args = vars(ap.parse_args())
 
@@ -159,7 +166,7 @@ if __name__ == "__main__":
             ,frame_size =   frame_size
             ,savedir =      args["savedir"]
             ,ext =          args["ext"]
-            ,b_codec =      args["codec"]
+            ,b_codec =      args["bcodec"]
             ,b_save =       not(args["dryrun"])
             ,b_show =       args["showvid"]
             ,b_logfps =     args["logfps"]

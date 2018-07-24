@@ -1,5 +1,51 @@
 #Tasks
 
+7/19
+
+[x] bug - Why does writevid1.py at framesize 1280,720 get read by VLC correctly? 
+          But then at 1920,1080 it records 2x too fast (Even tho larger?)
+
+    -> Makes sense: since there's only half as many frames logged, and expect to be at 30FPS
+        it's playing those frames twice as fast as it should.
+
+    [x] let's count frames on each rez
+
+    >python writevid1.py --showvid --time 5 --savedir data/aug2018/misc/ --framesize 1920,1080 --logfps
+    data/aug2018/misc/output6.avi :  9621  kb
+    numFrames recorded =  83
+
+    >python writevid1.py --showvid --time 5 --savedir data/aug2018/misc/ --framesize 1280,720 --logfps
+    data/aug2018/misc/output7.avi :  7926  kb
+    numFrames recorded =  141
+
+    >python writevid1.py --showvid --time 5 --savedir data/aug2018/misc/  --logfps
+    data/aug2018/misc/output8.avi :  2491  kb
+    numFrames recorded =  143
+
+    [ ] Let's investigate this warning message:
+    
+        [OpenH264] this = 0x05FE2C70, Warning:bEnableFrameSkip = 0,bitrate can't be controlled for RC_QUALITY_MODE,RC_BITRATE_MODE and RC_TIMESTAMP_MODE without enabling skip frame.
+
+    [ ] Let's look at timestamps on vid via VLC
+
+
+[ ] Can you get faster processing without doing showvid?
+[ ] Can you get faster processing with separate thread?
+[ ] Can you get steadier perf after waiting fro a warm-up?
+[ ] Can we getter better perf with all frames in memory untill end
+    [x] This is 32-bit proc => max_size = 2GB?    """ [MSC v.1500 32 bit (Intel)] on win32 """  
+    [ ] calc in-proc size of the frame
+    [ ] calc perf time of each component, using time.time and cprofile, timeit
+
+
+[ ] Might need to add an ffmpeg processing module, e.g. to change frame count, playback fps etc
+
+[ ] Build tests, then exapnd into gui and meta
+
+[ ] Gui's main job, besides start/stop is r/w meta-settings
+
+
+
 7/18
 
 [x] basecamp on writevid1, remove cruft
