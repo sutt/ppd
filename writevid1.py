@@ -54,17 +54,15 @@ def main(
     '''
 
     if b_save:
-
-        #TODO - input_fn
         
         fn = uniqueFn(  fn_base = "output"
                         ,fn_dir = savedir
                         ,fn_ext = ext
                         )
-        
+               
         if input_fn is not None:
             fn = input_fn
-
+        
         fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
 
         out = VidWriter( savefn = savedir + fn
@@ -182,4 +180,63 @@ if __name__ == "__main__":
         )
 
 def test_unit_1():
-    pass
+    ''' basic test of functionality '''
+    
+    TEST_DIR = "data/test/writevid1/test1/"
+    FN = "output1.avi"
+    
+    #SETUP
+    for _f in os.listdir(TEST_DIR):
+        os.remove(TEST_DIR + _f)
+    assert len(os.listdir(TEST_DIR)) == 0
+
+    #ACTION
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi")
+    #Note: need to specify ext as CLI arg defaults to "avi"
+    #      but main's ext defaults to ""
+    
+    #TESTS    
+    files = os.listdir(TEST_DIR)
+    assert FN in files
+    assert os.path.getsize(TEST_DIR + FN) > 0
+    assert os.path.getsize(TEST_DIR + FN) > 10**5
+
+
+def test_unit_2():
+    ''' test frame size '''
+    
+    TEST_DIR = "data/test/writevid1/test2/"
+    FN640 = "output1.avi"
+    FN1280 = "output2.avi"
+    FN1920 = "output3.avi"
+    FNALL = [FN640, FN1280, FN1920]
+    
+    #SETUP
+    for _f in os.listdir(TEST_DIR):
+        os.remove(TEST_DIR + _f)
+    assert len(os.listdir(TEST_DIR)) == 0
+
+    #ACTION
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi")
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi"
+        ,frame_size=(1280,720))
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi"
+         ,frame_size=(1920,1080))
+    
+    #TESTS    
+    files = os.listdir(TEST_DIR)
+    
+    assert FN640 in files
+    assert FN1280 in files
+    assert FN1920 in files
+
+    s640, s1280, s1920 = map(lambda f: os.path.getsize(TEST_DIR + f)
+                              ,FNALL)
+    assert s640 > 0
+    assert s1280 > s640
+    assert s1920 > s1280
+
+    assert s640 > 10**5
+    assert s1280 > 10**6
+    assert s1920 > 1.5*(10**6)
+    
