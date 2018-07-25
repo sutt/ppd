@@ -11,6 +11,7 @@ EXAMPLES
 >python writevid1.py --time 10 --savedir data/aug2018/misc/
 >python writevid1.py --framesize 1280,720
 >python writevid1.py --framesize 1920,1080
+>python writevid1.py --warmuptime 5
 >python writevid1.py --logfps   (print each frame and )
 >python writevid1.py --dryrun
     (dryrun dont record the video)
@@ -40,6 +41,7 @@ def main(
              time_to_record = 5
             ,cam_num = 0
             ,frame_size = (640,480)
+            ,warmup_time = 0
             ,savedir = ""
             ,ext = ""
             ,input_fn = None
@@ -60,7 +62,7 @@ def main(
                         ,fn_ext = ext
                         )
                
-        if input_fn is not None:
+        if input_fn != "":
             fn = input_fn
         
         fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
@@ -79,6 +81,22 @@ def main(
             cam.set(4,frame_size[1])
         except:
             print 'couldnt set cam with frame_size: ', str(frame_size)
+
+    
+    if warmup_time > 0:
+        t0_warmup = time.time()
+        while(cam.isOpened()):
+            try:
+                ret,frame = cam.read()
+            except:
+                print 'exception in warmup time'
+                break
+            if b_show:
+                cv2.imshow('frame',frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+            if time.time() - t0_warmup > warmup_time:
+                break
 
 
     t0 = time.time()
@@ -148,6 +166,7 @@ if __name__ == "__main__":
     ap.add_argument("--savedir", default="data/july2018/misc/")
     ap.add_argument("--time",  default=5)
     ap.add_argument("--camnum", type=str, default=0)
+    ap.add_argument("--warmuptime", type=str, default=0)
     args = vars(ap.parse_args())
 
     #PARSE
@@ -169,6 +188,7 @@ if __name__ == "__main__":
              time_to_record = int(args["time"])
             ,cam_num =      args["camnum"]
             ,frame_size =   frame_size
+            ,warmup_time =  int(args["warmuptime"])
             ,savedir =      args["savedir"]
             ,ext =          args["ext"]
             ,input_fn =     args["inputfn"]

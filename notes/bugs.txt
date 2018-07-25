@@ -1,9 +1,15 @@
 #Tasks
 
+7/25
+
+[ ] do preview/warmup
+[ ] hello gui
+[ ] add a gui
+
 7/24
 
-[ ] test input_fn
-[ ] Build Tests
+[x] test input_fn
+[x] Build Tests
 
 7/19
 
