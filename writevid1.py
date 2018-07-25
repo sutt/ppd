@@ -239,4 +239,56 @@ def test_unit_2():
     assert s640 > 10**5
     assert s1280 > 10**6
     assert s1920 > 1.5*(10**6)
+
+def test_unit_3():
+    ''' test time_to_record arg '''
+
+    TEST_DIR = "data/test/writevid1/test3/"
+    FN1sec = "output1.avi"
+    FN2sec = "output2.avi"
+
+    #SETUP
+    for _f in os.listdir(TEST_DIR):
+        os.remove(TEST_DIR + _f)
+    assert len(os.listdir(TEST_DIR)) == 0
+
+    #ACTION
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi")
+    main(time_to_record=2, savedir=TEST_DIR, ext="avi")
     
+    #TESTS
+    files = os.listdir(TEST_DIR)
+    
+    assert FN1sec in files
+    assert FN2sec in files
+
+    assert os.path.getsize(TEST_DIR + FN1sec) < os.path.getsize(TEST_DIR + FN2sec)
+
+def test_unit_4():
+    ''' test b_codec, ext, b_save, input_fn '''
+
+    TEST_DIR = "data/test/writevid1/test4/"
+    FN_bcodec = "output1.avi"
+    FN_ext = "output1.h264"
+    FN_dryrun = "output2.avi"
+    FN_inputfn = "customfn.h264"
+
+    #SETUP
+    for _f in os.listdir(TEST_DIR):
+        os.remove(TEST_DIR + _f)
+    assert len(os.listdir(TEST_DIR)) == 0
+
+    #ACTION
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi", b_codec=False)
+    main(time_to_record=1, savedir=TEST_DIR, ext="h264")
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi", b_save=False)
+    main(time_to_record=1, savedir=TEST_DIR, ext="avi", input_fn="customfn.h264")
+    
+    #TESTS
+    files = os.listdir(TEST_DIR)
+    
+    assert FN_bcodec in files
+    assert FN_ext in files
+    assert FN_dryrun not in files
+    assert FN_inputfn in files
+
