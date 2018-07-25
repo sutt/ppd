@@ -2,8 +2,8 @@
 
 7/25
 
-[ ] do preview/warmup
-[ ] hello gui
+[x] do preview/warmup
+[x] hello gui
 [ ] add a gui
 
 7/24

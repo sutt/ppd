@@ -4,6 +4,8 @@ import argparse
 import os, sys, time
 from miscutils import uniqueFn
 from vidwriter import VidWriter
+import modules.GlobalsB as Globals
+from modules.GuiB import GuiB
 
 '''
 EXAMPLES
@@ -50,11 +52,19 @@ def main(
             ,b_show = False
             ,b_logfps = False
             ,b_showsize = False
+            ,b_gui = False
         ):
     '''
         Record a Video, and Save to Disk.
     '''
 
+    if b_gui:
+
+        Globals.init()
+        Globals.gui_cmd_quit = False
+        gui = GuiB()
+
+    
     if b_save:
         
         fn = uniqueFn(  fn_base = "output"
@@ -95,6 +105,8 @@ def main(
                 cv2.imshow('frame',frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
+            if Globals.gui_cmd_quit:
+                break
             if time.time() - t0_warmup > warmup_time:
                 break
 
@@ -128,6 +140,9 @@ def main(
 
             if (time.time() - t0) > time_to_record:
                 break
+
+            if Globals.gui_cmd_quit:
+                break
         
         except:
             print 'excepted during frame read.'
@@ -140,6 +155,12 @@ def main(
         out.release()
     except:
         print 'no out to release'
+
+    try:
+        cv2.destroyAllWindows()
+    except:
+        print 'no cv2 windows to destroy'
+        
         
     if b_save:
         pfn = str(savedir) + fn
@@ -167,6 +188,7 @@ if __name__ == "__main__":
     ap.add_argument("--time",  default=5)
     ap.add_argument("--camnum", type=str, default=0)
     ap.add_argument("--warmuptime", type=str, default=0)
+    ap.add_argument("--gui", action="store_true", default=False)
     args = vars(ap.parse_args())
 
     #PARSE
@@ -197,6 +219,7 @@ if __name__ == "__main__":
             ,b_show =       args["showvid"]
             ,b_logfps =     args["logfps"]
             ,b_showsize =   args["showsize"]
+            ,b_gui =        args["gui"]
         )
 
 def test_unit_1():
