@@ -1,5 +1,34 @@
 #Tasks
 
+8/2
+
+[x] fix writevid1
+[ ] verify tests, list in commands.txt
+
+
+7/26
+
+[ ] start copying GuiA ton GuiB
+    [ ] what's the point of GlobeGui?
+    [ ] record button
+    [ ] time to record field: default 999
+    [ ] preview window on/off
+    [ ] frame size
+    [ ] cam num
+    [ ] uniqueFN textbox
+    [ ] directory textbox
+    [ ] codec combobox
+    [ ] draw onto frame:
+        [ ] currently recording
+        [ ] countdown to record-start-time
+    
+[ ] If we did cProfile we'd know info on processing time
+    [ ] do num frames recorded change b/w:
+        [ ] gui on/off
+        [ ] preview on/off
+    [ ] how will cprofile work since we don't have subfunctions?
+    [ ] can we read the cam faster with threading?
+
 7/25
 
 [x] do preview/warmup

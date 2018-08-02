@@ -14,6 +14,8 @@ EXAMPLES
 >python writevid1.py --framesize 1280,720
 >python writevid1.py --framesize 1920,1080
 >python writevid1.py --warmuptime 5
+>python writevid1.py --gui
+
 >python writevid1.py --logfps   (print each frame and )
 >python writevid1.py --dryrun
     (dryrun dont record the video)
