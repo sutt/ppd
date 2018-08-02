@@ -1,6 +1,9 @@
 
 8/2
 
+>python guirecord.py
+>python modules/guib.py   [to test guiB w/o guirecord]
+
 >pytest -vv writevid1.py
 >pytest -vv miscutils.py
 >pytest -vv vidwriter.py

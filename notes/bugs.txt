@@ -8,6 +8,29 @@
     [x] make sure this works from CLI too, not just unit tests
     [x] fix other problems in tests?
 
+[x] hello guirecord.py by 9am
+
+[ ] Basic Control Flow
+    [x] preview without record
+    [ ] don't init vidwrite untill record
+
+[ ] get a uniquefn textbox with record toggle working by 1020am:
+    [ ] how to handle preview cam?
+    [ ] toggle record button
+        [x] does the action
+        [x] change the visual element of button onState
+        [?] multiple actions
+    [ ] uniqueFn text box
+        [ ] read from view to model
+        [ ] update from model to view
+        [ ] when to update/re-run
+        [ ] how to handle user entered non-uniqueFn, just overwrite?
+
+[ ] Then, add a directory switch
+
+
+
+
 
 
 7/26
@@ -17,6 +40,7 @@
     [ ] record button
     [ ] time to record field: default 999
     [ ] preview window on/off
+    [ ] continue record ("jump cuts") or new video after each toggle
     [ ] frame size
     [ ] cam num
     [ ] uniqueFN textbox
