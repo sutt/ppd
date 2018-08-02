@@ -26,6 +26,7 @@ class BuildGuiB:
             self.record_button.configure(bg = 'gray')
         else:
             Globals.gui_cmd_record = True
+            Globals.sw_record = True
             self.record_button.configure(bg = '#000fff000')
         if self.b_log:
             print 'gui_cmd_record: ', str(Globals.gui_cmd_record)

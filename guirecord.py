@@ -99,7 +99,6 @@ while(not(Globals.gui_cmd_quit)):
     
     try:
         gui.myGui.set_sv_fn(fn)
-
     except Exception as e:
         print 'exception on init unqiue_fn'
         print e
@@ -111,11 +110,10 @@ while(not(Globals.gui_cmd_quit)):
 
     fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
 
-    #TODO - don't init vidwriter yet
-    out = VidWriter( savefn = savedir + fn
-                    ,fourcc = fourcc
-                    ,outshape = frame_size
-                    )
+    # out = VidWriter( savefn = savedir + fn
+    #                 ,fourcc = fourcc
+    #                 ,outshape = frame_size
+    #                 )
     # -------------------------------------------------------------
 
     #RECORD VIDEO
@@ -141,12 +139,28 @@ while(not(Globals.gui_cmd_quit)):
                     print frame.shape
 
                 if Globals.gui_cmd_record:
+
+                    #init vidwriter
+                    if Globals.sw_record:
+
+                        Globals.sw_record = False
+
+                        out = VidWriter( 
+                                 savefn = savedir + Globals.gui_unique_fn
+                                ,fourcc = fourcc
+                                ,outshape = frame_size
+                                )
+
+                        #TODO - release out when finished
+ 
+                        #dont write current frame
+                        continue
+
+                    #record frame
                     out.write(frame)
 
                 if b_logfps:
                     i += 1
-                
-                
 
             if (time.time() - t0) > time_to_record:
                 break
@@ -154,8 +168,9 @@ while(not(Globals.gui_cmd_quit)):
             if Globals.gui_cmd_quit:
                 break
         
-        except:
+        except Exception as e:
             print 'excepted during frame read.'
+            print e
             break
 
 

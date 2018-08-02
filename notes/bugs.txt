@@ -14,20 +14,29 @@
     [x] preview without record
     [ ] don't init vidwrite untill record
 
-[ ] get a uniquefn textbox with record toggle working by 1020am:
-    [ ] how to handle preview cam?
-    [ ] toggle record button
+[x] get a uniquefn textbox with record toggle working by 1020am:
+    [x] how to handle preview cam?
+    [x] toggle record button
         [x] does the action
         [x] change the visual element of button onState
         [?] multiple actions
-    [ ] uniqueFn text box
+    [x] uniqueFn text box
         [x] read from view to model
         [x] set width
         [x] update from model to view
-        [ ] when to update/re-run
+        [x] when to update/re-run
         [ ] how to handle user entered non-uniqueFn, just overwrite?
 
-[ ] Then, add a directory switch
+    BUGS:
+    [ ] release vidwrite onEndRecord (so we can view it in file explorer)
+    [ ] toggling record is overwriting
+    [ ] need to re-run uniquefn after each toggle?
+    
+
+
+[ ] Then, add a directory selection gui elem
+
+
 
 
 
