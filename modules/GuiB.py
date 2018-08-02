@@ -38,6 +38,16 @@ class BuildGuiB:
         if self.b_log:
             print 'gui_cmd_record: ', str(Globals.gui_cmd_record)
         
+    # @staticmethod
+    def cmd_set_unique_fn(self,sv):
+        Globals.gui_unique_fn = str(sv.get())
+        if self.b_log:
+            print 'setting gui_unique_fn to: ', Globals.gui_unique_fn
+
+    def init_unique_fn(self, fn):
+        print 'in INIT!'
+        print fn
+        
 
     def build_gui_b(self, root):
         
@@ -57,6 +67,18 @@ class BuildGuiB:
                 ,command = self.cmd_record_sw
                 )
         self.record_button.pack()
+
+        f1a2 = tk.Frame(f1a)
+        f1a2.pack(side = tk.TOP)
+
+        tk.Label(f1a2, text="filename:").pack(side=tk.LEFT)
+        sv_tp = tk.StringVar()
+        sv_tp.set(str(Globals.gui_unique_fn))
+        tk.Entry(f1a2,textvariable = sv_tp, width = 6 ).pack(side=tk.LEFT)
+        tk.Button(f1a2
+                 ,text = 'set'
+                 ,command = lambda: self.cmd_set_unique_fn(sv_tp)
+                 ).pack(side=tk.LEFT)
 
         return root
 
@@ -85,5 +107,6 @@ if __name__ == "__main__":
     Globals.gui_cmd_quit = False
     Globals.gui_cmd_record = False
     Globals.gui_cmd_reset = False
+    Globals.gui_unique_fn = "------N/A------"
     
     gui = GuiB(b_log=True)

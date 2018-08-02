@@ -46,6 +46,7 @@ Globals.init()
 Globals.gui_cmd_quit = False
 Globals.gui_cmd_record = False
 Globals.gui_cmd_reset = False
+Globals.gui_unique_fn = "------N/A------"
 
 try:
     gui = GuiB()
@@ -93,6 +94,17 @@ while(not(Globals.gui_cmd_quit)):
                     ,fn_dir = savedir
                     ,fn_ext = ext
                     )
+
+    #TODO - set Global, then update gui
+    Globals.gui_unique_fn = fn
+    print Globals.gui_unique_fn
+    
+    try:
+        gui.myGui.init_unique_fn(fn)
+
+    except Exception as e:
+        print 'exception on init unqiue_fn'
+        print e
                
     if input_fn != "" and input_fn is not None:
         fn = input_fn
