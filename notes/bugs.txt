@@ -10,9 +10,9 @@
 
 [x] hello guirecord.py by 9am
 
-[ ] Basic Control Flow
+[x] Basic Control Flow
     [x] preview without record
-    [ ] don't init vidwrite untill record
+    [x] don't init vidwrite untill record
 
 [x] get a uniquefn textbox with record toggle working by 1020am:
     [x] how to handle preview cam?
@@ -28,10 +28,10 @@
         [ ] how to handle user entered non-uniqueFn, just overwrite?
 
     BUGS:
-    [ ] release vidwrite onEndRecord (so we can view it in file explorer)
+    [x] release vidwrite onEndRecord (so we can view it in file explorer)
     [ ] toggling record is overwriting
-    [ ] need to re-run uniquefn after each toggle?
-    
+    [x] need to re-run uniquefn after each toggle?
+    [ ] get ext from filename
 
 
 [ ] Then, add a directory selection gui elem

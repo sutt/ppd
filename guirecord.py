@@ -47,6 +47,8 @@ Globals.gui_cmd_quit = False
 Globals.gui_cmd_record = False
 Globals.gui_cmd_reset = False
 Globals.gui_unique_fn = "------N/A------"
+Globals.sw_record_start = False
+Globals.sw_record_stop = False
 
 try:
     gui = GuiB(b_log=True)
@@ -63,7 +65,7 @@ while(not(Globals.gui_cmd_quit)):
 
     savedir = "data/aug2018/misc/"
     ext = "avi"
-    b_codec = False
+    b_codec = False   #True to do manual select popup
     frame_size = (640,480)
     cam_num = 0
     input_fn = None
@@ -89,34 +91,16 @@ while(not(Globals.gui_cmd_quit)):
         break
     
 
-    #SAVE-FN INIT------------------------------------------------
     fn = uniqueFn(  fn_base = "output"
                     ,fn_dir = savedir
                     ,fn_ext = ext
                     )
-
-    Globals.gui_unique_fn = fn
     
-    try:
-        gui.myGui.set_sv_fn(fn)
-    except Exception as e:
-        print 'exception on init unqiue_fn'
-        print e
-        sys.exit()
-               
-    if input_fn != "" and input_fn is not None:
-        fn = input_fn
-        #TODO - validate its unqiue in the directory
+    gui.myGui.set_sv_fn(fn)
+    gui.myGui.get_sv_fn()
 
+    #TODO - move this to vidwrite block
     fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
-
-    # out = VidWriter( savefn = savedir + fn
-    #                 ,fourcc = fourcc
-    #                 ,outshape = frame_size
-    #                 )
-    # -------------------------------------------------------------
-
-    #RECORD VIDEO
     
     t0 = time.time()
     i = 0
@@ -130,37 +114,59 @@ while(not(Globals.gui_cmd_quit)):
             
             if ret:
 
+                if b_logfps:
+                    i += 1
+
                 if b_show:
                     cv2.imshow('frame',frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
+                    #TODO - add destroyWindow for preveiw off
 
                 if b_showsize:
                     print frame.shape
 
                 if Globals.gui_cmd_record:
 
-                    #init vidwriter
-                    if Globals.sw_record:
+                    if Globals.sw_record_start:
 
-                        Globals.sw_record = False
+                        Globals.sw_record_start = False
+
+                        i = 0
+
+                        fn = uniqueFn(  fn_base = "output"
+                                        ,fn_dir = savedir
+                                        ,fn_ext = ext
+                                        )
+
+                        if Globals.gui_unique_fn != fn:
+                            fn = Globals.gui_unique_fn
 
                         out = VidWriter( 
-                                 savefn = savedir + Globals.gui_unique_fn
+                                 savefn = savedir + fn
                                 ,fourcc = fourcc
                                 ,outshape = frame_size
                                 )
-
-                        #TODO - release out when finished
  
-                        #dont write current frame
                         continue
 
-                    #record frame
                     out.write(frame)
 
-                if b_logfps:
-                    i += 1
+                #TODO - add off switch in jumpcut vidwriter
+                if Globals.sw_record_stop:
+
+                    Globals.sw_record_stop = False
+                    
+                    out.release()
+
+                    new_fn = uniqueFn(   fn_base = "output"
+                                        ,fn_dir = savedir
+                                        ,fn_ext = ext
+                                        )
+                    
+                    gui.myGui.set_sv_fn(new_fn)
+                    gui.myGui.get_sv_fn()
+
 
             if (time.time() - t0) > time_to_record:
                 break
@@ -175,7 +181,11 @@ while(not(Globals.gui_cmd_quit)):
 
 
 #Clean up        
-cam.release()
+try:
+    cam.release()
+except:
+    print 'no cam to release'
+
 try:
     out.release()
 except:

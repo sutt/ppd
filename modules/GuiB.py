@@ -23,10 +23,11 @@ class BuildGuiB:
         ''' toggle gui_cmd_record global; reformat record button color '''
         if Globals.gui_cmd_record:
             Globals.gui_cmd_record = False
+            Globals.sw_record_stop = True
             self.record_button.configure(bg = 'gray')
         else:
             Globals.gui_cmd_record = True
-            Globals.sw_record = True
+            Globals.sw_record_start = True
             self.record_button.configure(bg = '#000fff000')
         if self.b_log:
             print 'gui_cmd_record: ', str(Globals.gui_cmd_record)
@@ -34,6 +35,7 @@ class BuildGuiB:
     def get_sv_fn(self):
         ''' unique filename entry box -> global '''
         Globals.gui_unique_fn = str(self.sv_fn.get())
+        #TODO - validate its unqiue in the directory
         if self.b_log:
             print 'setting gui_unique_fn to: ', Globals.gui_unique_fn
 
@@ -115,6 +117,8 @@ if __name__ == "__main__":
     Globals.gui_cmd_quit = False
     Globals.gui_cmd_record = False
     Globals.gui_cmd_reset = False
+    Globals.sw_record_start = False
+    Globals.sw_record_stop = False
     Globals.gui_unique_fn = "------N/A------"
     
     gui = GuiB(b_log=True)
