@@ -1,7 +1,9 @@
 
 8/2
 
-
+>pytest -vv writevid1.py
+>pytest -vv miscutils.py
+>pytest -vv vidwriter.py
 
 
 7/18

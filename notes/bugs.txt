@@ -3,7 +3,11 @@
 8/2
 
 [x] fix writevid1
-[ ] verify tests, list in commands.txt
+[x] verify tests, list in commands.txt
+    [x] writevid1 line 77-78
+    [x] make sure this works from CLI too, not just unit tests
+    [x] fix other problems in tests?
+
 
 
 7/26
