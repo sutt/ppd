@@ -8,19 +8,7 @@ class GuiData:
 
     def __init__(self):
         self.record_on = False
-
-
-
-def cmd_quit():
-    Globals.gui_cmd_quit = True
-
-def cmd_record_sw():
-    if Globals.gui_cmd_record:
-        Globals.gui_cmd_record = False
-    else:
-        Globals.gui_cmd_record = True
-    if b_log:
-        print 'gui_cmd_record: ', str(Globals.gui_cmd_record)
+        self.sv_fn = None
 
 class BuildGuiB:
 
@@ -28,7 +16,11 @@ class BuildGuiB:
         self.record_button = None
         self.b_log = b_log
 
+    def cmd_quit(self):
+        Globals.gui_cmd_quit = True
+
     def cmd_record_sw(self):
+        ''' toggle gui_cmd_record global; reformat record button color '''
         if Globals.gui_cmd_record:
             Globals.gui_cmd_record = False
             self.record_button.configure(bg = 'gray')
@@ -38,25 +30,28 @@ class BuildGuiB:
         if self.b_log:
             print 'gui_cmd_record: ', str(Globals.gui_cmd_record)
         
-    # @staticmethod
-    def cmd_set_unique_fn(self,sv):
-        Globals.gui_unique_fn = str(sv.get())
+    def get_sv_fn(self):
+        ''' unique filename entry box -> global '''
+        Globals.gui_unique_fn = str(self.sv_fn.get())
         if self.b_log:
             print 'setting gui_unique_fn to: ', Globals.gui_unique_fn
 
-    def init_unique_fn(self, fn):
-        print 'in INIT!'
-        print fn
+    def set_sv_fn(self, fn):
+        ''' unqiue filename entry box, set value displayed in gui '''
+        self.sv_fn.set(str(fn))
+        if self.b_log:
+            print 'setting sv_fn to: ', str(fn)
         
 
     def build_gui_b(self, root):
         
         f1 = tk.Frame(root)
         f1.pack(side = tk.TOP)
-        tk.Button(f1
-                ,text = 'quit!'
-                ,command = cmd_quit
-                ).pack()
+        tk.Button(
+             f1
+            ,text = 'quit'
+            ,command = self.cmd_quit
+            ).pack()
         f1a = tk.Frame(root)
         f1a.pack(side = tk.TOP)
 
@@ -70,15 +65,27 @@ class BuildGuiB:
 
         f1a2 = tk.Frame(f1a)
         f1a2.pack(side = tk.TOP)
-
-        tk.Label(f1a2, text="filename:").pack(side=tk.LEFT)
-        sv_tp = tk.StringVar()
-        sv_tp.set(str(Globals.gui_unique_fn))
-        tk.Entry(f1a2,textvariable = sv_tp, width = 6 ).pack(side=tk.LEFT)
-        tk.Button(f1a2
-                 ,text = 'set'
-                 ,command = lambda: self.cmd_set_unique_fn(sv_tp)
-                 ).pack(side=tk.LEFT)
+        
+        tk.Label(
+                f1a2
+                ,text="filename:"
+            ).pack(side=tk.LEFT)
+        
+        self.sv_fn = tk.StringVar()
+        self.set_sv_fn(Globals.gui_unique_fn)
+        
+        self.fn_entry = tk.Entry(
+                f1a2
+                ,textvariable = self.sv_fn
+                ,width = 16
+                )
+        self.fn_entry.pack(side=tk.LEFT)
+        
+        tk.Button(
+                f1a2
+                ,text = 'set'
+                ,command = self.get_sv_fn
+            ).pack(side=tk.LEFT)
 
         return root
 

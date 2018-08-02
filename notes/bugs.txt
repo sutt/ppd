@@ -21,8 +21,9 @@
         [x] change the visual element of button onState
         [?] multiple actions
     [ ] uniqueFn text box
-        [ ] read from view to model
-        [ ] update from model to view
+        [x] read from view to model
+        [x] set width
+        [x] update from model to view
         [ ] when to update/re-run
         [ ] how to handle user entered non-uniqueFn, just overwrite?
 
