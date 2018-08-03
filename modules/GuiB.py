@@ -17,6 +17,7 @@ class BuildGuiB:
         self.record_button = None
         self.dir_entry = None
         self.entry_dir_valid = True
+        self.int_jumpcut = None
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -79,6 +80,12 @@ class BuildGuiB:
         self.sv_dir.set(str(dir_path))
         if self.b_log:
             print 'setting sv_dir to: ', str(dir_path)
+
+    def set_jumpcut_var(self):
+        ''' set global boolean gui_b_jumpcut from radio button '''
+        Globals.gui_b_jumpcut = bool(self.int_jumpcut.get())
+        if self.b_log:
+            print 'setting gui_b_jumpcut to: ', str(Globals.gui_b_jumpcut)
         
 
     def build_gui_b(self, root):
@@ -151,6 +158,32 @@ class BuildGuiB:
                 ,command = lambda: self.get_sv_dir(True)
             ).pack(side=tk.LEFT)
 
+        
+        f1a4 = tk.Frame(root)
+        f1a4.pack(side = tk.TOP)
+
+        tk.Label(f1a4, text="On Stop Record:").pack(side=tk.LEFT)
+
+        self.int_jumpcut = tk.IntVar()
+        self.int_jumpcut.set(0)
+        
+        tk.Radiobutton(
+             f1a4
+            ,text="new file"
+            ,variable=self.int_jumpcut
+            ,value=0
+            ,command=self.set_jumpcut_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             f1a4
+            ,text="jump cut"
+            ,variable=self.int_jumpcut
+            ,value=1
+            ,command=self.set_jumpcut_var
+            ).pack(side=tk.LEFT)
+
+
         return root
 
 class GuiB(threading.Thread):
@@ -182,5 +215,7 @@ if __name__ == "__main__":
     Globals.sw_record_stop = False
     Globals.gui_unique_fn = "------N/A------"
     Globals.gui_dir_path = "/"
+    Globals.sw_gui_dir = False
+    Globals.gui_b_jumpcut = False
     
     gui = GuiB(b_log=True)

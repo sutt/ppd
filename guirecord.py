@@ -51,6 +51,8 @@ Globals.gui_dir_path = "/"
 Globals.sw_record_start = False
 Globals.sw_record_stop = False
 Globals.sw_gui_dir = False
+Globals.gui_b_jumpcut = False
+Globals.b_jumpcut_inprogress = False
 
 try:
     gui = GuiB(b_log=True)
@@ -137,6 +139,17 @@ while(not(Globals.gui_cmd_quit)):
 
                         Globals.sw_record_start = False
 
+                        if Globals.gui_b_jumpcut:
+                            if Globals.b_jumpcut_inprogres:
+                                continue
+
+                        if not(Globals.gui_b_jumpcut):
+                            Globals.b_jumpcut_inprogres = False
+                            try:
+                                out.release()
+                            except:
+                                pass
+
                         i = 0
 
                         fn = uniqueFn(  fn_base = "output"
@@ -152,15 +165,24 @@ while(not(Globals.gui_cmd_quit)):
                                 ,fourcc = fourcc
                                 ,outshape = frame_size
                                 )
+
+                        if Globals.gui_b_jumpcut:
+                            Globals.b_jumpcut_inprogres = True
  
                         continue
 
                     out.write(frame)
 
-                #TODO - add off switch in jumpcut vidwriter
+                
                 if Globals.sw_record_stop:
 
                     Globals.sw_record_stop = False
+
+                    print 'in sw_stop_record'
+                    print Globals.gui_b_jumpcut
+                                  
+                    if Globals.gui_b_jumpcut:
+                        continue
                     
                     out.release()
 
