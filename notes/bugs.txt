@@ -2,14 +2,24 @@
 
 8/3
 
-[ ] directory text input
+[x] directory text input
     [x] set on init
     [x] read on edit
-    [ ] color based validation
+    [x] color based validation
     [x] change the uniqueFn of the directory
+
+    BUGS:
+    hypothesis: can't call from guirecord with gui.myGui.method() -> tk.elem.config()
+                can only call config methods from guiB events
+    [x] verified and fixed
+         
 
 [ ] toggle newFile vs. jumpCut
 
+[ ] see if this can be debbuged via vscode
+
+    
+    
 
 8/2
 

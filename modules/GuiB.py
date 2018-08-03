@@ -13,8 +13,10 @@ class GuiData:
 class BuildGuiB:
 
     def __init__(self, b_log=False):
-        self.record_button = None
         self.b_log = b_log
+        self.record_button = None
+        self.dir_entry = None
+        self.entry_dir_valid = True
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -46,13 +48,31 @@ class BuildGuiB:
             print 'setting sv_fn to: ', str(fn)
 
     def get_sv_dir(self, b_apply_sw=False):
-        ''' directory path as text (relative) -> global '''
+        ''' directory path as text (relative) -> global
+            if called with b_apply_sw:
+             - a validation step to check if directory exists
+             - finally sets a switch to recalc uniqueFn for new directory in guirecord
+         '''
+        _temp = Globals.gui_dir_path                  
         Globals.gui_dir_path = str(self.sv_dir.get())
-        if b_apply_sw:
-            Globals.sw_gui_dir = True
-        #TODO - validate its unqiue in the directory
         if self.b_log:
             print 'setting gui_dir_path to: ', Globals.gui_dir_path
+        if not(b_apply_sw): return
+        
+        #Validation ----
+        try:
+            _dummy = os.listdir(Globals.gui_dir_path) 
+            if not(self.entry_dir_valid):
+                self.dir_entry.configure(bg = 'white')
+                self.entry_dir_valid = True
+            Globals.sw_gui_dir = True                  
+            
+        except:
+            if self.b_log: print 'directory entry validation exception'
+            Globals.gui_dir_path = _temp
+            if self.entry_dir_valid:
+                self.dir_entry.configure(bg = 'red')
+                self.entry_dir_valid = False
 
     def set_sv_dir(self, dir_path):
         ''' directory path entry box, set value displayed in gui '''
@@ -121,6 +141,7 @@ class BuildGuiB:
                 f1a3
                 ,textvariable = self.sv_dir
                 ,width = 20
+                ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
         

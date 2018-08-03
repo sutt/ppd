@@ -176,8 +176,6 @@ while(not(Globals.gui_cmd_quit)):
                     
                     Globals.sw_gui_dir = False
 
-                    gui.myGui.get_sv_dir()
-
                     new_fn = uniqueFn(   fn_base = "output"
                                         ,fn_dir = Globals.gui_dir_path
                                         ,fn_ext = ext
@@ -185,7 +183,6 @@ while(not(Globals.gui_cmd_quit)):
                     
                     gui.myGui.set_sv_fn(new_fn)
                     gui.myGui.get_sv_fn()
-
 
 
             if (time.time() - t0) > time_to_record:
