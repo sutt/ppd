@@ -1,5 +1,16 @@
 #Tasks
 
+8/3
+
+[ ] directory text input
+    [x] set on init
+    [x] read on edit
+    [ ] color based validation
+    [x] change the uniqueFn of the directory
+
+[ ] toggle newFile vs. jumpCut
+
+
 8/2
 
 [x] fix writevid1

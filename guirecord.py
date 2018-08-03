@@ -47,8 +47,10 @@ Globals.gui_cmd_quit = False
 Globals.gui_cmd_record = False
 Globals.gui_cmd_reset = False
 Globals.gui_unique_fn = "------N/A------"
+Globals.gui_dir_path = "/"
 Globals.sw_record_start = False
 Globals.sw_record_stop = False
+Globals.sw_gui_dir = False
 
 try:
     gui = GuiB(b_log=True)
@@ -63,7 +65,7 @@ while(not(Globals.gui_cmd_quit)):
 
     #SET VARS from GUI
 
-    savedir = "data/aug2018/misc/"
+    init_savedir = "data/aug2018/misc/"
     ext = "avi"
     b_codec = False   #True to do manual select popup
     frame_size = (640,480)
@@ -89,10 +91,13 @@ while(not(Globals.gui_cmd_quit)):
 
     if Globals.gui_cmd_reset:
         break
-    
+
+    #set directory to gui ang global
+    gui.myGui.set_sv_dir(init_savedir)
+    gui.myGui.get_sv_dir()
 
     fn = uniqueFn(  fn_base = "output"
-                    ,fn_dir = savedir
+                    ,fn_dir = Globals.gui_dir_path
                     ,fn_ext = ext
                     )
     
@@ -135,7 +140,7 @@ while(not(Globals.gui_cmd_quit)):
                         i = 0
 
                         fn = uniqueFn(  fn_base = "output"
-                                        ,fn_dir = savedir
+                                        ,fn_dir = Globals.gui_dir_path
                                         ,fn_ext = ext
                                         )
 
@@ -143,7 +148,7 @@ while(not(Globals.gui_cmd_quit)):
                             fn = Globals.gui_unique_fn
 
                         out = VidWriter( 
-                                 savefn = savedir + fn
+                                 savefn = Globals.gui_dir_path + fn
                                 ,fourcc = fourcc
                                 ,outshape = frame_size
                                 )
@@ -160,12 +165,27 @@ while(not(Globals.gui_cmd_quit)):
                     out.release()
 
                     new_fn = uniqueFn(   fn_base = "output"
-                                        ,fn_dir = savedir
+                                        ,fn_dir = Globals.gui_dir_path
                                         ,fn_ext = ext
                                         )
                     
                     gui.myGui.set_sv_fn(new_fn)
                     gui.myGui.get_sv_fn()
+
+                if Globals.sw_gui_dir:
+                    
+                    Globals.sw_gui_dir = False
+
+                    gui.myGui.get_sv_dir()
+
+                    new_fn = uniqueFn(   fn_base = "output"
+                                        ,fn_dir = Globals.gui_dir_path
+                                        ,fn_ext = ext
+                                        )
+                    
+                    gui.myGui.set_sv_fn(new_fn)
+                    gui.myGui.get_sv_fn()
+
 
 
             if (time.time() - t0) > time_to_record:
@@ -196,7 +216,9 @@ try:
 except:
     print 'no cv2 windows to destroy'
     
-    
-if b_save:
-    pfn = str(savedir) + fn
-    print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
+try:
+    if b_save:
+        pfn = str(Globals.gui_dir_path) + fn
+        print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
+except:
+    print 'couldnt find most recent saved file.'

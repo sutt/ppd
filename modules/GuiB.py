@@ -44,6 +44,21 @@ class BuildGuiB:
         self.sv_fn.set(str(fn))
         if self.b_log:
             print 'setting sv_fn to: ', str(fn)
+
+    def get_sv_dir(self, b_apply_sw=False):
+        ''' directory path as text (relative) -> global '''
+        Globals.gui_dir_path = str(self.sv_dir.get())
+        if b_apply_sw:
+            Globals.sw_gui_dir = True
+        #TODO - validate its unqiue in the directory
+        if self.b_log:
+            print 'setting gui_dir_path to: ', Globals.gui_dir_path
+
+    def set_sv_dir(self, dir_path):
+        ''' directory path entry box, set value displayed in gui '''
+        self.sv_dir.set(str(dir_path))
+        if self.b_log:
+            print 'setting sv_dir to: ', str(dir_path)
         
 
     def build_gui_b(self, root):
@@ -90,6 +105,31 @@ class BuildGuiB:
                 ,command = self.get_sv_fn
             ).pack(side=tk.LEFT)
 
+        
+        f1a3 = tk.Frame(f1a)
+        f1a3.pack(side = tk.TOP)
+
+        tk.Label(
+                f1a3
+                ,text="dir:"
+            ).pack(side=tk.LEFT)
+
+        self.sv_dir = tk.StringVar()
+        self.set_sv_dir(Globals.gui_dir_path)
+        
+        self.dir_entry = tk.Entry(
+                f1a3
+                ,textvariable = self.sv_dir
+                ,width = 20
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+        
+        tk.Button(
+                f1a3
+                ,text = 'set'
+                ,command = lambda: self.get_sv_dir(True)
+            ).pack(side=tk.LEFT)
+
         return root
 
 class GuiB(threading.Thread):
@@ -120,5 +160,6 @@ if __name__ == "__main__":
     Globals.sw_record_start = False
     Globals.sw_record_stop = False
     Globals.gui_unique_fn = "------N/A------"
+    Globals.gui_dir_path = "/"
     
     gui = GuiB(b_log=True)
