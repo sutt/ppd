@@ -19,6 +19,7 @@ class BuildGuiB:
         self.entry_dir_valid = True
         self.int_jumpcut = None
         self.int_preview_frame = None
+        self.int_frame_size = None
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -93,6 +94,13 @@ class BuildGuiB:
         Globals.sw_preview_frame = True
         if self.b_log:
             print 'setting sw_preview_frame to: ', str(Globals.sw_preview_frame)
+
+    def set_frame_size_var(self):
+        ''' set global boolean gui_b_jumpcut from radio button '''
+        Globals.gui_frame_size_enum = int(self.int_frame_size.get())
+        Globals.sw_camera_reset = True
+        if self.b_log:
+            print 'setting gui_frame_size_enum to: ', str(Globals.gui_frame_size_enum)
         
 
     def build_gui_b(self, root):
@@ -212,6 +220,38 @@ class BuildGuiB:
             ,variable=self.int_preview_frame
             ,value=1
             ,command=self.set_preview_frame_var
+            ).pack(side=tk.LEFT)
+
+        f1a6 = tk.Frame(root)
+        f1a6.pack(side = tk.TOP)
+
+        tk.Label(f1a6, text="Frame Size:").pack(side=tk.LEFT)
+
+        self.int_frame_size = tk.IntVar()
+        self.int_frame_size.set(0)
+        
+        tk.Radiobutton(  
+            f1a6
+            ,text="640"
+            ,variable=self.int_frame_size
+            ,value=0
+            ,command=self.set_frame_size_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a6
+            ,text="1280"
+            ,variable=self.int_frame_size
+            ,value=1
+            ,command=self.set_frame_size_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a6
+            ,text="1920"
+            ,variable=self.int_frame_size
+            ,value=2
+            ,command=self.set_frame_size_var
             ).pack(side=tk.LEFT)
 
 

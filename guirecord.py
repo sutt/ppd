@@ -54,6 +54,8 @@ Globals.sw_gui_dir = False
 Globals.gui_b_jumpcut = False
 Globals.b_jumpcut_inprogress = False
 Globals.sw_preview_frame = False
+Globals.sw_camera_reset = False
+Globals.gui_frame_size_enum = 0
 
 try:
     gui = GuiB(b_log=True)
@@ -65,13 +67,13 @@ except Exception as e:
 
 while(not(Globals.gui_cmd_quit)):
 
+    Globals.sw_camera_reset = False
 
     #SET VARS from GUI
 
     init_savedir = "data/aug2018/misc/"
     ext = "avi"
     b_codec = False   #True to do manual select popup
-    frame_size = (640,480)
     cam_num = 0
     input_fn = None
     time_to_record = 99
@@ -79,18 +81,25 @@ while(not(Globals.gui_cmd_quit)):
     b_show = True
     b_save = True
     b_showsize = False
+    
+
+    if Globals.gui_frame_size_enum == 0:
+        frame_size = (640,480)
+    if Globals.gui_frame_size_enum == 1:
+        frame_size = (1280,720)
+    if Globals.gui_frame_size_enum == 2:
+        frame_size = (1920,1080)        
 
 
     #INIT NEW VIDEO
 
     cam  =  cv2.VideoCapture(cam_num)
 
-    if frame_size != (640,480):
-        try:
-            cam.set(3,frame_size[0])
-            cam.set(4,frame_size[1])
-        except:
-            print 'couldnt set cam with frame_size: ', str(frame_size)
+    try:
+        cam.set(3,frame_size[0])
+        cam.set(4,frame_size[1])
+    except:
+        print 'couldnt set cam with frame_size: ', str(frame_size)
 
     if Globals.gui_cmd_reset:
         break
@@ -223,12 +232,25 @@ while(not(Globals.gui_cmd_quit)):
 
             if Globals.gui_cmd_quit:
                 break
+
+            if Globals.sw_camera_reset:
+                break
         
         except Exception as e:
             print 'excepted during frame read.'
             print e
             break
 
+    #Clean up        
+    try:
+        cam.release()
+    except:
+        print 'no cam to release'
+
+    try:
+        out.release()
+    except:
+        print 'no out to release'
 
 #Clean up        
 try:

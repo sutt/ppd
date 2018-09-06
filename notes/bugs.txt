@@ -3,6 +3,13 @@
 9/6
 
 [x] preview frame on/off
+[x] frame size
+    [ ] frame size on vidwrite
+
+[ ] perf testing module
+    [ ] difference in fps when preview on/off?
+    [ ] difference when putting frame data into holding var instead of out.write
+    
 
 8/11
 
