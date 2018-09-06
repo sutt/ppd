@@ -4,8 +4,12 @@
 
 [x] preview frame on/off
 [x] frame size
-    [ ] frame size on vidwrite
-    [ ] change frame size in display
+    [x] frame size on vidwrite
+    [x] change frame size in display
+
+[ ] cam num
+[ ] read from file cam
+    [ ] with slowdown b/w frames
 
 [ ] perf testing module
     [ ] difference in fps when preview on/off?

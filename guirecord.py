@@ -7,6 +7,7 @@ from miscutils import uniqueFn
 from vidwriter import VidWriter
 import modules.GlobalsB as Globals
 from modules.GuiB import GuiB
+from modules.GraphicsCV import resize_img
 
 
 '''
@@ -71,7 +72,7 @@ while(not(Globals.gui_cmd_quit)):
 
     #SET VARS from GUI
 
-    init_savedir = "data/aug2018/misc/"
+    init_savedir = "data/sept2018/misc/"
     ext = "avi"
     b_codec = False   #True to do manual select popup
     cam_num = 0
@@ -81,6 +82,7 @@ while(not(Globals.gui_cmd_quit)):
     b_show = True
     b_save = True
     b_showsize = False
+    b_resize = False
     
 
     if Globals.gui_frame_size_enum == 0:
@@ -145,9 +147,16 @@ while(not(Globals.gui_cmd_quit)):
                         b_show = True
                 
                 if b_show:
-                    cv2.imshow('frame',frame)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    if b_resize:
+                        img_display = frame.copy()
+                        img_display = resize_img(frame, True)    
+                        cv2.imshow('img_display',img_display)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
+                    else:
+                        cv2.imshow('frame',frame)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
                     
 
                 if b_showsize:
