@@ -12,3 +12,4 @@ def init():
     global sw_preview_frame
     global sw_camera_reset
     global gui_frame_size_enum
+    global gui_cam_num

@@ -20,6 +20,7 @@ class BuildGuiB:
         self.int_jumpcut = None
         self.int_preview_frame = None
         self.int_frame_size = None
+        self.int_cam_num = None
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -101,6 +102,13 @@ class BuildGuiB:
         Globals.sw_camera_reset = True
         if self.b_log:
             print 'setting gui_frame_size_enum to: ', str(Globals.gui_frame_size_enum)
+
+    def set_cam_num_var(self):
+        ''' set global int gui_cam_num from radio button '''
+        Globals.gui_cam_num = int(self.int_cam_num.get())
+        Globals.sw_camera_reset = True
+        if self.b_log:
+            print 'setting gui_cam_num to: ', str(Globals.gui_frame_size_enum)
         
 
     def build_gui_b(self, root):
@@ -252,6 +260,38 @@ class BuildGuiB:
             ,variable=self.int_frame_size
             ,value=2
             ,command=self.set_frame_size_var
+            ).pack(side=tk.LEFT)
+
+        f1a7 = tk.Frame(root)
+        f1a7.pack(side = tk.TOP)
+
+        tk.Label(f1a7, text="Cam num:").pack(side=tk.LEFT)
+
+        self.int_cam_num = tk.IntVar()
+        self.int_cam_num.set(0)
+        
+        tk.Radiobutton(  
+            f1a7
+            ,text="0"
+            ,variable=self.int_cam_num
+            ,value=0
+            ,command=self.set_cam_num_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a7
+            ,text="1"
+            ,variable=self.int_cam_num
+            ,value=1
+            ,command=self.set_cam_num_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a7
+            ,text="2"
+            ,variable=self.int_cam_num
+            ,value=2
+            ,command=self.set_cam_num_var
             ).pack(side=tk.LEFT)
 
 

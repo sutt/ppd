@@ -57,6 +57,7 @@ Globals.b_jumpcut_inprogress = False
 Globals.sw_preview_frame = False
 Globals.sw_camera_reset = False
 Globals.gui_frame_size_enum = 0
+Globals.gui_cam_num = 0
 
 try:
     gui = GuiB(b_log=True)
@@ -95,7 +96,7 @@ while(not(Globals.gui_cmd_quit)):
 
     #INIT NEW VIDEO
 
-    cam  =  cv2.VideoCapture(cam_num)
+    cam  =  cv2.VideoCapture(Globals.gui_cam_num)
 
     try:
         cam.set(3,frame_size[0])
