@@ -18,6 +18,7 @@ class BuildGuiB:
         self.dir_entry = None
         self.entry_dir_valid = True
         self.int_jumpcut = None
+        self.int_preview_frame = None
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -86,6 +87,12 @@ class BuildGuiB:
         Globals.gui_b_jumpcut = bool(self.int_jumpcut.get())
         if self.b_log:
             print 'setting gui_b_jumpcut to: ', str(Globals.gui_b_jumpcut)
+
+    def set_preview_frame_var(self):
+        ''' set sw_preview_frame to True, the radio button value is irrelevant '''
+        Globals.sw_preview_frame = True
+        if self.b_log:
+            print 'setting sw_preview_frame to: ', str(Globals.sw_preview_frame)
         
 
     def build_gui_b(self, root):
@@ -181,6 +188,30 @@ class BuildGuiB:
             ,variable=self.int_jumpcut
             ,value=1
             ,command=self.set_jumpcut_var
+            ).pack(side=tk.LEFT)
+
+        f1a5 = tk.Frame(root)
+        f1a5.pack(side = tk.TOP)
+
+        tk.Label(f1a5, text="Preview Frame:").pack(side=tk.LEFT)
+
+        self.int_preview_frame = tk.IntVar()
+        self.int_preview_frame.set(0)
+        
+        tk.Radiobutton(
+             f1a5
+            ,text="on"
+            ,variable=self.int_preview_frame
+            ,value=0
+            ,command=self.set_preview_frame_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             f1a5
+            ,text="off"
+            ,variable=self.int_preview_frame
+            ,value=1
+            ,command=self.set_preview_frame_var
             ).pack(side=tk.LEFT)
 
 

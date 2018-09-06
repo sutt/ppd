@@ -2,7 +2,7 @@
 
 9/6
 
-[ ] preview frame on/off
+[x] preview frame on/off
 
 8/11
 

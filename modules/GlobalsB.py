@@ -9,4 +9,4 @@ def init():
     global sw_gui_dir
     global gui_b_jumpcut
     global b_jumpcut_inprogress
-    
+    global sw_preview_frame

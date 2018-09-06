@@ -53,6 +53,7 @@ Globals.sw_record_stop = False
 Globals.sw_gui_dir = False
 Globals.gui_b_jumpcut = False
 Globals.b_jumpcut_inprogress = False
+Globals.sw_preview_frame = False
 
 try:
     gui = GuiB(b_log=True)
@@ -124,11 +125,21 @@ while(not(Globals.gui_cmd_quit)):
                 if b_logfps:
                     i += 1
 
+                if Globals.sw_preview_frame:
+                    
+                    Globals.sw_preview_frame = False
+                    
+                    if b_show:
+                        b_show = False
+                        cv2.destroyAllWindows()
+                    else:
+                        b_show = True
+                
                 if b_show:
                     cv2.imshow('frame',frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
-                    #TODO - add destroyWindow for preveiw off
+                    
 
                 if b_showsize:
                     print frame.shape
