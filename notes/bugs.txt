@@ -5,6 +5,7 @@
 [x] preview frame on/off
 [x] frame size
     [ ] frame size on vidwrite
+    [ ] change frame size in display
 
 [ ] perf testing module
     [ ] difference in fps when preview on/off?

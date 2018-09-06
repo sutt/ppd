@@ -8,3 +8,6 @@ Untitled*.ipynb
 *.mp4
 *.avi
 *.h264
+scratch/
+.cache
+.vscode
