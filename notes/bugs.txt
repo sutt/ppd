@@ -1,5 +1,34 @@
 #Tasks
 
+9/6
+
+[ ] preview frame on/off
+
+8/11
+
+[x] refresh knowledge
+[ ] Jumpcut logic
+    BUGS:
+    [ ] first record as jumpcut throws quasi-crashing error
+        notes:
+            but jumpcut does work if you do a newfile first
+            
+    [ ] no way to stop recording jumpcut w/o quitting
+
+        [ ] what if you do new file while record is on?
+        [ ] what if you do new file while record is off?
+
+
+8/6
+
+[ ] Finish jumpcut logic
+
+[ ] Onto...
+    [ ] preview window on/off
+    [ ] continue record ("jump cuts") or new video after each toggle
+    [ ] frame size
+    [ ] cam num
+
 8/3
 
 [x] directory text input

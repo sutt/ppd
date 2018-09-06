@@ -155,7 +155,7 @@ if False:
 if args['writebookvideo']:
     
     output_ext = '.h264'
-    output_vid_fn = uni_file(writepath,'outvid',output_ext)
+    output_vid_fn = uni_file(args["writepath"],'outvid',output_ext)
     output_fps = 30
     output_size = (640,480)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -284,7 +284,7 @@ while(vc.isOpened()):
                     if len(ret_args) > 1:
                         output_vid_fn = str(ret_args[1])
                     else:
-                        output_vid_fn = uni_file(writepath,'outvid',output_ext)
+                        output_vid_fn = uni_file(args["writepath"],'outvid',output_ext)
                     vw.release()
                     vw = cv2.VideoWriter(output_vid_fn,fourcc, output_fps, output_size)
 
