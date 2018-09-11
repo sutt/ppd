@@ -8,7 +8,7 @@ from vidwriter import VidWriter
 import modules.GlobalsB as Globals
 from modules.GuiB import GuiB
 from modules.GraphicsCV import resize_img
-
+from modules.Utils import TimeLog
 
 '''
 
@@ -71,6 +71,9 @@ while(not(Globals.gui_cmd_quit)):
 
     Globals.sw_camera_reset = False
 
+    #TODO - set inert if needed
+    timelog = TimeLog()
+
     #SET VARS from GUI
 
     init_savedir = "data/sept2018/misc/"
@@ -128,9 +131,14 @@ while(not(Globals.gui_cmd_quit)):
             
         try:
             
-            t_frame_i = time.time()
-            
             ret,frame = cam.read()
+
+            #TODO - toggle for b_record; send in info about state 
+            #       of globals to be logged
+            #Globals.gui_cmd_record
+            #Note: this records for even preview frames
+            timelog.log_time()
+            
             
             if ret:
 
@@ -196,6 +204,8 @@ while(not(Globals.gui_cmd_quit)):
                                 ,outshape = frame_size
                                 )
 
+                        timelog.set_output(Globals.gui_dir_path + fn)
+
                         if Globals.gui_b_jumpcut:
                             Globals.b_jumpcut_inprogres = True
  
@@ -215,6 +225,8 @@ while(not(Globals.gui_cmd_quit)):
                         continue
                     
                     out.release()
+
+                    timelog.output_log()
 
                     new_fn = uniqueFn(   fn_base = "output"
                                         ,fn_dir = Globals.gui_dir_path
@@ -251,7 +263,7 @@ while(not(Globals.gui_cmd_quit)):
             print e
             break
 
-    #Clean up        
+    #Exit one cam-setup loop; still in main gui-loop
     try:
         cam.release()
     except:
