@@ -3,6 +3,12 @@
 9/12
 
 [x] b_resize to gui
+[ ] output logfile even without record
+[ ] setup timelog benchmark directory
+[ ] record some vids
+[ ] build unittests
+    [ ] without recording, using existin
+    [ ] new rcordings
 
 9/10
 

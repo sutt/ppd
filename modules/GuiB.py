@@ -94,6 +94,7 @@ class BuildGuiB:
     def set_preview_frame_var(self):
         ''' set sw_preview_frame to True, the radio button value is irrelevant '''
         Globals.sw_preview_frame = True
+        Globals.gui_b_preview_frame = not(bool(self.int_preview_frame.get()))
         if self.b_log:
             print 'setting sw_preview_frame to: ', str(Globals.sw_preview_frame)
 

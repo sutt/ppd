@@ -5,6 +5,9 @@
 
 >python timelog.py --file data/sept2018/misc/output7.txt --skip 10 --hz
 
+>python timelog.py --file output8.txt --filtervar recordOn --filterval False
+>python timelog.py --file output8.txt --filtervar frameSizeEnum --filterval 2
+
 8/2
 
 >python guirecord.py

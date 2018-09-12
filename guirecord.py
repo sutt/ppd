@@ -55,6 +55,7 @@ Globals.sw_gui_dir = False
 Globals.gui_b_jumpcut = False
 Globals.b_jumpcut_inprogress = False
 Globals.sw_preview_frame = False
+Globals.gui_b_preview_frame = True
 Globals.sw_camera_reset = False
 Globals.gui_frame_size_enum = 0
 Globals.gui_cam_num = 0
@@ -134,11 +135,11 @@ while(not(Globals.gui_cmd_quit)):
             
             ret,frame = cam.read()
 
-            #TODO - toggle for b_record; send in info about state 
-            #       of globals to be logged
-            #Globals.gui_cmd_record
-            #Note: this records for even preview frames
-            timelog.log_time()
+            timelog.log_time( 
+                              Globals.gui_cmd_record
+                             ,Globals.gui_b_preview_frame
+                             ,Globals.gui_frame_size_enum
+                            )
             
             if not(ret):
                 print 'ret is False'

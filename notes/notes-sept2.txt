@@ -1,6 +1,32 @@
 timelog:
 
+One file, filtering by recordOn True vs False: no diff
 
+    -----------
+    metric:  time-per-frame
+    file:    output8.txt
+    skip:    1
+    filter   recordOn = True
+    -----------
+    n:       350
+    mean:    0.0333
+    Z +/-  : 0.0331 - 0.0336
+    min:     0.0269   3.3 sd
+    max:     0.0390   2.9 sd
+    sd:      0.0019
+
+    -----------
+    metric:  time-per-frame
+    file:    output8.txt
+    skip:    1
+    filter   recordOn = False
+    -----------
+    n:       188
+    mean:    0.0334
+    Z +/-  : 0.0331 - 0.0336
+    min:     0.0290   2.2 sd
+    max:     0.0370   1.8 sd
+    sd:      0.0020
 
 
 Two separate but same param recordings: within eachother's CI's
