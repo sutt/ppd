@@ -19,6 +19,7 @@ class BuildGuiB:
         self.entry_dir_valid = True
         self.int_jumpcut = None
         self.int_preview_frame = None
+        self.int_resize_preview = None
         self.int_frame_size = None
         self.int_cam_num = None
 
@@ -95,6 +96,12 @@ class BuildGuiB:
         Globals.sw_preview_frame = True
         if self.b_log:
             print 'setting sw_preview_frame to: ', str(Globals.sw_preview_frame)
+
+    def set_resize_preview_var(self):
+        ''' set sw_preview_frame to True, the radio button value is irrelevant '''
+        Globals.gui_b_resize = not(bool(self.int_resize_preview.get()))
+        if self.b_log:
+            print 'setting gui_b_resize to: ', str(Globals.gui_b_resize)
 
     def set_frame_size_var(self):
         ''' set global boolean gui_b_jumpcut from radio button '''
@@ -228,6 +235,30 @@ class BuildGuiB:
             ,variable=self.int_preview_frame
             ,value=1
             ,command=self.set_preview_frame_var
+            ).pack(side=tk.LEFT)
+
+        f1a5b = tk.Frame(root)
+        f1a5b.pack(side = tk.TOP)
+
+        tk.Label(f1a5b, text="Resize Preveiw:").pack(side=tk.LEFT)
+
+        self.int_resize_preview = tk.IntVar()
+        self.int_resize_preview.set(0)
+        
+        tk.Radiobutton(
+             f1a5b
+            ,text="on"
+            ,variable=self.int_resize_preview
+            ,value=0
+            ,command=self.set_resize_preview_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             f1a5b
+            ,text="off"
+            ,variable=self.int_resize_preview
+            ,value=1
+            ,command=self.set_resize_preview_var
             ).pack(side=tk.LEFT)
 
         f1a6 = tk.Frame(root)

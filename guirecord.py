@@ -58,6 +58,7 @@ Globals.sw_preview_frame = False
 Globals.sw_camera_reset = False
 Globals.gui_frame_size_enum = 0
 Globals.gui_cam_num = 0
+Globals.gui_b_resize = True
 
 try:
     gui = GuiB(b_log=True)
@@ -154,7 +155,7 @@ while(not(Globals.gui_cmd_quit)):
                         b_show = True
                 
                 if b_show:
-                    if b_resize:
+                    if Globals.gui_b_resize:
                         img_display = frame.copy()
                         img_display = resize_img(frame, True)    
                         cv2.imshow('img_display',img_display)

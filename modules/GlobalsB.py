@@ -13,3 +13,5 @@ def init():
     global sw_camera_reset
     global gui_frame_size_enum
     global gui_cam_num
+    global gui_b_resize
+    
