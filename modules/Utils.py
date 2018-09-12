@@ -69,14 +69,18 @@ class TimeLog:
     def multi_interpret_log(self):
         pass
     
-    def interpret_log(self, path_fn, skip_frist_n=0):
+    def interpret_log(self, path_fn, skip_frist_n=0, b_hz=False):
         ''' output summary stats from log '''
         
         s_data = self.load_log_file(path_fn)
         data = map(lambda x: float(x), s_data)
         data = data[skip_frist_n:]
+
+        if b_hz:
+            data = map(lambda x: 1/x, data)
         
         head, tail = os.path.split(path_fn)
+        print 'metric:  %s' % ('FPS' if b_hz else 'time-per-frame')
         print 'file:    %s' % tail
         
         print_summary_stats(data)

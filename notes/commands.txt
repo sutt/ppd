@@ -3,6 +3,8 @@
 
 >python timelog.py --file data/sept2018/misc/output7.txt --skip 0
 
+>python timelog.py --file data/sept2018/misc/output7.txt --skip 10 --hz
+
 8/2
 
 >python guirecord.py

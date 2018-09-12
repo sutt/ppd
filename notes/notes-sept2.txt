@@ -1,0 +1,42 @@
+timelog:
+
+
+
+
+Two separate but same param recordings: within eachother's CI's
+
+    metric:  time-per-frame
+    file:    output2.txt
+    n:       310
+    mean:    0.0333
+    Z +/-  : 0.0331 - 0.0335
+    min:     0.0160   8.1 sd
+    max:     0.0420   4.1 sd
+    sd:      0.0021
+
+    metric:  time-per-frame
+    file:    output3.txt
+    n:       264
+    mean:    0.0333
+    Z +/-  : 0.0330 - 0.0336
+    min:     0.0150   8.1 sd
+    max:     0.0390   2.5 sd
+    sd:      0.0023
+
+    metric:  FPS
+    file:    output2.txt
+    n:       310
+    mean:    30.1843
+    Z +/-  : 29.8955 - 30.4731
+    min:     23.8095   2.5 sd
+    max:     62.5000   12.7 sd
+    sd:      2.5424
+
+    metric:  FPS
+    file:    output3.txt
+    n:       264
+    mean:    30.2236
+    Z +/-  : 29.8709 - 30.5762
+    min:     25.6410   1.6 sd
+    max:     66.6667   12.7 sd
+    sd:      2.8649

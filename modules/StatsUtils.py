@@ -20,8 +20,8 @@ def print_summary_stats(data, _places = 4):
     _min_sds = float(_mean - _min) / float(_sd)
     _max_sds = float(_max - _mean) / float(_sd)
 
-    _minus2sd = float(_mean - 2*_sd)
-    _plus2sd = float(_mean + 2*_sd)
+    _minus2sd = float(_mean - (float(2*_sd)/float(_n**.5)))
+    _plus2sd = float(_mean + (float(2*_sd)/float(_n**.5)))
 
     __mean = round(_mean, _places)
     __sd = round(_sd, _places)
@@ -35,7 +35,7 @@ def print_summary_stats(data, _places = 4):
 
     print 'n:       %i'             % _n
     print 'mean:    %.*f'           % (_places, _mean)
-    print '2sd +/-: %.*f - %.*f'    % (_places,_minus2sd, _places, _plus2sd)
+    print 'Z +/-  : %.*f - %.*f'    % (_places,_minus2sd, _places, _plus2sd)
     print 'min:     %.*f   %.*f sd' % (_places, _min, 1, _min_sds)
     print 'max:     %.*f   %.*f sd' % (_places, _max, 1, _max_sds)
     print 'sd:      %.*f'           % (_places, _sd)
