@@ -71,8 +71,6 @@ while(not(Globals.gui_cmd_quit)):
 
     Globals.sw_camera_reset = False
 
-    #TODO - set inert if needed
-    timelog = TimeLog()
 
     #SET VARS from GUI
 
@@ -87,6 +85,10 @@ while(not(Globals.gui_cmd_quit)):
     b_save = True
     b_showsize = False
     b_resize = False
+    b_timelog = True
+
+
+    timelog = TimeLog(inert=not(b_timelog))
     
 
     if Globals.gui_frame_size_enum == 0:
@@ -110,8 +112,7 @@ while(not(Globals.gui_cmd_quit)):
     if Globals.gui_cmd_reset:
         break
 
-    #set directory to gui ang global
-    gui.myGui.set_sv_dir(init_savedir)
+    gui.myGui.set_sv_dir(init_savedir)      #set directory to gui ang global
     gui.myGui.get_sv_dir()
 
     fn = uniqueFn(  fn_base = "output"
@@ -122,11 +123,10 @@ while(not(Globals.gui_cmd_quit)):
     gui.myGui.set_sv_fn(fn)
     gui.myGui.get_sv_fn()
 
-    #TODO - move this to vidwrite block
     fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
     
     t0 = time.time()
-    i = 0
+
     while(cam.isOpened()):
             
         try:
@@ -139,11 +139,9 @@ while(not(Globals.gui_cmd_quit)):
             #Note: this records for even preview frames
             timelog.log_time()
             
-            
-            if ret:
-
-                if b_logfps:
-                    i += 1
+            if not(ret):
+                print 'ret is False'
+            else:
 
                 if Globals.sw_preview_frame:
                     

@@ -4,25 +4,23 @@ import copy
 class TimeLog:
     ''' to track timing '''
     
-    def __init__(self, b_inert=False):
+    def __init__(self, inert=False):
+        
         self.inert=inert
-        self.t0 = None
+        self.t0 = time.time()
         self.b_init = False
         self.log_frame_time = []
         self.path_fn = ""
+
+        self.inert=False
     
     def time_interval(self):
         
-        if (self.b_init):
-            t1 = time.time()
-            t = t1 - self.t0
-            self.t0 = t1
-            return t
+        t1 = time.time()
+        t_interval = t1 - self.t0
+        self.t0 = t1
+        return t_interval
 
-        if not(self.b_init):
-            self.b_init = True
-            self.t0 = time.time()
-            return 0
 
     def log_time(self):
         ''' add element to log_frame_time '''

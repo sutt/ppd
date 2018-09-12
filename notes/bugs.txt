@@ -1,5 +1,28 @@
 #Tasks
 
+9/12
+
+[ ] b_resize to gui
+
+9/10
+
+[ ] Build TimeLog to completion
+    [ ] add attribute of previewing vs recording to TimeLog
+    [ ] Build a analysis util for summary stats
+
+[ ] Do a demo of analysis:
+    [ ] framerate under dif framesize
+    [ ] framerate w/ w/o output
+    [ ] framerate w/ w/o preview window
+    [ ] add to commands.txt
+    [ ] Adding a graphing module
+
+[ ] Build some unittests for TimeLog
+
+[ ] Make a DB module instead output file
+
+
+
 9/6
 
 [x] preview frame on/off
