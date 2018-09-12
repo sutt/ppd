@@ -1,4 +1,8 @@
 
+9/12
+
+>python timelog.py --file data/sept2018/misc/output7.txt --skip 0
+
 8/2
 
 >python guirecord.py

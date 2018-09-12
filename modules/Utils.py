@@ -1,5 +1,7 @@
+import os
 import time
 import copy
+from StatsUtils import print_summary_stats
 
 class TimeLog:
     ''' to track timing '''
@@ -56,8 +58,10 @@ class TimeLog:
         
 
 
-    def load_log_file(self):
-        pass
+    def load_log_file(self, path_fn):
+        with open(path_fn, 'r') as f:
+            lines = f.readlines()
+        return lines
 
     def load_multi_log_file(self):
         pass
@@ -67,11 +71,16 @@ class TimeLog:
     
     def interpret_log(self, path_fn, skip_frist_n=0):
         ''' output summary stats from log '''
-        f = self.load_log_file(path_fn)
-        lines = f.readlines()
-        f.close()
-        data = map(lambda x: float(x), lines)
-        data = data[sk]
+        
+        s_data = self.load_log_file(path_fn)
+        data = map(lambda x: float(x), s_data)
+        data = data[skip_frist_n:]
+        
+        head, tail = os.path.split(path_fn)
+        print 'file:    %s' % tail
+        
+        print_summary_stats(data)
+        
 
 
 

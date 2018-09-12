@@ -2,7 +2,7 @@
 
 9/12
 
-[ ] b_resize to gui
+[x] b_resize to gui
 
 9/10
 
