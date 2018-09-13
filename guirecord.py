@@ -79,20 +79,16 @@ while(not(Globals.gui_cmd_quit)):
     init_savedir = "data/sept2018/misc/"
     ext = "avi"
     b_codec = False   #True to do manual select popup
-    cam_num = 0
-    input_fn = None
     time_to_record = 99
-    b_logfps = False
     b_show = True
-    b_save = True
-    b_showsize = False
-    b_resize = False
-    b_timelog = True
-
-
-    timelog = TimeLog(inert=not(b_timelog))
     
+    b_timelog = True    #if true, output a outputX.txt file in same directory
+    b_log_vars = False  #if true, the .txt has extra cols for global vars
 
+    timelog = TimeLog(inert = not(b_timelog)
+                     ,b_log_vars = b_log_vars
+                     )
+    
     if Globals.gui_frame_size_enum == 0:
         frame_size = (640,480)
     if Globals.gui_frame_size_enum == 1:
@@ -141,9 +137,7 @@ while(not(Globals.gui_cmd_quit)):
                              ,Globals.gui_frame_size_enum
                             )
             
-            if not(ret):
-                print 'ret is False'
-            else:
+            if ret:
 
                 if Globals.sw_preview_frame:
                     
@@ -163,13 +157,10 @@ while(not(Globals.gui_cmd_quit)):
                         if cv2.waitKey(1) & 0xFF == ord('q'):
                             break
                     else:
-                        cv2.imshow('frame',frame)
+                        cv2.imshow('unresized_frame',frame)
                         if cv2.waitKey(1) & 0xFF == ord('q'):
                             break
                     
-
-                if b_showsize:
-                    print frame.shape
 
                 if Globals.gui_cmd_record:
 
@@ -291,8 +282,7 @@ except:
     print 'no cv2 windows to destroy'
     
 try:
-    if b_save:
-        pfn = str(Globals.gui_dir_path) + fn
-        print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
+    pfn = str(Globals.gui_dir_path) + fn
+    print pfn, ": ", str(os.path.getsize(pfn) / (1000)), " kb"
 except:
     print 'couldnt find most recent saved file.'

@@ -1,5 +1,149 @@
 timelog:
 
+Just a good basic example: we're pretty close to 30fps in 
+    this "worst" case high computational load:
+
+    -----------
+    metric:  FPS
+    file:    fs1920_prev_noresize.txt
+    skip:    10
+    filter   previewFrame = True
+    -----------
+    n:       1149
+    mean:    30.3517
+    Z +/-  : 30.1244 - 30.5790
+    min:     16.9492   3.5 sd
+    max:     90.9091   15.7 sd
+    sd:      3.8523
+
+
+A 1920 previewFrame on off with full screen preview: no diff
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_prev_noresize.txt
+    skip:    10
+    filter   previewFrame = True
+    -----------
+    n:       1149
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0336
+    min:     0.0110   6.2 sd
+    max:     0.0590   7.1 sd
+    sd:      0.0036
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_prev_noresize.txt
+    skip:    10
+    filter   previewFrame = False
+    -----------
+    n:       189
+    mean:    0.0333
+    Z +/-  : 0.0325 - 0.0341
+    min:     0.0130   3.6 sd
+    max:     0.0590   4.6 sd
+    sd:      0.0056
+
+
+
+A 1920 preveiwFrame and resize on/off : no diff
+
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_prev_resize.txt
+    skip:    10
+    filter   previewFrame = True
+    -----------
+    n:       1347
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0335
+    min:     0.0220   4.6 sd
+    max:     0.0460   5.2 sd
+    sd:      0.0025
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_prev_noresize.txt
+    skip:    10
+    filter   previewFrame = True
+    -----------
+    n:       1149
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0336
+    min:     0.0110   6.2 sd
+    max:     0.0590   7.1 sd
+    sd:      0.0036
+
+
+Conparing frame size 680 vs 1280 vs 1920: no diff
+
+    -----------
+    metric:  time-per-frame
+    file:    fs680_onoff.txt
+    skip:    10
+    -----------
+    n:       1463
+    mean:    0.0334
+    Z +/-  : 0.0333 - 0.0335
+    min:     0.0239   5.4 sd
+    max:     0.0420   5.0 sd
+    sd:      0.0017
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1280_onoff.txt
+    skip:    10
+    -----------
+    n:       986
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0335
+    min:     0.0200   7.0 sd
+    max:     0.0479   7.6 sd
+    sd:      0.0019
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_onoff.txt
+    skip:    10
+    -----------
+    n:       975
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0335
+    min:     0.0269   2.8 sd
+    max:     0.0390   2.5 sd
+    sd:      0.0023
+
+
+A 1920 size on v off comparison: no diff
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_onoff.txt
+    skip:    10
+    filter   recordOn = True
+    -----------
+    n:       145
+    mean:    0.0334
+    Z +/-  : 0.0330 - 0.0338
+    min:     0.0280   2.2 sd
+    max:     0.0390   2.3 sd
+    sd:      0.0024
+
+    -----------
+    metric:  time-per-frame
+    file:    fs1920_onoff.txt
+    skip:    10
+    filter   recordOn = False
+    -----------
+    n:       820
+    mean:    0.0334
+    Z +/-  : 0.0332 - 0.0335
+    min:     0.0269   2.9 sd
+    max:     0.0390   2.5 sd
+    sd:      0.0022
+
 One file, filtering by recordOn True vs False: no diff
 
     -----------

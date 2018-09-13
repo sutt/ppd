@@ -6,9 +6,10 @@ from StatsUtils import print_summary_stats
 class TimeLog:
     ''' to track timing '''
     
-    def __init__(self, inert=False):
+    def __init__(self, inert=False, b_log_vars=False):
         
         self.inert=inert
+        self.b_log_vars = b_log_vars
         self.t0 = time.time()
         self.b_init = False
         self.log_frame_time = []
@@ -38,7 +39,7 @@ class TimeLog:
         
         self.log_frame_time.append(self.time_interval())
         
-        if len(schema_vars) > 0:
+        if len(schema_vars) > 0 and self.b_log_vars:
             self.log_schema_vars.append(schema_vars)
 
     def set_output(self, path_fn):
@@ -62,7 +63,8 @@ class TimeLog:
         output = copy.copy(self.log_frame_time[1:])
         output = [str(x)[:6] for x in output]
         
-        if (self.log_schema_vars) > 0:
+        if len(self.log_schema_vars) > 0:
+            
             schema_vars = copy.copy(self.log_schema_vars)
             schema_vars = map(lambda tup: ",".join(map(lambda elem: str(elem)
                                                         , tup)

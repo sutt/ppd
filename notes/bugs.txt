@@ -1,31 +1,64 @@
 #Tasks
 
+9/13
+
+[ ] Get an ffmpeg script to convert the vids to correct time
+
+[ ] Changes to adapt_thresh:
+    [ ] allow it to play file-vids
+    [ ] do agenda with file-vids
+    [ ] do agenda manually with dragging ROI, mousing, etc..
+
+[ ] Get some videos!
+    [ ] of long distance range
+    [ ] build a notes/schema of vid creates
+    [ ] cut the videos to particular images
+
+[ ] Cut the tracking algo out of iter_thresh
+
+[ ] Build a batch processing for all the images
+
+Ideas:
+
+    git-commit  algo-main       y-0     y-1     truth-y0    err-0-y0  time-perframe
+
+    current     long-track-1    99,107  23      100,100     29.9        0.0345
+    current     focus-track-2   98,107  19      100,100     9.6         0.651
+    09ba        long-track-1
+    876c
+
+    y-0 is center, y-0 is radius in a particular picture
+    truth-y0 is established by hand - need a contour not a blob here
+
+    record for each git commit, this will track all changes made in other utils as well
+    
+
 9/12
 
 [x] b_resize to gui
-[ ] output logfile even without record
-[ ] setup timelog benchmark directory
-[ ] record some vids
+[~] output logfile even without record
+[x] setup timelog benchmark directory
+[x] record some vids
 [ ] build unittests
     [ ] without recording, using existin
     [ ] new rcordings
 
 9/10
 
-[ ] Build TimeLog to completion
-    [ ] add attribute of previewing vs recording to TimeLog
-    [ ] Build a analysis util for summary stats
+[x] Build TimeLog to completion
+    [x] add attribute of previewing vs recording to TimeLog
+    [x] Build a analysis util for summary stats
 
-[ ] Do a demo of analysis:
-    [ ] framerate under dif framesize
-    [ ] framerate w/ w/o output
-    [ ] framerate w/ w/o preview window
-    [ ] add to commands.txt
-    [ ] Adding a graphing module
+[x] Do a demo of analysis:
+    [x] framerate under dif framesize
+    [x] framerate w/ w/o output
+    [x] framerate w/ w/o preview window
+    [x] add to commands.txt
+    [~] Adding a graphing module
 
-[ ] Build some unittests for TimeLog
+[~] Build some unittests for TimeLog
 
-[ ] Make a DB module instead output file
+[~] Make a DB module instead output file
 
 
 
