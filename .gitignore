@@ -11,3 +11,4 @@ Untitled*.ipynb
 scratch/
 .cache
 .vscode
+.ipynb_checkpoints/
