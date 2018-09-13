@@ -47,3 +47,20 @@ But one thing to notice is that a compressed video frame is smaller and thus les
             [ ] how to get the vid's enconding from ffmpeg?
 
 
+9/12
+
+
+Idea for how to track model perf:
+
+    git-commit  algo-main       y-0     y-1     truth-y0    err-0-y0  time-perframe
+
+    current     long-track-1    99,107  23      100,100     29.9        0.0345
+    current     focus-track-2   98,107  19      100,100     9.6         0.651
+    09ba        long-track-1
+    876c
+
+    y-0 is center, y-0 is radius in a particular picture
+    truth-y0 is established by hand - need a contour not a blob here
+
+    record for each git commit, this will track all changes made in other utils as well
+    

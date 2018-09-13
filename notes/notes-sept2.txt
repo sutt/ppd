@@ -1,5 +1,38 @@
 timelog:
 
+Here's b_hack_writevid in action: can only 
+    get 241 frames before breaking - > 7secs
+
+    @1920
+    ----------
+    metric:  time-per-frame
+    file:    output35.txt
+    skip:    1
+    filter   recordOn = True
+    -----------
+    n:       241
+    mean:    0.0335
+    Z +/-  : 0.0332 - 0.0339
+    min:     0.0249   3.2 sd
+    max:     0.0420   3.2 sd
+    sd:      0.0027
+
+Here's early positive results from b_hack_writevid:
+
+    @680 with b_hack_writevid=True
+    -----------
+    metric:  time-per-frame
+    file:    output28.txt
+    skip:    1
+    filter   recordOn = True
+    -----------
+    n:       348
+    mean:    0.0334
+    Z +/-  : 0.0331 - 0.0337
+    min:     0.0169   5.7 sd
+    max:     0.0529   6.8 sd
+    sd:      0.0029
+
     
 More evidence that 1920 has problems when recordOn=True, so slowed by vidwriter
     note: 1280 has no problems

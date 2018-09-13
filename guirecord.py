@@ -81,9 +81,12 @@ while(not(Globals.gui_cmd_quit)):
     b_codec = False   #True to do manual select popup
     time_to_record = 99
     b_show = True
+
+    b_hack_writevid = True
+    list_frames = []
     
     b_timelog = True    #if true, output a outputX.txt file in same directory
-    b_log_vars = False  #if true, the .txt has extra cols for global vars
+    b_log_vars = True  #if true, the .txt has extra cols for global vars
 
     timelog = TimeLog(inert = not(b_timelog)
                      ,b_log_vars = b_log_vars
@@ -166,6 +169,9 @@ while(not(Globals.gui_cmd_quit)):
 
                     if Globals.sw_record_start:
 
+                        if b_hack_writevid:
+                            list_frames = []
+
                         Globals.sw_record_start = False
 
                         if Globals.gui_b_jumpcut:
@@ -201,8 +207,11 @@ while(not(Globals.gui_cmd_quit)):
                             Globals.b_jumpcut_inprogres = True
  
                         continue
-
-                    out.write(frame)
+                    
+                    if b_hack_writevid:
+                        list_frames.append(frame.copy())
+                    else:
+                        out.write(frame)
 
                 
                 if Globals.sw_record_stop:
@@ -215,6 +224,11 @@ while(not(Globals.gui_cmd_quit)):
                     if Globals.gui_b_jumpcut:
                         continue
                     
+                    if b_hack_writevid:
+                        for _frame in list_frames:
+                            out.write(_frame)
+                        list_frames = None
+
                     out.release()
 
                     timelog.output_log()
@@ -240,6 +254,13 @@ while(not(Globals.gui_cmd_quit)):
                     gui.myGui.get_sv_fn()
 
 
+            if b_hack_writevid:
+
+                if sys.getsizeof(frame)* len(list_frames) > 1.5 * (10**9):    
+                    print 'breaking... to reset memory'    #1,530,332,544
+                    Globals.sw_record_stop = True
+
+            
             if (time.time() - t0) > time_to_record:
                 break
 

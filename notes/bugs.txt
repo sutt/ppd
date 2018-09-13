@@ -2,6 +2,20 @@
 
 9/13
 
+[ ] need a way to know when recordOn starts in 1-col frame-timing-logs
+    [ ] add detailed vs simple timelog to gui
+
+[ ] going to need a buffer way to record at 1920
+    [x] or just hack it with a list of frames
+        [ ] add hack to gui
+        [ ] add mem-break to gui (?) rolling create files
+        [ ] add compression selection to gui
+
+[ ] Add noncompression module
+    [ ] find a noloss codec
+    [ ] or write the frames as png's
+    [ ] test this in ipython notebook
+
 [ ] Get an ffmpeg script to convert the vids to correct time
 
     C:...Downloads\ffmpeg-20171209-f20c8f6-win64-static\bin>ffmpeg -f h264 -i ../../60secondvid.h264  ../../60test.mp4
@@ -22,20 +36,6 @@
 
 [ ] get cv2 intellisense in vscode
 
-Ideas:
-
-    git-commit  algo-main       y-0     y-1     truth-y0    err-0-y0  time-perframe
-
-    current     long-track-1    99,107  23      100,100     29.9        0.0345
-    current     focus-track-2   98,107  19      100,100     9.6         0.651
-    09ba        long-track-1
-    876c
-
-    y-0 is center, y-0 is radius in a particular picture
-    truth-y0 is established by hand - need a contour not a blob here
-
-    record for each git commit, this will track all changes made in other utils as well
-    
 
 9/12
 
