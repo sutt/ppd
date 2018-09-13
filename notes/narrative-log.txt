@@ -1,0 +1,49 @@
+
+
+9/13
+
+guirecord.py is pretty well positioned for it's use. As of yesterday we established frame rate is constant across different different gui options and framesizes. Also record does not delay framerate on laptop cam. (Still to try: logitech and picam)
+    
+    To remember:
+    - use timelog.py to check summary stats on fps data
+    - use b_timelog, b_log_vars in guirecord to affect logging behavior
+
+    To do:
+    [ ] apply guirecord to logitech and picam (both as streaming and local)
+
+But one thing to notice is that a compressed video frame is smaller and thus less detailed than uncompressed frame. But we do live processing on (in memory) uncompressed frames. So, the live tracking algo could differ in performance from the saved version. We need a way to save uncompressed frames and make them a video.
+
+    To do:
+    [x] check that a compressed frame is different than uncompressed
+    [x] how to check the size of each in 
+    [x] how to save in opencv
+    [ ] or do cv2.imsave() of each frame; use ffmpeg to make vid
+
+
+    Notes:
+    b_codec = True can allow a pop-up where you select 
+    
+    @680
+        72  Mb 2sec uncompressed     - output12
+        0.5 Mb 2sec h264-compressed  - output11
+        but, no slowdown in framerate
+
+    @1920
+        400 Mb 2 sec uncompressed     - output13
+          7 Mb 2 sec h264-compressed  - output14
+        and yes, definetly down possibly 40% in framerate
+
+
+    Get uncompressed video:
+    
+        https://stackoverflow.com/questions/15728939/lossless-compression-for-video-in-opencv
+
+        https://docs.opencv.org/trunk/dd/d9e/classcv_1_1VideoWriter.html#ad59c61d8881ba2b2da22cff5487465b5
+        
+        http://answers.opencv.org/question/3410/saving-video-losslessly-rgb/
+    
+        Questions:
+            [ ] does my opencv use "system ffmpeg" or only the ffmpeg.dll on the path in rootdir; and does this matter?
+            [ ] how to get the vid's enconding from ffmpeg?
+
+

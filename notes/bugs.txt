@@ -4,6 +4,8 @@
 
 [ ] Get an ffmpeg script to convert the vids to correct time
 
+    C:...Downloads\ffmpeg-20171209-f20c8f6-win64-static\bin>ffmpeg -f h264 -i ../../60secondvid.h264  ../../60test.mp4
+
 [ ] Changes to adapt_thresh:
     [ ] allow it to play file-vids
     [ ] do agenda with file-vids
@@ -17,6 +19,8 @@
 [ ] Cut the tracking algo out of iter_thresh
 
 [ ] Build a batch processing for all the images
+
+[ ] get cv2 intellisense in vscode
 
 Ideas:
 
