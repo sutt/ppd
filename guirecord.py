@@ -147,6 +147,8 @@ while(not(Globals.gui_cmd_quit)):
             
         try:
             
+            timelog.log_start()
+
             ret,frame = cam.read()
 
             timelog.log_time( 

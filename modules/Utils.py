@@ -10,27 +10,25 @@ class TimeLog:
         
         self.inert=inert
         self.b_log_vars = b_log_vars
+        self.b_log_start = True
+        self.b_sleep_schedule = False
+        self.sleep_val = 0.004
         self.t0 = time.time()
+        self.start_t1 = time.time()
         self.b_init = False
         self.found_first_frame = False
         self.log_frame_time = []
+        self.log_start_time = []    #as diff b/w t1 and start_t1
         self.log_schema_vars = []
         self.path_fn = ""
         
         self.log_schema = [
             "data"
+            ,"dataStart"
             ,"recordOn"
             ,"previewFrame"
             ,"frameSizeEnum"
         ]
-
-    
-    def time_interval(self):
-        
-        t1 = time.time()
-        t_interval = t1 - self.t0
-        self.t0 = t1
-        return t_interval
 
 
     def log_time(self, *schema_vars):
@@ -38,7 +36,12 @@ class TimeLog:
         
         if self.inert: return
         
-        self.log_frame_time.append(self.time_interval())
+        t1 = time.time()
+        self.log_frame_time.append(t1 - self.t0)
+        self.t0 = t1
+
+        if self.b_log_start:
+            self.log_start_time.append(t1 - self.start_t1)
         
         if not(self.b_log_vars):
             if schema_vars[0] == True and not(self.found_first_frame):
@@ -48,6 +51,20 @@ class TimeLog:
         if len(schema_vars) > 0 and self.b_log_vars:
             self.log_schema_vars.append(schema_vars)
 
+        if self.b_sleep_schedule:
+            self.sleep_val *= 1.01
+            time.sleep(self.sleep_val)
+
+    
+    def log_start(self):
+        ''' log here before frame-read: at t1 as t0 was previous'''
+        
+        if self.inert: return
+        if not(self.b_log_start): return
+
+        self.start_t1 = time.time()
+
+    
     def set_output(self, path_fn):
         ''' set path_fn by changing x/x/fn.avi to x/x/fn.txt '''
         
@@ -56,7 +73,7 @@ class TimeLog:
         base = path_fn.split(".")[0]
         base += ".txt"
         self.path_fn = base
-    
+
 
     def output_log(self, path_fn = ""):
         ''' write out log_frame_time to a file '''
@@ -72,6 +89,10 @@ class TimeLog:
         output = copy.copy(self.log_frame_time[frame_ind:])
         output = [str(x)[:6] for x in output]
 
+        if self.b_log_start:
+            tmp = copy.copy(self.log_start_time[frame_ind:])
+            tmp = [str(x)[:6] for x in tmp]
+            output = [a + "," + b for a,b in zip(output, tmp)]
         
         if len(self.log_schema_vars) > 0:
             
@@ -89,6 +110,7 @@ class TimeLog:
             f.writelines(output)
 
         self.log_frame_time = []
+        self.log_start_time = []
         self.log_schema_vars = []
 
         
@@ -141,6 +163,7 @@ class TimeLog:
                         ,b_hz=False
                         ,filter_schema_var=""
                         ,filter_schema_val=None
+                        ,b_start_time=False
                         ):
         ''' output summary stats from log '''
         
@@ -174,6 +197,9 @@ class TimeLog:
         print '-----------'
         
         print_summary_stats(data)
+
+        if b_start_time:
+            pass
         
 
 
