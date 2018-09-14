@@ -77,6 +77,10 @@ class TimeLog:
 
         with open(path_fn, 'w') as f:
             f.writelines(output)
+
+        self.log_frame_time = []
+        self.log_schema_vars = []
+        
         
     def load_log_file(self, path_fn):
         ''' load file, return data as 1-string per line'''

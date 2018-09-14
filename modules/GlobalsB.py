@@ -15,3 +15,7 @@ def init():
     global gui_frame_size_enum
     global gui_cam_num
     global gui_b_resize
+    global gui_codec_enum
+    global gui_b_buffer
+    global gui_log_enum
+    

@@ -22,6 +22,9 @@ class BuildGuiB:
         self.int_resize_preview = None
         self.int_frame_size = None
         self.int_cam_num = None
+        self.int_codec_enum = None
+        self.int_buffer = None
+        self.int_log_enum = None
 
     def cmd_quit(self):
         Globals.gui_cmd_quit = True
@@ -117,6 +120,19 @@ class BuildGuiB:
         Globals.sw_camera_reset = True
         if self.b_log:
             print 'setting gui_cam_num to: ', str(Globals.gui_frame_size_enum)
+
+    def set_codec_enum_var(self):
+        Globals.gui_codec_enum = int(self.int_codec_enum.get())
+        Globals.sw_camera_reset = True
+
+    def set_buffer_var(self):
+        Globals.gui_b_buffer = bool(int(self.int_buffer.get()))
+        Globals.sw_camera_reset = True
+
+    def set_log_enum_var(self):
+        Globals.gui_log_enum = int(self.int_log_enum.get())
+        Globals.sw_camera_reset = True
+        
         
 
     def build_gui_b(self, root):
@@ -324,6 +340,97 @@ class BuildGuiB:
             ,variable=self.int_cam_num
             ,value=2
             ,command=self.set_cam_num_var
+            ).pack(side=tk.LEFT)
+
+        
+        f1a8 = tk.Frame(root)
+        f1a8.pack(side = tk.TOP)
+        
+        tk.Label(f1a8, text="Codec:").pack(side=tk.LEFT)
+
+        self.int_codec_enum = tk.IntVar()
+        self.int_codec_enum.set(0)
+        
+        tk.Radiobutton(  
+            f1a8
+            ,text="h264"
+            ,variable=self.int_codec_enum
+            ,value=0
+            ,command=self.set_codec_enum_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a8
+            ,text="prompt"
+            ,variable=self.int_codec_enum
+            ,value=1
+            ,command=self.set_codec_enum_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a8
+            ,text="n/a"
+            ,variable=self.int_codec_enum
+            ,value=2
+            ,command=self.set_codec_enum_var
+            ).pack(side=tk.LEFT)
+
+        
+        f1a9 = tk.Frame(root)
+        f1a9.pack(side = tk.TOP)
+        
+        tk.Label(f1a9, text="Save Buffer:").pack(side=tk.LEFT)
+
+        self.int_buffer = tk.IntVar()
+        self.int_buffer.set(0)
+        
+        tk.Radiobutton(  
+            f1a9
+            ,text="off"
+            ,variable=self.int_buffer
+            ,value=0
+            ,command=self.set_buffer_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a9
+            ,text="on"
+            ,variable=self.int_buffer
+            ,value=1
+            ,command=self.set_buffer_var
+            ).pack(side=tk.LEFT)
+
+        
+        f1a10 = tk.Frame(root)
+        f1a10.pack(side = tk.TOP)
+        
+        tk.Label(f1a10, text="Log Type:").pack(side=tk.LEFT)
+
+        self.int_log_enum = tk.IntVar()
+        self.int_log_enum.set(0)
+        
+        tk.Radiobutton(  
+            f1a10
+            ,text="simple"
+            ,variable=self.int_log_enum
+            ,value=0
+            ,command=self.set_log_enum_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a10
+            ,text="detailed"
+            ,variable=self.int_log_enum
+            ,value=1
+            ,command=self.set_log_enum_var
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(  
+            f1a10
+            ,text="none"
+            ,variable=self.int_log_enum
+            ,value=2
+            ,command=self.set_log_enum_var
             ).pack(side=tk.LEFT)
 
 

@@ -60,6 +60,10 @@ Globals.sw_camera_reset = False
 Globals.gui_frame_size_enum = 0
 Globals.gui_cam_num = 0
 Globals.gui_b_resize = True
+Globals.gui_codec_enum = 0
+Globals.gui_b_buffer = False
+Globals.gui_log_enum = 0
+
 
 try:
     gui = GuiB(b_log=True)
@@ -73,20 +77,29 @@ while(not(Globals.gui_cmd_quit)):
 
     Globals.sw_camera_reset = False
 
-
-    #SET VARS from GUI
-
+    
     init_savedir = "data/sept2018/misc/"
     ext = "avi"
-    b_codec = False   #True to do manual select popup
     time_to_record = 99
     b_show = True
-
-    b_hack_writevid = True
+    reset_cntr_exit = 10
     list_frames = []
+    reset_cntr = 0
     
-    b_timelog = True    #if true, output a outputX.txt file in same directory
-    b_log_vars = True  #if true, the .txt has extra cols for global vars
+
+    
+    if Globals.gui_log_enum == 0:
+        #simple
+        b_timelog = True    
+        b_log_vars = False  
+    if Globals.gui_log_enum == 1:
+        #detailed
+        b_timelog = True   
+        b_log_vars = True
+    if Globals.gui_log_enum == 2:
+        #none
+        b_timelog = False   
+        b_log_vars = False
 
     timelog = TimeLog(inert = not(b_timelog)
                      ,b_log_vars = b_log_vars
@@ -99,8 +112,11 @@ while(not(Globals.gui_cmd_quit)):
     if Globals.gui_frame_size_enum == 2:
         frame_size = (1920,1080)        
 
+    if Globals.gui_codec_enum == 0:
+        fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
+    if Globals.gui_codec_enum == 1:
+        fourcc = -1   
 
-    #INIT NEW VIDEO
 
     cam  =  cv2.VideoCapture(Globals.gui_cam_num)
 
@@ -110,8 +126,6 @@ while(not(Globals.gui_cmd_quit)):
     except:
         print 'couldnt set cam with frame_size: ', str(frame_size)
 
-    if Globals.gui_cmd_reset:
-        break
 
     gui.myGui.set_sv_dir(init_savedir)      #set directory to gui ang global
     gui.myGui.get_sv_dir()
@@ -123,10 +137,9 @@ while(not(Globals.gui_cmd_quit)):
     
     gui.myGui.set_sv_fn(fn)
     gui.myGui.get_sv_fn()
-
-    fourcc = -1 if b_codec else cv2.VideoWriter_fourcc("X","2","6","4") 
     
     t0 = time.time()
+    reset_cntr += 1
 
     while(cam.isOpened()):
             
@@ -169,9 +182,6 @@ while(not(Globals.gui_cmd_quit)):
 
                     if Globals.sw_record_start:
 
-                        if b_hack_writevid:
-                            list_frames = []
-
                         Globals.sw_record_start = False
 
                         if Globals.gui_b_jumpcut:
@@ -208,7 +218,7 @@ while(not(Globals.gui_cmd_quit)):
  
                         continue
                     
-                    if b_hack_writevid:
+                    if Globals.gui_b_buffer:
                         list_frames.append(frame.copy())
                     else:
                         out.write(frame)
@@ -224,10 +234,10 @@ while(not(Globals.gui_cmd_quit)):
                     if Globals.gui_b_jumpcut:
                         continue
                     
-                    if b_hack_writevid:
+                    if Globals.gui_b_buffer:
                         for _frame in list_frames:
                             out.write(_frame)
-                        list_frames = None
+                        list_frames = []
 
                     out.release()
 
@@ -254,11 +264,13 @@ while(not(Globals.gui_cmd_quit)):
                     gui.myGui.get_sv_fn()
 
 
-            if b_hack_writevid:
+            if Globals.gui_b_buffer:
 
                 if sys.getsizeof(frame)* len(list_frames) > 1.5 * (10**9):    
-                    print 'breaking... to reset memory'    #1,530,332,544
                     Globals.sw_record_stop = True
+
+                if reset_cntr > reset_cntr_exit:
+                    break
 
             
             if (time.time() - t0) > time_to_record:
