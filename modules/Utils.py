@@ -12,6 +12,7 @@ class TimeLog:
         self.b_log_vars = b_log_vars
         self.t0 = time.time()
         self.b_init = False
+        self.found_first_frame = False
         self.log_frame_time = []
         self.log_schema_vars = []
         self.path_fn = ""
@@ -39,6 +40,11 @@ class TimeLog:
         
         self.log_frame_time.append(self.time_interval())
         
+        if not(self.b_log_vars):
+            if schema_vars[0] == True and not(self.found_first_frame):
+                self.first_record_frame = len(self.log_frame_time)
+                self.found_first_frame = True
+        
         if len(schema_vars) > 0 and self.b_log_vars:
             self.log_schema_vars.append(schema_vars)
 
@@ -60,8 +66,12 @@ class TimeLog:
         if path_fn == "":
             path_fn = self.path_fn
         
-        output = copy.copy(self.log_frame_time[1:])
+        #first frame is skip on sw_record_on in guirecord
+        frame_ind = 1 if self.b_log_vars else self.first_record_frame + 1  
+        
+        output = copy.copy(self.log_frame_time[frame_ind:])
         output = [str(x)[:6] for x in output]
+
         
         if len(self.log_schema_vars) > 0:
             
@@ -80,7 +90,7 @@ class TimeLog:
 
         self.log_frame_time = []
         self.log_schema_vars = []
-        
+
         
     def load_log_file(self, path_fn):
         ''' load file, return data as 1-string per line'''
