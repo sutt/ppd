@@ -85,6 +85,7 @@ while(not(Globals.gui_cmd_quit)):
     reset_cntr_exit = 10
     list_frames = []
     reset_cntr = 0
+    sw_outofmem_break = False
     
 
     
@@ -116,7 +117,8 @@ while(not(Globals.gui_cmd_quit)):
         fourcc = cv2.VideoWriter_fourcc("X","2","6","4")
     if Globals.gui_codec_enum == 1:
         fourcc = -1   
-
+    if Globals.gui_codec_enum == 2:
+        fourcc = 0   
 
     cam  =  cv2.VideoCapture(Globals.gui_cam_num)
 
@@ -227,21 +229,27 @@ while(not(Globals.gui_cmd_quit)):
                 if Globals.sw_record_stop:
 
                     Globals.sw_record_stop = False
-
-                    print 'in sw_stop_record'
-                    print Globals.gui_b_jumpcut
                                   
                     if Globals.gui_b_jumpcut:
                         continue
                     
+                    timelog.output_log()
+
                     if Globals.gui_b_buffer:
                         for _frame in list_frames:
                             out.write(_frame)
                         list_frames = []
 
-                    out.release()
+                        if sw_outofmem_break:
+                            #you broke from outof meme: continue writing another file
+                            sw_outofmem_break = False
+                            Globals.sw_record_start = True
+                        else:
+                            #you broke my hitting record button: pause on gui and dont save
+                            gui.myGui.cmd_record_sw()
+                            Globals.gui_cmd_record = False
 
-                    timelog.output_log()
+                    out.release()
 
                     new_fn = uniqueFn(   fn_base = "output"
                                         ,fn_dir = Globals.gui_dir_path
@@ -268,6 +276,7 @@ while(not(Globals.gui_cmd_quit)):
 
                 if sys.getsizeof(frame)* len(list_frames) > 1.5 * (10**9):    
                     Globals.sw_record_stop = True
+                    sw_outofmem_break = True
 
                 if reset_cntr > reset_cntr_exit:
                     break

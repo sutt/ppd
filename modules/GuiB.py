@@ -369,7 +369,7 @@ class BuildGuiB:
 
         tk.Radiobutton(  
             f1a8
-            ,text="n/a"
+            ,text="lossless"
             ,variable=self.int_codec_enum
             ,value=2
             ,command=self.set_codec_enum_var

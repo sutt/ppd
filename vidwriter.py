@@ -50,6 +50,9 @@ def VidWriter(savefn
     else:
         _outfps = outfps
 
+    if fourcc == 0:
+        _outfps = 0     #lossless
+
     if outshape is None:
         _outshape = (640,480)
     else:
@@ -130,6 +133,12 @@ def test_vidwriter_basic_1():
     for i in range(NUM_IMGS):
         vw.write(input_imgs[i])
     vw.release()
+
+    fn = output_staging_dir + "testlossless"
+    vw = VidWriter(fn, ext="avi", fourcc = 0 )
+    for i in range(NUM_IMGS):
+        vw.write(input_imgs[i])
+    vw.release()
     
     
     #Verify
@@ -152,6 +161,8 @@ def test_vidwriter_basic_1():
     fn = output_staging_dir + "testext.h264"
     assert os.path.getsize(fn) > 0
     fn = output_staging_dir + "testext.2.avi"
+    assert os.path.getsize(fn) > 0
+    fn = output_staging_dir + "testlossless.avi"
     assert os.path.getsize(fn) > 0
 
 def test_videowriter_dif_sizes():
