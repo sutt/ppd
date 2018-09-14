@@ -5,16 +5,16 @@
 [x] need a way to know when recordOn starts in 1-col frame-timing-logs
     [x] add detailed vs simple timelog to gui
 
-[ ] going to need a buffer way to record at 1920
+[x] going to need a buffer way to record at 1920
     [x] or just hack it with a list of frames
         [x] add hack to gui
         [x] add mem-break to gui (?) rolling create files
         [x] add compression selection to gui
 
-[ ] Add noncompression module
-    [ ] find a noloss codec
-    [ ] or write the frames as png's
-    [ ] test this in ipython notebook
+[x] Add noncompression module
+    [x] find a noloss codec
+    [~] or write the frames as png's
+    [x] test this in ipython notebook
 
 [ ] Get an ffmpeg script to convert the vids to correct time
 

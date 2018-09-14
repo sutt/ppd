@@ -8,7 +8,7 @@ Found issues with slower than 30 FPS when 1920 and recordOn = True. Multiple opt
                   detailed log (multi col) outputs frames before
 
     To do:
-    [ ] add no-loss option to gui
+    [x] add no-loss option to gui
 
 
     Notes:
@@ -69,10 +69,18 @@ But one thing to notice is that a compressed video frame is smaller and thus les
         https://docs.opencv.org/trunk/dd/d9e/classcv_1_1VideoWriter.html#ad59c61d8881ba2b2da22cff5487465b5
         
         http://answers.opencv.org/question/3410/saving-video-losslessly-rgb/
+
+        This is the best answer:
+        http://answers.opencv.org/question/100967/codecs-list/
+            codec=0, fps=0 on vidwriter -> lossless
     
         Questions:
             [ ] does my opencv use "system ffmpeg" or only the ffmpeg.dll on the path in rootdir; and does this matter?
             [ ] how to get the vid's enconding from ffmpeg?
+            [ ] Can it be watched though?
+
+        Notes: good discussion how to use ffmpeg to make moveis from photos
+        https://stackoverflow.com/questions/24961127/how-to-create-a-video-from-images-with-ffmpeg
 
 
 9/12
