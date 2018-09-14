@@ -1,3 +1,31 @@
+9/14
+
+Found issues with slower than 30 FPS when 1920 and recordOn = True. Multiple options have been added to gui to deal with this:
+    codec       - prompt allows
+    buffer      - on save frames to memory and only writes to disk 
+                  at end-of-record / out of memory
+    log type -   simple log (1 col of framerate data) only outputs saved frames data;
+                  detailed log (multi col) outputs frames before
+
+    To do:
+    [ ] add no-loss option to gui
+
+
+    Notes:
+     - can use detailed log, with timelog.py --filtervar recordOn --filterval True
+       to debug slow fps
+    - if, simple-log with timelog.py --skip 1 --hz is off
+
+
+Explored compression and loss in books/compare-compression-frames.ipynb:
+    png is lossless
+    jpg is different encoding from h264
+    diff is ~ 25% of pixels ?
+
+    -> we now have strategies for dealing with compression alterations
+
+    Todo:
+    [ ] What is time to process each size image?
 
 
 9/13
