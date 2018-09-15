@@ -1,3 +1,34 @@
+9/15
+
+We're finding that framelog times dont correspond to the actual time between frames: it's only the next frame that has the delay
+
+Looking at frametime plots in analyze-frame-time.ipynb:
+    cam.read() is deliberately slowing down the call time as it can go to 1 millisec 
+    when the inter-frame-processing overhead forces it to.
+    
+    That's roughly 2/3 of processing time be used for dilly-dallying, if you needed more proc time, seek to put this on another thread or something.
+    
+It's still not clear if long start-end- intervals are reading camera's CCD at start or end of that time. But working hypothesis is it's at the end of the interval. Therefore, frametime is always accurate: when it's unusually long, cam just pulled that image.
+When it's unusually short, cam pulled that image quickly.
+
+n:       232
+mean:    0.0334
+min:     0.0250   3.3 sd
+max:     0.0480   5.8 sd
+sd:      0.0025
+
+So -40% to +40% frame times; high is 100% larger than low
+    -> which is significant for bounce projection
+
+But what do they mean? What is the exact information that can be extracted?
+What is the order of frametimelogs to the actual picture?
+
+    To do:
+    [x] build a deliberate time.sleep() on some frame and compare log to actual frames
+    [x] build a frame_start_time log as well; interpret with timelog
+    [ ] build a book showing a big frame jump and how that corresponds in frametime
+
+
 9/14
 
 Found issues with slower than 30 FPS when 1920 and recordOn = True. Multiple options have been added to gui to deal with this:

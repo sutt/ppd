@@ -2,6 +2,7 @@
 
 9/13
 
+
 [x] need a way to know when recordOn starts in 1-col frame-timing-logs
     [x] add detailed vs simple timelog to gui
 
