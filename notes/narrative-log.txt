@@ -1,3 +1,19 @@
+9/16
+
+Looks like we're one frame behind the current frame within the loop as demonstated by the --sleepschedule experiments. This can be overcome with --funkyread but that cuts FPS in half. Instead, we just note we're one frame behind and offset frametimelog ahead one frame. 
+
+We've looked at startInterval and compared it to frametimelog: when processing like writing vid is high, it forces startInterval down to zero, so this function seems to be compensating for too-fast loops by idling.
+
+    To do:
+    [x] verify this behavior is duplicated by logitech cam
+    [x] verify buffer size is 1 with --funkyread
+
+    Questions:
+    [ ] why is startInterval 0 in cases where sleepschedule is applied?
+    [ ] why doesn't grab/retrieve work as expected?
+    [ ] why does opening a VideoCapture object provide a grabbed  frame to be retrieved?
+        can this be alleviated?
+
 9/15
 
 even a .001 float drift per frame -> 1.0 seconds after 1,000 frames!
