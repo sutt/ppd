@@ -268,6 +268,8 @@ class MetaDataLog:
             notes_data = json.loads(input_str)
             return notes_data
         except:
+            print 'JSON-Notes FAILED to load'
+            #TODO - add validation step
             return None
 
 

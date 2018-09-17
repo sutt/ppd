@@ -273,7 +273,7 @@ while(not(Globals.gui_cmd_quit)):
                         list_frames = []
 
                         if sw_outofmem_break:
-                            #you broke from outof meme: continue writing another file
+                            #you broke from outofmem: continue writing another file
                             sw_outofmem_break = False
                             Globals.sw_record_start = True
                         else:
