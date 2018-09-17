@@ -1,0 +1,12 @@
+
+
+Parrot Bebop controlled by python
+https://github.com/robotika/katarina
+
+    Project page
+    https://robotika.cz/robots/katarina/en
+
+    The dev board used for Mavlink
+    http://wiki.paparazziuav.org/wiki/Main_Page
+
+    
