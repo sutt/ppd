@@ -244,6 +244,7 @@ while(not(Globals.gui_cmd_quit)):
 
                         timelog.set_output(Globals.gui_dir_path + fn)
                         metalog.set_output_path_fn(Globals.gui_dir_path + fn)
+                        metalog.set_notes()
 
                         if Globals.gui_b_jumpcut:
                             Globals.b_jumpcut_inprogres = True

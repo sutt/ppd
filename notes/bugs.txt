@@ -13,9 +13,9 @@
 [ ] write up learnings on frame-sync
     [ ] and continuing questions
 
-[ ] add metadata file
-    [ ] feed notes in from file
-    
+[x] add metadata file
+    [x] feed notes in from file
+
 9/13
 
 

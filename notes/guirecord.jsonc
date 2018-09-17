@@ -1,0 +1,14 @@
+{
+	 "basic_notes": "This is a test note."
+	
+	,"ball_color": null //"red"
+	
+	,"category": null //"distant_find" "motion" "background"
+
+	,"details": {
+
+        "light_level": null //"sunlight_strong", "min_lamp", "two_lamps"
+
+        ,"ball_present": false
+    }
+}

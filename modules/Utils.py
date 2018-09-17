@@ -224,7 +224,7 @@ class MetaDataLog:
 
     def __init__(self):
         self.output_path_fn = None
-        self.notes_path_fn = ""
+        self.notes_path_fn = "notes/guirecord.jsonc"
         self.data = {}
 
     def check_notes_file_is_fresh(self):
@@ -237,27 +237,38 @@ class MetaDataLog:
         self.data['frame_size'] =   str(kwargs.get('frame_size', None))
         self.data['fourcc_enum'] =      kwargs.get('fourcc_enum', None)
         self.data['b_buffer'] =         kwargs.get('b_buffer', None)
+
+    def set_notes(self):
+        ''' wait until record starts to allow editing guirecord.jsonc'''
+        self.data['notes'] = self.load_notes()
     
     def set_output_path_fn(self, path_fn):
         base = path_fn.split(".")[0]
         path_fn = base + ".metalog"
-        self.output_path_fn = base
+        self.output_path_fn = path_fn
     
     def output_log(self):
         ''' write out data as json '''
         with open(self.output_path_fn, 'w') as f:
-            json.dump(self.data, f)
+            json.dump(self.data, f, indent=4)
 
     def load_log_data(self, input_path_fn):
         ''' load the .metalog file at path_fn '''
         with open(input_path_fn, 'r') as f:
-            self.data = json.load(f,)
+            self.data = json.load(f)
 
     def load_notes(self):
-        ''' load the notes file '''
-        input_str = re.sub(r'\\\n', '', input_str)
-        input_str = re.sub(r'//.*\n', '\n', input_str)
-        pass
+        ''' load the notes file as returns as dict'''
+        try:
+            with open(self.notes_path_fn, "r") as f:
+                lines = f.readlines()
+            input_str = ''.join(lines)
+            input_str = re.sub(r'\\\n', '', input_str)      #rm comments
+            input_str = re.sub(r'//.*\n', '\n', input_str)
+            notes_data = json.loads(input_str)
+            return notes_data
+        except:
+            return None
 
 
 
