@@ -9,6 +9,7 @@ import modules.GlobalsB as Globals
 from modules.GuiB import GuiB
 from modules.GraphicsCV import resize_img
 from modules.Utils import TimeLog
+from modules.Utils import MetaDataLog
 
 '''
 
@@ -85,7 +86,7 @@ while(not(Globals.gui_cmd_quit)):
     
     init_savedir = "data/sept2018/misc/"
     ext = "avi"
-    time_to_record = 99
+    time_to_record = 999
     b_show = True
     reset_cntr_exit = 10
     list_frames = []
@@ -136,6 +137,15 @@ while(not(Globals.gui_cmd_quit)):
     except:
         print 'couldnt set cam with frame_size: ', str(frame_size)
 
+
+    metalog = MetaDataLog()
+
+    metalog.set(
+         cam_num =      Globals.gui_cam_num
+        ,frame_size =   frame_size
+        ,fourcc_enum =  fourcc
+        ,b_buffer =     Globals.gui_b_buffer
+                )
 
     gui.myGui.set_sv_dir(init_savedir)      #set directory to gui ang global
     gui.myGui.get_sv_dir()
@@ -233,6 +243,7 @@ while(not(Globals.gui_cmd_quit)):
                                 )
 
                         timelog.set_output(Globals.gui_dir_path + fn)
+                        metalog.set_output_path_fn(Globals.gui_dir_path + fn)
 
                         if Globals.gui_b_jumpcut:
                             Globals.b_jumpcut_inprogres = True
@@ -253,6 +264,7 @@ while(not(Globals.gui_cmd_quit)):
                         continue
                     
                     timelog.output_log()
+                    metalog.output_log()
 
                     if Globals.gui_b_buffer:
                         for _frame in list_frames:

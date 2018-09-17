@@ -6,7 +6,6 @@
     [x] add argparse to guirecord
     [x] remove all prints
 
-
 [x] finish books/sync-frame
     [x] add a demo for sleep schedule #1
     [x] add a demo for sleep schedule #2
@@ -14,6 +13,9 @@
 [ ] write up learnings on frame-sync
     [ ] and continuing questions
 
+[ ] add metadata file
+    [ ] feed notes in from file
+    
 9/13
 
 

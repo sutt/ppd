@@ -1,7 +1,10 @@
 import os
 import time
 import copy
+import json
+import re
 from StatsUtils import print_summary_stats
+
 
 class TimeLog:
     ''' to track timing '''
@@ -99,7 +102,6 @@ class TimeLog:
         if path_fn == "":
             path_fn = self.path_fn
         
-        #first frame is skip on sw_record_on in guirecord
         frame_ind = 1 if self.b_log_vars else self.first_record_frame  
         
         output = copy.copy(self.log_frame_time[frame_ind:])
@@ -217,6 +219,45 @@ class TimeLog:
         if b_start_time:
             pass
         
+
+class MetaDataLog:
+
+    def __init__(self):
+        self.output_path_fn = None
+        self.notes_path_fn = ""
+        self.data = {}
+
+    def check_notes_file_is_fresh(self):
+        ''' check if the file has been updated in last 20 minutes, if not, warn '''
+        pass
+
+    def set(self, **kwargs):
+        ''' set data at camera init stage '''
+        self.data['cam_num'] =          kwargs.get('cam_num', None)
+        self.data['frame_size'] =   str(kwargs.get('frame_size', None))
+        self.data['fourcc_enum'] =      kwargs.get('fourcc_enum', None)
+        self.data['b_buffer'] =         kwargs.get('b_buffer', None)
+    
+    def set_output_path_fn(self, path_fn):
+        base = path_fn.split(".")[0]
+        path_fn = base + ".metalog"
+        self.output_path_fn = base
+    
+    def output_log(self):
+        ''' write out data as json '''
+        with open(self.output_path_fn, 'w') as f:
+            json.dump(self.data, f)
+
+    def load_log_data(self, input_path_fn):
+        ''' load the .metalog file at path_fn '''
+        with open(input_path_fn, 'r') as f:
+            self.data = json.load(f,)
+
+    def load_notes(self):
+        ''' load the notes file '''
+        input_str = re.sub(r'\\\n', '', input_str)
+        input_str = re.sub(r'//.*\n', '\n', input_str)
+        pass
 
 
 
