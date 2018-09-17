@@ -10,11 +10,89 @@
     [x] add a demo for sleep schedule #1
     [x] add a demo for sleep schedule #2
     
-[ ] write up learnings on frame-sync
-    [ ] and continuing questions
+[x] write up learnings on frame-sync
+    [x] and continuing questions
 
 [x] add metadata file
     [x] feed notes in from file
+
+[x] verify logitech camera has same behavior as internalwebcam
+[x] verify --funkyread handles sleepschedule differently
+
+[ ] build guiview.py like (fbf2.py)
+
+    [ ] check if that basic app structure can be debugged? It wasn't for guirecord
+
+    [ ] gui features
+        [ ] get keypress in tkinter
+        [ ] zoom in on vid window
+
+    [ ] slowdown frames with timelag
+
+    [ ] annotate filename on video
+
+    [ ] Note: arrow keys and mouse are used for both scoring (drawing a ground truth circle)
+              and for zooming
+    
+    [ ] separate gui for hand scoring the data
+        [ ] create a .scorelog files
+            - could be testing whether algo has found the correct obj
+            - could be the ground-truth for where the ball is
+            - indexed by frame_num
+    
+    [ ] separate function for drag/select ROI, and processing of that ROI 
+        (e.g. create seed thresh-hold)
+
+    [ ] --dir to go thru all vids
+        [ ] a dir box
+
+    [ ] a settings sqlite db to hold last settings
+        [ ] directory
+        [ ] zoom settings - ROI
+
+    [ ] do images too
+
+    [ ] display on gui
+        [ ] frame num
+        [ ] time t=
+        [ ] time since last frame
+
+    [ ] display metadata / notes:
+         in zmq shell?
+
+[ ] build vidprobe
+    [ ] --dir to probe all file in a dir
+        [ ] -r recursively probe
+    [ ] list
+        [ ] num frames
+        [ ] running time according to frametimelog
+        [ ] file size
+        [ ] frame size
+        [ ] some description/notes
+        [ ] date modified
+        [ ] encoding
+
+    filter by criteria:
+        [ ] criteria in notes (e.g. ball_present = True)
+        [ ] criteria of num_frames, etc
+
+    [ ] works for images too
+
+
+[ ] Build mock tests for guirecord and timelog
+
+    a test function will call guirecord in a subprocess with cmd args:
+    these cli args override initial states of globals at beginning of script
+    a warm up period is given to check in body, then cmd_record_on is called
+    and at end of num_record_frames you go to exit,
+    this creates vid and log files in the test directory of choice
+    then you load the data from these files into test function and do:
+     - asserts on various stats of the data
+     - display/graph the benchmark vs test data in ipython
+
+Note: tracking in guiveiw is really tracker.score(current_frame). 
+      But what we're really looking for 
+
 
 9/13
 
