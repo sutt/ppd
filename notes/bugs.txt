@@ -21,7 +21,9 @@
 
 [ ] build guiview.py like (fbf2.py)
 
-    [ ] check if that basic app structure can be debugged? It wasn't for guirecord
+    [x] check if that basic app structure can be debugged?
+        must debug guiview and GuiC separately, 
+        run debug config: guiview-main for launch with --nogui
 
     [ ] gui features
         [ ] get keypress in tkinter
@@ -91,7 +93,13 @@
      - display/graph the benchmark vs test data in ipython
 
 Note: tracking in guiveiw is really tracker.score(current_frame). 
-      But what we're really looking for 
+      But what we're really looking for "seed" / training img before that
+      train the image to later i.d. it scoring frame:
+      train_img.append(img1)
+      train_img.append(img2)
+      tracker.train(train_imgs)
+       ->
+      tracker.score(current_frame)
 
 
 9/13

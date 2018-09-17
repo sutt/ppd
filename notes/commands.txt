@@ -1,4 +1,12 @@
 
+9/17
+
+[to experiment with framerate / camera buffer]
+>python guirecord.py --sleepschedule
+>python guirecord.py --sleepschedule --funkyread    
+
+>python timelog.py --file output8.txt --graph
+
 9/12
 
 >python timelog.py --file data/sept2018/misc/output7.txt --skip 0
