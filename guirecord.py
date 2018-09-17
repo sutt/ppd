@@ -43,6 +43,11 @@ indv. video data:
 
 '''
 
+ap = argparse.ArgumentParser()
+ap.add_argument("--funkyread",  action="store_true", default=False)
+ap.add_argument("--sleepschedule",  action="store_true", default=False)
+args = vars(ap.parse_args())
+
 Globals.init()
 Globals.gui_cmd_quit = False
 Globals.gui_cmd_record = False
@@ -86,8 +91,10 @@ while(not(Globals.gui_cmd_quit)):
     list_frames = []
     reset_cntr = 0
     sw_outofmem_break = False
+    local_sw_record_start = False               # only way to tell first frame being recorded
     
-
+    b_experimental_read = args["funkyread"] 
+    b_sleep_schedule = args["sleepschedule"]
     
     if Globals.gui_log_enum == 0:
         #simple
@@ -104,6 +111,7 @@ while(not(Globals.gui_cmd_quit)):
 
     timelog = TimeLog(inert = not(b_timelog)
                      ,b_log_vars = b_log_vars
+                     ,b_sleep_schedule = b_sleep_schedule
                      )
     
     if Globals.gui_frame_size_enum == 0:
@@ -149,12 +157,18 @@ while(not(Globals.gui_cmd_quit)):
             
             timelog.log_start()
 
-            ret,frame = cam.read()
+            if not(b_experimental_read):
+                ret,frame = cam.read()
+            else:
+                for _ in range(2):
+                    ret =  cam.grab()
+                    ret, frame = cam.retrieve()
 
             timelog.log_time( 
                               Globals.gui_cmd_record
                              ,Globals.gui_b_preview_frame
                              ,Globals.gui_frame_size_enum
+                             ,local_sw_record_start
                             )
             
             if ret:
@@ -184,9 +198,12 @@ while(not(Globals.gui_cmd_quit)):
 
                 if Globals.gui_cmd_record:
 
+                    local_sw_record_start = False
+
                     if Globals.sw_record_start:
 
                         Globals.sw_record_start = False
+                        local_sw_record_start = True
 
                         if Globals.gui_b_jumpcut:
                             if Globals.b_jumpcut_inprogres:
@@ -247,7 +264,7 @@ while(not(Globals.gui_cmd_quit)):
                             sw_outofmem_break = False
                             Globals.sw_record_start = True
                         else:
-                            #you broke my hitting record button: pause on gui and dont save
+                            #you broke by hitting record button: pause on gui and dont save
                             gui.myGui.cmd_record_sw()
                             Globals.gui_cmd_record = False
 
@@ -297,6 +314,8 @@ while(not(Globals.gui_cmd_quit)):
             print 'excepted during frame read.'
             print e
             break
+
+        timelog.delay_here()
 
     #Exit one cam-setup loop; still in main gui-loop
     try:

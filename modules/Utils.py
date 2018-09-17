@@ -6,21 +6,24 @@ from StatsUtils import print_summary_stats
 class TimeLog:
     ''' to track timing '''
     
-    def __init__(self, inert=False, b_log_vars=False):
+    def __init__(self, inert=False, b_log_vars=False, b_sleep_schedule=False):
         
-        self.inert=inert
+        self.inert = inert
         self.b_log_vars = b_log_vars
+        self.b_sleep_schedule = b_sleep_schedule
         self.b_log_start = True
-        self.b_sleep_schedule = False
-        self.sleep_val = 0.004
+        
         self.t0 = time.time()
         self.start_t1 = time.time()
-        self.b_init = False
-        self.found_first_frame = False
-        self.log_frame_time = []
-        self.log_start_time = []    #as diff b/w t1 and start_t1
-        self.log_schema_vars = []
+        
+        self.first_record_frame = None
+
         self.path_fn = ""
+
+        self.log_frame_time = []
+        self.log_start_time = []
+        self.log_schema_vars = []
+        
         
         self.log_schema = [
             "data"
@@ -28,8 +31,25 @@ class TimeLog:
             ,"recordOn"
             ,"previewFrame"
             ,"frameSizeEnum"
+            ,"firstFrame"
         ]
 
+    def delay_here(self):
+        ''' force preplanned delays; to eval framelog to actuals '''
+
+        if (self.b_sleep_schedule and 
+            self.first_record_frame is not None):
+        
+            if len(self.log_frame_time) - 1 == self.first_record_frame + 3:
+                time.sleep(0.3)
+
+            if len(self.log_frame_time) - 1 == self.first_record_frame + 60:
+                time.sleep(0.3)
+
+            # t_sleep = 0.004 * ((1.01) ** (len(self.log_frame_time) - self.first_record_frame))
+            # time.sleep()
+            
+            
 
     def log_time(self, *schema_vars):
         ''' add element to log_frame_time '''
@@ -43,17 +63,13 @@ class TimeLog:
         if self.b_log_start:
             self.log_start_time.append(t1 - self.start_t1)
         
-        if not(self.b_log_vars):
-            if schema_vars[0] == True and not(self.found_first_frame):
-                self.first_record_frame = len(self.log_frame_time)
-                self.found_first_frame = True
+        if (self.first_record_frame is None and 
+            schema_vars[3] == True):
+                self.first_record_frame = len(self.log_frame_time) - 1
         
-        if len(schema_vars) > 0 and self.b_log_vars:
+        if self.b_log_vars and len(schema_vars) > 0:
             self.log_schema_vars.append(schema_vars)
 
-        if self.b_sleep_schedule:
-            self.sleep_val *= 1.01
-            time.sleep(self.sleep_val)
 
     
     def log_start(self):
@@ -84,7 +100,7 @@ class TimeLog:
             path_fn = self.path_fn
         
         #first frame is skip on sw_record_on in guirecord
-        frame_ind = 1 if self.b_log_vars else self.first_record_frame + 1  
+        frame_ind = 1 if self.b_log_vars else self.first_record_frame  
         
         output = copy.copy(self.log_frame_time[frame_ind:])
         output = [str(x)[:6] for x in output]
