@@ -14,7 +14,13 @@ from modules.GraphicsCV import draw_annotations, resize_img
 '''
 
 [ ] frameFactory
-[ ] pauseTime
+    [ ] frameCounter internalized
+    [ ] retreatFrame
+    [ ] reset global vars
+
+
+[ ] timeFactory
+    [ ] pauseTime
 
 '''
 
@@ -66,6 +72,8 @@ while(True):
     if b_play_dir:
         vidFn = list_vids[playCounter % len(list_vids)]
 
+    
+    #TODO - timeFactory
     frametimeFn = vidFn.split(".")[0] + ".txt"
 
     cumFrametime = TimeLog().get_cum_time(
@@ -77,18 +85,10 @@ while(True):
 
     frameFactory = FrameFactory()
     
-    # frameFactory.setCam(cam)
+    frameFactory.setCam(cam)
 
     # if b_preload:
     #     frameFactroy.preload()        
-    
-    # frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
-    # frameFactory.setPlay(g.playOn)
-    
-    # if not(frameFactory.queryNewFrame()):
-    #     continue
-
-    # ret, frame = frameFactory.getFrame()
 
     # pauseTime = frameFactory.getPauseTime()
 
@@ -99,29 +99,23 @@ while(True):
     frameCounter = 0
     pauseTime = 0
     
-    while(cam.isOpened() or b_preload):
+    while(frameFactory.isOpened()):
 
-        bNewFrame = False
-
-        if g.playOn or bOneFrame:
-
-            ret,frame = cam.read()
-
-            bNewFrame = True
-            
-            bOneFrame = False
-
+        
+        frameFactory.setPlay(g.playOn)
+        
+        frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
+        
         if g.switchAdvanceFrame:
             g.switchAdvanceFrame = False
-            bOneFrame = True
-            #TODO - set pauseTime
+
+        if frameFactory.queryNewFrame():
+            ret, frame = frameFactory.getFrame()
+        else:
             continue
 
         if ret:
             
-            if not(bNewFrame):
-                continue
-
             imgDisplay = frame.copy()
 
             if b_resize:
