@@ -16,8 +16,13 @@ class BuildGuiC:
         self.b_log = b_log
         self.record_button = None
 
-    def cmd_quit(self):
+    def cmd_retreat(self):
+        g.switchRetreatFrame = True
+        # print '--retreat'
+
+    def cmd_advance(self):
         g.switchAdvanceFrame = True
+        # print '--advance'
 
     def cmd_record_sw(self):
         ''' play/pause '''
@@ -50,9 +55,15 @@ class BuildGuiC:
         
         tk.Button(
              f1b
+            ,text = 'retreat'
+            ,command = self.cmd_retreat
+            ).pack(side=tk.LEFT)
+        
+        tk.Button(
+             f1b
             ,text = 'advance'
-            ,command = self.cmd_quit
-            ).pack()
+            ,command = self.cmd_advance
+            ).pack(side=tk.LEFT)
 
 
         return root
