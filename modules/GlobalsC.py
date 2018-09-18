@@ -20,4 +20,4 @@ def init():
     global gui_log_enum
 
     global playOn
-    
+    global switchAdvanceFrame

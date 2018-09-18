@@ -167,7 +167,14 @@ class TimeLog:
         
         return tmp
 
+    def get_cum_time(self, path_fn):
+        ''' return the cumulative time '''
+        
+        all_data = self.load_log_data(path_fn)
+        data = [x[0] for x in all_data]
+        cumsum_data = [ sum(data[:i]) for i in range(len(data))]
 
+        return cumsum_data
 
     def load_multi_log_file(self):
         pass

@@ -29,9 +29,9 @@
         [ ] get keypress in tkinter
         [ ] zoom in on vid window
 
-    [ ] slowdown frames with timelag
+    [x] slowdown frames with timelag
 
-    [ ] annotate filename on video
+    [x] annotate filename on video
 
     [ ] Note: arrow keys and mouse are used for both scoring (drawing a ground truth circle)
               and for zooming
@@ -45,7 +45,7 @@
     [ ] separate function for drag/select ROI, and processing of that ROI 
         (e.g. create seed thresh-hold)
 
-    [ ] --dir to go thru all vids
+    [x] --dir to go thru all vids
         [ ] a dir box
 
     [ ] a settings sqlite db to hold last settings
