@@ -1,15 +1,16 @@
+import os, sys, time
 import numpy as np
 import cv2
 import argparse
-import os, sys, time
+import modules.GlobalsC as g
 from miscutils import uniqueFn
 from vidwriter import VidWriter
-import modules.GlobalsC as g
 from modules.GuiC import GuiC
-from modules.GraphicsCV import resize_img
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
+from modules.ControlFlow import FrameFactory
 from modules.GraphicsCV import draw_annotations, resize_img
+
 '''
 
 [ ] frameFactory
@@ -24,9 +25,12 @@ g.switchAdvanceFrame = False
 b_play_dir = False
 b_preload = True
 b_pause_onopen = True
-init_dir = "data/proc/hello-training-data/"
 b_delay = True
 b_annotate_fn = False
+b_resize = True
+
+init_dir = "data/proc/hello-training-data/"
+
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--nogui",  action="store_true", default=False)
@@ -46,11 +50,11 @@ if args["dir"] != "":
 
 
 if b_play_dir:
-    vidExts = (".avi")
+    vidExts = (".avi",)
     list_files = os.listdir(init_dir)
     list_vids = filter(lambda fn: any([ext in fn for ext in vidExts]), list_files)
 
-play_counter = 0
+playCounter = 0
 
 while(True):
 
@@ -60,7 +64,7 @@ while(True):
     vidFn = (FN + "." + EXT)
 
     if b_play_dir:
-        vidFn = list_vids[play_counter % len(list_vids)]
+        vidFn = list_vids[playCounter % len(list_vids)]
 
     frametimeFn = vidFn.split(".")[0] + ".txt"
 
@@ -68,16 +72,31 @@ while(True):
                                         os.path.join(init_dir, frametimeFn)
                                         )[1:]
 
+    
     cam = cv2.VideoCapture(os.path.join(init_dir, vidFn))
 
-    if b_preload:
-        preloaded_frames = preloadFromCam(cam)
+    frameFactory = FrameFactory()
+    
+    # frameFactory.setCam(cam)
 
-    play_counter += 1
+    # if b_preload:
+    #     frameFactroy.preload()        
+    
+    # frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
+    # frameFactory.setPlay(g.playOn)
+    
+    # if not(frameFactory.queryNewFrame()):
+    #     continue
+
+    # ret, frame = frameFactory.getFrame()
+
+    # pauseTime = frameFactory.getPauseTime()
+
+    playCounter += 1
 
     t_0 = time.time()
+    
     frameCounter = 0
-    bOneFrame = False
     pauseTime = 0
     
     while(cam.isOpened() or b_preload):
