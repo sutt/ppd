@@ -1,4 +1,11 @@
 
+9/18
+
+use: notes/guirecord.jsonc in notepad++ with
+    >python guirecord.py 
+
+    edit the file to reflect the video being recorded
+
 9/17
 
 [to experiment with framerate / camera buffer]

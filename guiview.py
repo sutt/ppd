@@ -25,18 +25,21 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [ ] loop -> gui:
     [ ] frame_i
     [ ] t=
+        [ ] "/out of x"
     [ ] lag intervals
 
-[ ] --file function
-    [ ] it restarts video on play
-    [ ] it doesn't cycle on pause/advance
+[x] --file function
+    [x] it restarts video on play
+    [x] it doesn't cycle on pause/advance
 
 [ ] Add preload-flag for dir loop
+[ ] Add a no-delay flag
 
 BUGS:
     [x] fix --dir loop play
-    [ ] add requestedCounter and check
-        [ ] check frame < 0
+    [x] add requestedCounter and check
+        [x] check frame < 0
+    [ ] after pause + advance/retreat, vid restart from beginning
     [ ] why is reponsiveness so slow?
     [ ] are there misses on loop-action, globals set out of order?
 

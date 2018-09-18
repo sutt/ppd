@@ -19,9 +19,6 @@ class FrameFactory:
     def setCam(self, vidPathFn):
         self.cam = cv2.VideoCapture(vidPathFn)
 
-    # def setCam(self, cam):
-    #     self.cam = cam
-
     def preload(self):
 
         try:
@@ -36,10 +33,10 @@ class FrameFactory:
 
             if len(self.frames) > 0:
                 self.preloaded = True
-                print 'preloaded %s' % str(self.preloaded)
 
         except:
             return 
+
 
     def isOpened(self):
         
@@ -57,6 +54,7 @@ class FrameFactory:
         else:
             return self.cam.isOpened()
 
+
     def getFrame(self):
         if self.preloaded:
             
@@ -70,7 +68,6 @@ class FrameFactory:
             if not(ret):
                 self.cam.release()
             return ret, frame
-            
 
     
     def setPlay(self, playOn):
@@ -82,21 +79,41 @@ class FrameFactory:
     def setRetreatFrame(self, retreatFrame):
         self.retreatFrame = retreatFrame
 
+    
+    def deltaCounter(self, requestAmt, bypassValidation=False):
+        
+        if self.preloaded:
+            
+            if bypassValidation:
+                self.frameCounter += requestAmt
+                return True
+            
+            newCounter = requestAmt + self.frameCounter
+            
+            if (newCounter <= len(self.frames) - 1 and newCounter >= 0):
+                self.frameCounter += requestAmt
+                return True
+            else:
+                return False
+        else:
+            if requestAmt == 1:
+                self.frameCounter += requestAmt
+                return True
+            else:
+                return False
 
+    
     def queryNewFrame(self):
         
         if self.playOn:
-            self.frameCounter += 1  #TODO make this expectedFrame vs actualFrame
-            return True
+            return self.deltaCounter(1, bypassValidation=True)
         
         if self.advanceFrame:
             self.advanceFrame = False
-            self.frameCounter += 1
-            return True
-
+            return self.deltaCounter(1)
+            
         if self.retreatFrame:
             self.retreatFrame = False
-            self.frameCounter -= 1
-            return True
-
+            return self.deltaCounter(-1)
+            
         return False
