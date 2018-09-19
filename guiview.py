@@ -23,8 +23,8 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [ ] pauseTime
 
 [ ] loop -> gui:
-    [ ] frame_i
-    [ ] t=
+    [x] frame_i
+    [x] t=
         [ ] "/out of x"
     [ ] lag intervals
 
@@ -34,14 +34,17 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [ ] Add preload-flag for dir loop
 [ ] Add a no-delay flag
+[ ] Add speed-up / slow-down option
 
 BUGS:
     [x] fix --dir loop play
     [x] add requestedCounter and check
         [x] check frame < 0
+    [ ] cum time in gui off-by-one
     [ ] after pause + advance/retreat, vid restart from beginning
     [ ] why is reponsiveness so slow?
     [ ] are there misses on loop-action, globals set out of order?
+
 
 '''
 
@@ -109,21 +112,17 @@ while(True):
     # pauseTime = timeFactory.getPauseTime()    
 
     frameFactory = FrameFactory()
-
-    # cam = cv2.VideoCapture(os.path.join(init_dir, vidFn))
     
     frameFactory.setCam(os.path.join(init_dir, vidFn))
-    # frameFactory.setCam(cam)
 
     if b_preload:
         frameFactory.preload()        
 
-
+    if not(args["nogui"]):
+        frameFactory.linkGui(gui)
 
     playCounter += 1
-
     t_0 = time.time()
-    
     frameCounter = 0
     pauseTime = 0
     
@@ -144,6 +143,9 @@ while(True):
 
         if frameFactory.queryNewFrame():
             ret, frame = frameFactory.getFrame()
+            frameFactory.updateGui(vidFn=vidFn
+                                  ,cumTimeArray=cumFrametime
+                                  )
         else:
             continue
 

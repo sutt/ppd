@@ -13,6 +13,7 @@ class FrameFactory:
         self.preloaded = False
         self.frames = []
         self.cam = None
+        self.gui = None
         self.pauseTime = 0
         self.frameCounter = 0
 
@@ -117,3 +118,18 @@ class FrameFactory:
             return self.deltaCounter(-1)
             
         return False
+
+    def linkGui(self, objGui):
+        self.gui = objGui
+
+    def updateGui(self, vidFn="", cumTimeArray=None):
+        ''' call after getFrame() for correct data on frameCounter'''        
+        
+        if self.gui is None: return
+
+        self.gui.myGui.set_sv_vidFn(vidFn)
+        self.gui.myGui.set_sv_frameI(str(self.frameCounter))
+        
+        if cumTimeArray is not None:
+            self.gui.myGui.set_sv_cumTime(str(cumTimeArray[self.frameCounter]))
+
