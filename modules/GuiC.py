@@ -59,7 +59,15 @@ class BuildGuiC:
             strCumTotal = str(strCumTotal)[:4]
         self.sv_cumTotal.set(str(strCumTotal))
         
+    def initGui(self, **kwargs):
+        ''' from main loop, set initial state of gui elements '''
         
+        if kwargs.get('playOn', False):
+            self.play_button.configure(bg = '#000fff000')
+
+        if kwargs.get('frameDelay', None) is not None:
+            self.set_int_frameDelay(kwargs.get('frameDelay', True))
+
 
     def build_gui_c(self, root):
 
@@ -194,23 +202,38 @@ class BuildGuiC:
 class GuiC(threading.Thread):
     
     def __init__(self, b_log=False):
-        threading.Thread.__init__(self)
-        self.start()
+        
+        self.tk = tk.Tk()
+        self.tk.protocol("WM_DELETE_WINDOW", self.callback)
+        
         self.myGui = BuildGuiC(b_log=b_log)
-
+        self.myGuiCode = self.myGui.build_gui_c(self.tk)
+        
+        threading.Thread.__init__(self)
+        
+        self.start()
+        
     def callback(self):
         self.root.quit()
 
     def run(self):
-        self.root = tk.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.callback)
-        self.root = self.myGui.build_gui_c(self.root)
+        self.root = self.myGuiCode
         self.root.mainloop()
 
 
 
 if __name__ == "__main__":
 
+    import time
+
     g.init()
+    g.playOn = True
+    g.switchAdvanceFrame = False
+    g.switchRetreatFrame = False
+    g.frameDelay = True
     
     gui = GuiC(b_log=True)
+
+    gui.myGui.initGui(playOn = g.playOn
+                     ,frameDelay = g.frameDelay
+                     )

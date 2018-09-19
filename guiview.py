@@ -23,11 +23,12 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [x] timeFactory
     [x] pauseTime
         [ ] pauseTime bug - doesn't account for retreat/advance
+        [ ] doesn't account for when called with no-delay
 
 [x] handle err when no framelog
 [ ] pause on 1st frame after open
-[ ] init play button color, other gui vars
-    [ ] delay radio button
+[x] init play button color, other gui vars
+    [x] delay radio button
 
 [ ] loop -> gui:
     [x] frame_i
@@ -41,8 +42,8 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [x] it doesn't cycle on pause/advance
 
 [ ] Add preload-flag for dir loop
-[ ] Add a no-delay flag
-[ ] Add a no-delay radio button
+[x] Add a no-delay flag
+[x] Add a no-delay radio button
 [ ] Add slow-down option: a factor
 
 BUGS:
@@ -120,9 +121,10 @@ if b_play_dir:
 
 if b_gui:
     gui = GuiC()  
-    # gui.myGui.initGui(playOn = g.playOn
-    #                  ,frameDelay = g.frameDelay
-    #                  )
+
+    gui.myGui.initGui(playOn = g.playOn
+                     ,frameDelay = g.frameDelay
+                     )
 
 
 #Video Loop: init a new video-file at the top of this loop
