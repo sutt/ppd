@@ -9,7 +9,7 @@ class FrameFactory:
 
     ''' Manage frames from an open VideoCapture(file) object or preloaded list:
         - manipulate/validate frameCounter
-        - validate video end        
+        - validate video begin/end; suggest break from this frameloop       
     '''
 
     def __init__(self):
@@ -150,17 +150,17 @@ class FrameFactory:
         
         if self.gui is None: return
 
-        self.gui.myGui.set_sv_vidFn(vidFn)
-        self.gui.myGui.set_sv_frameI(str(self.frameCounter))
+        self.gui.guiHeader.set_sv_vidFn(vidFn)
+        self.gui.guiHeader.set_sv_frameI(str(self.frameCounter))
         
         _n = len(self.frames) - 1 if self.preloaded else "?"
-        self.gui.myGui.set_sv_frameN(str(_n))
+        self.gui.guiHeader.set_sv_frameN(str(_n))
         
         if cumTimeCurrent is not None:
-            self.gui.myGui.set_sv_cumTime(str(cumTimeCurrent))
+            self.gui.guiHeader.set_sv_cumTime(str(cumTimeCurrent))
 
         if cumTimeTotal is not None:
-            self.gui.myGui.set_sv_cumTotal(cumTimeTotal)
+            self.gui.guiHeader.set_sv_cumTotal(cumTimeTotal)
 
 
 class TimeFactory:

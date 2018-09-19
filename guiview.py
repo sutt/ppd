@@ -14,50 +14,19 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[x] frameFactory
-    [x] frameCounter internalized
-    [x] retreatFrame
-    [x] reset global vars
-
-
-[x] timeFactory
-    [x] pauseTime
-        [ ] pauseTime bug - doesn't account for retreat/advance
-        [ ] doesn't account for when called with no-delay
-
-[x] handle err when no framelog
 [ ] pause on 1st frame after open
-[x] init play button color, other gui vars
-    [x] delay radio button
 [x] --firstN frames for --dir option
 
 [ ] loop -> gui:
-    [x] frame_i
-    [x] t=
-        [x] "/out of x"
     [ ] lag intervals
     [ ] avg FPS
 
-[x] --file function
-    [x] it restarts video on play
-    [x] it doesn't cycle on pause/advance
-
-[x] Add preload-flag for dir loop
-[x] Add a no-delay flag
-[x] Add a no-delay radio button
 [ ] Add slow-down option: a factor
 
 BUGS:
-    [x] fix --dir loop play
-    [x] add requestedCounter and check
-        [x] check frame < 0
-    [x] cum time in gui off-by-one
-    [ ] random crashes during puase+adavanceframe-held-down; hard to replicate??
-    [ ] after pause + advance/retreat, vid restart from beginning
-    [ ] why is reponsiveness so slow?
-    [ ] are there misses on loop-action, globals set out of order?
-
-
+    [ ] pauseTime bug - doesn't account for retreat/advance
+    [ ] pauseTime - doesn't account for when called with no-delay
+    
 '''
 
 #Globals---------------------------------
@@ -67,6 +36,7 @@ g.playOn = True
 g.switchAdvanceFrame = False
 g.switchRetreatFrame = False
 g.frameDelay = True
+g.callExit = False
 
 #High Level Options --------------------------
 b_play_dir = False
@@ -128,9 +98,9 @@ if b_play_dir:
 if b_gui:
     gui = GuiC()  
 
-    gui.myGui.initGui(playOn = g.playOn
-                     ,frameDelay = g.frameDelay
-                     )
+    gui.guiHeader.init_gui(playOn = g.playOn
+                          ,frameDelay = g.frameDelay
+                          )
 
 
 #Video Loop: init a new video-file at the top of this loop
@@ -211,6 +181,10 @@ while(True):
                         
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
+            if g.callExit:
+                cv2.destroyAllWindows
+                sys.exit()
 
             timeFactory.delayFrame()
 

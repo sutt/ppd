@@ -4,18 +4,10 @@ import Tkinter as tk
 import GlobalsC as g
 
 
-class GuiData:
 
-    def __init__(self):
-        self.sv_vidFn = None
-        self.sv_frameI = None
-        self.sv_frameN = None
-        self.sv_cumTime = None
-        self.sv_cumTotal = None
-        self.play_button = None
+class ConstructGui:
 
-
-class BuildGuiC:
+    ''' Stores context for Gui: object we have to reference later from outside thread '''
 
     def __init__(self, b_log=False):
         self.b_log = b_log
@@ -59,7 +51,7 @@ class BuildGuiC:
             strCumTotal = str(strCumTotal)[:4]
         self.sv_cumTotal.set(str(strCumTotal))
         
-    def initGui(self, **kwargs):
+    def init_gui(self, **kwargs):
         ''' from main loop, set initial state of gui elements '''
         
         if kwargs.get('playOn', False):
@@ -69,7 +61,11 @@ class BuildGuiC:
             self.set_int_frameDelay(kwargs.get('frameDelay', True))
 
 
-    def build_gui_c(self, root):
+    def build_gui(self, root):
+
+        ''' attach the the gui boilerplate to the Tk() object passed in as root.
+            if the element needs to be manipulated later, attach it to self as well.
+        '''
 
         f1a = tk.Frame(root)
         f1a.pack(side = tk.TOP)
@@ -200,14 +196,25 @@ class BuildGuiC:
         return root
 
 class GuiC(threading.Thread):
+
+    ''' Dispatch a thread to do tk.mainloop()
+            
+            guiHeader is a reference to BuildGuiC class, it's 
+            self holds methods and elements if attached. Reference 
+            guiHeader to access methods outside thread.
+
+            root is the tk-object and has tk elements attached; it 
+            will perform mainloop
+        
+    '''
     
     def __init__(self, b_log=False):
         
         self.tk = tk.Tk()
         self.tk.protocol("WM_DELETE_WINDOW", self.callback)
         
-        self.myGui = BuildGuiC(b_log=b_log)
-        self.myGuiCode = self.myGui.build_gui_c(self.tk)
+        self.guiHeader = ConstructGui()
+        self.tkElements = self.guiHeader.build_gui(self.tk)
         
         threading.Thread.__init__(self)
         
@@ -215,9 +222,11 @@ class GuiC(threading.Thread):
         
     def callback(self):
         self.root.quit()
+        g.callExit = True
+        
 
     def run(self):
-        self.root = self.myGuiCode
+        self.root = self.tkElements
         self.root.mainloop()
 
 
@@ -232,8 +241,8 @@ if __name__ == "__main__":
     g.switchRetreatFrame = False
     g.frameDelay = True
     
-    gui = GuiC(b_log=True)
+    gui = GuiC()
 
-    gui.myGui.initGui(playOn = g.playOn
-                     ,frameDelay = g.frameDelay
-                     )
+    gui.guiHeader.init_gui( playOn = g.playOn
+                           ,frameDelay = g.frameDelay
+                            )

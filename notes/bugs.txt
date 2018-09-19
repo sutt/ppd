@@ -17,9 +17,9 @@
     https://stackoverflow.com/questions/459083/how-do-you-run-your-own-code-alongside-tkinters-event-loop
     
 [ ] Refactor:
-    [ ] remove vars from GlobalsC
+    [x] remove vars from GlobalsC
     [ ] refactor frameFactory updateGui into own class in GuiC
-    [ ] remove old issues from guiview head-notes
+    [x] remove old issues from guiview head-notes
     [ ] rename and move vidwriter and miscutils to modules
         [ ] refactor their imports
         [ ] keep tests running
@@ -39,7 +39,7 @@
     [ ] pause on open
     [ ] directoryFactory
 
-[ ] add to guiview to commands.txt  -11:15
+[x] add to guiview to commands.txt  -11:15
 [ ] write a narrative-log entry     -11:15
 
 [ ] investigate advanced features:
