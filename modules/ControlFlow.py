@@ -157,7 +157,10 @@ class TimeFactory:
         self.frameCurrent = 0
 
     def setFrametimeLog(self, logPathFn):
-        self.cumtime = TimeLog().get_cum_time(logPathFn) #[1:]
+        try:
+            self.cumtime = TimeLog().get_cum_time(logPathFn) #[1:]
+        except:
+            self.cumtime = None
 
     def setDelay(self, b_delay):
         self.b_delay = b_delay

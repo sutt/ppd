@@ -17,6 +17,10 @@ Skills
 
     opencv associates window names with open positions
 
+    PYTHON
+
+    dir(obj) shows all methods available to object
+
 
 
 Parrot Bebop controlled by python

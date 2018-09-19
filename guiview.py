@@ -24,6 +24,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [x] pauseTime
         [ ] pauseTime bug - doesn't account for retreat/advance
 
+[x] handle err when no framelog
 [ ] pause on 1st frame after open
 [ ] init play button color, other gui vars
     [ ] delay radio button
@@ -42,7 +43,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [ ] Add preload-flag for dir loop
 [ ] Add a no-delay flag
 [ ] Add a no-delay radio button
-[ ] Add speed-up / slow-down option
+[ ] Add slow-down option: a factor
 
 BUGS:
     [x] fix --dir loop play
@@ -57,29 +58,34 @@ BUGS:
 
 '''
 
+#Globals---------------------------------
+# carry info from gui -> mainloop
 g.init()
 g.playOn = True
 g.switchAdvanceFrame = False
 g.switchRetreatFrame = False
+g.frameDelay = True
 
+#High Level Options --------------------------
 b_play_dir = False
 b_preload = True
 b_pause_onopen = True
 b_delay = True
 b_annotate_fn = False
 b_resize = True
+b_gui = True
 
-# init_dir = "data/proc/hello-training-data/"
-
-
+#CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
-ap.add_argument("--nogui",  action="store_true", default=False)
 ap.add_argument("--dir", type=str, default="")
 ap.add_argument("--file", type=str, default="")
+ap.add_argument("--nogui",  action="store_true", default=False)
+ap.add_argument("--nodelay", action="store_true", default=False)
+ap.add_argument("--preload", action="store_true", default=False)
 args = vars(ap.parse_args())
 
-if not(args["nogui"]):
-    gui = GuiC(b_log=True)  
+
+#Run Type: sets options ----------------------
 
 if args["file"] != "":
     PATH_FN = args["file"]
@@ -95,17 +101,38 @@ if args["dir"] != "":
     b_annotate_fn = True
     b_resize = True
 
+if args["nogui"]:
+    b_gui = False
+
+if args["nodelay"]:
+    b_delay = False
+    g.frameDelay = False
+
+if args["preload"]:
+    b_preload = True
+
+
+#TODO - add this to directoryFactory
 if b_play_dir:
     vidExts = (".avi",)
     list_files = os.listdir(init_dir)
     list_vids = filter(lambda fn: any([ext in fn for ext in vidExts]), list_files)
 
-playCounter = 0
 
+if b_gui:
+    gui = GuiC()  
+    # gui.myGui.initGui(playOn = g.playOn
+    #                  ,frameDelay = g.frameDelay
+    #                  )
+
+
+#Video Loop: init a new video-file at the top of this loop
+playCounter = 0
 
 while(True):
 
 
+    #TODO - add to directoryFactory
     if b_play_dir:
         vidFn = list_vids[playCounter % len(list_vids)]
     else:
@@ -127,7 +154,7 @@ while(True):
     if b_preload:
         frameFactory.preload()        
 
-    if not(args["nogui"]):
+    if b_gui:
         frameFactory.linkGui(gui)
 
     playCounter += 1

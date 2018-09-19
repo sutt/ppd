@@ -22,3 +22,4 @@ def init():
     global playOn
     global switchAdvanceFrame
     global switchRetreatFrame
+    global frameDelay

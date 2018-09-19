@@ -2,6 +2,21 @@
 
 9/19
 
+[ ] Learn git workflow here:
+    stash changes, checkout previous
+    build a branch
+
+
+[ ] diagnose gui issues:
+    [ ] this could be the reason debug doesn't work?
+    [ ] can't self.play_button, when calling initGui in mainloop
+    [ ] prolly b/c build_gui_c() is the context for thread's mainloop
+        and in that context self.play_button is defined, but
+        in "myGui"/BuildGuiC, play_button is None.
+    [ ] can't register a tk element in __init__ ?
+    [ ] but why doesn't this break on set_sv_fn()?
+    [ ] is this b/c self.myGui was after self.start()? in Gui.__init__
+
 [ ] finish basic guiview features
     [x] all updateGui   - 10:15
     [x] timeFactory     - 10:45
