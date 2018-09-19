@@ -9,18 +9,24 @@ from modules.GuiC import GuiC
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
 from modules.ControlFlow import FrameFactory
+from modules.ControlFlow import TimeFactory
 from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[ ] frameFactory
+[x] frameFactory
     [x] frameCounter internalized
     [x] retreatFrame
     [x] reset global vars
 
 
-[ ] timeFactory
-    [ ] pauseTime
+[x] timeFactory
+    [x] pauseTime
+        [ ] pauseTime bug - doesn't account for retreat/advance
+
+[ ] pause on 1st frame after open
+[ ] init play button color, other gui vars
+    [ ] delay radio button
 
 [ ] loop -> gui:
     [x] frame_i
@@ -42,7 +48,7 @@ BUGS:
     [x] fix --dir loop play
     [x] add requestedCounter and check
         [x] check frame < 0
-    [ ] cum time in gui off-by-one
+    [x] cum time in gui off-by-one
     [ ] random crashes during puase+adavanceframe-held-down; hard to replicate??
     [ ] after pause + advance/retreat, vid restart from beginning
     [ ] why is reponsiveness so slow?
@@ -105,14 +111,14 @@ while(True):
     else:
         vidFn = FN
 
-    
+    #TODO - put this in class    
     frametimeFn = vidFn.split(".")[0] + ".txt"
+    
+    timeFactory = TimeFactory()
 
-    cumFrametime = TimeLog().get_cum_time(
-                                        os.path.join(init_dir, frametimeFn)
-                                        )[1:]
+    timeFactory.setFrametimeLog(logPathFn=os.path.join(init_dir, frametimeFn))
 
-    # pauseTime = timeFactory.getPauseTime()    
+    timeFactory.setDelay(b_delay)
 
     frameFactory = FrameFactory()
     
@@ -125,9 +131,9 @@ while(True):
         frameFactory.linkGui(gui)
 
     playCounter += 1
-    t_0 = time.time()
-    frameCounter = 0
-    pauseTime = 0
+    
+    timeFactory.setT0()
+
     
     while(frameFactory.isOpened()):
 
@@ -136,13 +142,17 @@ while(True):
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
         
+        timeFactory.setPlay(g.playOn)
+        
         if frameFactory.queryNewFrame():
             
             ret, frame = frameFactory.getFrame()
             
+            timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
+
             frameFactory.updateGui(vidFn=vidFn
-                                  ,cumTimeArray=cumFrametime
-                                  ,cumTimeTotal=cumFrametime[len(cumFrametime) - 1]
+                                  ,cumTimeCurrent=timeFactory.cumTimeCurrent()
+                                  ,cumTimeTotal=timeFactory.cumTimeTotal()
                                   )
         else:
             continue
@@ -165,14 +175,7 @@ while(True):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-            frameCounter += 1
-
-            if b_delay:
-                if frameCounter > len(cumFrametime) - 1:
-                    continue
-                secsAhead = cumFrametime[frameCounter] - (pauseTime + time.time() - t_0)
-                if secsAhead > 0.001:
-                    time.sleep(secsAhead - 0.001)
+            timeFactory.delayFrame()
 
         else:
             

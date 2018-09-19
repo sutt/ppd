@@ -1,5 +1,36 @@
 #Tasks
 
+9/19
+
+[ ] finish basic guiview features
+    [x] all updateGui   - 10:15
+    [x] timeFactory     - 10:45
+    [ ] extra flags     - 11:00
+    [ ] extra radio buttons -11:15
+
+[ ] add to guiview to commands.txt  -11:15
+[ ] write a narrative-log entry     -11:15
+
+[ ] investigate advanced features:
+    [ ] shortcut keys tkinter
+        [ ] do you need forcus on a particular button for them to register
+        [ ] or do we need to register them to opencv window?
+    [ ] ROI selection
+
+[ ] build intermediate features on guiview:
+    [ ] output image/video
+    [ ] read images
+        [ ] go into subdirectories
+
+[ ] still need testing on guirecord
+
+[ ] I would like some multi-thread safe data structures, jeez these crashes
+    and can't debug; do they fix?
+
+[ ] VScode fixes/updates:
+    [ ] get python intellisense msg to stop popping up
+    [ ] get a way to do terminal in vscode, and restore 2-panel editor
+
 9/17
 
 [x] clean up existing diffs
@@ -54,9 +85,9 @@
 
     [ ] do images too
 
-    [ ] display on gui
-        [ ] frame num
-        [ ] time t=
+    [x] display on gui
+        [x] frame num
+        [x] time t=
         [ ] time since last frame
 
     [ ] display metadata / notes:

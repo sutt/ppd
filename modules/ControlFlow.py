@@ -1,7 +1,8 @@
-import os, sys, time
+import os, sys, time, copy
 import numpy as np
 import cv2
 import argparse
+from modules.Utils import TimeLog
 from modules import GlobalsC as g
 
 class FrameFactory:
@@ -70,7 +71,9 @@ class FrameFactory:
                 self.cam.release()
             return ret, frame
 
-    
+    def getFrameCounter(self):
+        return self.frameCounter
+
     def setPlay(self, playOn):
         self.playOn = playOn
 
@@ -124,7 +127,7 @@ class FrameFactory:
     def linkGui(self, objGui):
         self.gui = objGui
 
-    def updateGui(self, vidFn="", cumTimeArray=None, cumTimeTotal=None):
+    def updateGui(self, vidFn="", cumTimeCurrent=None, cumTimeTotal=None):
         ''' call after getFrame() for correct data on frameCounter'''        
         
         if self.gui is None: return
@@ -133,15 +136,96 @@ class FrameFactory:
         self.gui.myGui.set_sv_frameI(str(self.frameCounter))
         
         _n = len(self.frames) - 1 if self.preloaded else "?"
-        
         self.gui.myGui.set_sv_frameN(str(_n))
         
-        if cumTimeArray is not None:
-            try:
-                _i = cumTimeArray[self.frameCounter]
-            except:
-                _i = -1
-            self.gui.myGui.set_sv_cumTime(str(_i))
+        if cumTimeCurrent is not None:
+            self.gui.myGui.set_sv_cumTime(str(cumTimeCurrent))
 
         if cumTimeTotal is not None:
             self.gui.myGui.set_sv_cumTotal(cumTimeTotal)
+
+
+class TimeFactory:
+
+    def __init__(self):
+        self.b_delay = False
+        self.t_0 = 0
+        self.pauseT0 = 0
+        self.pauseTime = 0
+        self.play = True
+        self.cumtime = None
+        self.frameCurrent = 0
+
+    def setFrametimeLog(self, logPathFn):
+        self.cumtime = TimeLog().get_cum_time(logPathFn) #[1:]
+
+    def setDelay(self, b_delay):
+        self.b_delay = b_delay
+
+    def setT0(self):
+        self.t_0 = time.time()
+    
+    def setFrameCurrent(self, frameCurrent):
+        self.frameCurrent = frameCurrent
+
+    def getCumFrametimeArray(self):
+        return copy.copy(self.cumtime)
+
+    def _validCumTime(self):
+        if self.cumtime is None:
+            return False
+        if len(self.cumtime) == 0:
+            return False
+        return True
+
+    def _validCurrentFrame(self):
+        if self.frameCurrent < 0:
+            return False
+        if self.frameCurrent >= len(self.cumtime):
+            return False
+        return True
+
+    def cumTimeCurrent(self):
+        if not(self._validCumTime()):
+            return -1
+        if not(self._validCurrentFrame()):
+            return -1
+        return self.cumtime[self.frameCurrent]
+
+    def cumTimeTotal(self):
+        if not(self._validCumTime()): 
+            return -1
+        return self.cumtime[len(self.cumtime) - 1]
+
+    def setPlay(self, playOn):
+        if self.play == playOn: 
+            return
+        else:
+            if playOn == False:
+                self.pauseT0 = time.time()
+            if playOn == True:
+                self.pauseTime += (time.time() - self.pauseT0)
+            self.play = playOn
+
+
+    def delayFrame(self):
+        ''' sleep in frame loop to match cumtime '''
+        
+        if not(self.b_delay): return
+
+        if not(self.play): return
+        
+        if not(self._validCumTime()): return
+        if not(self._validCurrentFrame()): return
+        
+        
+        secsAhead = ( self.cumtime[self.frameCurrent] 
+                        - 
+                      (time.time() - (self.pauseTime + self.t_0))
+                    )
+
+        if secsAhead > 0.001:
+            time.sleep(secsAhead - 0.001)
+
+        return 
+        
