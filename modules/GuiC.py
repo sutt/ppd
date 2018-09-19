@@ -36,6 +36,12 @@ class BuildGuiC:
             g.playOn = True
             self.play_button.configure(bg = '#000fff000')
 
+    def set_int_frameDelay(self, boolVal):
+        self.int_frameDelay.set(int(boolVal))
+
+    def cmd_frameDelay(self):
+        g.frameDelay = bool(self.int_frameDelay.get())
+
     def set_sv_vidFn(self, strVidFn):
         self.sv_vidFn.set(str(strVidFn))
 
@@ -99,6 +105,30 @@ class BuildGuiC:
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
+
+        f1a5b = tk.Frame(root)
+        f1a5b.pack(side = tk.TOP)
+
+        tk.Label(f1a5b, text="Frame Delay:").pack(side=tk.LEFT)
+
+        self.int_frameDelay = tk.IntVar()
+        self.int_frameDelay.set(1)
+        
+        tk.Radiobutton(
+             f1a5b
+            ,text="on"
+            ,variable=self.int_frameDelay
+            ,value=1
+            ,command=self.cmd_frameDelay
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             f1a5b
+            ,text="off"
+            ,variable=self.int_frameDelay
+            ,value=0
+            ,command=self.cmd_frameDelay
+            ).pack(side=tk.LEFT)
 
         f0_2 = tk.Frame(root)
         f0_2.pack(side = tk.TOP)

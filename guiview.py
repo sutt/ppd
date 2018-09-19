@@ -70,7 +70,6 @@ g.frameDelay = True
 b_play_dir = False
 b_preload = True
 b_pause_onopen = True
-b_delay = True
 b_annotate_fn = False
 b_resize = True
 b_gui = True
@@ -100,12 +99,12 @@ if args["dir"] != "":
     init_dir = os.path.realpath(args["dir"])
     b_annotate_fn = True
     b_resize = True
+    g.frameDelay = False
 
 if args["nogui"]:
     b_gui = False
 
 if args["nodelay"]:
-    b_delay = False
     g.frameDelay = False
 
 if args["preload"]:
@@ -145,7 +144,7 @@ while(True):
 
     timeFactory.setFrametimeLog(logPathFn=os.path.join(init_dir, frametimeFn))
 
-    timeFactory.setDelay(b_delay)
+    timeFactory.setDelay(g.frameDelay)
 
     frameFactory = FrameFactory()
     
@@ -170,6 +169,7 @@ while(True):
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
         
         timeFactory.setPlay(g.playOn)
+        timeFactory.setDelay(g.frameDelay)
         
         if frameFactory.queryNewFrame():
             
