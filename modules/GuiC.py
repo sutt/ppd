@@ -9,7 +9,9 @@ class GuiData:
     def __init__(self):
         self.sv_vidFn = None
         self.sv_frameI = None
+        self.sv_frameN = None
         self.sv_cumTime = None
+        self.sv_cumTotal = None
         self.play_button = None
 
 
@@ -40,8 +42,16 @@ class BuildGuiC:
     def set_sv_frameI(self, strFrameI):
         self.sv_frameI.set(str(strFrameI))
 
+    def set_sv_frameN(self, strFrameN):
+        self.sv_frameN.set(str(strFrameN))
+
     def set_sv_cumTime(self, strCumTime):
         self.sv_cumTime.set(str(strCumTime))
+
+    def set_sv_cumTotal(self, strCumTotal):
+        if len(str(strCumTotal)) > 4:
+            strCumTotal = str(strCumTotal)[:4]
+        self.sv_cumTotal.set(str(strCumTotal))
         
         
 
@@ -101,7 +111,20 @@ class BuildGuiC:
         self.dir_entry = tk.Entry(
                 f0_2
                 ,textvariable = self.sv_frameI
-                ,width = 15
+                ,width = 7
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+        tk.Label(f0_2, text="  of:").pack(side=tk.LEFT)
+
+        self.sv_frameN = tk.StringVar()
+        self.set_sv_frameN(-1)
+        
+        self.dir_entry = tk.Entry(
+                f0_2
+                ,textvariable = self.sv_frameN
+                ,width = 4
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
@@ -117,7 +140,20 @@ class BuildGuiC:
         self.dir_entry = tk.Entry(
                 f0_3
                 ,textvariable = self.sv_cumTime
-                ,width = 15
+                ,width = 7
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+        tk.Label(f0_3, text="  of:").pack(side=tk.LEFT)
+
+        self.sv_cumTotal = tk.StringVar()
+        self.set_sv_cumTotal("-1")
+        
+        self.dir_entry = tk.Entry(
+                f0_3
+                ,textvariable = self.sv_cumTotal
+                ,width = 4
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)

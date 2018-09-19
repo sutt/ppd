@@ -16,7 +16,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [ ] frameFactory
     [x] frameCounter internalized
     [x] retreatFrame
-    [ ] reset global vars
+    [x] reset global vars
 
 
 [ ] timeFactory
@@ -25,8 +25,9 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [ ] loop -> gui:
     [x] frame_i
     [x] t=
-        [ ] "/out of x"
+        [x] "/out of x"
     [ ] lag intervals
+    [ ] avg FPS
 
 [x] --file function
     [x] it restarts video on play
@@ -34,6 +35,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [ ] Add preload-flag for dir loop
 [ ] Add a no-delay flag
+[ ] Add a no-delay radio button
 [ ] Add speed-up / slow-down option
 
 BUGS:
@@ -41,6 +43,7 @@ BUGS:
     [x] add requestedCounter and check
         [x] check frame < 0
     [ ] cum time in gui off-by-one
+    [ ] random crashes during puase+adavanceframe-held-down; hard to replicate??
     [ ] after pause + advance/retreat, vid restart from beginning
     [ ] why is reponsiveness so slow?
     [ ] are there misses on loop-action, globals set out of order?
@@ -130,21 +133,16 @@ while(True):
 
         
         frameFactory.setPlay(g.playOn)
-        
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
-
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
         
-        if g.switchAdvanceFrame:
-            g.switchAdvanceFrame = False
-
-        if g.switchRetreatFrame:
-            g.switchRetreatFrame = False
-
         if frameFactory.queryNewFrame():
+            
             ret, frame = frameFactory.getFrame()
+            
             frameFactory.updateGui(vidFn=vidFn
                                   ,cumTimeArray=cumFrametime
+                                  ,cumTimeTotal=cumFrametime[len(cumFrametime) - 1]
                                   )
         else:
             continue

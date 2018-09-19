@@ -2,7 +2,7 @@ import os, sys, time
 import numpy as np
 import cv2
 import argparse
-# from modules import GlobalsC as g
+from modules import GlobalsC as g
 
 class FrameFactory:
 
@@ -76,9 +76,11 @@ class FrameFactory:
 
     def setAdvanceFrame(self, advanceFrame):
         self.advanceFrame = advanceFrame
+        g.switchAdvanceFrame = False
 
     def setRetreatFrame(self, retreatFrame):
         self.retreatFrame = retreatFrame
+        g.switchRetreatFrame = False
 
     
     def deltaCounter(self, requestAmt, bypassValidation=False):
@@ -122,7 +124,7 @@ class FrameFactory:
     def linkGui(self, objGui):
         self.gui = objGui
 
-    def updateGui(self, vidFn="", cumTimeArray=None):
+    def updateGui(self, vidFn="", cumTimeArray=None, cumTimeTotal=None):
         ''' call after getFrame() for correct data on frameCounter'''        
         
         if self.gui is None: return
@@ -130,6 +132,16 @@ class FrameFactory:
         self.gui.myGui.set_sv_vidFn(vidFn)
         self.gui.myGui.set_sv_frameI(str(self.frameCounter))
         
+        _n = len(self.frames) - 1 if self.preloaded else "?"
+        
+        self.gui.myGui.set_sv_frameN(str(_n))
+        
         if cumTimeArray is not None:
-            self.gui.myGui.set_sv_cumTime(str(cumTimeArray[self.frameCounter]))
+            try:
+                _i = cumTimeArray[self.frameCounter]
+            except:
+                _i = -1
+            self.gui.myGui.set_sv_cumTime(str(_i))
 
+        if cumTimeTotal is not None:
+            self.gui.myGui.set_sv_cumTotal(cumTimeTotal)
