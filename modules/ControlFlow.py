@@ -7,6 +7,11 @@ from modules import GlobalsC as g
 
 class FrameFactory:
 
+    ''' Manage frames from an open VideoCapture(file) object or preloaded list:
+        - manipulate/validate frameCounter
+        - validate video end        
+    '''
+
     def __init__(self):
         self.play = False
         self.advanceFrame = False
@@ -17,9 +22,16 @@ class FrameFactory:
         self.gui = None
         self.pauseTime = 0
         self.frameCounter = 0
+        self.bFirstN = False
+        self.firstN = 0
 
     def setCam(self, vidPathFn):
         self.cam = cv2.VideoCapture(vidPathFn)
+
+    def setFirstN(self, firstN):
+        if int(firstN) > 0:
+            self.bFirstN = True
+            self.firstN = firstN
 
     def preload(self):
 
@@ -41,6 +53,10 @@ class FrameFactory:
 
 
     def isOpened(self):
+        
+        if self.bFirstN:
+            if self.frameCounter > self.firstN:
+                return False
         
         if self.preloaded:
         
@@ -124,9 +140,11 @@ class FrameFactory:
             
         return False
 
+    #TODO - refactor this out
     def linkGui(self, objGui):
         self.gui = objGui
 
+    #TODO - refactor this out
     def updateGui(self, vidFn="", cumTimeCurrent=None, cumTimeTotal=None):
         ''' call after getFrame() for correct data on frameCounter'''        
         
@@ -147,6 +165,8 @@ class FrameFactory:
 
 class TimeFactory:
 
+    ''' Track frametime-log's sync with FrameFactory and video-display-time. '''
+    
     def __init__(self):
         self.b_delay = False
         self.t_0 = 0

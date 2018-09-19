@@ -18,10 +18,13 @@
     
 [ ] Refactor:
     [ ] remove vars from GlobalsC
+    [ ] refactor frameFactory updateGui into own class in GuiC
     [ ] remove old issues from guiview head-notes
     [ ] rename and move vidwriter and miscutils to modules
         [ ] refactor their imports
         [ ] keep tests running
+
+[ ] exit opencv window on gui close
 
 
 [ ] frameDelay bugs:

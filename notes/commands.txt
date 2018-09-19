@@ -1,4 +1,24 @@
+9/19
 
+>python guirecord.py -- dir data/folder/ --preload --firstN 20
+
+    --preload: allows rewind, but bad for long vids
+
+    --firstN: only plays first N frames of each vid; quick summary
+
+    defaults for --dir:
+    --nodelay:  frames play fast; not accurate time
+
+    focus on opencv window and press 'q' to quit that video; on to next
+
+>python guirecord.py --file data/folder/output1.avi
+
+    defaults for --file:
+    --preload
+    
+
+
+>python guirecord.py --file data
 9/18
 
 use: notes/guirecord.jsonc in notepad++ with

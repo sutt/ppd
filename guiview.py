@@ -29,6 +29,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [ ] pause on 1st frame after open
 [x] init play button color, other gui vars
     [x] delay radio button
+[x] --firstN frames for --dir option
 
 [ ] loop -> gui:
     [x] frame_i
@@ -41,7 +42,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [x] it restarts video on play
     [x] it doesn't cycle on pause/advance
 
-[ ] Add preload-flag for dir loop
+[x] Add preload-flag for dir loop
 [x] Add a no-delay flag
 [x] Add a no-delay radio button
 [ ] Add slow-down option: a factor
@@ -74,6 +75,7 @@ b_pause_onopen = True
 b_annotate_fn = False
 b_resize = True
 b_gui = True
+first_n = 0
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -82,6 +84,7 @@ ap.add_argument("--file", type=str, default="")
 ap.add_argument("--nogui",  action="store_true", default=False)
 ap.add_argument("--nodelay", action="store_true", default=False)
 ap.add_argument("--preload", action="store_true", default=False)
+ap.add_argument("--firstN", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -110,6 +113,9 @@ if args["nodelay"]:
 
 if args["preload"]:
     b_preload = True
+
+if args["firstN"] != "":
+    first_n = int(args["firstN"])
 
 
 #TODO - add this to directoryFactory
@@ -151,6 +157,8 @@ while(True):
     frameFactory = FrameFactory()
     
     frameFactory.setCam(os.path.join(init_dir, vidFn))
+
+    frameFactory.setFirstN(first_n)
 
     if b_preload:
         frameFactory.preload()        
