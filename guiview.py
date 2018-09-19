@@ -6,6 +6,7 @@ import modules.GlobalsC as g
 from miscutils import uniqueFn
 from vidwriter import VidWriter
 from modules.GuiC import GuiC
+from modules.GuiC import GuiInterface
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
 from modules.ControlFlow import FrameFactory
@@ -98,9 +99,11 @@ if b_play_dir:
 if b_gui:
     gui = GuiC()  
 
-    gui.guiHeader.init_gui(playOn = g.playOn
-                          ,frameDelay = g.frameDelay
-                          )
+    guiInterface = GuiInterface(gui)
+
+    guiInterface.initGui( playOnVal = g.playOn
+                         ,frameDelayVal = g.frameDelay
+                        )
 
 
 #Video Loop: init a new video-file at the top of this loop
@@ -133,9 +136,6 @@ while(True):
     if b_preload:
         frameFactory.preload()        
 
-    if b_gui:
-        frameFactory.linkGui(gui)
-
     playCounter += 1
     
     timeFactory.setT0()
@@ -157,10 +157,13 @@ while(True):
             
             timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
 
-            frameFactory.updateGui(vidFn=vidFn
+            guiInterface.updateGui(vidFn=vidFn
+                                  ,frameCurrent=frameFactory.getFrameCounter()
+                                  ,frameTotal=frameFactory.getFrameTotal()
                                   ,cumTimeCurrent=timeFactory.cumTimeCurrent()
                                   ,cumTimeTotal=timeFactory.cumTimeTotal()
                                   )
+            
         else:
             continue
 

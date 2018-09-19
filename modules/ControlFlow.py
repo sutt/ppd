@@ -90,6 +90,11 @@ class FrameFactory:
     def getFrameCounter(self):
         return self.frameCounter
 
+    def getFrameTotal(self):
+        if self.frames is None:
+            return -1
+        return len(self.frames) - 1
+
     def setPlay(self, playOn):
         self.playOn = playOn
 
@@ -139,28 +144,6 @@ class FrameFactory:
             return self.deltaCounter(-1)
             
         return False
-
-    #TODO - refactor this out
-    def linkGui(self, objGui):
-        self.gui = objGui
-
-    #TODO - refactor this out
-    def updateGui(self, vidFn="", cumTimeCurrent=None, cumTimeTotal=None):
-        ''' call after getFrame() for correct data on frameCounter'''        
-        
-        if self.gui is None: return
-
-        self.gui.guiHeader.set_sv_vidFn(vidFn)
-        self.gui.guiHeader.set_sv_frameI(str(self.frameCounter))
-        
-        _n = len(self.frames) - 1 if self.preloaded else "?"
-        self.gui.guiHeader.set_sv_frameN(str(_n))
-        
-        if cumTimeCurrent is not None:
-            self.gui.guiHeader.set_sv_cumTime(str(cumTimeCurrent))
-
-        if cumTimeTotal is not None:
-            self.gui.guiHeader.set_sv_cumTotal(cumTimeTotal)
 
 
 class TimeFactory:

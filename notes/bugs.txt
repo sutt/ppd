@@ -16,15 +16,16 @@
     here's where the code was lifted:
     https://stackoverflow.com/questions/459083/how-do-you-run-your-own-code-alongside-tkinters-event-loop
     
-[ ] Refactor:
+[x] Refactor:
     [x] remove vars from GlobalsC
-    [ ] refactor frameFactory updateGui into own class in GuiC
+    [x] refactor frameFactory updateGui into own class in GuiC
     [x] remove old issues from guiview head-notes
-    [ ] rename and move vidwriter and miscutils to modules
-        [ ] refactor their imports
-        [ ] keep tests running
+    
+[ ] Refactor - rename and move vidwriter and miscutils to modules
+    [ ] refactor their imports
+    [ ] keep tests running
 
-[ ] exit opencv window on gui close
+[x] exit opencv window on gui close
 
 
 [ ] frameDelay bugs:

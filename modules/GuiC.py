@@ -230,6 +230,51 @@ class GuiC(threading.Thread):
         self.root.mainloop()
 
 
+class GuiInterface:
+
+    ''' 
+        This acceses GuiConstructor and calls its method on data 
+        input from an instance of this class outside this thread. 
+    '''
+
+    def __init__(self, guiObj):
+        self.gui = guiObj
+
+    
+    #TODO - split this into updateForFrame, updateForVideo
+    def updateGui(  self
+                    ,vidFn=""
+                    ,frameCurrent=0
+                    ,frameTotal=0
+                    ,cumTimeCurrent=None
+                    ,cumTimeTotal=None
+                    ):
+        
+        ''' call after getFrame() for correct data on frameCounter'''        
+        
+        if self.gui is None: return
+
+        self.gui.guiHeader.set_sv_vidFn(vidFn)
+        self.gui.guiHeader.set_sv_frameI(str(frameCurrent))
+        
+        
+        self.gui.guiHeader.set_sv_frameN(str(frameTotal))
+        
+        if cumTimeCurrent is not None:
+            self.gui.guiHeader.set_sv_cumTime(str(cumTimeCurrent))
+
+        if cumTimeTotal is not None:
+            self.gui.guiHeader.set_sv_cumTotal(cumTimeTotal)
+
+    
+    def initGui(self, playOnVal, frameDelayVal):
+
+        self.gui.guiHeader.init_gui( playOn = playOnVal
+                                    ,frameDelay = frameDelayVal
+                                    )
+            
+
+
 
 if __name__ == "__main__":
 
