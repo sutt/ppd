@@ -15,7 +15,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[ ] pause on 1st frame after open
+[x] pause on 1st frame after open
 [x] --firstN frames for --dir option
 
 [ ] loop -> gui:
@@ -24,9 +24,14 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [ ] Add slow-down option: a factor
 
+[ ] BOLO regressions caused by new inner frame loop control flow
+    [ ] fix issue where video doesn't load first image -> no displayImg
+
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
+    [x] opencv window becomes "unresponsive after ~5s pause
+        -> if you don't touch imshow (or waitKey ?)for ~5s after call, it gets mad
     
 '''
 
@@ -66,6 +71,8 @@ if args["file"] != "":
     PATH, FN = os.path.split(PATH_FN)
     init_dir = os.path.realpath(PATH)
     b_preload = True
+    g.playOn = False
+    g.switchAdvanceFrame = True
     
     
 if args["dir"] != "":
@@ -165,7 +172,7 @@ while(True):
                                   )
             
         else:
-            continue
+            ret = False
 
         if ret:
             
@@ -178,26 +185,25 @@ while(True):
                 msg = [vidFn]
                 imgDisplay = draw_annotations(imgDisplay, msg)
 
-            windowName = 'img_display'  #TODO - change window if not resize
-
-            cv2.imshow(windowName, imgDisplay)
-                        
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-            if g.callExit:
-                cv2.destroyAllWindows
-                sys.exit()
-
-            timeFactory.delayFrame()
-
         else:
-            
+
             pass
+
+        windowName = 'img_display'  #TODO - change window if not resize
+
+        cv2.imshow(windowName, imgDisplay)
+                    
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        if g.callExit:
+            cv2.destroyAllWindows
+            sys.exit()
+
+        timeFactory.delayFrame()
 
 
     print 'end of camera'
-
 
 
 cv2.destroyAllWindows()

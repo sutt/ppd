@@ -37,7 +37,7 @@
     [x] extra flags     - 11:00
     [x] extra radio buttons -11:15
     [x] initial gui config
-    [ ] pause on open
+    [x] pause on open
     [ ] directoryFactory
 
 [x] add to guiview to commands.txt  -11:15
