@@ -27,6 +27,8 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [x] handle bad fn from cli
 
+[ ] validate lag interval with sync-framerate ipynb study videos
+
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
@@ -169,7 +171,6 @@ while(True):
                                     ,avgFrameFps=timeFactory.avgFrameFps()
                                     ,lagTuple=timeFactory.lagTuple()
                                     )
-            
         else:
             ret = False
 
