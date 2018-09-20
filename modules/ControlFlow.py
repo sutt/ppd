@@ -24,9 +24,15 @@ class FrameFactory:
         self.frameCounter = 0
         self.bFirstN = False
         self.firstN = 0
+        self.failedLoad = False
+
 
     def setCam(self, vidPathFn):
         self.cam = cv2.VideoCapture(vidPathFn)
+        
+        #TODO - raise opencv warning
+        if not(self.cam.isOpened()):
+            self.failedLoad = True
 
     def setFirstN(self, firstN):
         if int(firstN) > 0:
@@ -145,6 +151,9 @@ class FrameFactory:
             
         return False
 
+    def getFailedLoad(self):
+        return self.failedLoad
+
 
 class TimeFactory:
 
@@ -235,3 +244,78 @@ class TimeFactory:
 
         return 
         
+class DirectoryFactory:
+
+    ''' Handle directory path and video-file selection and rotation'''
+
+    def __init__(self):
+        self.playCounter = 0
+        self.b_play_dir = False
+        self.initDir = ""
+        self.fn = ""
+        self.listVids = None
+
+    def setRunType(self, b_play_dir = False):
+        self.b_play_dir = b_play_dir
+
+    def setData(self, initDir, fn=""):
+        
+        self.initDir = initDir
+
+        if not(self.b_play_dir):
+            self.fn = fn
+        
+        if self.b_play_dir:
+
+            vidExts = (".avi",)
+            
+            listFiles = os.listdir(self.initDir)
+            
+            self.listVids = filter(lambda fn: 
+                                    any([ext in fn for ext in vidExts])
+                                  ,listFiles)
+
+    def vidFn(self):
+
+        if self.b_play_dir:
+            if len(self.listVids) == 0:
+                vidFn = ""
+            else:
+                vidFn = self.listVids[self.playCounter % len(self.listVids)]
+        else:
+            vidFn = self.fn
+        
+        return vidFn
+    
+    def vidPathFn(self):
+
+        vidFn = self.vidFn()
+
+        return os.path.join(self.initDir, vidFn)
+
+    def frametimePathFn(self):
+
+        _vidFn = self.vidFn()
+        _frametimeFn = _vidFn.split(".")[0]
+        _frametimeFn += ".txt"
+        
+        return os.path.join(self.initDir, _frametimeFn)
+
+    def checkExit(self, bFailedLoad):
+        ''' return True to exit from outermost loop; exit program'''        
+
+        if bFailedLoad:
+            if not(self.b_play_dir):
+                print 'Exiting: video file not able to be opened.'
+                return True
+        
+        if self.b_play_dir:
+            if len(self.listVids) < 1:
+                print 'Exiting: failed to find video files in this directory'
+                return True
+        
+        return False
+
+    def incrementPlayCounter(self):
+        self.playCounter += 1
+

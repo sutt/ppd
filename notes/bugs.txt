@@ -1,5 +1,21 @@
 #Tasks
 
+9/20
+
+    [ ] how to raise opencv warnings to 'except' in python.
+        e.g. in frameFactory.setCam throws:
+            warning: Error opening file (/build/opencv/modules/videoio/src/cap_ffmpeg_impl.hpp:578)
+        do this?
+            warnings.filterwarnings('error')
+    
+    [ ] why does pause_on_first_frame opens show frame_i:1 (not 0?)
+        [ ] and you have t=.03 not(t=0) ?
+
+    [ ] frame delay radio above fn on gui
+
+    [ ] add slowdown value
+
+
 9/19
 
 [x] diagnose gui issues:
@@ -8,7 +24,14 @@
     That way the self of myGui/BuildGuiC can refer to tk elements 
     populated in build_gui_c()
 
-    [ ] is this why debug didn't work?
+    [x] is this why debug didn't work?
+
+        no, debug (with gui) still fails to recover from pause: both tkinter 
+        and opencv windows become unresponsive. And hitting puase again doesn't work
+
+        [ ] Can this debugger handle an arbitrary second thread
+        [ ] Can this debugger handle a tkinter second thread with no globals?
+            if so, replace globals with queues
     
     [ ] Implement queue for globals? 
         https://pymotw.com/2/Queue/
@@ -31,14 +54,14 @@
 [ ] frameDelay bugs:
     [ ] turning on/off pauses vid
 
-[ ] finish basic guiview features
+[x] finish basic guiview features
     [x] all updateGui   - 10:15
     [x] timeFactory     - 10:45
     [x] extra flags     - 11:00
     [x] extra radio buttons -11:15
     [x] initial gui config
     [x] pause on open
-    [ ] directoryFactory
+    [x] directoryFactory
 
 [x] add to guiview to commands.txt  -11:15
 [ ] write a narrative-log entry     -11:15
@@ -61,7 +84,14 @@
 
 [ ] VScode fixes/updates:
     [ ] get python intellisense msg to stop popping up
+        Starting Microsoft Python language server.
+        Initializing for C:\Python27\python.exe
+        [Error - 2:32:44 PM] Request textDocument/completion failed.
+        Message: Start and End must be well ordered
+        Code: -32000 
+        [object Object]
     [ ] get a way to do terminal in vscode, and restore 2-panel editor
+    [ ] but break points on the margin, not inline
 
 9/17
 
