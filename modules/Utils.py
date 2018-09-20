@@ -176,6 +176,16 @@ class TimeLog:
 
         return cumsum_data
 
+    def get_avg_frametime(self, path_fn, b_hz=False):
+        ''' return avg frametime of avg FPS if b_hz=true '''
+        all_data = self.load_log_data(path_fn)
+        data = [x[0] for x in all_data]
+        avg =  float(sum(data)) / float(len(data))
+        if b_hz:
+            return float(1.0) / float(avg)
+        return avg
+
+
     def load_multi_log_file(self):
         pass
 

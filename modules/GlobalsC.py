@@ -4,3 +4,4 @@ def init():
     global switchRetreatFrame
     global frameDelay
     global callExit
+    global delaySecs

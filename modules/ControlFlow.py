@@ -19,10 +19,7 @@ class FrameFactory:
         self.preloaded = False
         self.frames = []
         self.cam = None
-        self.gui = None
-        self.pauseTime = 0
         self.frameCounter = 0
-        self.bFirstN = False
         self.firstN = 0
         self.failedLoad = False
 
@@ -35,9 +32,7 @@ class FrameFactory:
             self.failedLoad = True
 
     def setFirstN(self, firstN):
-        if int(firstN) > 0:
-            self.bFirstN = True
-            self.firstN = firstN
+        self.firstN = firstN
 
     def preload(self):
 
@@ -60,7 +55,7 @@ class FrameFactory:
 
     def isOpened(self):
         
-        if self.bFirstN:
+        if self.firstN > 0:
             if self.frameCounter > self.firstN:
                 return False
         
@@ -167,6 +162,9 @@ class TimeFactory:
         self.play = True
         self.cumtime = None
         self.frameCurrent = 0
+        self.delaySecs = 0.0
+        self.avgFps = 0.0
+        self.avgFrametime = 0.0
 
     def setFrametimeLog(self, logPathFn):
         try:
@@ -174,8 +172,19 @@ class TimeFactory:
         except:
             self.cumtime = None
 
+        try:
+            self.avgFps = TimeLog().get_avg_frametime(logPathFn, b_hz=True)
+            self.avgFrametime = TimeLog().get_avg_frametime(logPathFn, b_hz=False)
+        except:
+            self.avgFps = None
+            self.avgFrametime = None
+
+
     def setDelay(self, b_delay):
         self.b_delay = b_delay
+
+    def setDelaySecs(self, delaySecs):
+        self.delaySecs = float(delaySecs)
 
     def setT0(self):
         self.t_0 = time.time()
@@ -212,6 +221,22 @@ class TimeFactory:
             return -1
         return self.cumtime[len(self.cumtime) - 1]
 
+    def avgFrameFps(self):
+        return (self.avgFps, self.avgFrametime)
+
+    def lagTuple(self):
+        
+        _lag0 = -1 if (self.frameCurrent < 1) else 0
+        _lag1 = -1 if (self.frameCurrent > len(self.cumtime) - 2) else 0
+        
+        if _lag0 != -1:
+            _lag0 = self.cumtime[self.frameCurrent] - self.cumtime[self.frameCurrent - 1]
+        if _lag1 != -1:
+            _lag1 = self.cumtime[self.frameCurrent + 1] - self.cumtime[self.frameCurrent]        
+        
+        return (_lag0, _lag1)
+        
+
     def setPlay(self, playOn):
         if self.play == playOn: 
             return
@@ -233,7 +258,10 @@ class TimeFactory:
         if not(self._validCumTime()): return
         if not(self._validCurrentFrame()): return
         
-        
+        if self.delaySecs > 0.001:
+            time.sleep(self.delaySecs)
+            return
+
         secsAhead = ( self.cumtime[self.frameCurrent] 
                         - 
                       (time.time() - (self.pauseTime + self.t_0))

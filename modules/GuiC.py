@@ -34,6 +34,9 @@ class ConstructGui:
     def cmd_frameDelay(self):
         g.frameDelay = bool(self.int_frameDelay.get())
 
+    def cmd_delaySecsSet(self):
+        g.delaySecs = float(self.sv_delaySecs.get())
+
     def set_sv_vidFn(self, strVidFn):
         self.sv_vidFn.set(str(strVidFn))
 
@@ -50,6 +53,23 @@ class ConstructGui:
         if len(str(strCumTotal)) > 4:
             strCumTotal = str(strCumTotal)[:4]
         self.sv_cumTotal.set(str(strCumTotal))
+
+    def set_sv_avgFrameFps(self, strAvgFps, strAvgFrameTime):
+        if len(str(strAvgFps)) > 4:
+            strAvgFps = str(strAvgFps)[:4]
+        self.sv_avgFps.set(str(strAvgFps))
+        if len(str(strAvgFrameTime)) > 6:
+            strAvgFrameTime = str(strAvgFrameTime)[:6]
+        self.sv_avgFrameTime.set(str(strAvgFrameTime))
+
+    def set_sv_lags(self, lag0, lag1):
+        if len(str(lag0)) > 6:
+            lag0 = str(lag0)[:6]
+        self.sv_lag0.set(str(lag0))
+        if len(str(lag1)) > 6:
+            lag1 = str(lag1)[:6]
+        self.sv_lag1.set(str(lag1))
+
         
     def init_gui(self, **kwargs):
         ''' from main loop, set initial state of gui elements '''
@@ -94,26 +114,10 @@ class ConstructGui:
             ,command = self.cmd_advance
             ).pack(side=tk.LEFT)
 
-        f0_1 = tk.Frame(root)
-        f0_1.pack(side = tk.TOP)
-
-        tk.Label(f0_1, text="file:").pack(side=tk.LEFT)
-
-        self.sv_vidFn = tk.StringVar()
-        self.set_sv_vidFn("n/a")
-        
-        self.dir_entry = tk.Entry(
-                f0_1
-                ,textvariable = self.sv_vidFn
-                ,width = 15
-                ,bg = 'white'
-                )
-        self.dir_entry.pack(side=tk.LEFT)
-
         f1a5b = tk.Frame(root)
         f1a5b.pack(side = tk.TOP)
 
-        tk.Label(f1a5b, text="Frame Delay:").pack(side=tk.LEFT)
+        tk.Label(f1a5b, text="True time:").pack(side=tk.LEFT)
 
         self.int_frameDelay = tk.IntVar()
         self.int_frameDelay.set(1)
@@ -133,6 +137,47 @@ class ConstructGui:
             ,value=0
             ,command=self.cmd_frameDelay
             ).pack(side=tk.LEFT)
+        
+        f0_1a = tk.Frame(root)
+        f0_1a.pack(side = tk.TOP)
+
+        tk.Label(f0_1a, text="delay secs:").pack(side=tk.LEFT)
+
+        self.sv_delaySecs = tk.StringVar()
+        self.sv_delaySecs.set("0.0")
+        
+        self.delaySecs_entry = tk.Entry(
+                f0_1a
+                ,textvariable = self.sv_delaySecs
+                # ,command/on change?
+                ,width = 7
+                ,bg = 'white'
+                )
+        self.delaySecs_entry.pack(side=tk.LEFT)
+
+        self.delaySecs_button = tk.Button(
+                f0_1a
+                ,text = 'set'
+                ,bg = 'gray'
+                ,command = self.cmd_delaySecsSet
+                )
+        self.delaySecs_button.pack(side=tk.LEFT)
+
+        f0_1 = tk.Frame(root)
+        f0_1.pack(side = tk.TOP)
+
+        tk.Label(f0_1, text="file:").pack(side=tk.LEFT)
+
+        self.sv_vidFn = tk.StringVar()
+        self.set_sv_vidFn("n/a")
+        
+        self.dir_entry = tk.Entry(
+                f0_1
+                ,textvariable = self.sv_vidFn
+                ,width = 15
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
 
         f0_2 = tk.Frame(root)
         f0_2.pack(side = tk.TOP)
@@ -188,6 +233,66 @@ class ConstructGui:
                 f0_3
                 ,textvariable = self.sv_cumTotal
                 ,width = 4
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+        
+        f0_4 = tk.Frame(root)
+        f0_4.pack(side = tk.TOP)
+
+        tk.Label(f0_4, text="avg FPS:").pack(side=tk.LEFT)
+
+        self.sv_avgFps = tk.StringVar()
+        self.sv_avgFps.set("-1")
+        
+        self.dir_entry = tk.Entry(
+                f0_4
+                ,textvariable = self.sv_avgFps
+                ,width = 5
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+        tk.Label(f0_4, text="  time:").pack(side=tk.LEFT)
+
+        self.sv_avgFrameTime = tk.StringVar()
+        self.sv_avgFrameTime.set("-1")
+        
+        self.dir_entry = tk.Entry(
+                f0_4
+                ,textvariable = self.sv_avgFrameTime
+                ,width = 7
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+
+        f0_5 = tk.Frame(root)
+        f0_5.pack(side = tk.TOP)
+
+        tk.Label(f0_5, text="lag -1:").pack(side=tk.LEFT)
+
+        self.sv_lag0 = tk.StringVar()
+        self.sv_lag0.set("-1")
+        
+        self.dir_entry = tk.Entry(
+                f0_5
+                ,textvariable = self.sv_lag0
+                ,width = 7
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+        tk.Label(f0_5, text=" lag +1:").pack(side=tk.LEFT)
+
+        self.sv_lag1 = tk.StringVar()
+        self.sv_lag1.set("-1")
+        
+        self.dir_entry = tk.Entry(
+                f0_5
+                ,textvariable = self.sv_lag1
+                ,width = 7
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
@@ -248,6 +353,8 @@ class GuiInterface:
                     ,frameTotal=0
                     ,cumTimeCurrent=None
                     ,cumTimeTotal=None
+                    ,avgFrameFps=(None, None)
+                    ,lagTuple=(None, None)
                     ):
         
         ''' call after getFrame() for correct data on frameCounter'''        
@@ -265,6 +372,12 @@ class GuiInterface:
 
         if cumTimeTotal is not None:
             self.gui.guiHeader.set_sv_cumTotal(cumTimeTotal)
+
+        if all([x is not None for x in avgFrameFps]):
+            self.gui.guiHeader.set_sv_avgFrameFps(*avgFrameFps)
+
+        if all([x is not None for x in lagTuple]):
+            self.gui.guiHeader.set_sv_lags(*lagTuple)
 
     
     def initGui(self, playOnVal, frameDelayVal):

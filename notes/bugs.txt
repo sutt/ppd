@@ -11,9 +11,9 @@
     [ ] why does pause_on_first_frame opens show frame_i:1 (not 0?)
         [ ] and you have t=.03 not(t=0) ?
 
-    [ ] frame delay radio above fn on gui
+    [x] frame delay radio above fn on gui
 
-    [ ] add slowdown value
+    [x] add slowdown value
 
 
 9/19
@@ -32,6 +32,8 @@
         [ ] Can this debugger handle an arbitrary second thread
         [ ] Can this debugger handle a tkinter second thread with no globals?
             if so, replace globals with queues
+
+        [ ] One way to fix threading is to have main thread call get() from guiInterface
     
     [ ] Implement queue for globals? 
         https://pymotw.com/2/Queue/

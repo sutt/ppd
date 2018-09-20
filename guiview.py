@@ -16,11 +16,11 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[ ] loop -> gui:
-    [ ] lag intervals
-    [ ] avg FPS
+[x] loop -> gui:
+    [x] lag intervals
+    [x] avg FPS
 
-[ ] Add slow-down option: a factor
+[x] Add slow-down option: a factor
 
 [ ] BOLO regressions caused by new inner frame loop control flow
     [ ] fix issue where video doesn't load first image -> no displayImg
@@ -30,8 +30,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
-    [x] opencv window becomes "unresponsive after ~5s pause
-        -> if you don't touch imshow (or waitKey ?)for ~5s after call, it gets mad
+
     
 '''
 
@@ -43,6 +42,7 @@ g.switchAdvanceFrame = False
 g.switchRetreatFrame = False
 g.frameDelay = True
 g.callExit = False
+g.delaySecs = 0.0
 
 #High Level Options --------------------------
 b_play_dir = False
@@ -151,6 +151,7 @@ while(True):
         
         timeFactory.setPlay(g.playOn)
         timeFactory.setDelay(g.frameDelay)
+        timeFactory.setDelaySecs(g.delaySecs)
         
         if frameFactory.queryNewFrame():
             
@@ -165,6 +166,8 @@ while(True):
                                     ,frameTotal=frameFactory.getFrameTotal()
                                     ,cumTimeCurrent=timeFactory.cumTimeCurrent()
                                     ,cumTimeTotal=timeFactory.cumTimeTotal()
+                                    ,avgFrameFps=timeFactory.avgFrameFps()
+                                    ,lagTuple=timeFactory.lagTuple()
                                     )
             
         else:
