@@ -27,11 +27,15 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [x] handle bad fn from cli
 
-[ ] validate lag interval with sync-framerate ipynb study videos
+[x] validate lag interval with sync-framerate ipynb study videos
+    --file data/books/correspond-frame-to-framelog/output82.avi
+
+[ ] add 5x/10x increment/decremnt buttons
 
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
+    [x] opens on frame1 (not frame0) for pause_on_open
 
     
 '''

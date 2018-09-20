@@ -19,7 +19,7 @@ class FrameFactory:
         self.preloaded = False
         self.frames = []
         self.cam = None
-        self.frameCounter = 0
+        self.frameCounter = -1
         self.firstN = 0
         self.failedLoad = False
 
@@ -226,11 +226,11 @@ class TimeFactory:
 
     def lagTuple(self):
         
+        if not(self._validCumTime()) or not(self._validCurrentFrame()):
+            return (-1, -1)
+        
         _lag0 = -1 if (self.frameCurrent < 1) else 0
         _lag1 = -1 if (self.frameCurrent > len(self.cumtime) - 2) else 0
-
-        if not(self._validCumTime()) or not(self._validCurrentFrame()):
-            _lag0, _lag1 = -1, -1
         
         if _lag0 != -1:
             _lag0 = self.cumtime[self.frameCurrent] - self.cumtime[self.frameCurrent - 1]

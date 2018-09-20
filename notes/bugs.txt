@@ -8,8 +8,8 @@
         do this?
             warnings.filterwarnings('error')
     
-    [ ] why does pause_on_first_frame opens show frame_i:1 (not 0?)
-        [ ] and you have t=.03 not(t=0) ?
+    [x] why does pause_on_first_frame opens show frame_i:1 (not 0?)
+        [x] and you have t=.03 not(t=0) ?
 
     [x] frame delay radio above fn on gui
 
