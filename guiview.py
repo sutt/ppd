@@ -16,21 +16,21 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[x] loop -> gui:
-    [x] lag intervals
-    [x] avg FPS
-
-[x] Add slow-down option: a factor
-
-[ ] BOLO regressions caused by new inner frame loop control flow
-    [ ] fix issue where video doesn't load first image -> no displayImg
-
-[x] handle bad fn from cli
-
 [x] validate lag interval with sync-framerate ipynb study videos
     --file data/books/correspond-frame-to-framelog/output82.avi
 
 [ ] add 5x/10x increment/decremnt buttons
+
+[ ] Add notesFactory
+    [ ] handle orientation with img_rotate
+
+[ ] Add output basic functionality
+    [ ] naming: proc1.output1.avi...proc2.output1.avi
+        [ ] uniqueFn modify + tests
+    [ ] making a directory
+    [ ] copy logs
+    [ ] set output dir with cmd line flag
+
 
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance

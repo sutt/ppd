@@ -1,3 +1,35 @@
+9/20
+
+Compare guiview + module.ControlFlow to guirecord:
+    view the benefits of object oriented programming
+     - isolation of concerns with counters
+     - minimal indentation for control flow
+     - handle validation and transforms outside of main
+     - easier to test with stubs
+
+How would I test gui_view? 
+    run from subproc and output to stderr? 
+    add stubs under b_test: send frame/time/directory Factory into TestData()
+    then TestData.test1(),test2(),... etc calls queries on these objects
+    also need mocks for test1() test2() so that playOn can be turned on etc.
+    these stubs/mocks need to be setup at both positions in the loop
+
+    this helps make sure --dir and --file function correctly as dev continues
+
+
+9/19
+
+We've invested time to write guiview to hand process training videos into precise tests.
+This came after the workflow for adaptive_thresh.py became impossible to keep doing "live tests" of agenda. Now we can compare multiple training scenarios and multiple scoring tests and perf; and do that in multiple scenario, etc
+
+guiview --dir --firstN / timelog.py  is unix like: "everything is a file" for videos; need to be able to manipulate with care and ease and review with power and flexibility.
+
+So, we like cli for videos, but we also need interactivity - for record, to set up the frame, and for view, to hand score - so we need a gui, not just cli.
+
+We can talk about mock testing for a gui: how you don't need interactivity to run checks
+And how this helps us create tests, which allows us to switch opencv and ffmpeg versions
+
+
 9/16
 
 Looks like we're one frame behind the current frame within the loop as demonstated by the --sleepschedule experiments. This can be overcome with --funkyread but that cuts FPS in half. Instead, we just note we're one frame behind and offset frametimelog ahead one frame. 
