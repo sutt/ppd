@@ -19,7 +19,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 [x] validate lag interval with sync-framerate ipynb study videos
     --file data/books/correspond-frame-to-framelog/output82.avi
 
-[ ] add 5x/10x increment/decremnt buttons
+[x] add 5x/10x increment/decremnt buttons
 
 [ ] Add notesFactory
     [ ] handle orientation with img_rotate
@@ -46,9 +46,12 @@ g.init()
 g.playOn = True
 g.switchAdvanceFrame = False
 g.switchRetreatFrame = False
+g.switchRewind = False
+g.switchFastforward = False
 g.frameDelay = True
 g.callExit = False
 g.delaySecs = 0.0
+
 
 #High Level Options --------------------------
 b_play_dir = False
@@ -149,11 +152,21 @@ while(True):
     
     timeFactory.setT0()
 
+    if b_gui:
+        
+        guiInterface.updateByVid(vidFn=directoryFactory.vidFn()
+                                ,frameTotal=frameFactory.getFrameTotal()
+                                ,cumTimeTotal=timeFactory.cumTimeTotal()
+                                ,avgFrameFps=timeFactory.avgFrameFps()
+                                )
+
     while(frameFactory.isOpened()):
         
         frameFactory.setPlay(g.playOn)
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
+        frameFactory.setRewind(g.switchRewind)
+        frameFactory.setFastforward(g.switchFastforward)
         
         timeFactory.setPlay(g.playOn)
         timeFactory.setDelay(g.frameDelay)
@@ -167,12 +180,9 @@ while(True):
 
             if b_gui:
 
-                guiInterface.updateGui(vidFn=directoryFactory.vidFn()
-                                    ,frameCurrent=frameFactory.getFrameCounter()
-                                    ,frameTotal=frameFactory.getFrameTotal()
+                guiInterface.updateByFrame(
+                                     frameCurrent=frameFactory.getFrameCounter()
                                     ,cumTimeCurrent=timeFactory.cumTimeCurrent()
-                                    ,cumTimeTotal=timeFactory.cumTimeTotal()
-                                    ,avgFrameFps=timeFactory.avgFrameFps()
                                     ,lagTuple=timeFactory.lagTuple()
                                     )
         else:

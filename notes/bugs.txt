@@ -15,7 +15,7 @@
 
     [x] add slowdown value
 
-    [ ] refactor updateGui into by-vid and by-frame
+    [x] refactor updateGui into by-vid and by-frame
 
 
 9/19
@@ -92,6 +92,11 @@
         Initializing for C:\Python27\python.exe
         [Error - 2:32:44 PM] Request textDocument/completion failed.
         Message: Start and End must be well ordered
+        Code: -32000 
+        [object Object]
+        object Object]
+        [Error - 6:50:34 AM] Request textDocument/completion failed.
+        Message: Collection was modified; enumeration operation may not execute.
         Code: -32000 
         [object Object]
     [ ] get a way to do terminal in vscode, and restore 2-panel editor

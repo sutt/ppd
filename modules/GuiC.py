@@ -19,6 +19,12 @@ class ConstructGui:
     def cmd_advance(self):
         g.switchAdvanceFrame = True
 
+    def cmd_rewind(self):
+        g.switchRewind = True
+
+    def cmd_fastforward(self):
+        g.switchFastforward = True
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -112,6 +118,21 @@ class ConstructGui:
              f1b
             ,text = 'advance'
             ,command = self.cmd_advance
+            ).pack(side=tk.LEFT)
+
+        f1c = tk.Frame(root)
+        f1c.pack(side = tk.TOP)
+        
+        tk.Button(
+             f1c
+            ,text = '<<'
+            ,command = self.cmd_rewind
+            ).pack(side=tk.LEFT)
+        
+        tk.Button(
+             f1c
+            ,text = '>>'
+            ,command = self.cmd_fastforward
             ).pack(side=tk.LEFT)
 
         f1a5b = tk.Frame(root)
@@ -345,36 +366,44 @@ class GuiInterface:
     def __init__(self, guiObj):
         self.gui = guiObj
 
-    
-    #TODO - split this into updateForFrame, updateForVideo
-    def updateGui(  self
+
+    def updateByVid( self
                     ,vidFn=""
-                    ,frameCurrent=0
                     ,frameTotal=0
-                    ,cumTimeCurrent=None
                     ,cumTimeTotal=None
                     ,avgFrameFps=(None, None)
-                    ,lagTuple=(None, None)
                     ):
         
-        ''' call after getFrame() for correct data on frameCounter'''        
+        ''' call once per video '''        
         
         if self.gui is None: return
 
         self.gui.guiHeader.set_sv_vidFn(vidFn)
-        self.gui.guiHeader.set_sv_frameI(str(frameCurrent))
-        
         
         self.gui.guiHeader.set_sv_frameN(str(frameTotal))
-        
-        if cumTimeCurrent is not None:
-            self.gui.guiHeader.set_sv_cumTime(str(cumTimeCurrent))
 
         if cumTimeTotal is not None:
             self.gui.guiHeader.set_sv_cumTotal(cumTimeTotal)
 
         if all([x is not None for x in avgFrameFps]):
             self.gui.guiHeader.set_sv_avgFrameFps(*avgFrameFps)
+
+
+    def updateByFrame( self
+                    ,frameCurrent=0
+                    ,cumTimeCurrent=None
+                    ,lagTuple=(None, None)
+                    ):
+        
+        ''' call every time frame is changed.
+            call after getFrame() for correct data on frameCounter'''        
+        
+        if self.gui is None: return
+
+        self.gui.guiHeader.set_sv_frameI(str(frameCurrent))
+        
+        if cumTimeCurrent is not None:
+            self.gui.guiHeader.set_sv_cumTime(str(cumTimeCurrent))
 
         if all([x is not None for x in lagTuple]):
             self.gui.guiHeader.set_sv_lags(*lagTuple)

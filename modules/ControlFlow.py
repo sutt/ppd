@@ -16,6 +16,8 @@ class FrameFactory:
         self.play = False
         self.advanceFrame = False
         self.retreatFrame = False
+        self.rewindCmd = False
+        self.fastforwardCmd = False
         self.preloaded = False
         self.frames = []
         self.cam = None
@@ -107,7 +109,15 @@ class FrameFactory:
         self.retreatFrame = retreatFrame
         g.switchRetreatFrame = False
 
-    
+    def setRewind(self, rewind):
+        self.rewindCmd = rewind
+        g.switchRewind = False
+
+    def setFastforward(self, fastforward):
+        self.fastforwardCmd = fastforward
+        g.switchFastforward = False
+
+
     def deltaCounter(self, requestAmt, bypassValidation=False):
         
         if self.preloaded:
@@ -143,6 +153,14 @@ class FrameFactory:
         if self.retreatFrame:
             self.retreatFrame = False
             return self.deltaCounter(-1)
+
+        if self.rewindCmd:
+            self.rewindCmd = False
+            return self.deltaCounter(-10)
+
+        if self.fastforwardCmd:
+            self.fastforwardCmd = False
+            return self.deltaCounter(10)
             
         return False
 
