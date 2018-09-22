@@ -1,3 +1,11 @@
+9/21
+
+    To test guiview:
+    [in test/]
+        >pytest guiview_test.py -vv
+
+    To help build a test, run guiview with the test flag
+
 9/19
 
 >python guirecord.py -- dir data/folder/ --preload --firstN 20

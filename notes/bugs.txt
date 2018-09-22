@@ -1,5 +1,13 @@
 #Tasks
 
+
+9/22
+    
+    [ ] Testing guiview updates
+        [ ] shorten videos to 25 frames in basic
+        [ ] change true_time to reflect a 25 frame vid (cumtime=0.8316 @frame 25)
+
+
 9/21
 
     [x] Testing guiview

@@ -33,6 +33,8 @@ Todo:
     [ ] timeout
     [ ] timeout wrapper
     [ ] modify test video files to be shorter
+    [ ] modify watchProcess: not catching tests that error
+        [ ] returncode is always 1 b/c error thrown in stub.exitByStr()
 
     Tests:
     [x] basic_dir
@@ -40,11 +42,11 @@ Todo:
     [x] a true positive: find an exception err 
     [x] file not found
     [x] a video that cant be read within a dir of valid vids
-    [ ] true time vs nodelay
+    [x] true time vs nodelay
     [x] firstN
     [x] advance + retreat frame
     [x] no logs
-    [ ] frame lag on delay vid
+    [x] frame lag on delay vid
 
 
 
@@ -101,8 +103,6 @@ class GuiviewStagingClass:
     def watchProcess(proc, b_poll=True):
 
         stderrLog = []
-
-        #pre-check with poll() in caase program crashes right away
         
         while(True):
 
@@ -120,8 +120,20 @@ class GuiviewStagingClass:
                 if proc.poll() is not None:
                     # p.returncode
                     break
+
+        #return code is valuable to see if test itself has an error
+        #that disrupts execution, and thus doesn't create an Assertion Error
+        #but does throw an error. This doesn't help right now because
+        #all  subproc's should throw an error onExit.
+        ret = 0
+        for ten_milli_sec_step in range(100):
+            if proc.poll() is not None:
+                ret = proc.returncode
+                break
+            time.sleep(0.01)
+
         
-        return stderrLog
+        return stderrLog, ret
 
 
     @staticmethod
@@ -167,11 +179,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: #or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: basic")
 
@@ -187,11 +199,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: #or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: basic_file")
 
@@ -206,11 +218,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if not(bErrors):
+        if not(bErrors):  #or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: true_positive (should have bErrors)")
 
@@ -225,11 +237,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: #or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: file err")
 
@@ -246,11 +258,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: fil_err_dir")
 
@@ -266,11 +278,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: no_logs")
 
@@ -285,11 +297,11 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: #or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: advance_retreat")
 
@@ -304,15 +316,32 @@ class GuiviewStagingClass:
         
         p = self.launchProcess(args)
         
-        msg = self.watchProcess(p)
+        msg, ret = self.watchProcess(p)
 
         bErrors = self.parseErrors(msg)
 
-        if bErrors:
+        if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: frame_sync")
 
+    def true_time(self):
+        ''' test that delayFrame() fires correctly; fuzzy assert bounds here to account
+            for sometime considerable startup time'''
 
+        cmd = '''python guiview.py --test true_time --nogui --noshow 
+                                    --file data/test/guiview/basic/output4.avi'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: true_time")
     
 
 
@@ -338,6 +367,8 @@ class GuiviewMock:
             self.file_err_dir_data()
         elif strTest == 'no_logs':
             self.no_logs_data()
+        elif strTest == 'true_time':
+            self.true_time_data()
         else:
             self.dummy()
 
@@ -359,6 +390,8 @@ class GuiviewMock:
             return self.advance_retreat_frame
         elif strTest == 'frame_sync':
             return self.frame_sync_frame
+        elif strTest == 'true_time':
+            return self.true_time_frame
         else:
             return self.dummy
 
@@ -368,6 +401,8 @@ class GuiviewMock:
             return self.dummy
         elif strTest == "file_err":
             return self.file_err_vid
+        elif strTest == "true_time":
+            return self.true_time_vid
         else:
             return self.dummy
 
@@ -562,6 +597,29 @@ class GuiviewMock:
         
         self.mockCounter += 1
 
+    def true_time_data(self):
+        self.t0 = None
+    
+    def true_time_frame(self, *args):
+        if self.t0 is None:
+            self.t0 = time.time()   #note first frame
+    
+    def true_time_vid(self, *args):
+                        # ,_frameFactory
+                        # ,_timeFactory
+                        # ,_directoryFactory
+                        # ):
+        
+        if self.mockCounter == 0:
+            #this video, output4.avi, is 12.89 seconds long
+            #this interval at least assures us we aren't running with nodelay on
+            #or some kind of inter
+            assert 13.0 > time.time() - self.t0 > 12.5
+
+        #only test first run thru
+        self.mockCounter += 1
+
+
         
 
 class GuiviewStub:
@@ -611,7 +669,8 @@ class GuiviewStub:
 
         if strTest == "basic":
             return self.basic_vid
-        # elif strTest
+        elif strTest == "true_time":
+            return self.true_time_vid
         else:
             return self.dummy
 
@@ -626,7 +685,6 @@ class GuiviewStub:
         pass
 
     def dummy_exit(self, *args):
-        pass
         raise Exception(STDERR_EXIT_MSG)
 
     #Test: basic ----------------------------------
@@ -643,7 +701,7 @@ class GuiviewStub:
         if self.stubCounter > 50:
             g.callExit = True
 
-    #Test: file_err_dir ----------------------------------
+    #Test Stub: file_err_dir ----------------------------------
 
     def file_err_dir_frame(self, *args):
         self.stubCounter += 1
@@ -678,14 +736,15 @@ class GuiviewStub:
             g.callExit = True
 
     
-    def frame_sync_frame(self, *args):
+    def true_time_vid(self, *args):
         
-        if self.stubCounter <= 5:
-            g.switchAdvanceFrame = True
-
+        #need to start froma paused state
+        g.playOn = True
+        
         self.stubCounter += 1
-
-        if self.stubCounter > 10:
+        
+        #exit after first run thru
+        if self.stubCounter > 1:
             g.callExit = True
         
     
@@ -725,7 +784,11 @@ def test_frame_sync():
     stage = GuiviewStagingClass()
     stage.frame_sync()
 
+def test_true_time():
+    stage = GuiviewStagingClass()
+    stage.true_time()
 
 if __name__ == "__main__":
-    test_advance_retreat()
+    test_true_positive()
+    pass
 
