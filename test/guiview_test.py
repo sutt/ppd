@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, copy
 import subprocess
 import time
 
@@ -33,16 +33,18 @@ Todo:
     [ ] timeout
     [ ] timeout wrapper
     [ ] modify test video files to be shorter
-    [ ] advance + retreat frame
 
     Tests:
     [x] basic_dir
     [x] basic_file
-    [ ] a true positive: find an exception err 
-    [ ] file not found
-    [ ] a video that cant be read within a dir of valid vids
+    [x] a true positive: find an exception err 
+    [x] file not found
+    [x] a video that cant be read within a dir of valid vids
     [ ] true time vs nodelay
-    [ ] firstN
+    [x] firstN
+    [ ] advance + retreat frame
+    [ ] no logs
+    [ ] frame lag on delay vid
 
 
 
@@ -158,7 +160,8 @@ class GuiviewStagingClass:
         '''
 
         cmd = '''python guiview.py --test basic --nogui --noshow 
-                                    --dir data/test/guiview/basic/'''
+                                    --dir data/test/guiview/basic/
+                                    --firstN 10'''
 
         args = self.argsFromCmd(cmd)
         
@@ -169,7 +172,7 @@ class GuiviewStagingClass:
         bErrors = self.parseErrors(msg)
 
         if bErrors:
-            print msg
+            print "\n".join(msg)
             raise Exception("TEST FAIL: basic")
 
     def basic_file(self):
@@ -189,13 +192,69 @@ class GuiviewStagingClass:
         bErrors = self.parseErrors(msg)
 
         if bErrors:
-            print msg
+            print "\n".join(msg)
             raise Exception("TEST FAIL: basic_file")
 
+    def true_positive(self):
+        ''' verify that an assert within the subprocess gets caught here.
+        '''
 
-    def basic_file_err():
+        cmd = '''python guiview.py --test true_positive --nogui --noshow 
+                                    --file data/test/guiview/basic/output4.avi'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if not(bErrors):
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: true_positive (should have bErrors)")
+
+
+    def file_err(self):
         ''' open an invalid --file, make sure it does exit but does so gracefully'''
-        pass
+        
+        cmd = '''python guiview.py --test file_err --nogui --noshow 
+                                    --file data/test/guiview/basic/notafn.avi'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: file err")
+
+    def file_err_dir(self):
+        ''' have an invalid .avi file (output6.avi) in a dir with other valid .avi files.
+            verify that the valids run thru multiple times on --dir
+        '''
+
+        cmd = '''python guiview.py --test file_err_dir --nogui --noshow 
+                                --dir data/test/guiview/file_err_dir/
+                                --firstN 10'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: fil_err_dir")
+
+
     
 
 
@@ -217,7 +276,8 @@ class GuiviewMock:
 
         if strTest == "basic":
             self.basic_data()
-        # elif strTest
+        elif strTest == "file_err_dir":
+            self.file_err_dir_data()
         else:
             self.dummy()
 
@@ -227,6 +287,12 @@ class GuiviewMock:
             return self.basic_frame
         elif strTest == "basic_file":
             return self.basic_file_frame
+        elif strTest == "true_positive":
+            return self.true_positive_frame
+        elif strTest =="file_err":
+            return self.file_err_frame
+        elif strTest =="file_err_dir":
+            return self.file_err_dir_frame
         else:
             return self.dummy
 
@@ -234,7 +300,8 @@ class GuiviewMock:
 
         if strTest == "basic":
             return self.dummy
-        # elif strTest
+        elif strTest == "file_err":
+            return self.file_err_vid
         else:
             return self.dummy
 
@@ -242,6 +309,8 @@ class GuiviewMock:
         
         if strTest == "basic":
              return self.basic_exit
+        elif strTest == "file_err_dir":
+            return self.file_err_dir_exit
         else:
             return self.dummy
 
@@ -249,7 +318,7 @@ class GuiviewMock:
         pass
 
     
-    #Test: basic -------------------------------------
+    #Mock Test: basic -------------------------------------
 
     def basic_data(self):
         self.requestedVids = ["output4.avi", "output5.avi", 
@@ -284,6 +353,68 @@ class GuiviewMock:
         #and continue to remain here.
         assert _frameFactory.getFrameCounter() ==  0
             
+    def true_positive_frame( self, 
+                            _frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ):
+        
+        #deliberately trigger an assert error here
+        assert _frameFactory.getFrameCounter() ==  99
+
+    #Mock Test: file_err  -------------------------------------
+
+    def file_err_frame(self, *args):
+        self.mockCounter += 1
+    
+    def file_err_vid(   self
+                        ,_frameFactory
+                        ,_timeFactory
+                        ,_directoryFactory
+                        ):
+
+        #check that program flow was as expected: 1 pass through frameloop
+        print self.mockCounter
+        assert self.mockCounter == 0
+
+        #check that exit conditions are met
+        assert _frameFactory.getFailedLoad() == True
+        assert _timeFactory.checkExit(_frameFactory.getFailedLoad()) == True
+
+
+    #Mock Test: file_err_dir  -------------------------------------
+
+    def file_err_dir_data(self):
+        self.requestedVids = ["output4.avi", "output5.avi", 
+                              "output6.avi"]
+        
+        #two copies of each
+        self.requestedVids += copy.copy(self.requestedVids)
+
+    def file_err_dir_frame( self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ):
+
+        if _frameFactory.getFrameCounter() == 5:
+        
+            vidFn = _directoryFactory.vidFn()
+
+            if vidFn in self.requestedVids:
+
+                self.requestedVids.pop(self.requestedVids.index(vidFn))
+
+        self.stubCounter += 1
+
+
+    def file_err_dir_exit(self):
+        
+        #Verify all videos have been popped and thus played twice in dir, 
+        # except for the invalid dir, thus validating it runs over problem files
+        assert len(self.requestedVids) == 2
+
+        assert self.requestedVids[0] == "output6.avi"
         
 
 
@@ -319,7 +450,8 @@ class GuiviewStub:
         
         if strTest == "basic_file":
             return self.basic_file_frame
-        #elif strTest
+        elif strTest == "file_err_dir":
+            return self.file_err_dir_frame
         else:
             return self.dummy
 
@@ -351,13 +483,22 @@ class GuiviewStub:
         self.t0 = time.time()
 
     def basic_vid(self, *args):
-        if time.time() - self.t0 > 20:
+        if time.time() - self.t0 > 3:
             g.callExit = True
 
     def basic_file_frame(self, *args):
         self.stubCounter += 1
         if self.stubCounter > 50:
             g.callExit = True
+
+    #Test: file_err_dir ----------------------------------
+
+    def file_err_dir_frame(self, *args):
+        self.stubCounter += 1
+        if self.stubCounter > 50:
+            g.callExit = True
+
+    
 
 
 #For collection by pytest ------------------------
@@ -370,6 +511,19 @@ def test_basic_file():
     stage = GuiviewStagingClass()
     stage.basic_file()
 
+def test_true_positive():
+    stage = GuiviewStagingClass()
+    stage.true_positive()
+
+def test_file_err():
+    stage = GuiviewStagingClass()
+    stage.file_err()
+
+def test_file_err_dir():
+    stage = GuiviewStagingClass()
+    stage.file_err_dir()
+
+
 if __name__ == "__main__":
-    test_basic_dir()
+    test_file_err()
 
