@@ -34,6 +34,18 @@ class ConstructGui:
             g.playOn = True
             self.play_button.configure(bg = '#000fff000')
 
+    def cmd_writevid_sw(self):
+        ''' turn on/off video frame write '''
+        if g.writevidOn:
+            g.writevidOn = False
+            self.writevid_button.configure(bg = 'gray')
+        else:
+            g.writevidOn = True
+            self.writevid_button.configure(bg = '#000fff000')
+
+    def cmd_initWritevid_sw(self):
+        g.initWriteVid = True
+
     def set_int_frameDelay(self, boolVal):
         self.int_frameDelay.set(int(boolVal))
 
@@ -43,6 +55,9 @@ class ConstructGui:
     def cmd_delaySecsSet(self):
         g.delaySecs = float(self.sv_delaySecs.get())
 
+    def set_sv_writevidFn(self, strWriteVidFn):
+        self.sv_writevidFn.set(str(strWriteVidFn))
+    
     def set_sv_vidFn(self, strVidFn):
         self.sv_vidFn.set(str(strVidFn))
 
@@ -134,6 +149,40 @@ class ConstructGui:
             ,text = '>>'
             ,command = self.cmd_fastforward
             ).pack(side=tk.LEFT)
+
+        fwrite0 = tk.Frame(root)
+        fwrite0.pack(side = tk.TOP)
+
+        self.writevid_button = tk.Button(
+                 fwrite0
+                ,text = 'writevid'
+                ,bg = 'gray'
+                ,command = self.cmd_writevid_sw
+                )
+        self.writevid_button.pack(side=tk.LEFT)
+
+        self.initWritevid_button = tk.Button(
+                 fwrite0
+                ,text = 'init output'
+                ,bg = 'gray'
+                ,command = self.cmd_initWritevid_sw
+                )
+        self.initWritevid_button.pack(side=tk.LEFT)
+        
+        fwrite1 = tk.Frame(root)
+        fwrite1.pack(side = tk.TOP)
+
+        self.sv_writevidFn = tk.StringVar()
+        self.set_sv_writevidFn("n/a")
+        
+        self.dir_entry = tk.Entry(
+                 fwrite1
+                ,textvariable = self.sv_writevidFn
+                ,width = 20
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
 
         f1a5b = tk.Frame(root)
         f1a5b.pack(side = tk.TOP)
@@ -408,7 +457,17 @@ class GuiInterface:
         if all([x is not None for x in lagTuple]):
             self.gui.guiHeader.set_sv_lags(*lagTuple)
 
-    
+
+    def update( self, **kwargs):
+        
+        ''' can be called from anywhere'''        
+        
+        if self.gui is None: return
+
+        if kwargs.get('writevidFn', None) is not None:
+            self.gui.guiHeader.set_sv_writevidFn(str(kwargs.get('writevidFn', "n/a")))
+        
+
     def initGui(self, playOnVal, frameDelayVal):
 
         self.gui.guiHeader.init_gui( playOn = playOnVal
@@ -427,7 +486,9 @@ if __name__ == "__main__":
     g.switchAdvanceFrame = False
     g.switchRetreatFrame = False
     g.frameDelay = True
-    
+    g.writevidOn = False
+    g.initWriteVid = False
+
     gui = GuiC()
 
     gui.guiHeader.init_gui( playOn = g.playOn

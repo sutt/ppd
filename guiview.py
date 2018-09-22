@@ -27,6 +27,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [ ] making a directory
     [ ] copy logs
     [ ] set output dir with cmd line flag
+    [ ] add writeSnap button
 
 
 BUGS:
@@ -38,7 +39,7 @@ BUGS:
 '''
 
 #Globals---------------------------------
-# carry info from gui -> mainloop
+# carry info from gui -> mainthread
 g.init()
 g.playOn = True
 g.switchAdvanceFrame = False
@@ -48,6 +49,8 @@ g.switchFastforward = False
 g.frameDelay = True
 g.callExit = False
 g.delaySecs = 0.0
+g.writevidOn = False
+g.initWriteVid = False
 
 
 #High Level Options --------------------------
@@ -195,6 +198,15 @@ while(True):
         timeFactory.setPlay(g.playOn)
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
+
+        if directoryFactory.setInitWriteVid(g.initWriteVid):
+            directoryFactory.initVidWriter(frameFactory.getFrameSize())
+            guiInterface.update(writevidFn = directoryFactory.getWritevidFn())
+        
+        directoryFactory.setWriteVid(g.writevidOn)
+        directoryFactory.setWriteFrame(frameFactory.checkWriteFrame())
+        if directoryFactory.checkWriteFrame():
+            directoryFactory.writeFrame(frame, timeFactory.getFrametimeCurrent())
         
         if frameFactory.queryNewFrame():
             
@@ -209,6 +221,9 @@ while(True):
                                     ,cumTimeCurrent=timeFactory.cumTimeCurrent()
                                     ,lagTuple=timeFactory.lagTuple()
                                     )
+
+            
+
         else:
             ret = False
 

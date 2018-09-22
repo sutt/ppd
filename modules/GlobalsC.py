@@ -7,3 +7,6 @@ def init():
     global frameDelay
     global callExit
     global delaySecs
+    global writevidOn
+    global initWriteVid
+

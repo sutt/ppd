@@ -7,6 +7,11 @@
         [ ] shorten videos to 25 frames in basic
         [ ] change true_time to reflect a 25 frame vid (cumtime=0.8316 @frame 25)
 
+    [ ] Build output feature:
+        [x] why isn't VidWriter showing up in directory?
+        
+    [ ] why does holding down pause-button cause the program to exit without err msg?
+
 
 9/21
 

@@ -2,6 +2,8 @@ import os, sys, time, copy
 import numpy as np
 import cv2
 import argparse
+from vidwriter import VidWriter
+from miscutils import uniqueFn
 from modules.Utils import TimeLog
 from modules import GlobalsC as g
 
@@ -75,6 +77,15 @@ class FrameFactory:
         else:
             return self.cam.isOpened()
 
+    def getFrameSize(self):
+        if self.preloaded:
+            try:
+                frameSize = (self.frames[0].shape[1], self.frames[0].shape[0])
+                return frameSize
+            except:
+                return None
+        else:
+            raise Exception("Not implemented for not preload")
 
     def getFrame(self):
         if self.preloaded:
@@ -164,6 +175,19 @@ class FrameFactory:
             
         return False
 
+    def _validCurrentFrame(self):
+        if self.frameCounter < 0:
+            return False
+        # TODO - add upperbound
+        return True
+    
+    def checkWriteFrame(self):
+
+        if self.playOn or self.advanceFrame:
+            if self._validCurrentFrame():
+                return True
+        return False
+
     def getFailedLoad(self):
         return self.failedLoad
 
@@ -242,6 +266,9 @@ class TimeFactory:
     def avgFrameFps(self):
         return (self.avgFps, self.avgFrametime)
 
+    def getFrametimeCurrent(self):
+        return self.cumtime[self.frameCurrent]
+    
     def lagTuple(self):
         
         if not(self._validCumTime()) or not(self._validCurrentFrame()):
@@ -303,6 +330,11 @@ class DirectoryFactory:
         self.initDir = ""
         self.fn = ""
         self.listVids = None
+        self.vidwriter = None
+        self.writeVidFn = None
+        self.vidWriteFrametimeLog = None
+        self.bWriteFrame = False
+
 
     def setRunType(self, b_play_dir = False):
         self.b_play_dir = b_play_dir
@@ -367,4 +399,58 @@ class DirectoryFactory:
 
     def incrementPlayCounter(self):
         self.playCounter += 1
+
+    
+    def setInitWriteVid(self, bInitWriteVid):
+        if bInitWriteVid:
+            g.initWriteVid = False
+            return True
+        return False
+
+    def setWriteVid(self, bWrite):
+        self.writeVid = bWrite
+    
+    def setWriteFrame(self, bWriteFrame):
+        self.bWriteFrame = bWriteFrame
+
+    def checkWriteFrame(self):
+        if self.bWriteFrame:
+            return True
+        return False
+
+    def initVidWriter(self, frame_size):
+
+        fourcc = "h264"
+        ext = "avi"
+        
+        if self.vidwriter is not None:
+            self.vidwriter.release()
+            self.vidwriter = None
+
+        self.writeVidFn = uniqueFn(  fn_base = "proc.output"
+                                    ,fn_dir = self.initDir
+                                    ,fn_ext = ext
+                                    )
+            
+        self.vidwriter = VidWriter( 
+                             savefn = os.path.join(self.initDir, self.writeVidFn)
+                            ,fourcc = fourcc
+                            ,outshape = frame_size
+                            )
+        
+        # self.vidWriterFrametimeLog = []
+
+    def getWritevidFn(self):
+        return self.writeVidFn
+
+    def writeFrame(self, frame, timelogEntry):
+        ''' on advance or play, write previous frame '''
+        
+        if self.bWriteFrame and self.vidwriter is not None:
+        
+            self.vidwriter.write(frame)
+
+            # self.vidWriterFrametimeLog.append(timelogEntry)
+
+    
 
