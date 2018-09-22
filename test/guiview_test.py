@@ -278,7 +278,7 @@ class GuiviewStagingClass:
         ''' verify that advance/retreat work on a --file run
         '''
 
-        cmd = '''python guiview.py --test frame_sync --nogui --noshow 
+        cmd = '''python guiview.py --test advance_retreat --nogui --noshow 
                                 --file data/test/guiview/basic/output4.avi'''
 
         args = self.argsFromCmd(cmd)
@@ -297,7 +297,7 @@ class GuiviewStagingClass:
         ''' verify that lag_tuple is sync'd with frame
         '''
 
-        cmd = '''python guiview.py --test advance_retreat --nogui --noshow 
+        cmd = '''python guiview.py --test frame_sync --nogui --noshow 
                                 --file data/test/guiview/frame_sync/output4.avi'''
 
         args = self.argsFromCmd(cmd)
@@ -357,6 +357,8 @@ class GuiviewMock:
             return self.no_logs_frame
         elif strTest == 'advance_retreat':
             return self.advance_retreat_frame
+        elif strTest == 'frame_sync':
+            return self.frame_sync_frame
         else:
             return self.dummy
 
@@ -503,7 +505,7 @@ class GuiviewMock:
 
                 self.requestedVids.pop(self.requestedVids.index(vidFn))
 
-        self.stubCounter += 1
+        self.mockCounter += 1
 
 
     def no_logs_exit(self):
@@ -517,6 +519,10 @@ class GuiviewMock:
                             ,_directoryFactory
                             ):
 
+        # verify that frame advances and retreats,
+        # verify that frame never goes below zero
+        # verfiy that fast forward advances 10 frames
+        
         currentFrame = _frameFactory.getFrameCounter()
         mockCounter = self.mockCounter
         
@@ -526,36 +532,35 @@ class GuiviewMock:
 
         elif 5 <= mockCounter <= 10:
             
-            assert currentFrame == max(0, 10 - self.mockCounter)
+            assert currentFrame == max(0, 8 - self.mockCounter)
 
         elif mockCounter  == 11:
 
             assert currentFrame == 10
 
-        self.stubCounter += 1
+        self.mockCounter += 1
 
     def frame_sync_frame( self
                             ,_frameFactory
                             ,_timeFactory
                             ,_directoryFactory
                             ):
-
-        currentFrame = _frameFactory.getFrameCounter()
-        mockCounter = self.mockCounter
         
-        if mockCounter < 5:
+        if self.mockCounter == 4:
         
-            assert currentFrame == self.mockCounter #+ 1
+            assert _frameFactory.getFrameCounter() == 5
 
-        elif 5 <= mockCounter <= 10:
-            
-            assert currentFrame == max(0, 10 - self.mockCounter)
+            assert 0.4 > _timeFactory.lag_tuple()[1] > 0.3
+            assert 0.05 > _timeFactory.lag_tuple()[0] > 0.02
 
-        elif mockCounter  == 11:
+        if self.mockCounter == 5:
+        
+            assert _frameFactory.getFrameCounter() == 5
 
-            assert currentFrame == 10
-
-        self.stubCounter += 1
+            assert 0.4 > _timeFactory.lag_tuple()[0] > 0.3
+            assert 0.04 > _timeFactory.lag_tuple()[1] > 0.01
+        
+        self.mockCounter += 1
 
         
 
@@ -597,7 +602,7 @@ class GuiviewStub:
             return self.no_logs_frame
         elif strTest == "advance_retreat":
             return self.advance_retreat_frame
-        elif strTest == "frame_synct":
+        elif strTest == "frame_sync":
             return self.frame_sync_frame
         else:
             return self.dummy
@@ -716,6 +721,11 @@ def test_advance_retreat():
     stage = GuiviewStagingClass()
     stage.advance_retreat()
 
+def test_frame_sync():
+    stage = GuiviewStagingClass()
+    stage.frame_sync()
+
+
 if __name__ == "__main__":
-    test_file_err()
+    test_advance_retreat()
 
