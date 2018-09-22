@@ -42,8 +42,8 @@ Todo:
     [x] a video that cant be read within a dir of valid vids
     [ ] true time vs nodelay
     [x] firstN
-    [ ] advance + retreat frame
-    [ ] no logs
+    [x] advance + retreat frame
+    [x] no logs
     [ ] frame lag on delay vid
 
 
@@ -254,6 +254,64 @@ class GuiviewStagingClass:
             print "\n".join(msg)
             raise Exception("TEST FAIL: fil_err_dir")
 
+    def no_logs(self):
+        ''' verifyb that .avi files even without .txt and .metalog files still run thru
+        '''
+
+        cmd = '''python guiview.py --test no_logs --nogui --noshow 
+                                --dir data/test/guiview/no_logs/
+                                --firstN 10'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: no_logs")
+
+    def advance_retreat(self):
+        ''' verify that advance/retreat work on a --file run
+        '''
+
+        cmd = '''python guiview.py --test frame_sync --nogui --noshow 
+                                --file data/test/guiview/basic/output4.avi'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: advance_retreat")
+
+    def frame_sync(self):
+        ''' verify that lag_tuple is sync'd with frame
+        '''
+
+        cmd = '''python guiview.py --test advance_retreat --nogui --noshow 
+                                --file data/test/guiview/frame_sync/output4.avi'''
+
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: frame_sync")
+
 
     
 
@@ -278,6 +336,8 @@ class GuiviewMock:
             self.basic_data()
         elif strTest == "file_err_dir":
             self.file_err_dir_data()
+        elif strTest == 'no_logs':
+            self.no_logs_data()
         else:
             self.dummy()
 
@@ -293,6 +353,10 @@ class GuiviewMock:
             return self.file_err_frame
         elif strTest =="file_err_dir":
             return self.file_err_dir_frame
+        elif strTest == 'no_logs':
+            return self.no_logs_frame
+        elif strTest == 'advance_retreat':
+            return self.advance_retreat_frame
         else:
             return self.dummy
 
@@ -311,6 +375,8 @@ class GuiviewMock:
              return self.basic_exit
         elif strTest == "file_err_dir":
             return self.file_err_dir_exit
+        elif strTest == "no_logs":
+            return self.no_logs_data
         else:
             return self.dummy
 
@@ -415,8 +481,83 @@ class GuiviewMock:
         assert len(self.requestedVids) == 2
 
         assert self.requestedVids[0] == "output6.avi"
-        
 
+
+    def no_logs_data(self):
+        self.requestedVids = ["output4.avi", "output5.avi"]
+        
+        #two copies of each
+        self.requestedVids += copy.copy(self.requestedVids)
+
+    def no_logs_frame( self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ):
+
+        if _frameFactory.getFrameCounter() == 5:
+        
+            vidFn = _directoryFactory.vidFn()
+
+            if vidFn in self.requestedVids:
+
+                self.requestedVids.pop(self.requestedVids.index(vidFn))
+
+        self.stubCounter += 1
+
+
+    def no_logs_exit(self):
+        
+        #both videos have been popped twice
+        assert len(self.requestedVids) == 0
+
+    def advance_retreat_frame( self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ):
+
+        currentFrame = _frameFactory.getFrameCounter()
+        mockCounter = self.mockCounter
+        
+        if mockCounter < 5:
+        
+            assert currentFrame == self.mockCounter #+ 1
+
+        elif 5 <= mockCounter <= 10:
+            
+            assert currentFrame == max(0, 10 - self.mockCounter)
+
+        elif mockCounter  == 11:
+
+            assert currentFrame == 10
+
+        self.stubCounter += 1
+
+    def frame_sync_frame( self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ):
+
+        currentFrame = _frameFactory.getFrameCounter()
+        mockCounter = self.mockCounter
+        
+        if mockCounter < 5:
+        
+            assert currentFrame == self.mockCounter #+ 1
+
+        elif 5 <= mockCounter <= 10:
+            
+            assert currentFrame == max(0, 10 - self.mockCounter)
+
+        elif mockCounter  == 11:
+
+            assert currentFrame == 10
+
+        self.stubCounter += 1
+
+        
 
 class GuiviewStub:
 
@@ -452,6 +593,12 @@ class GuiviewStub:
             return self.basic_file_frame
         elif strTest == "file_err_dir":
             return self.file_err_dir_frame
+        elif strTest == "no_logs":
+            return self.no_logs_frame
+        elif strTest == "advance_retreat":
+            return self.advance_retreat_frame
+        elif strTest == "frame_synct":
+            return self.frame_sync_frame
         else:
             return self.dummy
 
@@ -498,6 +645,44 @@ class GuiviewStub:
         if self.stubCounter > 50:
             g.callExit = True
 
+    def no_logs_frame(self, *args):
+        self.stubCounter += 1
+        if self.stubCounter > 50:
+            g.callExit = True
+
+    #Test Stub: advance_retreat ---------------------------------
+
+    def advance_retreat_frame(self, *args):
+                            # ,_frameFactory
+                            # ,_timeFactory
+                            # ,_directoryFactory
+                            # ):
+        
+        if self.stubCounter < 5:
+            g.switchAdvanceFrame = True
+        
+        elif 5 <= self.stubCounter <= 10:
+            g.switchRetreatFrame = True
+        
+        elif self.stubCounter == 11:
+            g.switchFastforward = True
+
+        self.stubCounter += 1
+
+        if self.stubCounter > 20:
+            g.callExit = True
+
+    
+    def frame_sync_frame(self, *args):
+        
+        if self.stubCounter <= 5:
+            g.switchAdvanceFrame = True
+
+        self.stubCounter += 1
+
+        if self.stubCounter > 10:
+            g.callExit = True
+        
     
 
 
@@ -523,6 +708,13 @@ def test_file_err_dir():
     stage = GuiviewStagingClass()
     stage.file_err_dir()
 
+def test_no_logs():
+    stage = GuiviewStagingClass()
+    stage.no_logs()
+
+def test_advance_retreat():
+    stage = GuiviewStagingClass()
+    stage.advance_retreat()
 
 if __name__ == "__main__":
     test_file_err()
