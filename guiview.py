@@ -16,10 +16,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
 
-[x] validate lag interval with sync-framerate ipynb study videos
-    --file data/books/correspond-frame-to-framelog/output82.avi
-
-[x] add 5x/10x increment/decremnt buttons
+[x] Add testing stubs/mocks
 
 [ ] Add notesFactory
     [ ] handle orientation with img_rotate
@@ -60,6 +57,9 @@ b_annotate_fn = False
 b_resize = True
 b_gui = True
 first_n = 0
+b_test = False
+str_test = ""
+b_show = True
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -69,6 +69,8 @@ ap.add_argument("--nogui",  action="store_true", default=False)
 ap.add_argument("--nodelay", action="store_true", default=False)
 ap.add_argument("--preload", action="store_true", default=False)
 ap.add_argument("--firstN", type=str, default="")
+ap.add_argument("--test", type=str, default="")
+ap.add_argument("--noshow", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -98,6 +100,17 @@ if args["dir"] != "":
     g.frameDelay = False
 
 
+if args["test"] != "":
+    
+    b_test = True
+    str_test = args["test"]
+
+    from test.guiview_test import GuiviewStub
+    from test.guiview_test import GuiviewMock
+    stub = GuiviewStub(str_test)
+    mock = GuiviewMock(str_test)
+
+
 if args["nogui"]:
     b_gui = False
 
@@ -110,6 +123,11 @@ if args["preload"]:
 if args["firstN"] != "":
     first_n = int(args["firstN"])
 
+if args["noshow"]:
+    b_show = False
+
+
+    
 
 # Initalize Top Level Loop ----------------------------
 
@@ -159,8 +177,14 @@ while(True):
                                 ,cumTimeTotal=timeFactory.cumTimeTotal()
                                 ,avgFrameFps=timeFactory.avgFrameFps()
                                 )
+    
+    if b_test:
+        stub.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory)
 
     while(frameFactory.isOpened()):
+        
+        if b_test:
+            stub.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
         
         frameFactory.setPlay(g.playOn)
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
@@ -199,23 +223,35 @@ while(True):
                 msg = [directoryFactory.vidFn()]
                 imgDisplay = draw_annotations(imgDisplay, msg)
 
+        if b_show:
 
-        windowName = 'img_display'
-        cv2.imshow(windowName, imgDisplay)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+            windowName = 'img_display'
+            cv2.imshow(windowName, imgDisplay)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        if g.callExit:
             break
-
-        if g.callExit:    
-            cv2.destroyAllWindows()
-            sys.exit()
-
+            
         timeFactory.delayFrame()
 
+        if b_test:
+            mock.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
 
+    if b_test:
+        mock.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+    
     directoryFactory.incrementPlayCounter()
 
     if directoryFactory.checkExit(frameFactory.getFailedLoad()):
         break
 
+    if g.callExit:
+        break
+
 
 cv2.destroyAllWindows()
+
+if b_test:
+    mock.exitByStr(str_test)()
+    stub.exitByStr(str_test)()    #write to stderr
