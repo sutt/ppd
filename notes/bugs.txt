@@ -1,5 +1,31 @@
 #Tasks
 
+9/21
+
+    [x] Testing guiview
+        [x] add tests/
+        [x] add template for tests on guiview
+        [x] add structure of tests to guiview
+
+            since we're running in Popen we need to write out data to tmp file
+            or do we? we can do asserts within mock_test() and raise an error and capture in stderr on the console?
+
+        [ ] build a test_timeout function on a thread
+        
+        [ ] try some of the features in vscode:
+            https://code.visualstudio.com/docs/python/unit-testing
+
+        [x] build 12 tests
+
+        [ ] shorten test data: cut the videos down
+
+    [ ] add a preload which checks for memory usage; doesn't overflow
+    [ ] add a "streaming" preload, holds N previous frames and pops last one off
+        each frameloop
+
+    [ ] dot operator for uniqueFn
+    [ ] find-project-root function
+
 9/20
 
     [ ] how to raise opencv warnings to 'except' in python.

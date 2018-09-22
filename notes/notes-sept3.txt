@@ -21,6 +21,8 @@ Skills
 
     dir(obj) shows all methods available to object
 
+    signal.SIGALRM is available in wsl, but not windows
+
 
 
 Parrot Bebop controlled by python
