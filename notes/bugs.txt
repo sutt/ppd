@@ -1,5 +1,18 @@
 #Tasks
 
+9/23
+
+    [ ] refactory directoryFactory to outputFactory
+    [x] add snap vid write button
+    [ ] add config to the button; green if written; reset if new frame
+    [ ] add tests for output functionality
+        [ ] does it write; size > x
+        [ ] can it advance without writing?
+        [ ] does it match a premade vid? only certain frames, only certain contguous frame regions
+        [ ] do two outputs
+    
+
+
 
 9/22
     
@@ -7,7 +20,7 @@
         [ ] shorten videos to 25 frames in basic
         [ ] change true_time to reflect a 25 frame vid (cumtime=0.8316 @frame 25)
 
-    [ ] Build output feature:
+    [x] Build output feature:
         [x] why isn't VidWriter showing up in directory?
         
     [ ] why does holding down pause-button cause the program to exit without err msg?

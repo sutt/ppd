@@ -9,4 +9,5 @@ def init():
     global delaySecs
     global writevidOn
     global initWriteVid
-
+    global switchWriteVid
+    

@@ -333,7 +333,9 @@ class DirectoryFactory:
         self.vidwriter = None
         self.writeVidFn = None
         self.vidWriteFrametimeLog = None
-        self.bWriteFrame = False
+        self.bWriteFrameOn = False
+        self.bWriteFrameCmd = False
+        self.bWriteFrameSnap = False
 
 
     def setRunType(self, b_play_dir = False):
@@ -407,14 +409,18 @@ class DirectoryFactory:
             return True
         return False
 
-    def setWriteVid(self, bWrite):
-        self.writeVid = bWrite
+    def setWriteFrameOn(self, bWriteFrameOn, bSwtichWriteFrame):
+        self.bWriteFrameOn = bWriteFrameOn
+        self.bWriteFrameSnap = bSwtichWriteFrame
+        if bSwtichWriteFrame:
+            g.switchWriteVid = False
     
-    def setWriteFrame(self, bWriteFrame):
-        self.bWriteFrame = bWriteFrame
+    def setWriteFrameCmd(self, bWriteFrame):
+        self.bWriteFrameCmd = bWriteFrame
 
     def checkWriteFrame(self):
-        if self.bWriteFrame:
+        if ((self.bWriteFrameOn and self.bWriteFrameCmd)
+            or self.bWriteFrameSnap):
             return True
         return False
 
@@ -427,7 +433,9 @@ class DirectoryFactory:
             self.vidwriter.release()
             self.vidwriter = None
 
-        self.writeVidFn = uniqueFn(  fn_base = "proc.output"
+        fnBase = "".join(self.vidFn().split(".")[:-1])
+        
+        self.writeVidFn = uniqueFn(  fn_base = fnBase + ".proc"
                                     ,fn_dir = self.initDir
                                     ,fn_ext = ext
                                     )
@@ -446,7 +454,7 @@ class DirectoryFactory:
     def writeFrame(self, frame, timelogEntry):
         ''' on advance or play, write previous frame '''
         
-        if self.bWriteFrame and self.vidwriter is not None:
+        if self.vidwriter is not None:
         
             self.vidwriter.write(frame)
 

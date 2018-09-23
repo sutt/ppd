@@ -46,6 +46,9 @@ class ConstructGui:
     def cmd_initWritevid_sw(self):
         g.initWriteVid = True
 
+    def cmd_snapWriteVid_sw(self):
+        g.switchWriteVid = True
+
     def set_int_frameDelay(self, boolVal):
         self.int_frameDelay.set(int(boolVal))
 
@@ -134,6 +137,16 @@ class ConstructGui:
             ,text = 'advance'
             ,command = self.cmd_advance
             ).pack(side=tk.LEFT)
+
+        f1b2 = tk.Frame(root)
+        f1b2.pack(side = tk.TOP)
+
+        self.snapWriteVid_button = tk.Button(
+             f1b2
+            ,text = 'writeFrame'
+            ,command = self.cmd_snapWriteVid_sw
+            )
+        self.snapWriteVid_button.pack()
 
         f1c = tk.Frame(root)
         f1c.pack(side = tk.TOP)

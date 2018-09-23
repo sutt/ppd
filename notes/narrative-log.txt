@@ -1,3 +1,17 @@
+9/23
+
+An experiment can be one video with particular frames:
+    e.g. output4.proc1.avi
+    first four frames are for training so I can save them as frame.purpose = training
+    also save their frame num from original,
+    and also save their 
+    now some later frames are for scoring, so put writevid to ON and play,
+        (if you know ball is present in all frames you can set that )
+    these can help you see how tracking is performing.
+    every once in a while, you pause and can select an ROI for the ball
+    and set handscore = true, handscoreroi = (200,291)
+
+
 9/20
 
 Compare guiview + module.ControlFlow to guirecord:

@@ -22,12 +22,12 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [ ] handle orientation with img_rotate
 
 [ ] Add output basic functionality
-    [ ] naming: proc1.output1.avi...proc2.output1.avi
-        [ ] uniqueFn modify + tests
+    [x] naming: proc1.output1.avi...proc2.output1.avi
+        [~] uniqueFn modify + tests
     [ ] making a directory
     [ ] copy logs
     [ ] set output dir with cmd line flag
-    [ ] add writeSnap button
+    [x] add writeSnap button
 
 
 BUGS:
@@ -51,6 +51,7 @@ g.callExit = False
 g.delaySecs = 0.0
 g.writevidOn = False
 g.initWriteVid = False
+g.switchWriteVid = False
 
 
 #High Level Options --------------------------
@@ -189,6 +190,7 @@ while(True):
         if b_test:
             stub.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
         
+        # receive cmd data from gui
         frameFactory.setPlay(g.playOn)
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
@@ -199,12 +201,13 @@ while(True):
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
 
+        # output, handle before next frame
         if directoryFactory.setInitWriteVid(g.initWriteVid):
             directoryFactory.initVidWriter(frameFactory.getFrameSize())
             guiInterface.update(writevidFn = directoryFactory.getWritevidFn())
         
-        directoryFactory.setWriteVid(g.writevidOn)
-        directoryFactory.setWriteFrame(frameFactory.checkWriteFrame())
+        directoryFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
+        directoryFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if directoryFactory.checkWriteFrame():
             directoryFactory.writeFrame(frame, timeFactory.getFrametimeCurrent())
         
@@ -221,9 +224,6 @@ while(True):
                                     ,cumTimeCurrent=timeFactory.cumTimeCurrent()
                                     ,lagTuple=timeFactory.lagTuple()
                                     )
-
-            
-
         else:
             ret = False
 
