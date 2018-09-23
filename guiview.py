@@ -26,7 +26,7 @@ from modules.GraphicsCV import draw_annotations, resize_img
     [x] naming: proc1.output1.avi...proc2.output1.avi
         [~] uniqueFn modify + tests
     [ ] making a directory
-    [ ] copy logs
+    [x] copy logs
     [ ] set output dir with cmd line flag
     [x] add writeSnap button
 
@@ -217,7 +217,7 @@ while(True):
         outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if outputFactory.checkWriteFrame():
-            outputFactory.writeFrame(frame, timeFactory.getFrametimeCurrent())
+            outputFactory.writeFrame(frame, timeFactory.getLagtimeCurrent())
         
         if frameFactory.queryNewFrame():
             

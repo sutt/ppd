@@ -5,6 +5,8 @@
     [x] refactory directoryFactory to outputFactory
     [x] add snap vid write button
     [ ] add config to the button; green if written; reset if new frame
+    [ ] add [separate] button to snap-write-frame and hand-scored data
+    [ ] need way to view frame notes as we step-thru
 
     [ ] add tests for output functionality
         [x] does it write; size > x
@@ -13,23 +15,34 @@
         [x] do two outputs
         [x] non-default framesize
         [x] snapWriteFrame
-        [ ] test log output
-        [ ] test log output when
+        [x] test log output
+        [x] test log output when no good log exists
+        [ ] test frame json
+        [ ] test time it takes to write new json metalog each time
 
     [ ] log outputs:
-        [ ] timelog
+        [x] timelog
         [ ] import notes from metalog
         [ ] frame json onto metalog
             [ ] does it update each time on disk?
+                [ ] this could be slow?
             [ ] viewable with tail?
+
     [ ] open an existing video file, write new frames to it:
         this could be useful for adding additional training frames after experiment
         is originally built
+
+        [ ] use --output for this?
+        [ ] or, use gui for that? 
+            [ ] with set button, that shows validation
+
     [ ] remove scratch work from git:
         create mode 100644 demo_sub.py
         create mode 100644 test/demo_dub.py
         create mode 100644 test/demo_subproc.py
         create mode 100644 test/demo_test.py
+
+    [ ] refactor .txt -> .framelog
 
     [ ] build mini-app to test tkinter debug ability
     [ ] look at gui.call_cmd: sv.get() instead of globals,

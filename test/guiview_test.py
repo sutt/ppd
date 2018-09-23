@@ -505,6 +505,149 @@ class GuiviewStagingClass:
         if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: write_adv")
+
+    def write_time(self):
+        ''' test that timelog gets written out, and that values are correct.
+            here, we skip 3rd frame so time log should have frame1, frame2, 
+            and frame4 values'''
+
+        cmd = '''python guiview.py --test write_time --nogui --noshow 
+                                    --file data/test/guiview/write_time/output4.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_time/"
+        TEST_DATA_FN_1 = "output4.proc1.avi"
+        TEST_DATA_FN_2 = "output4.proc1.txt"
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2))
+        except:
+            pass
+        assert not(TEST_DATA_FN_1 in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_2 in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN_1 in list_files) or not(TEST_DATA_FN_2 in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2), 'r') as f:
+                    lines = f.readlines()
+                assert len(lines) == 3
+                assert float(lines[0]) == 0
+                assert float(lines[1]) == 0.0329
+                assert float(lines[2]) == 0.0309
+
+            except:
+                bErrors = True
+                msg += ["TEST DATA: timelog file is not as expected"]
+                msg += [str(lines)]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_time")
+
+    def write_bad_time(self):
+        ''' test that timelog gets written out, even when existing timelog
+            is bad or doesn't exist: output5.txt is blank and output6.txt
+            does not exist, verify there is an output framelog with zeros '''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_time/"
+        TEST_DATA_FN_1 = "output5.proc1.txt"
+        TEST_DATA_FN_2 = "output6.proc1.txt"
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2))
+        except:
+            pass
+        assert not(TEST_DATA_FN_1 in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_2 in os.listdir(TEST_DATA_DIR))
+
+        #Run Test #1 -----------------------------------
+        cmd = '''python guiview.py --test write_bad_time --nogui --noshow 
+                                    --file data/test/guiview/write_time/output5.avi'''
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN_1 in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1), 'r') as f:
+                    lines = f.readlines()
+                assert len(lines) == 3
+                assert float(lines[0]) == 0
+                assert float(lines[1]) == 0
+
+            except:
+                bErrors = True
+                msg += ["TEST DATA: timelog file is not as expected"]
+                msg += [str(lines)]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_bad_time")
+
+        #Run Test #2 -----------------------------------
+        cmd = '''python guiview.py --test write_bad_time --nogui --noshow 
+                                    --file data/test/guiview/write_time/output6.avi'''
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN_1 in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2), 'r') as f:
+                    lines = f.readlines()
+                assert len(lines) == 3
+                assert float(lines[0]) == 0
+                assert float(lines[1]) == 0
+
+            except:
+                bErrors = True
+                msg += ["TEST DATA: timelog file is not as expected"]
+                msg += [str(lines)]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_bad_time")
     
 
 
@@ -831,6 +974,10 @@ class GuiviewStub:
             return self.write_adv_frame
         elif strTest == 'write_two':
             return self.write_two_frame
+        elif strTest == 'write_time':
+            return self.write_time_frame
+        elif strTest == 'write_bad_time':
+            return self.write_time_frame    #same as other test
         else:
             return self.dummy
 
@@ -971,11 +1118,46 @@ class GuiviewStub:
         
         if self.stubCounter > 25:
             g.callExit = True
+
+    def write_time_frame(self, *args):
         
+        if self.stubCounter == 1:
+            g.initWriteVid = True
+
+        if self.stubCounter == 2:
+            g.switchWriteVid = True
+
+        if self.stubCounter == 3:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 4:
+            g.switchWriteVid = True
+
+        if self.stubCounter == 5:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 6:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 7:
+            g.switchWriteVid = True
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 25:
+            g.callExit = True
     
 
 
 #For collection by pytest ------------------------
+
+def test_write_bad_time():
+    stage = GuiviewStagingClass()
+    stage.write_bad_time()
+
+def test_write_time():
+    stage = GuiviewStagingClass()
+    stage.write_time()
 
 def test_write_two():
     stage = GuiviewStagingClass()

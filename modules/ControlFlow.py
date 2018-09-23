@@ -268,7 +268,18 @@ class TimeFactory:
 
     def getFrametimeCurrent(self):
         return self.cumtime[self.frameCurrent]
-    
+
+    def getLagtimeCurrent(self):
+        
+        if not(self._validCumTime()) or not(self._validCurrentFrame()):
+            return 0
+
+        if self.frameCurrent == 0:
+            return 0
+        else:
+            return self.cumtime[self.frameCurrent] - self.cumtime[self.frameCurrent - 1]
+
+
     def lagTuple(self):
         
         if not(self._validCumTime()) or not(self._validCurrentFrame()):
@@ -404,8 +415,9 @@ class OutputFactory:
     def __init__(self):
         self.outputDir = ""
         self.vidwriter = None
+        self.timewriter = None
         self.writeVidFn = None
-        self.vidWriteFrametimeLog = None
+        self.writeTimeFn = None
         self.bWriteFrameOn = False
         self.bWriteFrameCmd = False
         self.bWriteFrameSnap = False
@@ -435,6 +447,10 @@ class OutputFactory:
             return True
         return False
 
+    @staticmethod
+    def stripExt(fn):
+        return ".".join(fn.split(".")[:-1])
+    
     def initVidWriter(self, frameSize, vidFn):
 
         fourcc = "h264"
@@ -444,7 +460,7 @@ class OutputFactory:
             self.vidwriter.release()
             self.vidwriter = None
 
-        fnBase = "".join(vidFn.split(".")[:-1])
+        fnBase = self.stripExt(vidFn)
         
         self.writeVidFn = uniqueFn(  fn_base = fnBase + ".proc"
                                     ,fn_dir = self.outputDir
@@ -457,7 +473,13 @@ class OutputFactory:
                             ,outshape = frameSize
                             )
         
-        # self.vidWriterFrametimeLog = []
+        if self.timewriter is not None:
+            self.timewriter.close()
+            self.timewriter = None
+        
+        self.writeTimeFn = self.stripExt(self.writeVidFn) + ".txt"
+        
+        self.timewriter = open(os.path.join(self.outputDir, self.writeTimeFn), 'w')
 
     def getWritevidFn(self):
         return self.writeVidFn
@@ -467,7 +489,8 @@ class OutputFactory:
         
         if self.vidwriter is not None:
         
-            print 'write'
             self.vidwriter.write(frame)
 
-            # self.vidWriterFrametimeLog.append(timelogEntry)
+        if self.timewriter is not None:
+            
+            self.timewriter.write(str(timelogEntry) + "\n")
