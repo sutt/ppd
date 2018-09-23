@@ -379,7 +379,60 @@ class GuiviewStagingClass:
                 output_size = os.path.getsize(os.path.join(TEST_DATA_DIR
                                                         ,TEST_DATA_FN))
 
-                if not((10**5) < output_size < (10**6)): #between 10 kB and 100 kB
+                print 'OUTPUT SIZE:'
+                print output_size
+                print 3*10**5
+                print output_size < 3*10**5
+                if not((10**4) < output_size < 3*(10**5)): #between 10 kB and 300 kB
+                    bErrors = True
+                    msg += ["TEST DATA: output file size below/above level expected"]
+            except:
+                bErrors = True
+                msg += ["TEST DATA: could not find size of the output file"]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_basic")
+
+
+    def write_adv(self):
+        ''' test that video output is does not write without writeframe on'''
+
+        cmd = '''python guiview.py --test write_adv --nogui --noshow 
+                                    --file data/test/guiview/write_adv/output4.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_adv/"
+        TEST_DATA_FN = "output4.proc1.avi"
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN))
+        except:
+            pass
+        assert not(TEST_DATA_FN in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not("output4.proc1.avi" in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        if not(bErrors):
+            try:        
+                output_size = os.path.getsize(os.path.join(TEST_DATA_DIR
+                                                        ,TEST_DATA_FN))
+
+                if not( 7*(10**3) < output_size < 4*(10**4)): #between 7 kB and 40 kB
                     bErrors = True
                     msg += ["TEST DATA: output file size below/above level expected"]
             except:
@@ -392,7 +445,66 @@ class GuiviewStagingClass:
         #Output test result -------------------------
         if bErrors: # or ret != 0:
             print "\n".join(msg)
-            raise Exception("TEST FAIL: write_basic")
+            raise Exception("TEST FAIL: write_adv")
+
+    
+    def write_two(self):
+        ''' test that video output is does not write without writeframe on'''
+
+        cmd = '''python guiview.py --test write_two --nogui --noshow 
+                                    --file data/test/guiview/write_two/output6.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_two/"
+        TEST_DATA_FN_1 = "output6.proc1.avi"
+        TEST_DATA_FN_2 = "output6.proc2.avi"
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2))
+        except:
+            pass
+        assert not(TEST_DATA_FN_1 in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_2 in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN_1 in list_files) or not(TEST_DATA_FN_2 in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:        
+                output_size_1 = os.path.getsize(os.path.join(TEST_DATA_DIR
+                                                        ,TEST_DATA_FN_1))
+
+                if not( 3*(10**4) < output_size_1 < 5*(10**4)): #between 30 kB and 40 kB
+                    bErrors = True
+                    msg += ["TEST DATA: output file size below/above level expected"]
+                
+                output_size_2 = os.path.getsize(os.path.join(TEST_DATA_DIR
+                                                        ,TEST_DATA_FN_2))
+
+                if not( 9*(10**5) < output_size_2 < 1.1*(10**6)): #between 900 kB and 1.1 MB
+                    bErrors = True
+                    msg += ["TEST DATA: output file size below/above level expected"]
+            except:
+                bErrors = True
+                msg += ["TEST DATA: could not find size of the output file"]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_adv")
     
 
 
@@ -715,6 +827,10 @@ class GuiviewStub:
             return self.frame_sync_frame
         elif strTest == 'write_basic':
             return self.write_basic_frame
+        elif strTest == 'write_adv':
+            return self.write_adv_frame
+        elif strTest == 'write_two':
+            return self.write_two_frame
         else:
             return self.dummy
 
@@ -817,11 +933,61 @@ class GuiviewStub:
         
         if self.stubCounter > 25:
             g.callExit = True
+
+    
+    def write_adv_frame(self, *args):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True
+
+        if self.stubCounter == 2:
+            g.writevidOn = True
+
+        if 2 < self.stubCounter < 25:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 5:
+            g.writevidOn = False
+        
+        self.stubCounter += 1
+        
+        if self.stubCounter > 25:
+            g.callExit = True
+
+    def write_two_frame(self, *args):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True
+
+        if 1 < self.stubCounter < 4:
+            g.switchWriteVid = True
+
+        if self.stubCounter == 5:
+            g.initWriteVid = True
+            g.writevidOn = True
+            g.playOn = True
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 25:
+            g.callExit = True
         
     
 
 
 #For collection by pytest ------------------------
+
+def test_write_two():
+    stage = GuiviewStagingClass()
+    stage.write_two()
+
+def test_write_basic():
+    stage = GuiviewStagingClass()
+    stage.write_basic()
+
+def test_write_adv():
+    stage = GuiviewStagingClass()
+    stage.write_adv()
 
 def test_basic_dir():
     stage = GuiviewStagingClass()
@@ -859,11 +1025,7 @@ def test_true_time():
     stage = GuiviewStagingClass()
     stage.true_time()
 
-def test_write_basic():
-    stage = GuiviewStagingClass()
-    stage.write_basic()
-
 if __name__ == "__main__":
-    test_true_positive()
+    test_write_basic()
     pass
 

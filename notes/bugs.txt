@@ -7,9 +7,11 @@
     [ ] add config to the button; green if written; reset if new frame
     [ ] add tests for output functionality
         [x] does it write; size > x
-        [ ] can it advance without writing?
+        [x] can it advance without writing?
         [ ] does it match a premade vid? only certain frames, only certain contguous frame regions
-        [ ] do two outputs
+        [x] do two outputs
+        [x] non-default framesize
+        [x] snapWriteFrame
     [ ] log outputs:
         [ ] timelog
         [ ] frame json onto metalog
@@ -23,6 +25,12 @@
         create mode 100644 test/demo_dub.py
         create mode 100644 test/demo_subproc.py
         create mode 100644 test/demo_test.py
+
+    [ ] look at gui.call_cmd: sv.get() instead of globals,
+        see if that helps with debug mini-app multi-thread debug ?
+        does it help with space-hold-down-crash?
+
+    [ ] filter vid names, e.g. with or without "proc"
 
 
 
