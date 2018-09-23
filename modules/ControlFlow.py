@@ -330,12 +330,6 @@ class DirectoryFactory:
         self.initDir = ""
         self.fn = ""
         self.listVids = None
-        self.vidwriter = None
-        self.writeVidFn = None
-        self.vidWriteFrametimeLog = None
-        self.bWriteFrameOn = False
-        self.bWriteFrameCmd = False
-        self.bWriteFrameSnap = False
 
 
     def setRunType(self, b_play_dir = False):
@@ -402,6 +396,23 @@ class DirectoryFactory:
     def incrementPlayCounter(self):
         self.playCounter += 1
 
+
+class OutputFactory:
+
+    ''' Handles logic for outputting a video '''
+
+    def __init__(self):
+        self.outputDir = ""
+        self.vidwriter = None
+        self.writeVidFn = None
+        self.vidWriteFrametimeLog = None
+        self.bWriteFrameOn = False
+        self.bWriteFrameCmd = False
+        self.bWriteFrameSnap = False
+
+
+    def setOutputDir(self, outputDir):
+        self.outputDir = outputDir
     
     def setInitWriteVid(self, bInitWriteVid):
         if bInitWriteVid:
@@ -424,7 +435,7 @@ class DirectoryFactory:
             return True
         return False
 
-    def initVidWriter(self, frame_size):
+    def initVidWriter(self, frameSize, vidFn):
 
         fourcc = "h264"
         ext = "avi"
@@ -433,17 +444,17 @@ class DirectoryFactory:
             self.vidwriter.release()
             self.vidwriter = None
 
-        fnBase = "".join(self.vidFn().split(".")[:-1])
+        fnBase = "".join(vidFn.split(".")[:-1])
         
         self.writeVidFn = uniqueFn(  fn_base = fnBase + ".proc"
-                                    ,fn_dir = self.initDir
+                                    ,fn_dir = self.outputDir
                                     ,fn_ext = ext
                                     )
             
         self.vidwriter = VidWriter( 
-                             savefn = os.path.join(self.initDir, self.writeVidFn)
+                             savefn = os.path.join(self.outputDir, self.writeVidFn)
                             ,fourcc = fourcc
-                            ,outshape = frame_size
+                            ,outshape = frameSize
                             )
         
         # self.vidWriterFrametimeLog = []
@@ -460,6 +471,3 @@ class DirectoryFactory:
             self.vidwriter.write(frame)
 
             # self.vidWriterFrametimeLog.append(timelogEntry)
-
-    
-

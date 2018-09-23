@@ -2,9 +2,10 @@
 
 9/23
 
-    [ ] refactory directoryFactory to outputFactory
+    [x] refactory directoryFactory to outputFactory
     [x] add snap vid write button
     [ ] add config to the button; green if written; reset if new frame
+
     [ ] add tests for output functionality
         [x] does it write; size > x
         [x] can it advance without writing?
@@ -12,8 +13,12 @@
         [x] do two outputs
         [x] non-default framesize
         [x] snapWriteFrame
+        [ ] test log output
+        [ ] test log output when
+
     [ ] log outputs:
         [ ] timelog
+        [ ] import notes from metalog
         [ ] frame json onto metalog
             [ ] does it update each time on disk?
             [ ] viewable with tail?
@@ -26,6 +31,7 @@
         create mode 100644 test/demo_subproc.py
         create mode 100644 test/demo_test.py
 
+    [ ] build mini-app to test tkinter debug ability
     [ ] look at gui.call_cmd: sv.get() instead of globals,
         see if that helps with debug mini-app multi-thread debug ?
         does it help with space-hold-down-crash?

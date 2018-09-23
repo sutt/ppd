@@ -12,6 +12,7 @@ from modules.Utils import MetaDataLog
 from modules.ControlFlow import DirectoryFactory
 from modules.ControlFlow import FrameFactory
 from modules.ControlFlow import TimeFactory
+from modules.ControlFlow import OutputFactory
 from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
@@ -144,7 +145,9 @@ directoryFactory.setData( initDir= init_dir
                          ,fn=FN
                          )
 
-#TODO - add outputFactory
+outputFactory = OutputFactory()
+
+outputFactory.setOutputDir(directoryFactory.initDir)
 
 if b_gui:
 
@@ -205,15 +208,16 @@ while(True):
         timeFactory.setDelaySecs(g.delaySecs)
 
         # output, handle before next frame
-        if directoryFactory.setInitWriteVid(g.initWriteVid):
-            directoryFactory.initVidWriter(frameFactory.getFrameSize())
+        if outputFactory.setInitWriteVid(g.initWriteVid):
+            outputFactory.initVidWriter(frameFactory.getFrameSize()
+                                        ,directoryFactory.vidFn())
             if b_gui:
-                guiInterface.update(writevidFn = directoryFactory.getWritevidFn())
+                guiInterface.update(writevidFn = outputFactory.getWritevidFn())
         
-        directoryFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
-        directoryFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
-        if directoryFactory.checkWriteFrame():
-            directoryFactory.writeFrame(frame, timeFactory.getFrametimeCurrent())
+        outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
+        outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
+        if outputFactory.checkWriteFrame():
+            outputFactory.writeFrame(frame, timeFactory.getFrametimeCurrent())
         
         if frameFactory.queryNewFrame():
             
