@@ -342,6 +342,57 @@ class GuiviewStagingClass:
         if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: true_time")
+
+    def write_basic(self):
+        ''' test that video output is created and written to'''
+
+        cmd = '''python guiview.py --test write_basic --nogui --noshow 
+                                    --file data/test/guiview/write_basic/output4.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_basic/"
+        TEST_DATA_FN = "output4.proc1.avi"
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN))
+        except:
+            pass
+        assert not(TEST_DATA_FN in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not("output4.proc1.avi" in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        if not(bErrors):
+            try:        
+                output_size = os.path.getsize(os.path.join(TEST_DATA_DIR
+                                                        ,TEST_DATA_FN))
+
+                if not((10**5) < output_size < (10**6)): #between 10 kB and 100 kB
+                    bErrors = True
+                    msg += ["TEST DATA: output file size below/above level expected"]
+            except:
+                bErrors = True
+                msg += ["TEST DATA: could not find size of the output file"]
+
+        #TODO - more tests: is each frame the same?
+                #import frame factory? import diffSummary?
+
+        #Output test result -------------------------
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_basic")
     
 
 
@@ -662,6 +713,8 @@ class GuiviewStub:
             return self.advance_retreat_frame
         elif strTest == "frame_sync":
             return self.frame_sync_frame
+        elif strTest == 'write_basic':
+            return self.write_basic_frame
         else:
             return self.dummy
 
@@ -746,6 +799,24 @@ class GuiviewStub:
         #exit after first run thru
         if self.stubCounter > 1:
             g.callExit = True
+
+    #Test Stub: write_basic --------------------
+
+    def write_basic_frame(self, *args):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True
+
+        if self.stubCounter == 2:
+            g.writevidOn = True
+
+        if 2 < self.stubCounter < 20:
+            g.switchAdvanceFrame = True
+        
+        self.stubCounter += 1
+        
+        if self.stubCounter > 25:
+            g.callExit = True
         
     
 
@@ -787,6 +858,10 @@ def test_frame_sync():
 def test_true_time():
     stage = GuiviewStagingClass()
     stage.true_time()
+
+def test_write_basic():
+    stage = GuiviewStagingClass()
+    stage.write_basic()
 
 if __name__ == "__main__":
     test_true_positive()

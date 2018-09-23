@@ -75,6 +75,7 @@ ap.add_argument("--preload", action="store_true", default=False)
 ap.add_argument("--firstN", type=str, default="")
 ap.add_argument("--test", type=str, default="")
 ap.add_argument("--noshow", action="store_true", default=False)
+ap.add_argument("--output", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -143,6 +144,8 @@ directoryFactory.setData( initDir= init_dir
                          ,fn=FN
                          )
 
+#TODO - add outputFactory
+
 if b_gui:
 
     gui = GuiC()  
@@ -204,7 +207,8 @@ while(True):
         # output, handle before next frame
         if directoryFactory.setInitWriteVid(g.initWriteVid):
             directoryFactory.initVidWriter(frameFactory.getFrameSize())
-            guiInterface.update(writevidFn = directoryFactory.getWritevidFn())
+            if b_gui:
+                guiInterface.update(writevidFn = directoryFactory.getWritevidFn())
         
         directoryFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
         directoryFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())

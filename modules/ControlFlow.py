@@ -456,6 +456,7 @@ class DirectoryFactory:
         
         if self.vidwriter is not None:
         
+            print 'write'
             self.vidwriter.write(frame)
 
             # self.vidWriterFrametimeLog.append(timelogEntry)

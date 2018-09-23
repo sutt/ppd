@@ -6,11 +6,24 @@
     [x] add snap vid write button
     [ ] add config to the button; green if written; reset if new frame
     [ ] add tests for output functionality
-        [ ] does it write; size > x
+        [x] does it write; size > x
         [ ] can it advance without writing?
         [ ] does it match a premade vid? only certain frames, only certain contguous frame regions
         [ ] do two outputs
-    
+    [ ] log outputs:
+        [ ] timelog
+        [ ] frame json onto metalog
+            [ ] does it update each time on disk?
+            [ ] viewable with tail?
+    [ ] open an existing video file, write new frames to it:
+        this could be useful for adding additional training frames after experiment
+        is originally built
+    [ ] remove scratch work from git:
+        create mode 100644 demo_sub.py
+        create mode 100644 test/demo_dub.py
+        create mode 100644 test/demo_subproc.py
+        create mode 100644 test/demo_test.py
+
 
 
 
