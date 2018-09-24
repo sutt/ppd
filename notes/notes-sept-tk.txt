@@ -1,4 +1,23 @@
-Notes on Tk and how
+Notes on Tk and how to debug:
+
+Debug findings on 9/24:
+    need to pause the program in the gui-thread:
+    do this with breakpoints
+
+    DO: set a breakpoint in the cmd_ function of GuiConstructor
+    DONT: set a breakpoint in guiview, until program pauses.
+
+    chosing your context as the gui thread, you can step-thru only that cmd_ function
+    once you (hit a global?) the main thread will auto continue
+    or you can chose main thread as your context and start stepping.
+    this will cause gui-thread to immediately continue
+
+note how globals get updated (or don't get updated) on these pauses:
+    if gui-thread hadn't updated a global yet, then its not updated
+    on the main thread, even after you step in main thread causing gui-thread
+    to continue, you have to set main-thread to continue before you'll get
+    the new global val
+
 
 tk tutorials:
     

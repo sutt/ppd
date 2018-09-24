@@ -1,5 +1,8 @@
 #Tasks
 
+9/24
+
+
 9/23
 
     [x] refactory directoryFactory to outputFactory
@@ -47,7 +50,7 @@
 
     [ ] refactor .txt -> .framelog
 
-    [ ] build mini-app to test tkinter debug ability
+    [x] build mini-app to test tkinter debug ability
     [ ] look at gui.call_cmd: sv.get() instead of globals,
         see if that helps with debug mini-app multi-thread debug ?
         does it help with space-hold-down-crash?
