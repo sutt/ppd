@@ -1,3 +1,9 @@
+9/24
+
+The major question guirecord was built around is how much framedelay occurs with each option of the program, and how the image may be altered due to compression. So it include timelog in its output analysis steps.
+
+Thisn morning, I'm searching for a way to debug tkinter by reproducing the problem in a minimal app.
+
 9/23
 
 An experiment can be one video with particular frames:

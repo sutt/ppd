@@ -6,7 +6,10 @@
     [x] add snap vid write button
     [ ] add config to the button; green if written; reset if new frame
     [ ] add [separate] button to snap-write-frame and hand-scored data
+    [ ] add writeframe-writescoredata-and-advance button/keypress
     [ ] need way to view frame notes as we step-thru
+    [ ] add output compression-type to gui and OutputFactory
+    [ ] add output as image option
 
     [ ] add tests for output functionality
         [x] does it write; size > x
@@ -89,7 +92,7 @@
     [ ] add a "streaming" preload, holds N previous frames and pops last one off
         each frameloop
 
-    [ ] dot operator for uniqueFn
+    [x] dot operator for uniqueFn
     [ ] find-project-root function
 
 9/20
