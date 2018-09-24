@@ -6,6 +6,9 @@ import Tkinter as tk
 This is an attempt to run debug (with vscode) and pause and restart w/o problems an
 app using both tkinter and cv2. Presently, that can't be acheived in guiview.
 
+Hacks to fix it?
+[ ] try to step gently in guiview
+
 Try to isolate the problem:
 [ ] tkinter
     [ ] non threaded tk?
@@ -50,6 +53,10 @@ Notes:
 
     When pausing basic():
         only mainthread is paused, gui-thread stays running
+
+    thrashing f10 appears to be the things that breaks basic(); can run
+    indefinetly pause/continue/Step as long as you step slowly
+    (but is this only with print off?)
 
     Debugging matplotlib import get this message:
         Backend TkAgg is interactive backend. Turning interactive mode on.
@@ -118,7 +125,7 @@ class GuiC(threading.Thread):
     def __init__(self, b_log=False):
         
         self.tk = tk.Tk()
-        self.tk.protocol("WM_DELETE_WINDOW", self.callback)  
+        # self.tk.protocol("WM_DELETE_WINDOW", self.callback)  
         self.guiHeader = ConstructGui()
         self.tkElements = self.guiHeader.build_gui(self.tk)
         threading.Thread.__init__(self)

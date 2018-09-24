@@ -1,0 +1,47 @@
+Notes on Tk and how
+
+tk tutorials:
+    
+    Short and minimalist
+    http://staff.washington.edu/rowen/TkinterSummary.html
+
+        "Extra modules"
+        FileDialog defines FileDialog, LoadFileDialog, SaveFileDialog. Here is an example:
+            fdlg = FileDialog.LoadFileDialog(root, title="Choose A File")
+                fname = fdlg.go() # opt args: dir_or_file=os.curdir, pattern="*", default="", key=None)
+                if file == None: # user cancelled
+
+
+tk debug:
+
+    using threading with remote debugging, "a recipe"
+    https://code.activestate.com/recipes/580721-tkinter-remote-debugging/
+
+    he's maybe experiencing same issue
+    https://stackoverflow.com/questions/35819769/python-method-strangely-on-pause-until-tkinter-root-is-closed
+
+        recommend to view thris tutorial-like thread:
+        https://stackoverflow.com/questions/17466561/best-way-to-structure-a-tkinter-application?noredirect=1&lq=1
+
+
+
+What is Tcl? where is it on my box?
+
+tk on my box:
+
+    Run tests:
+        C:\Python27\Lib\lib-tk\test\python runtktests.py
+    
+    check out this program:
+        C:\Python27\Lib\lib-tk\turtle.py
+
+    from idle TODO file:
+        >>> from inspector import Tkinspect
+        >>> Tkinspect(None, myObject)
+        Tkinspect could probably be extended and refined to integrate better into IDLE.
+
+
+
+I think tkinter worked out of the box on my python install?
+    Python 2.7.13
+    Python 2.7.13 (v2.7.13:a06454b1afa1, Dec 17 2016, 20:42:59) [MSC v.1500 32 bit (Intel)] on win32
