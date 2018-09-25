@@ -568,16 +568,22 @@ class GuiviewStagingClass:
 
         #Setup Test Data Dir -------------------------
         TEST_DATA_DIR = "../data/test/guiview/write_time/"
+        TEST_DATA_FN_1_VID = "output5.proc1.avi"
         TEST_DATA_FN_1 = "output5.proc1.txt"
+        TEST_DATA_FN_2_VID = "output6.proc1.avi"
         TEST_DATA_FN_2 = "output6.proc1.txt"
 
         try:
             os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1))
             os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1_VID))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2_VID))
         except:
             pass
         assert not(TEST_DATA_FN_1 in os.listdir(TEST_DATA_DIR))
         assert not(TEST_DATA_FN_2 in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_1_VID in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_2_VID in os.listdir(TEST_DATA_DIR))
 
         #Run Test #1 -----------------------------------
         cmd = '''python guiview.py --test write_bad_time --nogui --noshow 

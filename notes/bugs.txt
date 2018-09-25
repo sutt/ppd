@@ -2,6 +2,8 @@
 
 9/24
 
+    [ ] fix write_time_bad test: need to delete more than just .txt in test setup
+    [ ] file bug report on pause/continue for basic()
 
 9/23
 
