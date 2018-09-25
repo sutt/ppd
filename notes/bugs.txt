@@ -1,9 +1,29 @@
 #Tasks
 
+9/25
+
+    [ ] notes factory
+        [ ] notesFactory.getOrientation -> paneFactory
+        [ ] notesFactory.getCompression -> guiInterface(g.CompressionType)
+            (which then flows thru to outputFactory)
+        [ ] notesFactory filters DirectoryFactory for notes attributes
+        [ ] add tests
+    [ ] guiveiw.jsonc
+    [ ] per frame json
+    [ ] guiview output finish.
+        [ ] add tests
+    [ ] pane Factory
+        [ ] two extra windows
+        [ ] one extra large window
+        [ ] img_rotate based on orientation
+    [ ] gui options
+
+
 9/24
 
-    [ ] fix write_time_bad test: need to delete more than just .txt in test setup
-    [ ] file bug report on pause/continue for basic()
+    [x] fix write_time_bad test: need to delete more than just .txt in test setup
+    [x] file bug report on pause/continue for basic()
+        #https://github.com/Microsoft/ptvsd/issues/837
 
 9/23
 

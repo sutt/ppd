@@ -13,6 +13,7 @@ from modules.ControlFlow import DirectoryFactory
 from modules.ControlFlow import FrameFactory
 from modules.ControlFlow import TimeFactory
 from modules.ControlFlow import OutputFactory
+from modules.ControlFlow import NotesFactory
 from modules.GraphicsCV import draw_annotations, resize_img
 
 '''
@@ -172,6 +173,10 @@ while(True):
     if b_preload:
         frameFactory.preload()     
 
+    notesFactory = NotesFactory()
+
+    notesFactory.loadMetaLog(directoryFactory.metalogPathFn())
+
     timeFactory = TimeFactory()
 
     timeFactory.setFrametimeLog(directoryFactory.frametimePathFn())    
@@ -217,7 +222,9 @@ while(True):
         outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if outputFactory.checkWriteFrame():
-            outputFactory.writeFrame(frame, timeFactory.getLagtimeCurrent())
+            outputFactory.writeFrame(frame
+                                    ,timeFactory.getLagtimeCurrent()
+                                    ,notesFactory.getNotesCurrent() )
         
         if frameFactory.queryNewFrame():
             

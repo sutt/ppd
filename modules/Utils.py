@@ -274,6 +274,11 @@ class MetaDataLog:
         with open(input_path_fn, 'r') as f:
             self.data = json.load(f)
 
+    def get_log_data(self, input_path_fn):
+        self.load_log_data(input_path_fn)
+        return self.data
+
+
     def load_notes(self):
         ''' load the notes file as returns as dict'''
         try:

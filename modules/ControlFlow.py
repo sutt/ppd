@@ -1,10 +1,11 @@
-import os, sys, time, copy
+import os, sys, time, copy, json
 import numpy as np
 import cv2
 import argparse
 from vidwriter import VidWriter
 from miscutils import uniqueFn
 from modules.Utils import TimeLog
+from modules.Utils import MetaDataLog
 from modules import GlobalsC as g
 
 class FrameFactory:
@@ -389,6 +390,14 @@ class DirectoryFactory:
         
         return os.path.join(self.initDir, _frametimeFn)
 
+    def metalogPathFn(self):
+
+        _vidFn = self.vidFn()
+        _metalogFn = _vidFn.split(".")[0]
+        _metalogFn += ".metalog"
+        
+        return os.path.join(self.initDir, _metalogFn)
+
     def checkExit(self, bFailedLoad):
         ''' return True to exit from outermost loop; exit program'''        
 
@@ -416,8 +425,10 @@ class OutputFactory:
         self.outputDir = ""
         self.vidwriter = None
         self.timewriter = None
+        self.metawriter = None
         self.writeVidFn = None
         self.writeTimeFn = None
+        self.writeMetaFn = None
         self.bWriteFrameOn = False
         self.bWriteFrameCmd = False
         self.bWriteFrameSnap = False
@@ -481,10 +492,18 @@ class OutputFactory:
         
         self.timewriter = open(os.path.join(self.outputDir, self.writeTimeFn), 'w')
 
+        if self.metawriter is not None:
+            self.metawriter.close()
+            self.metawriter = None
+
+        self.writeMetaFn = self.stripExt(self.writeVidFn) + ".metalog"
+
+        self.metawriter = open(os.path.join(self.outputDir, self.writeMetaFn), 'w')
+
     def getWritevidFn(self):
         return self.writeVidFn
 
-    def writeFrame(self, frame, timelogEntry):
+    def writeFrame(self, frame, timelogEntry, metalogEntire):
         ''' on advance or play, write previous frame '''
         
         if self.vidwriter is not None:
@@ -494,3 +513,47 @@ class OutputFactory:
         if self.timewriter is not None:
             
             self.timewriter.write(str(timelogEntry) + "\n")
+
+        if self.metawriter is not None:
+
+            self.metawriter.truncate(0)
+            self.metawriter.write(metalogEntire)
+
+
+
+class NotesFactory:
+
+    ''' handle non-timelog data associated with each video, and and each frame '''
+
+    def __init__(self):
+        self.metalog = MetaDataLog()
+        self.goodLoad = False
+        self.dataVid = {}
+        self.dataFrame = {}
+
+    def loadMetaLog(self, metalogPathFn):
+        
+        self.dataVid  = self.metalog.get_log_data(metalogPathFn)
+        
+        if type(self.metalog.data) == type.__dict__:
+            if len(self.metalog.data.keys()) > 0:
+                self.goodLoad = True
+
+        #add extra processing data
+        self.dataVid['processed'] = True
+
+    def loadFrameLogCurrent(self):
+        ''' load data from notepad '''
+        pass
+
+    def getFullNotes(self):
+        
+        fullNotes = copy.copy(self.dataVid)
+        # fullNotes['frames'] = self.loadFrameLogCurrent()
+        return fullNotes
+
+    def getNotesCurrent(self):
+        
+        return json.dumps(self.getFullNotes(), indent = 4)   
+
+
