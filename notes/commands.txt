@@ -1,6 +1,30 @@
 9/24
 
+    to record perFrame data into a processed video
+    >open: notes/guiview.jsonc  and edit+save
+
+        or use --framelog x/x/guiview-jsonc: to specify a dif json template
     
+    to view updated .metalog for processed video, run:
+    > tail -f x/x/outputX.metalog -n 10
+    
+    debugging guiview in vscode:
+        option1 - run with gui:
+            set only breakpoints within a method "cmd_" of GuiConstructor
+            pause the program with a gui action
+            (don't set breaks in main-thread before ui-thread gets stopped)
+            then when the GuiC thread stops
+            you can continue to step in main-thread; ui-thread will resume;
+            and main-thread won't have updated globals values
+
+        option2 - run without gui; set breaks before launch
+            >python --file x/x/out1.avi --nogui
+            on pause, enter cmds via debug console, e.g.
+            >g.play=True
+
+    debugging guiview_test:
+        run the program with a specified --test <test_str> and --nogui; set breaks before launch
+        >python guiview --file data/test/test_name/out1.avi --test test_name --nogui
 
 9/21
 

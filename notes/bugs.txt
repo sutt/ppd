@@ -2,17 +2,34 @@
 
 9/26
 
-    [ ] write up commands.txt
-        [ ] using tail with proc's .metalog
-        [ ] using --framelog for custom .jsonc
+    [x] write up commands.txt
+        [x] using tail with proc's .metalog
+        [x] using --framelog for custom .jsonc
 
-    [ ] intellisense for cv2
+    [x] intellisense for cv2
 
-    [ ] need "mod" / "%" padding on zoom frame, so zoom box will convert to whole integer
-        coords in main img
+        hasn't worked since upgraded pip install opencv-contrib-python
+        ok, so from cv2 import * gets it to work
 
-    [ ] need to make a circle within bounding box? or only afterwards?
-        [ ] how to cut img pixels out of a circle?
+        [ ] file bug for this
+
+    [ ] paneFactory
+        
+        [ ] mimic existing function, e.g.  output7.avi
+
+        [ ] add selectROI
+        
+            [ ] resize during selectROI bug
+                http://answers.opencv.org/question/84985/resizing-the-output-window-of-imshow-function/
+                https://stackoverflow.com/questions/47524734/selecting-roi-in-auto-resized-window
+
+        [ ] zoom window
+
+            [ ] need "mod" / "%" padding on zoom frame, so zoom box will convert to whole integer
+                coords in main img
+
+            [ ] need to make a circle within bounding box? or only afterwards?
+                [ ] how to cut img pixels out of a circle?
 
 9/25
 
@@ -70,7 +87,7 @@
     [ ] add config to the button; green if written; reset if new frame
     [ ] add [separate] button to snap-write-frame and hand-scored data
     [ ] add writeframe-writescoredata-and-advance button/keypress
-    [ ] need way to view frame notes as we step-thru
+    [x] need way to view frame notes as we step-thru (tail -f outputX.metalog)
     [ ] add output compression-type to gui and OutputFactory
     [ ] add output as image option
 
@@ -86,7 +103,7 @@
         [x] test frame json
         [ ] test time it takes to write new json metalog each time
 
-    [ ] log outputs:
+    [x] log outputs:
         [x] timelog
         [x] import notes from metalog
         [x] frame json onto metalog

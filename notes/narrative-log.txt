@@ -1,3 +1,11 @@
+9/25
+
+OpenCV comes with lots of good demos in samples/, e.g. color_histogram.py is much faster than I could acheive; I should investigate these "samples" in the context of my own data.
+
+Also, were going to investigate pyimagesearch tutorial on tracking and apply it to the data as a null.
+
+Note: there's plans to 1.) package guirecord/guiview as python package 2.) make a compelling demo with chess piece clipping -> training data.
+
 9/24
 
 The major question guirecord was built around is how much framedelay occurs with each option of the program, and how the image may be altered due to compression. So it include timelog in its output analysis steps.

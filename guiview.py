@@ -16,26 +16,46 @@ from modules.ControlFlow import OutputFactory
 from modules.ControlFlow import NotesFactory
 from modules.GraphicsCV import draw_annotations, resize_img
 
-'''
+if False: from cv2 import *  # for vscode intellisense
 
-[x] Add testing stubs/mocks
+'''
 
 [x] Add notesFactory
     [ ] handle orientation with img_rotate
+    [ ] handle scoring data
 
-[x] Add output basic functionality
-    [x] naming: proc1.output1.avi...proc2.output1.avi
-        [~] uniqueFn modify + tests
-    [~] making a directory
-    [x] copy logs
-    [~] set output dir with cmd line flag
-    [x] add writeSnap button
+[ ] Add paneFactory
+    [ ] new module
+    [ ] reproduce existing; including hang unresponsive bug
+    [ ] selectROI
+        [ ] options
+        [ ] draw with it
+    [ ] zoom panel
+        [ ] window positioning, window naming, numbering
 
+[ ] controls
+    [ ] button: write frame + frame-data + frame-scoring [ + advanceFrame]
+    [ ] compression radio button
+    
+    [ ] refactor gui to make
+        [ ] does this enable debugging better?
+    
+    [ ] keypress basic
+
+[ ] functionality
+    [ ] i/o images
+    [ ] write to an existing video
+    [ ] delete frame(s) from a video via script:
+    [ ] semi-preload; streaming
+        [ ] default for files_size * 25(?) > 1.5BG
+    [ ] filter videos played via metalog props
+    [ ] filter frames played via metalog props
 
 BUGS:
     [ ] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
     [x] opens on frame1 (not frame0) for pause_on_open
+    [ ] add other file extensions for vids
 
     
 '''
