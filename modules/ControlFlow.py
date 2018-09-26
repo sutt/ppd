@@ -1,4 +1,5 @@
-import os, sys, time, copy, json
+import os, sys, time, copy, json, re
+from collections import OrderedDict
 import numpy as np
 import cv2
 import argparse
@@ -390,6 +391,7 @@ class DirectoryFactory:
         
         return os.path.join(self.initDir, _frametimeFn)
 
+    
     def metalogPathFn(self):
 
         _vidFn = self.vidFn()
@@ -492,13 +494,12 @@ class OutputFactory:
         
         self.timewriter = open(os.path.join(self.outputDir, self.writeTimeFn), 'w')
 
-        if self.metawriter is not None:
-            self.metawriter.close()
-            self.metawriter = None
 
         self.writeMetaFn = self.stripExt(self.writeVidFn) + ".metalog"
 
-        self.metawriter = open(os.path.join(self.outputDir, self.writeMetaFn), 'w')
+        _f = open(os.path.join(self.outputDir, self.writeMetaFn), 'w')
+        _f.close()
+        self.metawriter = True
 
     def getWritevidFn(self):
         return self.writeVidFn
@@ -516,8 +517,10 @@ class OutputFactory:
 
         if self.metawriter is not None:
 
-            self.metawriter.truncate(0)
-            self.metawriter.write(metalogEntire)
+            _f = open(os.path.join(self.outputDir, self.writeMetaFn), 'w')
+            _f.truncate(0)
+            _f.write(metalogEntire)
+            _f.close()
 
 
 
@@ -527,33 +530,113 @@ class NotesFactory:
 
     def __init__(self):
         self.metalog = MetaDataLog()
-        self.goodLoad = False
+        self.vidIsLoaded = False
         self.dataVid = {}
-        self.dataFrame = {}
 
+        self.bFrameNotes = True
+        self.framesData = []
+        self.frameInd = None
+        
+        self.frameLogInputPathFn = None
+        self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
+        
+
+    def setFrameLog(self, frameLogPathFn):
+        
+        if frameLogPathFn == "":
+            self.frameLogInputPathFn = self.defaultLogFrameInputPathFn
+        else:
+            self.frameLogInputPathFn = frameLogPathFn
+
+        try:
+            _f = open(self.frameLogInputPathFn, 'r')
+        except:
+            print 'couldnt open framelog'
+            self.frameLogInputPathFn = None
+
+    def setFrameCurrent(self, frameInd):
+        self.frameInd = frameInd
+    
     def loadMetaLog(self, metalogPathFn):
         
-        self.dataVid  = self.metalog.get_log_data(metalogPathFn)
-        
-        if type(self.metalog.data) == type.__dict__:
-            if len(self.metalog.data.keys()) > 0:
-                self.goodLoad = True
+        try:
+            self.dataVid  = self.metalog.get_log_data(metalogPathFn)
+            
+            if type(self.metalog.data) == type.__dict__:
+                if len(self.metalog.data.keys()) > 0:
+                    self.vidIsLoaded = True
 
-        #add extra processing data
-        self.dataVid['processed'] = True
+            #add extra processing data
+            self.dataVid['processed'] = True
+            self.dataVid['proc-data'] = {}  #e.g. datetime of processing
+        
+        except:
+            self.dataVid = {}
 
     def loadFrameLogCurrent(self):
         ''' load data from notepad '''
-        pass
+        if self.frameLogInputPathFn is not None:
+            try:
+                with open(self.frameLogInputPathFn, "r") as f:
+                    lines = f.readlines()
+                input_str = ''.join(lines)
+                
+                #remove comments
+                input_str = re.sub(r'\\\n', '', input_str)      
+                input_str = re.sub(r'//.*\n', '\n', input_str)
+        
+                return json.loads(input_str)
+            except:
+                print 'couldnt parse framelog jsonc'
+                return {}
+        else:
+            return {}
+    
+    @staticmethod
+    def orderDict(dict, first_keys= [],  last_keys = []):
+            
+        _keys = [k for k in dict.keys()]
+        _order = [0 for _ in range(len(_keys))]
+        
+        for i in range(len(_keys)):
+            if _keys[i] in first_keys: 
+                _order[i] = -1
+            if _keys[i] in last_keys: 
+                _order[i] = 1
+        
+        _temp = [(a,b) for a,b in zip(_keys,_order)]
+        _temp.sort(key=lambda tup: tup[1])
+        
+        sorted_keys = [elem[0] for elem in _temp]
+        
+        output = OrderedDict()
+        for k in sorted_keys:
+            output[k] = dict[k]
+        
+        return output
 
     def getFullNotes(self):
         
         fullNotes = copy.copy(self.dataVid)
-        # fullNotes['frames'] = self.loadFrameLogCurrent()
+        
+        if self.bFrameNotes:
+             
+            frameData = self.loadFrameLogCurrent()
+            
+            frameData['orig_vid_index'] = self.frameInd
+
+            #TODO - add scoring from panes to frame data
+            
+            self.framesData.append(frameData)
+             
+            fullNotes['frames'] = copy.copy(self.framesData)
+            
+            fullNotes = self.orderDict(copy.copy(fullNotes)
+                                        ,last_keys = ["frames"])
+        
         return fullNotes
 
     def getNotesCurrent(self):
         
         return json.dumps(self.getFullNotes(), indent = 4)   
-
 

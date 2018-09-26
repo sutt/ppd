@@ -1,0 +1,18 @@
+{
+    "frame_type": "sutton demo" //"training" "scoring"
+   
+   //,"category": "distant_find" //"motion" "background"
+   
+   ,"notes": "adding a demo frame"
+
+   ,"details-type": "details1"
+   
+   ,"details": {
+
+       "ball_present": true
+   
+       ,"ball_partial_occluded": false
+       
+       ,"ball_is_close": "medium"  // "far"
+   }
+}

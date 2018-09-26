@@ -66,6 +66,7 @@ first_n = 0
 b_test = False
 str_test = ""
 b_show = True
+framelog_pathfn = ""
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -78,6 +79,7 @@ ap.add_argument("--firstN", type=str, default="")
 ap.add_argument("--test", type=str, default="")
 ap.add_argument("--noshow", action="store_true", default=False)
 ap.add_argument("--output", type=str, default="")
+ap.add_argument("--framelog", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -133,7 +135,8 @@ if args["firstN"] != "":
 if args["noshow"]:
     b_show = False
 
-
+if args["framelog"]:
+    framelog_pathfn = args["framelog"]
     
 
 # Initalize Top Level Loop ----------------------------
@@ -176,6 +179,8 @@ while(True):
     notesFactory = NotesFactory()
 
     notesFactory.loadMetaLog(directoryFactory.metalogPathFn())
+
+    notesFactory.setFrameLog(framelog_pathfn)
 
     timeFactory = TimeFactory()
 
@@ -222,6 +227,7 @@ while(True):
         outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if outputFactory.checkWriteFrame():
+            #TODO - notesFactory.getScoringVals(paneFactory.getScoring())
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
                                     ,notesFactory.getNotesCurrent() )
@@ -231,6 +237,8 @@ while(True):
             ret, frame = frameFactory.getFrame()
             
             timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
+
+            notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
 
             if b_gui:
 
