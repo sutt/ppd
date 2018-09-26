@@ -13,13 +13,14 @@
 
         [ ] file bug for this
 
-    [ ] paneFactory
+    [x] paneFactory
         
-        [ ] mimic existing function, e.g.  output7.avi
+        [x] mimic existing function, e.g.  output7.avi
 
         [ ] add selectROI
         
             [ ] resize during selectROI bug
+                maybe b/c it's resize to wrong dimensions?
                 http://answers.opencv.org/question/84985/resizing-the-output-window-of-imshow-function/
                 https://stackoverflow.com/questions/47524734/selecting-roi-in-auto-resized-window
 

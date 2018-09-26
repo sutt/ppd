@@ -14,6 +14,7 @@ from modules.ControlFlow import FrameFactory
 from modules.ControlFlow import TimeFactory
 from modules.ControlFlow import OutputFactory
 from modules.ControlFlow import NotesFactory
+from modules.ControlDisplay import Display
 from modules.GraphicsCV import draw_annotations, resize_img
 
 if False: from cv2 import *  # for vscode intellisense
@@ -24,9 +25,9 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] handle orientation with img_rotate
     [ ] handle scoring data
 
-[ ] Add paneFactory
-    [ ] new module
-    [ ] reproduce existing; including hang unresponsive bug
+[x] Add Display
+    [x] new module
+    [x] reproduce existing; including hang unresponsive bug
     [ ] selectROI
         [ ] options
         [ ] draw with it
@@ -183,6 +184,12 @@ if b_gui:
                          ,frameDelayVal = g.frameDelay
                         )
 
+display = Display()
+
+display.setInit(showOn=b_show
+                ,frameResize=b_resize
+                ,frameAnnotateFn=b_annotate_fn)
+
 #Video Loop: init a new video-file at top --------------
 
 while(True):
@@ -201,6 +208,8 @@ while(True):
     notesFactory.loadMetaLog(directoryFactory.metalogPathFn())
 
     notesFactory.setFrameLog(framelog_pathfn)
+
+    #display.setOrientation(notesFactory.getOrientation())
 
     timeFactory = TimeFactory()
 
@@ -273,28 +282,12 @@ while(True):
 
         if ret:
             
-            imgDisplay = frame.copy()
+            display.setFrame(frame)
+            display.setAnnotateMsg(directoryFactory.vidFn())
+            display.alterFrame()
 
-            if b_resize:
-                imgDisplay = resize_img(imgDisplay, True, (640,480))
-            
-            if b_annotate_fn:
-                msg = [directoryFactory.vidFn()]
-                imgDisplay = draw_annotations(imgDisplay, msg)
-
-        if b_show:
-
-            windowName = 'img_display'
-            cv2.imshow(windowName, imgDisplay)
-            key = cv2.waitKey(1) & 0xFF
-            
-            if key == ord("s"):
-                initBB = cv2.selectROI("img_display", frame, True, False )
-                print initBB
-                
-            if key == ord('q'):
-                break
-
+        display.show()
+        
         if g.callExit:
             break
             
