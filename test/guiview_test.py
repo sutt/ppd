@@ -1,4 +1,4 @@
-import os, sys, copy
+import os, sys, copy, json
 import subprocess
 import time
 
@@ -47,6 +47,15 @@ Todo:
     [x] advance + retreat frame
     [x] no logs
     [x] frame lag on delay vid
+    [x] check for metalog
+        check for properties:
+        [x] vid notes
+        [x] added vid proc data
+        [x] orig_vid_index
+        [x] FrameLogInput
+    [ ] use custom --framelog
+        [ ] check what happens for no associated metalog
+    [ ] check two outputs for metalog
 
 
 
@@ -579,7 +588,8 @@ class GuiviewStagingClass:
             os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1_VID))
             os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2_VID))
         except:
-            pass
+            print 'cant remove files'
+            # sys.exit()
         assert not(TEST_DATA_FN_1 in os.listdir(TEST_DATA_DIR))
         assert not(TEST_DATA_FN_2 in os.listdir(TEST_DATA_DIR))
         assert not(TEST_DATA_FN_1_VID in os.listdir(TEST_DATA_DIR))
@@ -654,7 +664,81 @@ class GuiviewStagingClass:
         if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: write_bad_time")
+
     
+    def meta_basic(self):
+        ''' test that metalog gets written out. even when existing timelog
+            is bad or doesn't exist: output5.txt is blank and output6.txt
+            does not exist, verify there is an output framelog with zeros '''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/meta_basic/"
+        TEST_DATA_FN_VID = "output4.proc1.avi"
+        TEST_DATA_FN_TXT = "output4.proc1.txt"
+        TEST_DATA_FN = "output4.proc1.metalog"
+        
+
+        try:
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_TXT))
+            os.remove(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_VID))
+        except:
+            pass
+        assert not(TEST_DATA_FN in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_TXT in os.listdir(TEST_DATA_DIR))
+        assert not(TEST_DATA_FN_VID in os.listdir(TEST_DATA_DIR))
+
+        cmd = '''python guiview.py --test meta_basic --nogui --noshow 
+                                    --file data/test/guiview/meta_basic/output4.avi'''
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                assert len(lines) > 0
+
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                assert len(json_data['notes']['basic_notes']) > 0
+
+                assert json_data['processed'] == True
+
+                assert json_data['notes']['orientation'] == 0
+
+                assert len(json_data['frames']) > 0
+
+                #save three frames: indexes 0,2,2
+                assert json_data['frames'][0]['orig_vid_index'] == 0
+                assert json_data['frames'][1]['orig_vid_index'] == 2
+                assert json_data['frames'][2]['orig_vid_index'] == 2
+
+                assert len(json_data['frames'][2]['frame_type']) > 0
+                
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog file is not as expected"]
+                msg += [str(line)]
+                msg += [e.message]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: meta_basic")
+
 
 
 class GuiviewMock:
@@ -984,6 +1068,8 @@ class GuiviewStub:
             return self.write_time_frame
         elif strTest == 'write_bad_time':
             return self.write_time_frame    #same as other test
+        elif strTest == 'meta_basic':
+            return self.meta_basic_frame
         else:
             return self.dummy
 
@@ -1154,8 +1240,38 @@ class GuiviewStub:
             g.callExit = True
     
 
+    def meta_basic_frame(self, *args):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True
+
+        if self.stubCounter == 2:
+            g.switchWriteVid = True     #frame0
+
+        if self.stubCounter == 3:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 4:
+            g.switchAdvanceFrame = True
+            
+        if self.stubCounter == 5:
+            g.switchWriteVid = True     #frame2
+            
+        if self.stubCounter == 6:
+            g.switchWriteVid = True     #frame2
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 10:
+            g.callExit = True
+    
+
 
 #For collection by pytest ------------------------
+
+def test_meta_basic():
+    stage = GuiviewStagingClass()
+    stage.meta_basic()
 
 def test_write_bad_time():
     stage = GuiviewStagingClass()
