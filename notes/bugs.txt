@@ -1,5 +1,19 @@
 #Tasks
 
+9/26
+
+    [ ] write up commands.txt
+        [ ] using tail with proc's .metalog
+        [ ] using --framelog for custom .jsonc
+
+    [ ] intellisense for cv2
+
+    [ ] need "mod" / "%" padding on zoom frame, so zoom box will convert to whole integer
+        coords in main img
+
+    [ ] need to make a circle within bounding box? or only afterwards?
+        [ ] how to cut img pixels out of a circle?
+
 9/25
 
     [ ] notes factory
@@ -15,8 +29,32 @@
     [ ] pane Factory
         [ ] two extra windows
         [ ] one extra large window
+        [ ] sub window image zoom
+        [ ] bbox on subimage <- bbox_main
+            [ ] conversion coord's back to main
         [ ] img_rotate based on orientation
-    [ ] gui options
+        [ ] gui.update(scoringFeatures)
+
+    need new opencv to get selectROI:
+    
+    https://stackoverflow.com/questions/42387322/how-to-add-tracker-in-opencv-python-2-7
+    https://pypi.org/project/opencv-contrib-python/3.3.0.10/
+    cv2.__version__ = '3.2.0'
+    Lib/site-packages/cv2.pyd (modified 12/23/2016)
+    opencv folder in downloads is modified 5/6/2017
+
+    upgrading from pip 9.0.1 to 18.0
+
+    C:\Users\wsutt\Desktop\files\ppd\ppd>
+    C:\Users\wsutt\Desktop\files\ppd\ppd>pip install opencv-contrib-python==3.2.0.8
+    Collecting opencv-contrib-python==3.2.0.8
+    Downloading https://files.pythonhosted.org/packages/f9/01/7c80c13a9b8de8c15da5568a90bcc7a33ce345651613e9af14d7eb23d741/opencv_contrib_python-3.2.0.8-cp27-cp27m-win32.whl (24.4MB)
+        100% |UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU| 24.4MB 605kB/s
+    Requirement already satisfied: numpy>=1.11.1 in c:\python27\lib\site-packages (from opencv-contrib-python==3.2.0.8) (1.14.5+mkl)
+    Installing collected packages: opencv-contrib-python
+    Successfully installed opencv-contrib-python-3.2.0.8
+
+    now it lives in it's own folder: site-packages/cv2/cv2.pyd
 
 
 9/24
@@ -45,16 +83,16 @@
         [x] snapWriteFrame
         [x] test log output
         [x] test log output when no good log exists
-        [ ] test frame json
+        [x] test frame json
         [ ] test time it takes to write new json metalog each time
 
     [ ] log outputs:
         [x] timelog
-        [ ] import notes from metalog
-        [ ] frame json onto metalog
-            [ ] does it update each time on disk?
-                [ ] this could be slow?
-            [ ] viewable with tail?
+        [x] import notes from metalog
+        [x] frame json onto metalog
+            [x] does it update each time on disk?
+                [x] this could be slow? (0.015 secs at most)
+            [x] viewable with tail? (yes)
 
     [ ] open an existing video file, write new frames to it:
         this could be useful for adding additional training frames after experiment

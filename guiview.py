@@ -266,7 +266,13 @@ while(True):
 
             windowName = 'img_display'
             cv2.imshow(windowName, imgDisplay)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            key = cv2.waitKey(1) & 0xFF
+            
+            if key == ord("s"):
+                initBB = cv2.selectROI("img_display", frame, True, False )
+                print initBB
+                
+            if key == ord('q'):
                 break
 
         if g.callExit:
