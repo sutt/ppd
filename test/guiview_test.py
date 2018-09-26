@@ -53,10 +53,10 @@ Todo:
         [x] added vid proc data
         [x] orig_vid_index
         [x] FrameLogInput
-    [ ] use custom --framelog
-        [ ] check what happens for no associated metalog
-    [ ] check two outputs for metalog
-
+    [x] use custom --framelog
+        [x] check what happens for no associated metalog
+        [x] check two outputs for metalog
+    [ ] Need to check frame pixel values against a benchmark: a diff
 
 
 Primer: How to Add a Test
@@ -667,9 +667,7 @@ class GuiviewStagingClass:
 
     
     def meta_basic(self):
-        ''' test that metalog gets written out. even when existing timelog
-            is bad or doesn't exist: output5.txt is blank and output6.txt
-            does not exist, verify there is an output framelog with zeros '''
+        ''' test that metalog gets written out. and test associated values'''
 
         #Setup Test Data Dir -------------------------
         TEST_DATA_DIR = "../data/test/guiview/meta_basic/"
@@ -738,6 +736,95 @@ class GuiviewStagingClass:
         if bErrors: # or ret != 0:
             print "\n".join(msg)
             raise Exception("TEST FAIL: meta_basic")
+
+    def meta_adv(self):
+        ''' test metalog:
+                -writes out even without an associated metalog for orig vid
+                -custom frameloginput (in the test data dir itself) via --framelog
+                -write two separate outputs: check framelog doesn't overlap
+        '''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/meta_adv/"
+        TEST_DATA_FN_1_ALL = ["output6.proc1.avi", "output6.proc1.txt", "output6.proc1.metalog"]
+        TEST_DATA_FN_2_ALL = ["output6.proc2.avi", "output6.proc2.txt", "output6.proc2.metalog"]
+        TEST_DATA_FN_1 = "output6.proc1.metalog"
+        TEST_DATA_FN_2 = "output6.proc2.metalog"
+        
+        test_fns = TEST_DATA_FN_1_ALL
+        test_fns.extend(TEST_DATA_FN_2_ALL)
+        
+        for f in test_fns:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in test_fns:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+        
+
+        cmd = '''python guiview.py --test meta_adv --nogui --noshow 
+                            --file data/test/guiview/meta_adv/output6.avi
+                            --framelog data/test/guiview/meta_adv/guiview-custom.jsonc'''
+        
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN_1 in list_files) or not(TEST_DATA_FN_2 in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output files in test data directory"]
+
+        if not(bErrors):
+            try:
+                
+                #1st metalog
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_1), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                assert json_data.get('notes', None) is None
+
+                assert len(json_data['frames']) == 2
+                
+                assert json_data['frames'][0]['orig_vid_index'] == 0
+                assert json_data['frames'][1]['orig_vid_index'] == 1
+
+                assert json_data['frames'][0]['frame_type'] == "test meta_adv"
+
+                #2nd metalog
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN_2), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                assert json_data.get('notes', None) is None
+
+                assert len(json_data['frames']) == 3
+
+                assert json_data['frames'][0]['orig_vid_index'] == 2
+                assert json_data['frames'][1]['orig_vid_index'] == 3
+                assert json_data['frames'][2]['orig_vid_index'] == 4
+
+                assert json_data['frames'][1]['notes'] == "use this for testing custom framelogs with the --framelog flag"                
+                
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog file is not as expected"]
+                msg += [str(line)]
+                msg += [str(e)]
+
+        #Output test result
+        if bErrors: # or ret != 0:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: meta_adv")
 
 
 
@@ -1070,6 +1157,8 @@ class GuiviewStub:
             return self.write_time_frame    #same as other test
         elif strTest == 'meta_basic':
             return self.meta_basic_frame
+        elif strTest == 'meta_adv':
+            return self.meta_adv_frame
         else:
             return self.dummy
 
@@ -1264,10 +1353,54 @@ class GuiviewStub:
         
         if self.stubCounter > 10:
             g.callExit = True
+
+    def meta_adv_frame(self, *args):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True       #out0
+
+        if self.stubCounter == 2:
+            g.switchWriteVid = True     #frame0->out0
+
+        if self.stubCounter == 3:
+            g.switchAdvanceFrame = True
+
+        if self.stubCounter == 4:
+            g.switchWriteVid = True     #frame1->out1
+            
+        if self.stubCounter == 5:
+            g.initWriteVid = True       #out1
+
+        if self.stubCounter == 6:
+            g.switchAdvanceFrame = True
+            
+        if self.stubCounter == 7:
+            g.switchWriteVid = True     #frame2->out1
+        
+        if self.stubCounter == 8:
+            g.switchAdvanceFrame = True
+            
+        if self.stubCounter == 9:
+            g.switchWriteVid = True     #frame3->out1
+
+        if self.stubCounter == 10:
+            g.switchAdvanceFrame = True
+            
+        if self.stubCounter == 11:
+            g.switchWriteVid = True     #frame4->out1
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 15:
+            g.callExit = True
     
 
 
 #For collection by pytest ------------------------
+
+def test_meta_adv():
+    stage = GuiviewStagingClass()
+    stage.meta_adv()
 
 def test_meta_basic():
     stage = GuiviewStagingClass()
@@ -1330,6 +1463,6 @@ def test_true_time():
     stage.true_time()
 
 if __name__ == "__main__":
-    test_write_basic()
+    test_meta_adv()
     pass
 

@@ -7,9 +7,9 @@
         [ ] notesFactory.getCompression -> guiInterface(g.CompressionType)
             (which then flows thru to outputFactory)
         [ ] notesFactory filters DirectoryFactory for notes attributes
-        [ ] add tests
-    [ ] guiveiw.jsonc
-    [ ] per frame json
+        [x] add tests
+    [x] guiveiw.jsonc
+    [x] per frame json
     [ ] guiview output finish.
         [ ] add tests
     [ ] pane Factory

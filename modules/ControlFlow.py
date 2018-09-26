@@ -554,6 +554,9 @@ class NotesFactory:
             print 'couldnt open framelog'
             self.frameLogInputPathFn = None
 
+    def resetFramesData(self):
+        self.framesData = []
+    
     def setFrameCurrent(self, frameInd):
         self.frameInd = frameInd
     

@@ -20,15 +20,15 @@ from modules.GraphicsCV import draw_annotations, resize_img
 
 [x] Add testing stubs/mocks
 
-[ ] Add notesFactory
+[x] Add notesFactory
     [ ] handle orientation with img_rotate
 
-[ ] Add output basic functionality
+[x] Add output basic functionality
     [x] naming: proc1.output1.avi...proc2.output1.avi
         [~] uniqueFn modify + tests
-    [ ] making a directory
+    [~] making a directory
     [x] copy logs
-    [ ] set output dir with cmd line flag
+    [~] set output dir with cmd line flag
     [x] add writeSnap button
 
 
@@ -221,6 +221,7 @@ while(True):
         if outputFactory.setInitWriteVid(g.initWriteVid):
             outputFactory.initVidWriter(frameFactory.getFrameSize()
                                         ,directoryFactory.vidFn())
+            notesFactory.resetFramesData()
             if b_gui:
                 guiInterface.update(writevidFn = outputFactory.getWritevidFn())
         
