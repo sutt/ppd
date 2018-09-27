@@ -19,6 +19,7 @@ Features:
         [ ] select roi in zoom window
             [ ] draw roi in main
         [ ] zoom:blue, roi:yellow
+        [ ] annotate with zoomwindow pixel size
     
     [ ] orientation adjust
         [ ] handle flow thru of bounding box adjust
@@ -34,7 +35,7 @@ Bugs:
     [ ] zoom frame is too large; do a max of those dims
     [ ] crop zoom on full frame
     [ ] crop frame before annotations
-    [ ] need to erase previous drawn shapes in drawOperators
+    [x] need to erase previous drawn shapes in drawOperators
 
 
 '''
@@ -100,7 +101,11 @@ class Display:
 
     def setFrame(self, _frame):
         self.frame = _frame.copy()
+        self.origFrame = _frame.copy()
 
+    def getOrigFrame(self):
+        return self.origFrame.copy()
+    
     def setAnnotateMsg(self, msg):
         self.annotateMsg = copy.copy([msg])
 
@@ -116,6 +121,12 @@ class Display:
         if self.orientation != 0:
             pass    #rotate img
 
+    def resetOperators(self):
+        self.frame = self.getOrigFrame()
+        self.alterFrame()
+
+        #TODO - reset zoomImg
+    
     def drawOperators(self):
         ''' called within the cmd loop '''
 
@@ -201,23 +212,29 @@ class Display:
         key = cv2.waitKey(1) & 0xFF
 
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
+            
             initBB = cv2.selectROI("img_display", self.frame, True, False )
-            print initBB
+            
             if self.cmdSelectZoom:
                 self.zoomRect = initBB
                 self.zoomOn = True
+                self.resetOperators()
 
             if self.cmdSelectRoiMain:
                 self.roiRect = initBB
                 self.roiSelected = True
+                self.resetOperators()
         
         if self.zoomOn:
+        
             windowName = 'zoom_display'
             cv2.imshow(windowName, self.buildZoomFrame())
             key2 = cv2.waitKey(1) & 0xFF
 
         if self.zoomOn and self.cmdSelectRoiZoom:
+            
             initBB = cv2.selectROI("zoom_display", self.frame, True, False )
+        
             #TODO - add selectRoiZoom logic
             
 
@@ -251,15 +268,29 @@ if __name__ == "__main__":
     display.setFrame(frame)
     display.setAnnotateMsg("dummy")
     display.alterFrame()
+    display.zoomOn = True
+
+    cmdSelectZoom = False
+    cmdSelectRoiMain = False
+    cmdSelectRoiZoom = False
 
     i = 0
     while(True):
+
+        #to debug pause and set these in console
+        display.setCmd(cmdSelectZoom=cmdSelectZoom
+                        ,cmdSelectRoiMain=cmdSelectRoiMain
+                        ,cmdSelectRoiZoom=cmdSelectRoiZoom
+                        )
+        
+        display.drawOperators()
+        
         display.show()
         
-        i += 1
-        if i % 5*10**2 == 0:
-            print 'cmdSelectZoom'
-            display.setCmd(cmdSelectZoom=True)
+        # i += 1
+        # if i % 5*10**2 == 0:
+        #     print 'cmdSelectZoom'
+        #     display.setCmd(cmdSelectZoom=True)
         
 
     cv2.destroyAllWindows()
