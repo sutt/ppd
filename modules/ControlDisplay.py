@@ -27,6 +27,7 @@ Features:
     [ ] Control Agenda box with keys
 
     [ ] add unittests, can't test with guiview_test
+        [ ] test for coord conversion between zoom and main
 
 Bugs:
     [ ] adjust resize for correct aspect ratio
@@ -151,11 +152,12 @@ class Display:
 
         #TODO - reset zoomImg
         self.zoomFrame = self.buildZoomFrame()
-        print 'done reset'
         
     
     def drawOperators(self):
         ''' called within the cmd loop '''
+
+        #this only has to be called for a new frame, or reset operators
 
         if self.zoomOn and self.zoomRect is not None:
             self.frame = draw_rect(  self.frame
@@ -178,10 +180,12 @@ class Display:
             
             x0, y0, dx, dy = copy.copy(self.roiRect)
             x0,y0 = self.mainToZoom((x0,y0))
+            x0,y0 = self.zoomCoordAdj(x0), self.zoomCoordAdj(y0)
+            dx, dy = self.zoomCoordAdj(dx), self.zoomCoordAdj(dy)
             rectZoom = (x0, y0, dx, dy)
             x, y, radius = self.rectToCircle(rectZoom)
             
-            self.zoomFrame = draw_circle(self.frame
+            self.zoomFrame = draw_circle(self.zoomFrame
                                     ,x
                                     ,y
                                     ,radius
@@ -207,7 +211,7 @@ class Display:
         zoom_img  = resize_img(zoom_img, True, (320,240))
 
         # zoom_img = self.alterZooself.buildZoomFrame()mrFrame(zoom_img)
-
+        print zoom_img.shape
         return zoom_img
 
     def show(self):
@@ -225,6 +229,8 @@ class Display:
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
             
             initBB = cv2.selectROI("img_display", self.frame, True, False )
+            
+            #note: this is based on resize on mainFrame, 640 is maxwidth
             
             if self.cmdSelectZoom:
                 self.zoomRect = initBB
@@ -273,8 +279,18 @@ class Display:
     def mainToZoom(self, xy):
         ''' convert the coord is main window to the coord in zoom window '''
         #account for orientation
-        #TODO - implement
-        return xy[0], xy[1]
+        
+        x = xy[0] - self.zoomRect[0]
+        y = xy[1] - self.zoomRect[1]
+
+        return x,y
+
+    def zoomCoordAdj(self, coord):
+
+        adj_factor = 320 / self.zoomRect[2] 
+
+        return int(coord*adj_factor)
+
 
     def zoomToMain(self, xy):
         ''' convert the coord is main window to the coord in zoom window '''
