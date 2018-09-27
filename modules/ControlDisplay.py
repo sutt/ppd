@@ -18,7 +18,7 @@ Features:
         [ ] further zoom in/out with keypress on zoom window
         [ ] select roi in zoom window
             [ ] draw roi in main
-        [ ] zoom:blue, roi:yellow
+        [x] zoom:blue, roi:yellow
         [ ] annotate with zoomwindow pixel size
     
     [ ] orientation adjust
@@ -34,8 +34,9 @@ Bugs:
     [ ] can't exit on a zoom select request
     [ ] zoom frame is too large; do a max of those dims
     [ ] crop zoom on full frame
-    [ ] crop frame before annotations
+    [x] crop frame before annotations
     [x] need to erase previous drawn shapes in drawOperators
+    [ ] zoom isn't cropped after selectroi
 
 
 '''
@@ -54,6 +55,7 @@ class Display:
         self.roiSelected = False
         
         self.frame = None
+        self.zoomFrame = None
 
         self.zoomRect = None
         self.selectRectMain = None
@@ -96,15 +98,19 @@ class Display:
         g.switchRoiMain = False
         g.switchRoiZoom = False
 
-        #reset self.roiSelected to False? no, at new frame
-
 
     def setFrame(self, _frame):
         self.frame = _frame.copy()
         self.origFrame = _frame.copy()
 
     def getOrigFrame(self):
-        return self.origFrame.copy()
+        return self.origFrame
+
+    def getOrigFrameResize(self):
+        _tmp =  self.origFrame.copy()
+        _tmp = resize_img(_tmp, True,(640,480))
+        return _tmp
+
     
     def setAnnotateMsg(self, msg):
         self.annotateMsg = copy.copy([msg])
@@ -121,11 +127,32 @@ class Display:
         if self.orientation != 0:
             pass    #rotate img
 
+        #new mainFrame, new zoomFrame
+        #could move to the top to avoid copying?
+        self.zoomFrame = self.buildZoomFrame()
+
+    def alterZoomrFrame(self, zoom_img):
+        ''' called after each new frame '''        
+        
+        # if self.frameResize:
+        #     def.zoomFrame =  zoom_img = resize_img(self.frame, True, (640,480))
+
+        #TODO
+        # if self.zoomAnnotateShape:
+        #     self.frame = draw_annotations(self.frame, self.annotateMsg)
+
+        if self.orientation != 0:
+            pass    #rotate img
+
+
     def resetOperators(self):
         self.frame = self.getOrigFrame()
         self.alterFrame()
 
         #TODO - reset zoomImg
+        self.zoomFrame = self.buildZoomFrame()
+        print 'done reset'
+        
     
     def drawOperators(self):
         ''' called within the cmd loop '''
@@ -147,11 +174,113 @@ class Display:
                                     ,thick = 3
                                     )
 
+        if self.roiSelected and self.zoomOn:
+            
+            x0, y0, dx, dy = copy.copy(self.roiRect)
+            x0,y0 = self.mainToZoom((x0,y0))
+            rectZoom = (x0, y0, dx, dy)
+            x, y, radius = self.rectToCircle(rectZoom)
+            
+            self.zoomFrame = draw_circle(self.frame
+                                    ,x
+                                    ,y
+                                    ,radius
+                                    ,color = 'yellow'
+                                    ,thick = 1
+                                    )
     
-    def mainToZoom(self, data):
+    def buildZoomFrame(self):
+        
+        if self.zoomRect is None:
+            
+            zoom_img = np.zeros(self.frame.shape)
+            zoom_img = draw_annotations(zoom_img, ["n/a"])
+        
+        else:
+            
+            zoom_img = crop_img( self.getOrigFrameResize()
+                                ,self.transformRect(self.zoomRect)
+                                )
+
+        #TODO - better logic, resize by min dimension reduction
+        
+        zoom_img  = resize_img(zoom_img, True, (320,240))
+
+        # zoom_img = self.alterZooself.buildZoomFrame()mrFrame(zoom_img)
+
+        return zoom_img
+
+    def show(self):
+        
+        # need to keep entering this function once windows are created or
+        # they become unresponsive
+
+        if not(self.showOn):
+            return
+
+        windowName = 'img_display'
+        cv2.imshow(windowName, self.frame)
+        key = cv2.waitKey(1) & 0xFF
+
+        if self.cmdSelectRoiMain or self.cmdSelectZoom:
+            
+            initBB = cv2.selectROI("img_display", self.frame, True, False )
+            
+            if self.cmdSelectZoom:
+                self.zoomRect = initBB
+                self.zoomOn = True
+                self.resetOperators()
+
+            if self.cmdSelectRoiMain:
+                self.roiRect = initBB
+                self.roiSelected = True
+                self.resetOperators()
+        
+        # if self.zoomOn and self.zoomFrame is not None:
+        if self.zoomOn:
+        
+            windowName = 'zoom_display'
+            cv2.imshow(windowName, self.zoomFrame)
+            key2 = cv2.waitKey(1) & 0xFF
+
+        if self.zoomOn and self.cmdSelectRoiZoom:
+            
+            initBB = cv2.selectROI("zoom_display", self.frame, True, False )
+        
+            #TODO - add selectRoiZoom logic
+            # self.rectZoom = zoomToMain(initBB)
+            # self.resetOperators()
+
+            
+        #new func -----------
+        if key == ord("s"):
+            initBB = cv2.selectROI("img_display", self.frame, True, False )
+            print initBB
+
+        # if self.zoomOn and self.zoomFrame is not None:
+
+        #     if key2 == ord('z'):
+        #         pass
+        #         #TODO - add more zoom
+
+        #     if key2 == ord('x'):
+        #         pass
+        #         #TODO - add less zoom
+
+    
+    #helpers ------
+
+    def mainToZoom(self, xy):
         ''' convert the coord is main window to the coord in zoom window '''
         #account for orientation
-        pass
+        #TODO - implement
+        return xy[0], xy[1]
+
+    def zoomToMain(self, xy):
+        ''' convert the coord is main window to the coord in zoom window '''
+        #account for orientation
+        #TODO - implement
+        return xy[0], xy[1]
 
     @staticmethod
     def transformRect(input_rect):
@@ -183,74 +312,6 @@ class Display:
         radius = min( int(rect[2] / 2), int(rect[3] / 2) )
 
         return (x, y, radius)
-    
-    def buildZoomFrame(self):
-        
-        if self.zoomRect is None:
-            
-            zoom_img = np.zeros(self.frame.shape)
-            zoom_img = draw_annotations(zoom_img, ["n/a"])
-        
-        else:
-            
-            zoom_img = crop_img(self.frame, self.transformRect(self.zoomRect))
-
-        zoom_img  = resize_img(zoom_img, True, (320,240))
-
-        return zoom_img
-
-    def show(self):
-        
-        # need to keep entering this function once windows are created or
-        # they become unresponsive
-
-        if not(self.showOn):
-            return
-
-        windowName = 'img_display'
-        cv2.imshow(windowName, self.frame)
-        key = cv2.waitKey(1) & 0xFF
-
-        if self.cmdSelectRoiMain or self.cmdSelectZoom:
-            
-            initBB = cv2.selectROI("img_display", self.frame, True, False )
-            
-            if self.cmdSelectZoom:
-                self.zoomRect = initBB
-                self.zoomOn = True
-                self.resetOperators()
-
-            if self.cmdSelectRoiMain:
-                self.roiRect = initBB
-                self.roiSelected = True
-                self.resetOperators()
-        
-        if self.zoomOn:
-        
-            windowName = 'zoom_display'
-            cv2.imshow(windowName, self.buildZoomFrame())
-            key2 = cv2.waitKey(1) & 0xFF
-
-        if self.zoomOn and self.cmdSelectRoiZoom:
-            
-            initBB = cv2.selectROI("zoom_display", self.frame, True, False )
-        
-            #TODO - add selectRoiZoom logic
-            
-
-        if key == ord("s"):
-            initBB = cv2.selectROI("img_display", self.frame, True, False )
-            print initBB
-
-        if self.zoomOn:
-
-            if key2 == ord('z'):
-                pass
-                #TODO - add more zoom
-
-            if key2 == ord('x'):
-                pass
-                #TODO - add less zoom
 
 
 
@@ -274,6 +335,8 @@ if __name__ == "__main__":
     cmdSelectRoiMain = False
     cmdSelectRoiZoom = False
 
+    display.zoomOn = True   #debugZoom
+
     i = 0
     while(True):
 
@@ -283,12 +346,17 @@ if __name__ == "__main__":
                         ,cmdSelectRoiZoom=cmdSelectRoiZoom
                         )
         
+        display.alterFrame()
+        
         display.drawOperators()
         
         display.show()
         
-        # i += 1
-        # if i % 5*10**2 == 0:
+        i += 1
+        if i % 5*10**3 == 0:
+            
+            print 'new rect box'
+            display.rectZoom = (20,20, 40,40)   #debugZoom
         #     print 'cmdSelectZoom'
         #     display.setCmd(cmdSelectZoom=True)
         
