@@ -10,4 +10,4 @@ def init():
     global writevidOn
     global initWriteVid
     global switchWriteVid
-    
+    global switchZoom

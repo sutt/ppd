@@ -13,6 +13,10 @@
 
         [ ] file bug for this
 
+        [ ] file bug for python.analysis pop-up, or fix
+
+        [ ] how to turn off inline-breakpoint displays: margin glpyhs on?
+
     [x] paneFactory
         
         [x] mimic existing function, e.g.  output7.avi

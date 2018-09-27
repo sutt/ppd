@@ -25,6 +25,9 @@ class ConstructGui:
     def cmd_fastforward(self):
         g.switchFastforward = True
 
+    def cmd_selectzoom(self):
+        g.switchZoom = True
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -162,6 +165,21 @@ class ConstructGui:
             ,text = '>>'
             ,command = self.cmd_fastforward
             ).pack(side=tk.LEFT)
+
+        fselect0 = tk.Frame(root)
+        fselect0.pack(side = tk.TOP)
+        
+        tk.Button(
+             fselect0
+            ,text = 'select zoom'
+            ,command = self.cmd_selectzoom
+            ).pack(side=tk.LEFT)
+        
+        # tk.Button(
+        #      fselect0
+        #     ,text = '>>'
+        #     ,command = self.cmd_fastforward
+        #     ).pack(side=tk.LEFT)
 
         fwrite0 = tk.Frame(root)
         fwrite0.pack(side = tk.TOP)

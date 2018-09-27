@@ -32,6 +32,7 @@ if False: from cv2 import *  # for vscode intellisense
         [ ] options
         [ ] draw with it
     [ ] zoom panel
+        [ ] basic
         [ ] window positioning, window naming, numbering
 
 [ ] controls
@@ -75,6 +76,7 @@ g.delaySecs = 0.0
 g.writevidOn = False
 g.initWriteVid = False
 g.switchWriteVid = False
+g.switchZoom = False
 
 
 #High Level Options --------------------------
@@ -246,6 +248,8 @@ while(True):
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
 
+        display.setCmd(cmdSelectZoom=g.switchZoom)
+
         # output, handle before next frame
         if outputFactory.setInitWriteVid(g.initWriteVid):
             outputFactory.initVidWriter(frameFactory.getFrameSize()
@@ -287,6 +291,8 @@ while(True):
             display.alterFrame()
 
         display.show()
+
+        # display.getScoring()  #TODO
         
         if g.callExit:
             break

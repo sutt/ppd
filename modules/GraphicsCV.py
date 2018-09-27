@@ -7,7 +7,7 @@ from collections import deque
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-
+if False: from cv2 import *
 
 def draw_tracking_frame(img, x,y,radius, **kwargs):
     if kwargs.get('one_color',False):
@@ -18,6 +18,13 @@ def draw_tracking_frame(img, x,y,radius, **kwargs):
 
 def draw_tracking(img, rect ):
     cv2.rectangle(img, rect[0], rect[1], (0, 255, 255), 3)
+    return img
+
+def draw_rect(img, rect, color='yellow', thick=3):
+    COLOR = (0, 255, 255)
+    if color == 'blue':
+        COLOR = (255,0,0)
+    cv2.rectangle(img, rect[0], rect[1], COLOR, thick)
     return img
 
 def draw_annotations(img, info_annotations):
