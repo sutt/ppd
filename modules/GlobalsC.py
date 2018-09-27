@@ -11,3 +11,5 @@ def init():
     global initWriteVid
     global switchWriteVid
     global switchZoom
+    global switchRoiMain
+    global switchRoiZoom

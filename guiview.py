@@ -77,6 +77,8 @@ g.writevidOn = False
 g.initWriteVid = False
 g.switchWriteVid = False
 g.switchZoom = False
+g.switchRoiMain = False
+g.switchRoiZoom = False
 
 
 #High Level Options --------------------------
@@ -248,7 +250,9 @@ while(True):
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
 
-        display.setCmd(cmdSelectZoom=g.switchZoom)
+        display.setCmd(cmdSelectZoom=g.switchZoom
+                      ,cmdSelectRoiMain=g.switchRoiMain
+                      ,cmdSelectRoiZoom=g.switchRoiZoom)
 
         # output, handle before next frame
         if outputFactory.setInitWriteVid(g.initWriteVid):
@@ -290,6 +294,8 @@ while(True):
             display.setAnnotateMsg(directoryFactory.vidFn())
             display.alterFrame()
 
+        display.drawOperators()
+        
         display.show()
 
         # display.getScoring()  #TODO

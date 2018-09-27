@@ -28,6 +28,12 @@ class ConstructGui:
     def cmd_selectzoom(self):
         g.switchZoom = True
 
+    def cmd_selectroimain(self):
+        g.switchRoiMain = True
+
+    def cmd_selectroizoom(self):
+        g.switchRoiZoom = True
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -175,11 +181,17 @@ class ConstructGui:
             ,command = self.cmd_selectzoom
             ).pack(side=tk.LEFT)
         
-        # tk.Button(
-        #      fselect0
-        #     ,text = '>>'
-        #     ,command = self.cmd_fastforward
-        #     ).pack(side=tk.LEFT)
+        tk.Button(
+             fselect0
+            ,text = 'roi main'
+            ,command = self.cmd_selectroimain
+            ).pack(side=tk.LEFT)
+
+        tk.Button(
+             fselect0
+            ,text = 'roi zoom'
+            ,command = self.cmd_selectroizoom
+            ).pack(side=tk.LEFT)
 
         fwrite0 = tk.Frame(root)
         fwrite0.pack(side = tk.TOP)

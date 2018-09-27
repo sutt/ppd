@@ -4,7 +4,7 @@ import cv2
 import argparse
 
 import GlobalsC as g
-from GraphicsCV import (draw_annotations, resize_img, draw_rect)
+from GraphicsCV import (draw_annotations, resize_img, draw_rect, draw_circle)
 from ImgUtils import crop_img
 
 if False: from cv2 import *
@@ -23,6 +23,8 @@ Features:
     [ ] orientation adjust
         [ ] handle flow thru of bounding box adjust
 
+    [ ] Control Agenda box with keys
+
     [ ] add unittests, can't test with guiview_test
 
 Bugs:
@@ -32,6 +34,7 @@ Bugs:
     [ ] zoom frame is too large; do a max of those dims
     [ ] crop zoom on full frame
     [ ] crop frame before annotations
+    [ ] need to erase previous drawn shapes in drawOperators
 
 
 '''
@@ -47,6 +50,7 @@ class Display:
         self.frameAnnotateFn = False
         
         self.zoomOn = False
+        self.roiSelected = False
         
         self.frame = None
 
@@ -88,6 +92,10 @@ class Display:
         self.cmdSelectRoiZoom = cmdSelectRoiZoom
 
         g.switchZoom = False
+        g.switchRoiMain = False
+        g.switchRoiZoom = False
+
+        #reset self.roiSelected to False? no, at new frame
 
 
     def setFrame(self, _frame):
@@ -97,12 +105,19 @@ class Display:
         self.annotateMsg = copy.copy([msg])
 
     def alterFrame(self):
+        ''' called after each new frame '''        
         
         if self.frameResize:
             self.frame = resize_img(self.frame, True, (640,480))
 
         if self.frameAnnotateFn:
             self.frame = draw_annotations(self.frame, self.annotateMsg)
+
+        if self.orientation != 0:
+            pass    #rotate img
+
+    def drawOperators(self):
+        ''' called within the cmd loop '''
 
         if self.zoomOn and self.zoomRect is not None:
             self.frame = draw_rect(  self.frame
@@ -111,12 +126,27 @@ class Display:
                                     ,thick = 1
                                     )
 
-        if self.orientation != 0:
-            pass    #rotate img
+        if self.roiSelected:
+            x, y, radius = self.rectToCircle(self.roiRect)
+            self.frame = draw_circle(self.frame
+                                    ,x
+                                    ,y
+                                    ,radius
+                                    ,color = 'yellow'
+                                    ,thick = 3
+                                    )
+
     
+    def mainToZoom(self, data):
+        ''' convert the coord is main window to the coord in zoom window '''
+        #account for orientation
+        pass
+
     @staticmethod
     def transformRect(input_rect):
-        ''' (x0,y0, d_x, d_y) -> ((xo,y0),(x1, y1)) '''
+        ''' (x0,y0, d_x, d_y) -> ((xo,y0),(x1, y1)) 
+            note: must be tuples, not lists; to use in opencv functions
+        '''
 
         x = copy.copy(input_rect)            
 
@@ -126,6 +156,22 @@ class Display:
                 )
 
         return rect
+
+    @staticmethod
+    def rectToCircle(input_rect):
+        ''' (x0,y0, d_x, d_y) -> (x,y, radius) 
+            note: try to create a square for the sake of radius
+        '''
+
+        # (x0,y0, d_x, d_y)
+        rect = copy.copy(input_rect)            
+
+        x = int( rect[0] + int(rect[2] / 2) )
+        y = int( rect[1] + int(rect[3] / 2) )
+
+        radius = min( int(rect[2] / 2), int(rect[3] / 2) )
+
+        return (x, y, radius)
     
     def buildZoomFrame(self):
         
@@ -157,8 +203,13 @@ class Display:
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
             initBB = cv2.selectROI("img_display", self.frame, True, False )
             print initBB
-            self.zoomRect = initBB
-            self.zoomOn=True
+            if self.cmdSelectZoom:
+                self.zoomRect = initBB
+                self.zoomOn = True
+
+            if self.cmdSelectRoiMain:
+                self.roiRect = initBB
+                self.roiSelected = True
         
         if self.zoomOn:
             windowName = 'zoom_display'
@@ -173,14 +224,18 @@ class Display:
         if key == ord("s"):
             initBB = cv2.selectROI("img_display", self.frame, True, False )
             print initBB
-            
-        if key2 == ord('z'):
-            pass
-            #TODO - add more zoom
 
-        if key2 == ord('x'):
-            pass
-            #TODO - add less zoom
+        if self.zoomOn:
+
+            if key2 == ord('z'):
+                pass
+                #TODO - add more zoom
+
+            if key2 == ord('x'):
+                pass
+                #TODO - add less zoom
+
+
 
 if __name__ == "__main__":
     
@@ -209,4 +264,29 @@ if __name__ == "__main__":
 
     cv2.destroyAllWindows()
 
+
+
+
+def test_display_rectToCircle():
+    
+    rect = (0,0,10,10)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 5
+    assert y == 5 
+    assert r == 5
+
+    rect = (2,1,10,12)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 7
+    assert y == 7 
+    assert r == 5
+
+    rect = (2,1,11,12)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 7
+    assert y == 7 
+    assert r == 5
 

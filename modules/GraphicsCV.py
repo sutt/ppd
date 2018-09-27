@@ -27,6 +27,14 @@ def draw_rect(img, rect, color='yellow', thick=3):
     cv2.rectangle(img, rect[0], rect[1], COLOR, thick)
     return img
 
+def draw_circle(img, x,y,radius, color='yellow', thick=3):
+    COLOR = (0, 255, 255)
+    if color == 'blue':
+        COLOR = (255,0,0)
+    cv2.circle(img, (int(x), int(y)), int(radius), COLOR, thick)
+    
+    return img
+
 def draw_annotations(img, info_annotations):
     if len(info_annotations) == 0: return img
     try:
