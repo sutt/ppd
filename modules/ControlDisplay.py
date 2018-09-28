@@ -16,8 +16,8 @@ Features:
     [ ] Zoom Window
         [x] gui cmd: selectZoom
         [ ] further zoom in/out with keypress on zoom window
-        [ ] select roi in zoom window
-            [ ] draw roi in main
+        [x] select roi in zoom window
+            [x] draw roi in main
         [x] zoom:blue, roi:yellow
         [ ] annotate with zoomwindow pixel size
     
@@ -215,7 +215,9 @@ class Display:
         return zoom_img
 
     def show(self):
-        
+        ''' handle imshow calls, selectROI calls and return handling, and cvWindow
+            keypress handling
+        '''
         # need to keep entering this function once windows are created or
         # they become unresponsive
 
@@ -251,17 +253,23 @@ class Display:
 
         if self.zoomOn and self.cmdSelectRoiZoom:
             
-            initBB = cv2.selectROI("zoom_display", self.frame, True, False )
+            rect = cv2.selectROI("zoom_display", self.zoomFrame, True, False )
         
-            #TODO - add selectRoiZoom logic
-            # self.rectZoom = zoomToMain(initBB)
-            # self.resetOperators()
+            x0, y0, dx, dy = rect
+
+            x0,y0 = self.mainCoordAdj(x0), self.mainCoordAdj(y0)
+            dx, dy = self.mainCoordAdj(dx), self.mainCoordAdj(dy)
+            x0, y0 = self.zoomToMain((x0,y0))
+
+            self.roiRect = (x0, y0, dx, dy)
+            
+            self.roiSelected = True
+            self.resetOperators()
 
             
         #new func -----------
         if key == ord("s"):
             initBB = cv2.selectROI("img_display", self.frame, True, False )
-            print initBB
 
         # if self.zoomOn and self.zoomFrame is not None:
 
@@ -291,12 +299,21 @@ class Display:
 
         return int(coord*adj_factor)
 
+    def mainCoordAdj(self, coord):
+
+        adj_factor = self.zoomRect[2] / 320
+
+        return int(coord*adj_factor)
+
 
     def zoomToMain(self, xy):
         ''' convert the coord is main window to the coord in zoom window '''
         #account for orientation
         #TODO - implement
-        return xy[0], xy[1]
+        x = xy[0] + self.zoomRect[0]
+        y = xy[1] + self.zoomRect[1]
+
+        return x,y
 
     @staticmethod
     def transformRect(input_rect):
