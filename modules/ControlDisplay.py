@@ -4,7 +4,7 @@ import cv2
 import argparse
 
 import GlobalsC as g
-from GraphicsCV import (draw_annotations, resize_img, draw_rect, draw_circle)
+from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle)
 from ImgUtils import crop_img
 
 if False: from cv2 import *
@@ -19,8 +19,9 @@ Features:
         [x] select roi in zoom window
             [x] draw roi in main
         [x] zoom:blue, roi:yellow
-        [ ] annotate with zoomwindow pixel size
-            [ ] pixels in window, nums pixels in original
+        [x] annotate with zoomwindow pixel size
+            [x] pixels in window, nums pixels in original
+        [ ] return from drawOperator if not nec
         [ ] window3, diff
         [ ] zoom on/off by gui
         [x] crop from full size image
@@ -28,6 +29,7 @@ Features:
 
     [ ] orientation adjust
         [ ] handle flow thru of bounding box adjust
+        [ ] position windows side/side vs top/bottom
 
     [ ] Control Agenda box with keys
 
@@ -67,6 +69,7 @@ class Display:
         self.showOn = True
         self.frameResize = True
         self.frameAnnotateFn = False
+        self.zoomAnnotateSize = True
         
         self.zoomOn = False
         self.roiSelected = False
@@ -95,8 +98,11 @@ class Display:
         self.cmdSelectRoiMain = False
         self.cmdSelectRoiZoom = False
 
+        self.widthMainWindow = 640
+        self.heightMainWindow = 480
         self.widthZoomWindow = 320
         self.heightZoomWindow = 240
+        
 
     def setOrientation(iOrientation):
         if iOrientation not in (90,180,270):
@@ -135,39 +141,43 @@ class Display:
 
     def getOrigFrame(self):
         return self.origFrame
-
-    def getOrigFrameResize(self):
-        _tmp =  self.origFrame.copy()
-        _tmp = resize_img(_tmp, True,(640,480))
-        return _tmp
-
     
     def setAnnotateMsg(self, msg):
-        self.annotateMsg = copy.copy([msg])
+        self.annotateMsg = copy.copy(msg)
 
     def alterFrame(self):
-        ''' called after each new frame '''        
+        ''' make changes to frame, including resize. also, build zoomFrame here.
+            need to call this every new frame and on resetOperators
+        '''        
         
         if self.frameResize:
-            self.frame = resize_img(self.frame, True, (640,480))
+            self.frame = resize_img(self.frame, True, 
+                                    (self.widthMainWindow,self.heightMainWindow))
 
         if self.frameAnnotateFn:
-            self.frame = draw_annotations(self.frame, self.annotateMsg)
+            self.frame = draw_text(self.frame, self.annotateMsg)
 
         if self.orientation != 0:
             pass   
 
-        self.zoomFrame = self.buildZoomFrame()
-        # self.alterZoomFrame()
+        if self.zoomOn:
+            self.zoomFrame = self.buildZoomFrame()
+            self.alterZoomFrame()
 
-    def alterZoomFrame(self, zoom_img):
-        ''' called after each new frame '''        
+    def alterZoomFrame(self):
+        ''' make annotation to zoomFrame, but not resize; 
+            need to call this each time you do a buildZoomFrame().        
+        '''        
+
+        msg = str(self.zoomFrame.shape[:2])
+        msg += " orig: "
+        msg += str(self.rectMainToOrig(self.zoomRect)[2:4])
+        # if self.zoomModuloZero:
+        #     msg += " mod0"
         
-        # if self.frameResize:
-        #     def.zoomFrame =  zoom_img = resize_img(self.frame, True, (640,480))
-
-        # if self.zoomAnnotateShape:
-        #     self.frame = draw_annotations(self.frame, self.annotateMsg)
+        if self.zoomAnnotateSize:
+            self.zoomFrame = draw_text(self.zoomFrame, msg, fontscale = 0.6
+                                       ,color= (0,0,0), b_bottom=True)
 
         if self.orientation != 0:
             pass    #rotate img
@@ -176,9 +186,6 @@ class Display:
     def resetOperators(self):
         self.frame = self.getOrigFrame()
         self.alterFrame()
-
-        self.zoomFrame = self.buildZoomFrame()
-        # self.alterZoomFrame()
 
         # self.drawOperators()
         
@@ -235,7 +242,7 @@ class Display:
         if self.zoomRect is None:
             
             zoom_img = np.zeros(self.frame.shape)
-            zoom_img = draw_annotations(zoom_img, ["n/a"])
+            zoom_img = draw_text(zoom_img, "n/a")
         
         else:
             
@@ -288,7 +295,7 @@ class Display:
                 self.resetOperators()
 
             if self.cmdSelectRoiMain:
-                self.roiRect = self.rectscaleMainToOrig(rect)
+                self.roiRect = self.rectMainToOrig(rect)
                 self.roiSelected = True
                 self.resetOperators()
         
@@ -378,7 +385,7 @@ class Display:
         
         return rectOrig
 
-    def rectscaleMainToOrig(self, rectMain):
+    def rectMainToOrig(self, rectMain):
         ''' convert rect coords from relative to main to relative to orig
         '''
         rectOrig = tuple(map(self.scaleMainToOrig, rectMain))

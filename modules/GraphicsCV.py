@@ -45,6 +45,24 @@ def draw_annotations(img, info_annotations):
     cv2.putText(img,disp_text,(50,50), font, 2,(255,255,255),2,cv2.LINE_AA)
     return img
 
+def draw_text(  img
+                ,msg
+                ,fontscale=2
+                ,color=(255,255,255)
+                ,pos=(50,50)
+                ,b_bottom = False
+                ):
+    
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    if b_bottom:
+        pos = (10, img.shape[0] - 10)
+    
+    cv2.putText(img, msg, pos, font, fontscale, color, 2, cv2.LINE_AA)
+    
+    return img
+
+
 def flip_img(img,flip = True):
     """return a non-copied image be default vertically flipped"""
     if flip:
