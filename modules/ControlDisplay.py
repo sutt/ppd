@@ -21,7 +21,7 @@ Features:
         [x] zoom:blue, roi:yellow
         [x] annotate with zoomwindow pixel size
             [x] pixels in window, nums pixels in original
-        [ ] return from drawOperator if not nec
+        [x] return from drawOperator if not nec
         [ ] window3, diff
         [ ] zoom on/off by gui
         [x] crop from full size image
@@ -184,10 +184,12 @@ class Display:
 
 
     def resetOperators(self):
+        ''' every user/gui action that changes a frame will refresh the frames
+            and draw everything again'''
+
         self.frame = self.getOrigFrame()
         self.alterFrame()
-
-        # self.drawOperators()
+        self.drawOperators()
         
     
     def drawOperators(self):
@@ -195,8 +197,6 @@ class Display:
             This has to be called for every new frame.
             And everytime user/gui changes zoomRect or roiRect; resetOperators()
         '''
-
-        #TODO - return if not needed
 
         if self.zoomOn and self.zoomRect is not None:
             

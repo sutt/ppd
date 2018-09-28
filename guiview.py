@@ -15,7 +15,7 @@ from modules.ControlFlow import TimeFactory
 from modules.ControlFlow import OutputFactory
 from modules.ControlFlow import NotesFactory
 from modules.ControlDisplay import Display
-from modules.GraphicsCV import draw_annotations, resize_img
+from modules.GraphicsCV import (draw_annotations, resize_img, draw_text)
 
 if False: from cv2 import *  # for vscode intellisense
 
@@ -28,11 +28,11 @@ if False: from cv2 import *  # for vscode intellisense
 [x] Add Display
     [x] new module
     [x] reproduce existing; including hang unresponsive bug
-    [ ] selectROI
-        [ ] options
-        [ ] draw with it
-    [ ] zoom panel
-        [ ] basic
+    [x] selectROI
+        [x] options
+        [x] draw with it
+    [x] zoom panel
+        [x] basic
         [ ] window positioning, window naming, numbering
 
 [ ] controls
@@ -100,6 +100,7 @@ ap.add_argument("--file", type=str, default="")
 ap.add_argument("--nogui",  action="store_true", default=False)
 ap.add_argument("--nodelay", action="store_true", default=False)
 ap.add_argument("--preload", action="store_true", default=False)
+ap.add_argument("--dontload", action="store_true", default=False)
 ap.add_argument("--firstN", type=str, default="")
 ap.add_argument("--test", type=str, default="")
 ap.add_argument("--noshow", action="store_true", default=False)
@@ -163,6 +164,8 @@ if args["noshow"]:
 if args["framelog"]:
     framelog_pathfn = args["framelog"]
     
+if args["dontload"]:
+    b_preload = False
 
 # Initalize Top Level Loop ----------------------------
 
@@ -293,8 +296,7 @@ while(True):
             display.setFrame(frame)
             display.setAnnotateMsg(directoryFactory.vidFn())
             display.alterFrame()
-
-        display.drawOperators()
+            display.drawOperators()
         
         display.show()
 
