@@ -13,7 +13,7 @@ if False: from cv2 import *
 '''
 
 Features: 
-    [ ] Zoom Window
+    [x] Zoom Window
         [x] gui cmd: selectZoom
         [x] further zoom in/out with keypress on zoom window
         [x] select roi in zoom window
@@ -25,7 +25,10 @@ Features:
         [x] window3, diff
         [x] zoom on/off by gui
         [x] crop from full size image
-        [ ] zero-modulo resize should be default under certain size zoomFrame
+        [x] zero-modulo resize 
+            [x] should be default under certain size zoomFrame
+            [x] handle in keypress zoom/unzoom
+            [x] add annotation that modulo zero is ON for zoom_display
 
     [ ] orientation adjust
         [ ] handle flow thru of bounding box adjust
@@ -46,6 +49,7 @@ Refactors:
         [ ] test an actual image for cutting pixels
             [ ] show pixel blending on the border
         [ ] test for resize behavior
+        [ ] test mod0 vs not-mod0
 
 Bugs:
     [ ] adjust resize for correct aspect ratio
@@ -84,9 +88,11 @@ class Display:
         self.zoomFrame = None
 
         #zoomRect in coord for (resized) frame; relative-rect format
+        # (x,y,w,h)
         self.zoomRect = None
         
         #roiRect in coords relative to origFrame; relative-rect format
+        # (x,y,w,h)
         self.roiRect = None
         
         self.selectRectMain = None  #needed this?
@@ -106,6 +112,9 @@ class Display:
         self.heightMainWindow = 480
         self.widthZoomWindow = 320
         self.heightZoomWindow = 240
+
+        #below this size, zoom_display resizes by a whoole number multiple
+        self.modZeroSize = 40
         
 
     def setOrientation(iOrientation):
@@ -187,13 +196,14 @@ class Display:
         '''        
 
         msg = str(self.zoomFrame.shape[:2])
-        msg += " orig: "
+        msg += " <- "
         msg += str(self.rectMainToOrig(self.zoomRect)[2:4][::-1])
-        # if self.zoomModuloZero:
-        #     msg += " mod0"
+        
+        if self.zoomFrame.shape[1] % self.rectMainToOrig(self.zoomRect)[2] == 0:
+            msg += " mod0"
         
         if self.zoomAnnotateSize:
-            self.zoomFrame = draw_text(self.zoomFrame, msg, fontscale = 0.6
+            self.zoomFrame = draw_text(self.zoomFrame, msg, fontscale = 0.5
                                        ,color= (0,0,0), b_bottom=True)
 
         if self.orientation != 0:
@@ -276,7 +286,15 @@ class Display:
         
         widthZoom, heightZoom = self.widthZoomWindow,self.heightZoomWindow
         
-        #TODO - adjust for modulo zoom
+        if self.zoomRect is not None:
+            
+            if any(map(lambda x: x < self.modZeroSize, 
+                        self.rectMainToOrig(self.zoomRect)[2:4])):
+
+                # find a whole number multiple of zoomRect into 320,
+                # use that for resize factor
+                widthZoom = (int(self.widthZoomWindow / self.zoomRect[2]) 
+                             * self.zoomRect[2])
         
         zoom_img  = resize_img(zoom_img, True, (widthZoom, heightZoom))
 
