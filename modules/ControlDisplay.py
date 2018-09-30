@@ -15,7 +15,7 @@ if False: from cv2 import *
 Features: 
     [ ] Zoom Window
         [x] gui cmd: selectZoom
-        [ ] further zoom in/out with keypress on zoom window
+        [x] further zoom in/out with keypress on zoom window
         [x] select roi in zoom window
             [x] draw roi in main
         [x] zoom:blue, roi:yellow
@@ -36,7 +36,7 @@ Features:
 Refactors:
 
     [x] remove hard coded dim size: 640, 320 etc.
-    [ ] document resize behavior
+    [ ] document resize behavior; including resize gy width
     [x] transformRect - > absRect
     [x] comment self data definitions
     [ ] better explanation of alterFrame vs drawOperators
@@ -51,7 +51,8 @@ Bugs:
     [ ] adjust resize for correct aspect ratio
     [ ] how to cancel an roi request?
     [ ] can't exit on a zoom select request
-    [ ] zoom frame is too large; do a max of those dims
+    [ ] zoom_display annotation: wrong order
+    [~] zoom frame is too large; do a max of those dims
     [x] crop zoom on full frame
     [x] crop frame before annotations
     [x] need to erase previous drawn shapes in drawOperators
@@ -187,7 +188,7 @@ class Display:
 
         msg = str(self.zoomFrame.shape[:2])
         msg += " orig: "
-        msg += str(self.rectMainToOrig(self.zoomRect)[2:4])
+        msg += str(self.rectMainToOrig(self.zoomRect)[2:4][::-1])
         # if self.zoomModuloZero:
         #     msg += " mod0"
         
@@ -342,15 +343,38 @@ class Display:
         if key == ord("s"):
             initBB = cv2.selectROI("img_display", self.frame, True, False )
 
-        # if self.zoomOn and self.zoomFrame is not None:
+        if self.zoomOn and self.zoomFrame is not None and self.windowTwo:
 
-        #     if key2 == ord('z'):
-        #         pass
-        #         #TODO - add more zoom
+            if key2 == ord('z'):
+                
+                print 'zooming'
+                rect = copy.copy(self.zoomRect)
+                zoomFct = 0.1
+                deltaW, deltaH = zoomFct * rect[2], zoomFct * rect[3]
+                rect = (
+                          int(round(rect[0]+deltaW))
+                         ,int(round(rect[1]+deltaH))
+                         ,int(round(rect[2]-2*deltaW))
+                         ,int(round(rect[3]-2*deltaH))
+                        )
+                self.zoomRect = rect
+                self.resetOperators()
+                
 
-        #     if key2 == ord('x'):
-        #         pass
-        #         #TODO - add less zoom
+            if key2 == ord('x'):
+                print 'un-zooming'
+                rect = copy.copy(self.zoomRect)
+                zoomFct = 1 - (1.0/1.1)  #~0.09
+                deltaW, deltaH = zoomFct * rect[2], zoomFct * rect[3]
+                rect = (
+                          int(round(rect[0]-deltaW))
+                         ,int(round(rect[1]-deltaH))
+                         ,int(round(rect[2]+2*deltaW))
+                         ,int(round(rect[3]+2*deltaH))
+                        )
+                self.zoomRect = rect
+                self.resetOperators()
+                
 
     
     # main helpers ---------------------
