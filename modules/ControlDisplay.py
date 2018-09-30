@@ -22,8 +22,8 @@ Features:
         [x] annotate with zoomwindow pixel size
             [x] pixels in window, nums pixels in original
         [x] return from drawOperator if not nec
-        [ ] window3, diff
-        [ ] zoom on/off by gui
+        [x] window3, diff
+        [x] zoom on/off by gui
         [x] crop from full size image
         [ ] zero-modulo resize should be default under certain size zoomFrame
 
@@ -35,7 +35,7 @@ Features:
 
 Refactors:
 
-    [ ] remove hard coded dim size: 640, 320 etc.
+    [x] remove hard coded dim size: 640, 320 etc.
     [ ] document resize behavior
     [x] transformRect - > absRect
     [x] comment self data definitions
@@ -98,6 +98,9 @@ class Display:
         self.cmdSelectRoiMain = False
         self.cmdSelectRoiZoom = False
 
+        self.windowTwo = True
+        self.windowThree = False
+
         self.widthMainWindow = 640
         self.heightMainWindow = 480
         self.widthZoomWindow = 320
@@ -124,15 +127,28 @@ class Display:
                 ,cmdSelectZoom=False
                 ,cmdSelectRoiMain=False
                 ,cmdSelectRoiZoom=False
+                ,windowTwo=None
+                ,windowThree=None
                 ):
         
         self.cmdSelectZoom = cmdSelectZoom
         self.cmdSelectRoiMain = cmdSelectRoiMain
         self.cmdSelectRoiZoom = cmdSelectRoiZoom
 
+        if windowTwo is not None:
+            self.windowTwo = windowTwo
+        if windowThree is not None:
+            self.windowThree = windowThree
+
         g.switchZoom = False
         g.switchRoiMain = False
         g.switchRoiZoom = False
+
+        if not(g.windowTwo):
+            cv2.destroyWindow("zoom_display")
+
+        if not(g.windowThree):
+            cv2.destroyWindow("diff_display")
 
 
     def setFrame(self, _frame):
@@ -299,13 +315,13 @@ class Display:
                 self.roiSelected = True
                 self.resetOperators()
         
-        if self.zoomOn:
+        if self.zoomOn and self.windowTwo:
         
             windowName = 'zoom_display'
             cv2.imshow(windowName, self.zoomFrame)
             key2 = cv2.waitKey(1) & 0xFF
 
-        if self.zoomOn and self.cmdSelectRoiZoom:
+        if self.zoomOn and self.cmdSelectRoiZoom and self.windowTwo:
             
             rect = cv2.selectROI("zoom_display", self.zoomFrame, True, False )
 
@@ -316,7 +332,12 @@ class Display:
             # we don't need to ensure modulo-zero here, that has already been 
             # enforced (or not) in the choice of zoomFrame-width in buildZoomFrame()
 
-            
+        if self.windowThree:
+
+            windowName = 'diff_display'
+            cv2.imshow(windowName, self.zoomFrame)  #TODO add diffFrame
+            key2 = cv2.waitKey(1) & 0xFF
+
         #new func -----------
         if key == ord("s"):
             initBB = cv2.selectROI("img_display", self.frame, True, False )

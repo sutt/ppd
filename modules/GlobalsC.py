@@ -13,3 +13,7 @@ def init():
     global switchZoom
     global switchRoiMain
     global switchRoiZoom
+    global windowTwo
+    global windowThree
+    
+

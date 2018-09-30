@@ -79,6 +79,8 @@ g.switchWriteVid = False
 g.switchZoom = False
 g.switchRoiMain = False
 g.switchRoiZoom = False
+g.windowTwo = True
+g.windowThree = False
 
 
 #High Level Options --------------------------
@@ -255,7 +257,9 @@ while(True):
 
         display.setCmd(cmdSelectZoom=g.switchZoom
                       ,cmdSelectRoiMain=g.switchRoiMain
-                      ,cmdSelectRoiZoom=g.switchRoiZoom)
+                      ,cmdSelectRoiZoom=g.switchRoiZoom
+                      ,windowTwo=g.windowTwo
+                      ,windowThree=g.windowThree)
 
         # output, handle before next frame
         if outputFactory.setInitWriteVid(g.initWriteVid):

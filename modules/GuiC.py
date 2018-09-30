@@ -34,6 +34,12 @@ class ConstructGui:
     def cmd_selectroizoom(self):
         g.switchRoiZoom = True
 
+    def cmd_windowTwo(self):
+        g.windowTwo = bool(self.int_windowTwo.get())
+
+    def cmd_windowThree(self):
+        g.windowThree = bool(self.int_windowThree.get())
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -225,6 +231,54 @@ class ConstructGui:
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
+
+        fdisplay1 = tk.Frame(root)
+        fdisplay1.pack(side = tk.TOP)
+
+        tk.Label(fdisplay1, text="Zoom Win:").pack(side=tk.LEFT)
+
+        self.int_windowTwo = tk.IntVar()
+        self.int_windowTwo.set(1)
+        
+        tk.Radiobutton(
+             fdisplay1
+            ,text="on"
+            ,variable=self.int_windowTwo
+            ,value=1
+            ,command=self.cmd_windowTwo
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fdisplay1
+            ,text="off"
+            ,variable=self.int_windowTwo
+            ,value=0
+            ,command=self.cmd_windowTwo
+            ).pack(side=tk.LEFT)
+
+        fdisplay2 = tk.Frame(root)
+        fdisplay2.pack(side = tk.TOP)
+
+        tk.Label(fdisplay2, text="Diff Win:").pack(side=tk.LEFT)
+
+        self.int_windowThree = tk.IntVar()
+        self.int_windowThree.set(0)
+        
+        tk.Radiobutton(
+             fdisplay2
+            ,text="on"
+            ,variable=self.int_windowThree
+            ,value=1
+            ,command=self.cmd_windowThree
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fdisplay2
+            ,text="off"
+            ,variable=self.int_windowThree
+            ,value=0
+            ,command=self.cmd_windowThree
+            ).pack(side=tk.LEFT)
 
 
         f1a5b = tk.Frame(root)
