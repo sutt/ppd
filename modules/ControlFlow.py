@@ -557,6 +557,7 @@ class NotesFactory:
         self.bShowScoring = False
         self.bFrameNotes = True
         self.framesData = []
+        self.framesDataExisting = []
         self.frameInd = None
         self.frameScoring = None
         
@@ -613,15 +614,16 @@ class NotesFactory:
         try:
             assert len(self.dataVid['frames']) > 0
             assert isinstance(self.dataVid['frames'][0], dict)
-            self.framesData = self.dataVid['frames']
+            self.framesDataExisting = self.dataVid['frames']
         except:
-            self.framesData = []
+            self.framesDataExisting = []
 
     def getFrameNoteCurrent(self):
-        return self.framesData[self.frameInd]
+        return self.framesDataExisting[self.frameInd]
 
     def getFrameScoreCurrent(self):
         if not(self.bShowScoring):
+            #TODO - this can't impact getFullNotes query
             return None
         note = self.getFrameNoteCurrent()
         try:
@@ -678,14 +680,26 @@ class NotesFactory:
         
         if self.bFrameNotes:
              
-            frameData = self.loadFrameLogCurrent()
-            
-            frameData['orig_vid_index'] = self.frameInd
+            if self.isProcessed:
 
-            frameData['scoring'] = self.frameScoring
+                #re-processing
+
+                frameData = self.getFrameNoteCurrent()
+
+                # frameScoring is not None only when gui-cmd writeFrame+Data
+                if self.frameScoring is not None:
+                    frameData['scoring'] = self.frameScoring
             
-            #TODO - add an overwrite fro frameData when isProcessed
-            
+            else:
+                
+                #new-processing
+
+                frameData = self.loadFrameLogCurrent()
+                
+                frameData['orig_vid_index'] = self.frameInd
+
+                frameData['scoring'] = self.frameScoring
+
             self.framesData.append(frameData)
              
             fullNotes['frames'] = copy.copy(self.framesData)

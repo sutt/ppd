@@ -23,10 +23,10 @@ if False: from cv2 import *  # for vscode intellisense
 
 [x] Add notesFactory
     [ ] handle orientation with img_rotate
-    [ ] handle scoring data
+    [x] handle scoring data
 
 [ ] controls
-    [ ] button: write frame + frame-data + frame-scoring [ + advanceFrame]
+    [x] button: write frame + frame-data + frame-scoring [ + advanceFrame]
     [ ] compression radio button
     
     [ ] refactor gui to make
@@ -318,8 +318,6 @@ while(True):
             display.drawOperators()
         
         display.show()
-
-        # display.getScoring()  #TODO
         
         if g.callExit:
             break

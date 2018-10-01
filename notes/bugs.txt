@@ -15,16 +15,16 @@
     
     [x] build two training videos
 
-    [ ] show on replay
-        [ ] gui element
+    [x] show on replay
+        [~] gui element
         [x] cli option --showscoring
         [x] add delay for score or train
             [x] different for file vs dir
-        [ ] follow with zoom cam
+        [x] follow with zoom cam
         [x] different color blue to show pre-scored
-        [ ] how to overwrite / compare scorings?
-            [ ] "add additional non-scored as scored"
-                [ ] load to framesDataExisting
+        [x] how to overwrite / compare scorings?
+            [x] "add additional non-scored as scored"
+                [x] load to framesDataExisting
         [x] does log of a processed
         
 
