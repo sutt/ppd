@@ -4,12 +4,14 @@
 10/1
 
     [x] run tests
-    [ ] Bug Fix & Review roi/zoom
-        [ ] review select roi
-            [ ] draw in main vs draw in zoom
-            [ ] draw in mod0 vs draw non-mod0
-    [ ] getScore -> metalog json
-        [ ] gui elements
+    [x] Bug Fix & Review roi/zoom
+        [x] review select roi
+            [x] draw in main vs draw in zoom
+            [x] draw in mod0 vs draw non-mod0
+            [x] at 1280
+    [x] getScore -> metalog json
+        [x] gui elements
+        [x] reset frameScoring or in Display
     
     [ ] show on replay
         [ ] gui element

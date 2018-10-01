@@ -151,6 +151,14 @@ class Display:
     def setAnnotateMsg(self, msg):
         self.annotateMsg = copy.copy(msg)
 
+    def getScoring(self, bNeedScore):
+        ''' return the roiRect data '''
+        if not(bNeedScore):
+            return None
+        if self.roiRect is None:
+            return None
+        return copy.copy(self.roiRect)
+
     def alterFrame(self):
         ''' make changes to frame, including resize. also, build zoomFrame here.
             need to call this every new frame and on resetOperators

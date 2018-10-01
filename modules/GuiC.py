@@ -64,6 +64,9 @@ class ConstructGui:
     def cmd_snapWriteVid_sw(self):
         g.switchWriteVid = True
 
+    def cmd_snapWriteScoring_sw(self):
+        g.switchWriteScoring = True
+
     def set_int_frameDelay(self, boolVal):
         self.int_frameDelay.set(int(boolVal))
 
@@ -161,7 +164,14 @@ class ConstructGui:
             ,text = 'writeFrame'
             ,command = self.cmd_snapWriteVid_sw
             )
-        self.snapWriteVid_button.pack()
+        self.snapWriteVid_button.pack(side=tk.LEFT)
+
+        self.snapWriteScoring_button = tk.Button(
+             f1b2
+            ,text = 'writeF+Scoring'
+            ,command = self.cmd_snapWriteScoring_sw
+            )
+        self.snapWriteScoring_button.pack(side=tk.LEFT)
 
         f1c = tk.Frame(root)
         f1c.pack(side = tk.TOP)

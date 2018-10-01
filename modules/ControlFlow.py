@@ -434,6 +434,7 @@ class OutputFactory:
         self.bWriteFrameOn = False
         self.bWriteFrameCmd = False
         self.bWriteFrameSnap = False
+        self.bWriteScoreSnap = False
 
 
     def setOutputDir(self, outputDir):
@@ -445,20 +446,27 @@ class OutputFactory:
             return True
         return False
 
-    def setWriteFrameOn(self, bWriteFrameOn, bSwtichWriteFrame):
+    def setWriteFrameOn(self, bWriteFrameOn, bSwtichWriteFrame, bSwitchWriteScoring):
         self.bWriteFrameOn = bWriteFrameOn
         self.bWriteFrameSnap = bSwtichWriteFrame
+        self.bWriteScoreSnap = bSwitchWriteScoring
         if bSwtichWriteFrame:
             g.switchWriteVid = False
+        if bSwitchWriteScoring:
+            g.switchWriteScoring = False
     
     def setWriteFrameCmd(self, bWriteFrame):
         self.bWriteFrameCmd = bWriteFrame
 
     def checkWriteFrame(self):
         if ((self.bWriteFrameOn and self.bWriteFrameCmd)
-            or self.bWriteFrameSnap):
+            or self.bWriteFrameSnap or self.bWriteScoreSnap):
             return True
         return False
+
+    def needScore(self):
+        ''' return true if this frames notes should include scoring '''
+        return self.bWriteScoreSnap
 
     @staticmethod
     def stripExt(fn):
@@ -536,6 +544,7 @@ class NotesFactory:
         self.bFrameNotes = True
         self.framesData = []
         self.frameInd = None
+        self.frameScoring = None
         
         self.frameLogInputPathFn = None
         self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
@@ -559,6 +568,9 @@ class NotesFactory:
     
     def setFrameCurrent(self, frameInd):
         self.frameInd = frameInd
+
+    def setScoring(self, scoringData):
+        self.frameScoring = scoringData
     
     def loadMetaLog(self, metalogPathFn):
         
@@ -628,7 +640,7 @@ class NotesFactory:
             
             frameData['orig_vid_index'] = self.frameInd
 
-            #TODO - add scoring from panes to frame data
+            frameData['scoring'] = self.frameScoring
             
             self.framesData.append(frameData)
              

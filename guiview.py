@@ -25,16 +25,6 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] handle orientation with img_rotate
     [ ] handle scoring data
 
-[x] Add Display
-    [x] new module
-    [x] reproduce existing; including hang unresponsive bug
-    [x] selectROI
-        [x] options
-        [x] draw with it
-    [x] zoom panel
-        [x] basic
-        [ ] window positioning, window naming, numbering
-
 [ ] controls
     [ ] button: write frame + frame-data + frame-scoring [ + advanceFrame]
     [ ] compression radio button
@@ -81,6 +71,7 @@ g.switchRoiMain = False
 g.switchRoiZoom = False
 g.windowTwo = True
 g.windowThree = False
+g.switchWriteScoring = False
 
 
 #High Level Options --------------------------
@@ -263,16 +254,24 @@ while(True):
 
         # output, handle before next frame
         if outputFactory.setInitWriteVid(g.initWriteVid):
+            
             outputFactory.initVidWriter(frameFactory.getFrameSize()
                                         ,directoryFactory.vidFn())
+            
             notesFactory.resetFramesData()
+            
             if b_gui:
                 guiInterface.update(writevidFn = outputFactory.getWritevidFn())
         
-        outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid)
+        outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid, 
+                                      g.switchWriteScoring)
+        
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
+        
         if outputFactory.checkWriteFrame():
-            #TODO - notesFactory.getScoringVals(paneFactory.getScoring())
+        
+            notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
+        
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
                                     ,notesFactory.getNotesCurrent() )

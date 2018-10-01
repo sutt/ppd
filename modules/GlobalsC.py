@@ -10,10 +10,12 @@ def init():
     global writevidOn
     global initWriteVid
     global switchWriteVid
+    global switchWriteScoring
     global switchZoom
     global switchRoiMain
     global switchRoiZoom
     global windowTwo
     global windowThree
+
     
 
