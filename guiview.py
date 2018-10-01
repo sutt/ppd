@@ -87,6 +87,7 @@ str_test = ""
 b_show = True
 framelog_pathfn = ""
 b_showscoring = False
+f_scoredelay = 1.0
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -129,7 +130,8 @@ if args["dir"] != "":
     b_resize = True
     
     g.frameDelay = False
-    b_showscoring = True
+    # b_showscoring = True
+    f_scoredelay = 0.3
 
 
 if args["test"] != "":
@@ -225,6 +227,7 @@ while(True):
     timeFactory.setFrametimeLog(directoryFactory.frametimePathFn())    
     
     timeFactory.setDelay(g.frameDelay)   
+    timeFactory.setScoringDelaySecs(f_scoredelay)
     
     timeFactory.setT0()
 
@@ -309,7 +312,7 @@ while(True):
             display.setAnnotateMsg(directoryFactory.vidFn())
             
             display.setScoring(notesFactory.getFrameScoreCurrent())
-            # timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
+            timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
             
             display.alterFrame()
             display.drawOperators()

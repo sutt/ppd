@@ -18,8 +18,8 @@
     [ ] show on replay
         [ ] gui element
         [x] cli option --showscoring
-        [ ] add delay for score or train
-            [ ] different for file vs dir
+        [x] add delay for score or train
+            [x] different for file vs dir
         [ ] follow with zoom cam
         [x] different color blue to show pre-scored
         [ ] how to overwrite / compare scorings?

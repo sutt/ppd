@@ -206,7 +206,9 @@ class TimeFactory:
         self.play = True
         self.cumtime = None
         self.frameCurrent = 0
+        self.anyDelaySecs = 0.0
         self.delaySecs = 0.0
+        self.delaySecsScoring = 0.5
         self.avgFps = 0.0
         self.avgFrametime = 0.0
 
@@ -229,6 +231,9 @@ class TimeFactory:
 
     def setDelaySecs(self, delaySecs):
         self.delaySecs = float(delaySecs)
+
+    def setScoringDelaySecs(self, scoringDelaySecs):
+        self.delaySecsScoring = scoringDelaySecs
 
     def setT0(self):
         self.t_0 = time.time()
@@ -308,20 +313,27 @@ class TimeFactory:
                 self.pauseTime += (time.time() - self.pauseT0)
             self.play = playOn
 
+    def setScoringDelay(self, scoringData):
+        if scoringData is None:
+            self.anyDelaySecs = self.delaySecs
+        else:
+            self.anyDelaySecs = self.delaySecsScoring
+
 
     def delayFrame(self):
         ''' sleep in frame loop to match cumtime '''
-        
-        if not(self.b_delay): return
 
         if not(self.play): return
         
         if not(self._validCumTime()): return
         if not(self._validCurrentFrame()): return
         
-        if self.delaySecs > 0.001:
-            time.sleep(self.delaySecs)
+        if self.anyDelaySecs > 0.001:
+            time.sleep(self.anyDelaySecs)
+            self.pauseTime += self.anyDelaySecs
             return
+
+        if not(self.b_delay): return
 
         secsAhead = ( self.cumtime[self.frameCurrent] 
                         - 
