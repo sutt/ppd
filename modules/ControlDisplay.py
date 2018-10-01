@@ -13,22 +13,6 @@ if False: from cv2 import *
 '''
 
 Features: 
-    [x] Zoom Window
-        [x] gui cmd: selectZoom
-        [x] further zoom in/out with keypress on zoom window
-        [x] select roi in zoom window
-            [x] draw roi in main
-        [x] zoom:blue, roi:yellow
-        [x] annotate with zoomwindow pixel size
-            [x] pixels in window, nums pixels in original
-        [x] return from drawOperator if not nec
-        [x] window3, diff
-        [x] zoom on/off by gui
-        [x] crop from full size image
-        [x] zero-modulo resize 
-            [x] should be default under certain size zoomFrame
-            [x] handle in keypress zoom/unzoom
-            [x] add annotation that modulo zero is ON for zoom_display
 
     [ ] orientation adjust
         [ ] handle flow thru of bounding box adjust
@@ -39,10 +23,10 @@ Features:
 Refactors:
 
     [x] remove hard coded dim size: 640, 320 etc.
-    [ ] document resize behavior; including resize gy width
+    [x] document resize behavior; including resize gy width
     [x] transformRect - > absRect
     [x] comment self data definitions
-    [ ] better explanation of alterFrame vs drawOperators
+    [x] better explanation of alterFrame vs drawOperators
     
     [ ] add unittests, can't test with guiview_test
         [ ] test for coord conversion between zoom and main
@@ -52,15 +36,11 @@ Refactors:
         [ ] test mod0 vs not-mod0
 
 Bugs:
-    [ ] adjust resize for correct aspect ratio
+    [~] adjust resize for correct aspect ratio
     [ ] how to cancel an roi request?
     [ ] can't exit on a zoom select request
-    [ ] zoom_display annotation: wrong order
+    [x] zoom_display annotation: wrong order
     [~] zoom frame is too large; do a max of those dims
-    [x] crop zoom on full frame
-    [x] crop frame before annotations
-    [x] need to erase previous drawn shapes in drawOperators
-    [x] zoom isn't cropped after selectroi
 
 
 '''
@@ -293,12 +273,13 @@ class Display:
 
                 # find a whole number multiple of zoomRect into 320,
                 # use that for resize factor
-                widthZoom = (int(self.widthZoomWindow / self.zoomRect[2]) 
-                             * self.zoomRect[2])
+                widthZoom = int( int(self.widthZoomWindow / self.zoomRect[2]) 
+                                      * self.zoomRect[2])
         
         zoom_img  = resize_img(zoom_img, True, (widthZoom, heightZoom))
 
-        # since the zoom_img is always resize larger, if modulo == 0, then every pixel
+        # resize_img always (?) choses width to resize by, and maintains aspect ratio.
+        # Since the zoom_img is always resize larger, if modulo == 0, then every pixel
         # is (presumably?) scaled the exact same amount e.g. 3.0x increase has a 1 pixel 
         # becoming a 3x3 square of the same data-values.
         

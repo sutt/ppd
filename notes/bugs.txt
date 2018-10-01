@@ -1,5 +1,31 @@
 #Tasks
 
+
+10/1
+
+    [x] run tests
+    [ ] Bug Fix & Review roi/zoom
+        [ ] review select roi
+            [ ] draw in main vs draw in zoom
+            [ ] draw in mod0 vs draw non-mod0
+    [ ] getScore -> metalog json
+        [ ] gui elements
+    
+    [ ] show on replay
+        [ ] gui element
+
+    [ ] other todos
+        [ ] 
+    [ ] other tests
+
+9/30
+
+    [x] Can't do another zoomSelect that's small:
+    
+            zoom_img  = resize_img(zoom_img, True, (widthZoom, heightZoom))
+                ...
+            TypeError: integer argument expected, got float
+
 9/26
 
     [x] write up commands.txt
@@ -21,19 +47,19 @@
         
         [x] mimic existing function, e.g.  output7.avi
 
-        [ ] add selectROI
+        [x] add selectROI
         
-            [ ] resize during selectROI bug
+            [x] resize during selectROI bug
                 maybe b/c it's resize to wrong dimensions?
                 http://answers.opencv.org/question/84985/resizing-the-output-window-of-imshow-function/
                 https://stackoverflow.com/questions/47524734/selecting-roi-in-auto-resized-window
 
-        [ ] zoom window
+        [x] zoom window
 
-            [ ] need "mod" / "%" padding on zoom frame, so zoom box will convert to whole integer
+            [x] need "mod" / "%" padding on zoom frame, so zoom box will convert to whole integer
                 coords in main img
 
-            [ ] need to make a circle within bounding box? or only afterwards?
+            [x] need to make a circle within bounding box? or only afterwards?
                 [ ] how to cut img pixels out of a circle?
 
 9/25

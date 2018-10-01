@@ -1,3 +1,10 @@
+9/28
+
+Finish up main problems with Display,
+Then write getScore -> notesFactory (and gui element)
+    [ ] do a simple example, where you mark a few then that shows on replay
+Then do some unit tests on Display orig<->main<->zoom coords (w/w/o modulo-0)
+
 9/25
 
 OpenCV comes with lots of good demos in samples/, e.g. color_histogram.py is much faster than I could acheive; I should investigate these "samples" in the context of my own data.
