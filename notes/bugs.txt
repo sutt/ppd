@@ -13,8 +13,20 @@
         [x] gui elements
         [x] reset frameScoring or in Display
     
+    [x] build two training videos
+
     [ ] show on replay
         [ ] gui element
+        [x] cli option --showscoring
+        [ ] add delay for score or train
+            [ ] different for file vs dir
+        [ ] follow with zoom cam
+        [x] different color blue to show pre-scored
+        [ ] how to overwrite / compare scorings?
+            [ ] "add additional non-scored as scored"
+                [ ] load to framesDataExisting
+        [x] does log of a processed
+        
 
     [ ] other todos
         [ ] 

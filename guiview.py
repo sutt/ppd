@@ -48,6 +48,7 @@ BUGS:
     [ ] pauseTime - doesn't account for when called with no-delay
     [x] opens on frame1 (not frame0) for pause_on_open
     [ ] add other file extensions for vids
+    [ ] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
 
     
 '''
@@ -85,6 +86,7 @@ b_test = False
 str_test = ""
 b_show = True
 framelog_pathfn = ""
+b_showscoring = False
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -99,6 +101,7 @@ ap.add_argument("--test", type=str, default="")
 ap.add_argument("--noshow", action="store_true", default=False)
 ap.add_argument("--output", type=str, default="")
 ap.add_argument("--framelog", type=str, default="")
+ap.add_argument("--showscoring", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -126,6 +129,7 @@ if args["dir"] != "":
     b_resize = True
     
     g.frameDelay = False
+    b_showscoring = True
 
 
 if args["test"] != "":
@@ -159,6 +163,9 @@ if args["framelog"]:
     
 if args["dontload"]:
     b_preload = False
+
+if args["showscoring"]:
+    b_showscoring = True
 
 # Initalize Top Level Loop ----------------------------
 
@@ -208,6 +215,8 @@ while(True):
     notesFactory.loadMetaLog(directoryFactory.metalogPathFn())
 
     notesFactory.setFrameLog(framelog_pathfn)
+
+    notesFactory.setShowScoring(b_showscoring)
 
     #display.setOrientation(notesFactory.getOrientation())
 
@@ -298,6 +307,10 @@ while(True):
             
             display.setFrame(frame)
             display.setAnnotateMsg(directoryFactory.vidFn())
+            
+            display.setScoring(notesFactory.getFrameScoreCurrent())
+            # timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
+            
             display.alterFrame()
             display.drawOperators()
         

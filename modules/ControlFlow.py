@@ -386,7 +386,7 @@ class DirectoryFactory:
     def frametimePathFn(self):
 
         _vidFn = self.vidFn()
-        _frametimeFn = _vidFn.split(".")[0]
+        _frametimeFn = ".".join(_vidFn.split(".")[:-1])
         _frametimeFn += ".txt"
         
         return os.path.join(self.initDir, _frametimeFn)
@@ -395,7 +395,7 @@ class DirectoryFactory:
     def metalogPathFn(self):
 
         _vidFn = self.vidFn()
-        _metalogFn = _vidFn.split(".")[0]
+        _metalogFn = ".".join(_vidFn.split(".")[:-1])
         _metalogFn += ".metalog"
         
         return os.path.join(self.initDir, _metalogFn)
@@ -539,8 +539,10 @@ class NotesFactory:
     def __init__(self):
         self.metalog = MetaDataLog()
         self.vidIsLoaded = False
+        self.isProcessed = False
         self.dataVid = {}
 
+        self.bShowScoring = False
         self.bFrameNotes = True
         self.framesData = []
         self.frameInd = None
@@ -569,6 +571,9 @@ class NotesFactory:
     def setFrameCurrent(self, frameInd):
         self.frameInd = frameInd
 
+    def setShowScoring(self, bShowScoring):
+        self.bShowScoring = bShowScoring
+    
     def setScoring(self, scoringData):
         self.frameScoring = scoringData
     
@@ -577,16 +582,41 @@ class NotesFactory:
         try:
             self.dataVid  = self.metalog.get_log_data(metalogPathFn)
             
-            if type(self.metalog.data) == type.__dict__:
+            if isinstance(self.metalog.data, dict):
                 if len(self.metalog.data.keys()) > 0:
                     self.vidIsLoaded = True
 
-            #add extra processing data
-            self.dataVid['processed'] = True
-            self.dataVid['proc-data'] = {}  #e.g. datetime of processing
+            if self.dataVid.get('processed', False):
+                self.isProcessed = True
+                self.loadFrameNotes()
+            else:
+                self.dataVid['processed'] = True
+                self.dataVid['proc-data'] = {}  #e.g. datetime of processing
         
         except:
             self.dataVid = {}
+
+    def loadFrameNotes(self):
+        ''' if video is processed it already has frame notes, load those '''
+        try:
+            assert len(self.dataVid['frames']) > 0
+            assert isinstance(self.dataVid['frames'][0], dict)
+            self.framesData = self.dataVid['frames']
+        except:
+            self.framesData = []
+
+    def getFrameNoteCurrent(self):
+        return self.framesData[self.frameInd]
+
+    def getFrameScoreCurrent(self):
+        if not(self.bShowScoring):
+            return None
+        note = self.getFrameNoteCurrent()
+        try:
+            assert len(note['scoring']) == 4
+            return note['scoring']
+        except:
+            return None
 
     def loadFrameLogCurrent(self):
         ''' load data from notepad '''
@@ -641,6 +671,8 @@ class NotesFactory:
             frameData['orig_vid_index'] = self.frameInd
 
             frameData['scoring'] = self.frameScoring
+            
+            #TODO - add an overwrite fro frameData when isProcessed
             
             self.framesData.append(frameData)
              

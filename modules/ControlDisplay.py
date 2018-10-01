@@ -74,6 +74,8 @@ class Display:
         #roiRect in coords relative to origFrame; relative-rect format
         # (x,y,w,h)
         self.roiRect = None
+
+        self.roiRectScoring = None
         
         self.selectRectMain = None  #needed this?
         self.selectRectZoom = None  #needed this?
@@ -151,6 +153,20 @@ class Display:
     def setAnnotateMsg(self, msg):
         self.annotateMsg = copy.copy(msg)
 
+    def setScoring(self, frameScoring):
+        ''' set roiRectScore, is data is in correct form'''
+        if frameScoring is None:
+            self.roiRectScoring = None
+            return
+        try:
+            assert len(frameScoring) == 4
+            assert all( [isinstance(frameScoring[i], int) for i in range(4)] )
+        except:
+            self.roiRectScoring = None
+            return 
+
+        self.roiRectScoring = frameScoring
+    
     def getScoring(self, bNeedScore):
         ''' return the roiRect data '''
         if not(bNeedScore):
@@ -177,6 +193,11 @@ class Display:
         if self.zoomOn:
             self.zoomFrame = self.buildZoomFrame()
             self.alterZoomFrame()
+
+        if self.roiRectScoring is not None:
+            #TODO handle scoring here
+            # build padded zoom around roiRectScoring ( from zoomOut function)
+            pass
 
     def alterZoomFrame(self):
         ''' make annotation to zoomFrame, but not resize; 
@@ -250,6 +271,19 @@ class Display:
             # because when zoomwindow has resize, modulo might not be 0,
             # but whether it is or isn't, is decided in buildZoomFrame()
             # with the choice of width
+
+        if self.roiRectScoring is not None:
+
+            x, y, radius = self.rectToCircle(self.roiToMain(b_scoring=True))
+            
+            self.frame = draw_circle(self.frame
+                                    ,x
+                                    ,y
+                                    ,radius
+                                    ,color = 'red'
+                                    ,thick = 2
+                                    )
+
     
     
     def buildZoomFrame(self):
@@ -387,23 +421,28 @@ class Display:
     # main helpers ---------------------
     # (roiRect (which is relative to origFrame coors) <-> to main/zoom)
 
-    def roiToMain(self):
+    def roiToMain(self, b_scoring=False):
         ''' return relative-rect roi relative to main-window coord's.
                 (since there's no cropping, we only stretch.)
                 (we expect the stretch to be modulo-zero as 
                  640 1280 1920 are multiple )
         '''
         rect = copy.copy(self.roiRect)
+        if b_scoring:
+            rect = copy.copy(self.roiRectScoring)
         rectMain = tuple(map(self.scaleOrigToMain, rect))
         return rectMain
 
-    def roiToZoom(self):
+    def roiToZoom(self, b_scoring=False):
         ''' return a relative-rect roi relative to zoom-window coord's.
                 (there's cropping and stretching.)
                 (we don't assume it is modulo-zero; but if it is, 
                  this function should preserve that.)
         '''
         rect = copy.copy(self.roiRect)
+
+        if b_scoring:
+            rect = copy.copy(self.roiRectScoring)
         
         #orig->main
         x0, y0, dx, dy = map(self.scaleOrigToMain, rect)  
