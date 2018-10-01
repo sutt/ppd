@@ -553,6 +553,7 @@ class NotesFactory:
         self.vidIsLoaded = False
         self.isProcessed = False
         self.dataVid = {}
+        self.orientation = 0
 
         self.bShowScoring = False
         self.bFrameNotes = True
@@ -589,11 +590,16 @@ class NotesFactory:
     
     def setScoring(self, scoringData):
         self.frameScoring = scoringData
+
+    def getOrientation(self):
+        return self.orientation   #degrees clockwise
     
     def loadMetaLog(self, metalogPathFn):
         
         try:
             self.dataVid  = self.metalog.get_log_data(metalogPathFn)
+            
+            self.orientation = self.dataVid.get('notes', 0).get('orientation', 0)
             
             if isinstance(self.metalog.data, dict):
                 if len(self.metalog.data.keys()) > 0:
@@ -622,8 +628,8 @@ class NotesFactory:
         return self.framesDataExisting[self.frameInd]
 
     def getFrameScoreCurrent(self):
+        ''' guiview calls this to check if there is a scoring event '''
         if not(self.bShowScoring):
-            #TODO - this can't impact getFullNotes query
             return None
         note = self.getFrameNoteCurrent()
         try:

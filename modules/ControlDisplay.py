@@ -1,6 +1,7 @@
 import os, sys, time, copy
 import numpy as np
 import cv2
+import imutils
 import argparse
 
 import GlobalsC as g
@@ -81,6 +82,9 @@ class Display:
         self.selectRectZoom = None  #needed this?
         
         self.annotateMsg = ""
+        
+        #handle orientation just before show(), and right after selectROI()
+        #but otherwise all operations on original orientation
         self.orientation = 0
 
         self.cmdSelectZoom = False
@@ -99,9 +103,9 @@ class Display:
         self.modZeroSize = 40
         
 
-    def setOrientation(iOrientation):
+    def setOrientation(self, iOrientation):
         if iOrientation not in (90,180,270):
-            self.iOrientation = 0
+            self.orientation = 0
         else:
             self.orientation = iOrientation
 
@@ -238,6 +242,8 @@ class Display:
 
         if self.zoomOn and self.zoomRect is not None:
             
+            print self.frame.shape
+            
             self.frame = draw_rect(  self.frame
                                     ,self.absRect(self.zoomRect)
                                     ,color='blue'
@@ -299,6 +305,22 @@ class Display:
                                     ,thick = 1
                                     )
 
+        if self.orientation != 0:
+
+            #rotate images here, to apply minimal amount of coord adjustment
+            
+            self.frame = imutils.rotate_bound(self.frame
+                                            ,self.orientation)
+
+            if self.zoomOn:
+                
+                self.zoomFrame = imutils.rotate_bound(self.zoomFrame
+                                                    ,self.orientation)
+
+            # if self.diffOn:
+                #TODO - rotate diff image
+
+                
 
     
     
@@ -356,12 +378,21 @@ class Display:
             return
 
         windowName = 'img_display'
+        if self.orientation in (90,270): windowName += "_profile"    
+
         cv2.imshow(windowName, self.frame)
         key = cv2.waitKey(1) & 0xFF
 
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
             
-            rect = cv2.selectROI("img_display", self.frame, True, False )
+            windowName = 'img_display'
+            if self.orientation in (90,270): windowName += "_profile"    
+
+            rect = cv2.selectROI(windowName, self.frame, True, False )
+
+            print self.frame.shape
+            print rect
+            rect = self.adjOrientationRect(rect, self.frame)
             
             if self.cmdSelectZoom:
                 self.zoomRect = rect
@@ -376,14 +407,24 @@ class Display:
         if self.zoomOn and self.windowTwo:
         
             windowName = 'zoom_display'
+            if self.orientation in (90,270): windowName += "_profile"    
+
             cv2.imshow(windowName, self.zoomFrame)
             key2 = cv2.waitKey(1) & 0xFF
 
         if self.zoomOn and self.cmdSelectRoiZoom and self.windowTwo:
             
-            rect = cv2.selectROI("zoom_display", self.zoomFrame, True, False )
+            windowName = 'zoom_display'
+            if self.orientation in (90,270): windowName += "_profile"    
+            
+            rect = cv2.selectROI(windowName, self.zoomFrame, True, False )
 
-            self.roiRect = self.rectZoomToOrig(rect)
+            print rect
+            # rect = self.adjOrientationRect(rect, self.zoomFrame)
+
+            
+            rect = self.rectZoomToOrig(rect)
+            self.roiRect = self.adjOrientationRect(rect, self.getOrigFrame())
             self.roiSelected = True
             self.resetOperators()
 
@@ -512,6 +553,34 @@ class Display:
         return rect
 
     
+    def adjOrientationRect(self, rect, img):
+        ''' adjusting bounding box from selectROI into original images orientation '''
+        
+        if self.orientation == 0:
+            return rect
+        
+        x, y, dx, dy = rect
+        h, w = img.shape[:2]
+
+        if self.orientation == 90:
+            
+            h, w = img.shape[:2]   #note this actually reversed b/c weve rotated frame
+        
+            x_new = y
+            y_new =  w - (dx + x)
+            dx_new = dy
+            dy_new = dx
+
+        elif self.orientation == 180:
+            return rect
+        elif self.orientation == 180:
+            return rect
+        else:
+            return rect
+        
+        print (x_new, y_new, dx_new, dy_new)
+        return (x_new, y_new, dx_new, dy_new)
+
     # helpers for the helpers: --------------
     # (adjust individual coords or individual values)
     def coordMainToZoom(self, coord_xy):

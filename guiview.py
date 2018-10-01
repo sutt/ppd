@@ -220,7 +220,7 @@ while(True):
 
     notesFactory.setShowScoring(b_showscoring)
 
-    #display.setOrientation(notesFactory.getOrientation())
+    display.setOrientation(notesFactory.getOrientation())
 
     timeFactory = TimeFactory()
 
