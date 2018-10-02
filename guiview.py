@@ -273,7 +273,7 @@ while(True):
                                         ,directoryFactory.vidFn()
                                         ,g.compressionEnum)
             
-            notesFactory.resetFramesData()
+            outputFactory.resetFramesData()
             
             if b_gui:
                 guiInterface.update(writevidFn = outputFactory.getWritevidFn())
@@ -289,7 +289,8 @@ while(True):
         
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
-                                    ,notesFactory.getNotesCurrent() )
+                                    ,notesFactory.getBaseNote()
+                                    ,notesFactory.getFrameData() )
         
         if frameFactory.queryNewFrame():
             

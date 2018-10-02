@@ -448,10 +448,15 @@ class OutputFactory:
         self.bWriteFrameSnap = False
         self.bWriteScoreSnap = False
 
+        self.framesData = []
+
 
     def setOutputDir(self, outputDir):
         self.outputDir = outputDir
     
+    def resetFramesData(self):
+        self.framesData = []
+
     def setInitWriteVid(self, bInitWriteVid):
         if bInitWriteVid:
             g.initWriteVid = False
@@ -526,7 +531,7 @@ class OutputFactory:
     def getWritevidFn(self):
         return self.writeVidFn
 
-    def writeFrame(self, frame, timelogEntry, metalogEntire):
+    def writeFrame(self, frame, timelogEntry, baseNote, frameData):
         ''' on advance or play, write previous frame '''
         
         if self.vidwriter is not None:
@@ -539,11 +544,43 @@ class OutputFactory:
 
         if self.metawriter is not None:
 
+            self.framesData.append(frameData)
+
+            fullNotes = baseNote
+            fullNotes['frames'] = self.framesData
+
+            fullNotes = self.orderDict(copy.copy(fullNotes)
+                                        ,last_keys = ["frames"])
+            
+            metalogEntire = json.dumps(fullNotes, indent = 4)   
+            
             _f = open(os.path.join(self.outputDir, self.writeMetaFn), 'w')
             _f.truncate(0)
             _f.write(metalogEntire)
             _f.close()
 
+    @staticmethod
+    def orderDict(dict, first_keys= [],  last_keys = []):
+            
+        _keys = [k for k in dict.keys()]
+        _order = [0 for _ in range(len(_keys))]
+        
+        for i in range(len(_keys)):
+            if _keys[i] in first_keys: 
+                _order[i] = -1
+            if _keys[i] in last_keys: 
+                _order[i] = 1
+        
+        _temp = [(a,b) for a,b in zip(_keys,_order)]
+        _temp.sort(key=lambda tup: tup[1])
+        
+        sorted_keys = [elem[0] for elem in _temp]
+        
+        output = OrderedDict()
+        for k in sorted_keys:
+            output[k] = dict[k]
+        
+        return output
 
 
 class NotesFactory:
@@ -668,65 +705,42 @@ class NotesFactory:
         else:
             return {}
     
-    @staticmethod
-    def orderDict(dict, first_keys= [],  last_keys = []):
-            
-        _keys = [k for k in dict.keys()]
-        _order = [0 for _ in range(len(_keys))]
-        
-        for i in range(len(_keys)):
-            if _keys[i] in first_keys: 
-                _order[i] = -1
-            if _keys[i] in last_keys: 
-                _order[i] = 1
-        
-        _temp = [(a,b) for a,b in zip(_keys,_order)]
-        _temp.sort(key=lambda tup: tup[1])
-        
-        sorted_keys = [elem[0] for elem in _temp]
-        
-        output = OrderedDict()
-        for k in sorted_keys:
-            output[k] = dict[k]
-        
-        return output
 
-    def getFullNotes(self):
-        
-        fullNotes = copy.copy(self.dataVid)
-        
-        if self.bFrameNotes:
-             
-            if self.isProcessed:
+    def getFrameData(self):
+        ''' return only current frameData; store all frame notes in outputFactory '''
 
-                #re-processing
+        if self.isProcessed:
 
-                frameData = self.getFrameNoteCurrent()
+            #re-processing
 
-                # frameScoring is not None only when gui-cmd writeFrame+Data
-                if self.frameScoring is not None:
-                    frameData['scoring'] = self.frameScoring
-            
-            else:
-                
-                #new-processing
+            #but how to handle overwrite of template prop's?
+            #write frameData to a tmp file where you can edit
+            frameData = self.getFrameNoteCurrent()
 
-                frameData = self.loadFrameLogCurrent()
-                
-                frameData['orig_vid_index'] = self.frameInd
-
+            # frameScoring is not None only when gui-cmd writeFrame+Data
+            if self.frameScoring is not None:
                 frameData['scoring'] = self.frameScoring
-
-            self.framesData.append(frameData)
-             
-            fullNotes['frames'] = copy.copy(self.framesData)
+        
+        else:
             
-            fullNotes = self.orderDict(copy.copy(fullNotes)
-                                        ,last_keys = ["frames"])
-        
-        return fullNotes
+            #new-processing
 
-    def getNotesCurrent(self):
-        
-        return json.dumps(self.getFullNotes(), indent = 4)   
+            frameData = self.loadFrameLogCurrent()
+            
+            frameData['orig_vid_index'] = self.frameInd
 
+            frameData['scoring'] = self.frameScoring
+
+        return frameData
+
+    def getBaseNote(self):
+        
+        baseNote = copy.deepcopy(self.dataVid)
+        try:
+            del baseNote['frames']
+        except:
+            #some metalogs don't have frames
+            pass  
+        assert 'frames' not in baseNote.keys()
+        return baseNote
+    

@@ -10,7 +10,9 @@
         [x] contorls vidwriter
         [x] defaults to metalog compression value fourcc_enum
 
-    [ ] dont erase framenotes when video re-cycles
+    [x] dont erase framenotes when video re-cycles
+
+    [ ] write processing-compressiontype in proc-data for output metalog
 
     [ ] semi-preload
         [ ] default to this when preloaded and file size is too large
