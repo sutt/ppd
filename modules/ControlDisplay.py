@@ -112,6 +112,10 @@ class Display:
         else:
             self.orientation = iOrientation
 
+    def reset(self):
+        self.zoomOn = False
+        self.roiRectScoring = None
+
     def setInit( self
                 ,showOn=True
                 ,frameResize=True
@@ -201,7 +205,9 @@ class Display:
         if self.roiRectScoring is not None:
             
             # zoomRect in terms of original
-            self.zoomRect =  self.zoomInRect(self.roiRectScoring, b_zoomout = True)
+            self.zoomRect =  self.rectOrigToMain(
+                                self.zoomInRect(self.roiRectScoring, b_zoomout = True)
+                                )
         
         if self.zoomOn:
             self.zoomFrame = self.buildZoomFrame()
@@ -565,6 +571,12 @@ class Display:
         '''
         rectOrig = tuple(map(self.scaleMainToOrig, rectMain))
         return rectOrig
+
+    def rectOrigToMain(self, rectOrig):
+        ''' convert rect coords from relative to orig to relative to main
+        '''
+        rectMain = tuple(map(self.scaleOrigToMain, rectOrig))
+        return rectMain
 
     @staticmethod
     def zoomInRect(rect, zoomFct = 0.1, b_zoomout=False):

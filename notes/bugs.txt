@@ -12,6 +12,8 @@
 
     [x] dont erase framenotes when video re-cycles
 
+    [x] dir is broken on data/proc/demo-proc folder
+    
     [ ] write processing-compressiontype in proc-data for output metalog
 
     [ ] semi-preload

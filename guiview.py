@@ -223,6 +223,8 @@ while(True):
 
     display.setOrientation(notesFactory.getOrientation())
 
+    display.reset()
+
     timeFactory = TimeFactory()
 
     timeFactory.setFrametimeLog(directoryFactory.frametimePathFn())    
