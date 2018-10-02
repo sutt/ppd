@@ -23,6 +23,9 @@ class FrameFactory:
         self.rewindCmd = False
         self.fastforwardCmd = False
         self.preloaded = False
+        self.semiloaded = False
+        self.maxFramesSize = 10**9
+        self.semiloadCounter = 0
         self.frames = []
         self.cam = None
         self.frameCounter = -1
@@ -41,7 +44,7 @@ class FrameFactory:
         self.firstN = firstN
 
     def preload(self):
-
+        
         try:
             while(self.cam.isOpened()):
                 
@@ -50,6 +53,10 @@ class FrameFactory:
                 if ret:
                     self.frames.append(frame)
                 else:
+                    break
+                if sum([f.nbytes for f in self.frames]) > self.maxFramesSize:
+                    print 'cant load full video; going semiloaded mode'
+                    self.semiloaded = True
                     break
 
             if len(self.frames) > 0:
@@ -64,6 +71,9 @@ class FrameFactory:
         if self.firstN > 0:
             if self.frameCounter > self.firstN:
                 return False
+        
+        if self.semiloaded:
+            return self.cam.isOpened()
         
         if self.preloaded:
         
@@ -90,7 +100,7 @@ class FrameFactory:
             raise Exception("Not implemented for not preload")
 
     def getFrame(self):
-        if self.preloaded:
+        if self.preloaded and not(self.semiloaded):
             
             if len(self.frames) - 1 < self.frameCounter:
                 return False, None
@@ -98,9 +108,19 @@ class FrameFactory:
             return True, self.frames[self.frameCounter]
             
         else:
+            
             ret, frame = self.cam.read()
             if not(ret):
                 self.cam.release()
+            
+            if self.semiloaded:
+                
+                if self.semiloadCounter + len(self.frames) - 1 < self.frameCounter:
+                    
+                    self.frames.append(frame)
+                    self.frames.pop(0)
+                    self.semiloadCounter += 1
+                    
             return ret, frame
 
     def getFrameCounter(self):
@@ -108,6 +128,8 @@ class FrameFactory:
 
     def getFrameTotal(self):
         if self.frames is None:
+            return -1
+        if self.semiloaded:
             return -1
         return len(self.frames) - 1
 
@@ -140,7 +162,24 @@ class FrameFactory:
                 return True
             
             newCounter = requestAmt + self.frameCounter
-            
+
+            if self.semiloaded:
+                
+                if requestAmt == 1:
+                    self.frameCounter += requestAmt
+                    return True
+                
+                if requestAmt > 1:
+                    return False
+                    
+                if requestAmt < 1:
+                    
+                    if newCounter < self.semiloadCounter:
+                        return False
+                    else:
+                        self.frameCounter += requestAmt
+                        return True
+
             if (newCounter <= len(self.frames) - 1 and newCounter >= 0):
                 self.frameCounter += requestAmt
                 return True

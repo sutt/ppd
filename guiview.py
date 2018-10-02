@@ -27,7 +27,7 @@ if False: from cv2 import *  # for vscode intellisense
 
 [ ] controls
     [x] button: write frame + frame-data + frame-scoring [ + advanceFrame]
-    [ ] compression radio button
+    [x] compression radio button
     
     [ ] refactor gui to make
         [ ] does this enable debugging better?

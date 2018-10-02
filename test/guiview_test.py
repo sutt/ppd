@@ -496,7 +496,7 @@ class GuiviewStagingClass:
                 output_size_1 = os.path.getsize(os.path.join(TEST_DATA_DIR
                                                         ,TEST_DATA_FN_1))
 
-                if not( 3*(10**4) < output_size_1 < 5*(10**4)): #between 30 kB and 40 kB
+                if not( 3*(10**4) < output_size_1 < 6*(10**4)): #between 30 kB and 60 kB
                     bErrors = True
                     msg += ["TEST DATA: output file size below/above level expected"]
                 

@@ -16,9 +16,9 @@
     
     [ ] write processing-compressiontype in proc-data for output metalog
 
-    [ ] semi-preload
-        [ ] default to this when preloaded and file size is too large
-        [ ] demonstrate with output8
+    [x] semi-preload
+        [x] default to this when preloaded and file size is too large
+        [x] demonstrate with output8
 
     [ ] keypress basics
     
