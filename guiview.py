@@ -22,7 +22,7 @@ if False: from cv2 import *  # for vscode intellisense
 '''
 
 [x] Add notesFactory
-    [ ] handle orientation with img_rotate
+    [x] handle orientation with img_rotate
     [x] handle scoring data
 
 [ ] controls

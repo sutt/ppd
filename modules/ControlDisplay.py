@@ -242,8 +242,6 @@ class Display:
 
         if self.zoomOn and self.zoomRect is not None:
             
-            print self.frame.shape
-            
             self.frame = draw_rect(  self.frame
                                     ,self.absRect(self.zoomRect)
                                     ,color='blue'
@@ -389,10 +387,9 @@ class Display:
             if self.orientation in (90,270): windowName += "_profile"    
 
             rect = cv2.selectROI(windowName, self.frame, True, False )
-
-            print self.frame.shape
-            print rect
-            rect = self.adjOrientationRect(rect, self.frame)
+            
+            # frame is rotated at this point so h/w are reversed
+            rect = self.adjOrientationRect(rect, self.frame.shape[:2][::-1])
             
             if self.cmdSelectZoom:
                 self.zoomRect = rect
@@ -400,6 +397,7 @@ class Display:
                 self.resetOperators()
 
             if self.cmdSelectRoiMain:
+                self.frame = imutils.rotate_bound(self.frame, - self.orientation)
                 self.roiRect = self.rectMainToOrig(rect)
                 self.roiSelected = True
                 self.resetOperators()
@@ -417,14 +415,18 @@ class Display:
             windowName = 'zoom_display'
             if self.orientation in (90,270): windowName += "_profile"    
             
-            rect = cv2.selectROI(windowName, self.zoomFrame, True, False )
-
-            print rect
-            # rect = self.adjOrientationRect(rect, self.zoomFrame)
-
+            rect = cv2.selectROI(windowName, self.zoomFrame, True, False)
+            
+            # zoomFrame is rotated at this point so h/w are reversed
+            rect = self.adjOrientationRect(rect, self.zoomFrame.shape[:2][::-1])
+            
+            #frame and zoomFrame have been rotated already, put back in orig orientation
+            self.frame = imutils.rotate_bound(self.frame, -self.orientation)
+            self.zoomFrame = imutils.rotate_bound(self.zoomFrame, -self.orientation)
             
             rect = self.rectZoomToOrig(rect)
-            self.roiRect = self.adjOrientationRect(rect, self.getOrigFrame())
+
+            self.roiRect = rect 
             self.roiSelected = True
             self.resetOperators()
 
@@ -553,32 +555,40 @@ class Display:
         return rect
 
     
-    def adjOrientationRect(self, rect, img):
+    def adjOrientationRect(self, rect, (imgH, imgW)):
         ''' adjusting bounding box from selectROI into original images orientation '''
         
         if self.orientation == 0:
             return rect
         
         x, y, dx, dy = rect
-        h, w = img.shape[:2]
+        
+        h, w = imgH, imgW
 
         if self.orientation == 90:
-            
-            h, w = img.shape[:2]   #note this actually reversed b/c weve rotated frame
         
             x_new = y
-            y_new =  w - (dx + x)
+            y_new =  h - (dx + x)
             dx_new = dy
             dy_new = dx
 
         elif self.orientation == 180:
-            return rect
-        elif self.orientation == 180:
-            return rect
+            
+            x_new = -dx + h - x
+            y_new = -dy + w - y
+            dx_new = dx
+            dy_new = dy
+
+        elif self.orientation == 270:
+            
+            x_new = w - (dy + y)
+            y_new =  x
+            dx_new = dy
+            dy_new = dx
+
         else:
             return rect
         
-        print (x_new, y_new, dx_new, dy_new)
         return (x_new, y_new, dx_new, dy_new)
 
     # helpers for the helpers: --------------
@@ -678,7 +688,7 @@ class Display:
 
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and False:
     
     display = Display()
     display.setInit(showOn=True, frameResize=True, frameAnnotateFn=True)
@@ -797,9 +807,11 @@ def test_display_zoom_crop_1():
 
     assert rectZoom == (1)
 
-if __name__ == "__main__":
-    test_display_zoom_crop_1()
 
+if __name__ == "__main__":
+    pass
+    # test_display_zoom_crop_1()
+    # test_rotate_1()
 
     #resizeIt
     #cropIt 
