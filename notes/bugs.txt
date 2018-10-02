@@ -21,6 +21,8 @@
         [x] demonstrate with output8
 
     [ ] keypress basics
+
+    [ ] overwrite frame note template
     
 
 

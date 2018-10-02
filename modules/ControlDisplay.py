@@ -324,8 +324,7 @@ class Display:
                 self.zoomFrame = imutils.rotate_bound(self.zoomFrame
                                                     ,self.orientation)
 
-            # if self.diffOn:
-                #TODO - rotate diff image
+
 
                 
 
@@ -642,8 +641,6 @@ class Display:
         ''' convert the coord (a tuple of integers) in main window 
             to the coord in zoom window '''
         
-        #TODO - account for orientation
-        
         x = coord_xy[0] - self.zoomRect[0]
         y = coord_xy[1] - self.zoomRect[1]
 
@@ -652,8 +649,6 @@ class Display:
     def coordZoomToMain(self, coord_xy):
         ''' convert the coord (a tuple of integers) in zoom window 
             to the coord in main window '''
-        
-        #TODO - account for orientation
         
         x = coord_xy[0] + self.zoomRect[0]
         y = coord_xy[1] + self.zoomRect[1]

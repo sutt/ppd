@@ -219,7 +219,8 @@ class FrameFactory:
     def _validCurrentFrame(self):
         if self.frameCounter < 0:
             return False
-        # TODO - add upperbound
+        if self.frameCounter > len(self.frames) - 1:
+            return False
         return True
     
     def checkWriteFrame(self):
