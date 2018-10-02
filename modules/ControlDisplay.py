@@ -15,9 +15,9 @@ if False: from cv2 import *
 
 Features: 
 
-    [ ] orientation adjust
-        [ ] handle flow thru of bounding box adjust
-        [ ] position windows side/side vs top/bottom
+    [x] orientation adjust
+        [x] handle flow thru of bounding box adjust
+        [x] position windows side/side vs top/bottom
 
     [ ] Control Agenda box with keys
 
@@ -59,6 +59,9 @@ class Display:
         
         self.zoomOn = False
         self.roiSelected = False
+        self.orientChanged = False
+        
+        self.orientPrevious = 0
         
         #this will preserved un-adulterated
         self.origFrame = None
@@ -363,6 +366,34 @@ class Display:
         
         return zoom_img
 
+    def orientCheck(self):
+        ''' if orientation has changed, need to destroy old windows
+            on first call, it doesn't matter
+        '''
+        
+        #TODO - all windowName cv2.destory here and show() should be a class
+        
+        PROFILES = (90,270)
+        
+        if (self.orientation in PROFILES) ^ (self.orientPrevious in PROFILES):
+            
+            #they have changed; landscape -> profile or vice-versa
+            
+            windowName = "img_display"
+            if self.orientation not in PROFILES:
+                windowName += "_profile"
+
+            cv2.destroyWindow(windowName)
+                
+            if self.zoomOn:
+                
+                windowName = "zoom_display"
+                if self.orientation not in PROFILES:
+                    windowName += "_profile"
+                
+                cv2.destroyWindow(windowName)
+                
+        self.orientPrevious = self.orientation
     
     def show(self):
         ''' Handle imshow calls, selectROI calls and return handling.
@@ -374,6 +405,8 @@ class Display:
 
         if not(self.showOn):
             return
+
+        self.orientCheck()
 
         windowName = 'img_display'
         if self.orientation in (90,270): windowName += "_profile"    

@@ -1,5 +1,22 @@
 #Tasks
 
+10/2
+
+    [x] fix --dir with multiple orientations
+
+    [ ] add frames to existing video
+
+    [ ] compression radio button
+        [ ] contorls vidwriter
+        [ ] defaults to metalog compression value fourcc_enum
+
+    [ ] semi-preload
+        [ ] default to this when preloaded and file size is too large
+        [ ] demonstrate with output8
+
+    [ ] keypress basics
+    
+
 
 10/1
 
