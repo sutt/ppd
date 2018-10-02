@@ -484,10 +484,12 @@ class OutputFactory:
     def stripExt(fn):
         return ".".join(fn.split(".")[:-1])
     
-    def initVidWriter(self, frameSize, vidFn):
+    def initVidWriter(self, frameSize, vidFn, compressionEnum):
 
-        fourcc = "h264"
         ext = "avi"
+        fourcc = "h264"
+        if compressionEnum == 1:
+            fourcc = 0      #request lossless encoding
         
         if self.vidwriter is not None:
             self.vidwriter.release()
@@ -553,7 +555,9 @@ class NotesFactory:
         self.vidIsLoaded = False
         self.isProcessed = False
         self.dataVid = {}
+        
         self.orientation = 0
+        self.compression = -1
 
         self.bShowScoring = False
         self.bFrameNotes = True
@@ -593,6 +597,11 @@ class NotesFactory:
 
     def getOrientation(self):
         return self.orientation   #degrees clockwise
+
+    def getCompression(self):
+        if self.compression == 0:   # this is the code for lossless
+            return 1    
+        return 0
     
     def loadMetaLog(self, metalogPathFn):
         
@@ -600,6 +609,8 @@ class NotesFactory:
             self.dataVid  = self.metalog.get_log_data(metalogPathFn)
             
             self.orientation = self.dataVid.get('notes', 0).get('orientation', 0)
+
+            self.compression = self.dataVid.get('fourcc_enum', -1)
             
             if isinstance(self.metalog.data, dict):
                 if len(self.metalog.data.keys()) > 0:

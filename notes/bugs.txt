@@ -6,9 +6,11 @@
 
     [ ] add frames to existing video
 
-    [ ] compression radio button
-        [ ] contorls vidwriter
-        [ ] defaults to metalog compression value fourcc_enum
+    [x] compression radio button
+        [x] contorls vidwriter
+        [x] defaults to metalog compression value fourcc_enum
+
+    [ ] dont erase framenotes when video re-cycles
 
     [ ] semi-preload
         [ ] default to this when preloaded and file size is too large

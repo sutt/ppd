@@ -40,6 +40,9 @@ class ConstructGui:
     def cmd_windowThree(self):
         g.windowThree = bool(self.int_windowThree.get())
 
+    def cmd_compression(self):
+        g.compressionEnum = self.int_compression.get()
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -75,6 +78,10 @@ class ConstructGui:
 
     def cmd_delaySecsSet(self):
         g.delaySecs = float(self.sv_delaySecs.get())
+
+    def set_int_compression(self, intCompressionEnum):
+        self.int_compression.set(intCompressionEnum)
+        self.cmd_compression()  #set global.compressionEnum
 
     def set_sv_writevidFn(self, strWriteVidFn):
         self.sv_writevidFn.set(str(strWriteVidFn))
@@ -227,6 +234,28 @@ class ConstructGui:
                 ,command = self.cmd_initWritevid_sw
                 )
         self.initWritevid_button.pack(side=tk.LEFT)
+
+        fwrite12 = tk.Frame(root)
+        fwrite12.pack(side = tk.TOP)
+
+        self.int_compression = tk.IntVar()
+        self.int_compression.set(0)
+        
+        tk.Radiobutton(
+             fwrite12
+            ,text="h264"
+            ,variable=self.int_compression
+            ,value=0
+            ,command=self.cmd_compression
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fwrite12
+            ,text="lossless"
+            ,variable=self.int_compression
+            ,value=1
+            ,command=self.cmd_compression
+            ).pack(side=tk.LEFT)
         
         fwrite1 = tk.Frame(root)
         fwrite1.pack(side = tk.TOP)
@@ -525,6 +554,7 @@ class GuiInterface:
 
     def updateByVid( self
                     ,vidFn=""
+                    ,compressionType=0
                     ,frameTotal=0
                     ,cumTimeTotal=None
                     ,avgFrameFps=(None, None)
@@ -536,6 +566,8 @@ class GuiInterface:
 
         self.gui.guiHeader.set_sv_vidFn(vidFn)
         
+        self.gui.guiHeader.set_int_compression(compressionType)
+
         self.gui.guiHeader.set_sv_frameN(str(frameTotal))
 
         if cumTimeTotal is not None:

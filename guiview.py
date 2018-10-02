@@ -73,6 +73,7 @@ g.switchRoiZoom = False
 g.windowTwo = True
 g.windowThree = False
 g.switchWriteScoring = False
+g.compressionEnum = 0
 
 
 #High Level Options --------------------------
@@ -234,6 +235,7 @@ while(True):
     if b_gui:
         
         guiInterface.updateByVid(vidFn=directoryFactory.vidFn()
+                                ,compressionType=notesFactory.getCompression()
                                 ,frameTotal=frameFactory.getFrameTotal()
                                 ,cumTimeTotal=timeFactory.cumTimeTotal()
                                 ,avgFrameFps=timeFactory.avgFrameFps()
@@ -268,7 +270,8 @@ while(True):
         if outputFactory.setInitWriteVid(g.initWriteVid):
             
             outputFactory.initVidWriter(frameFactory.getFrameSize()
-                                        ,directoryFactory.vidFn())
+                                        ,directoryFactory.vidFn()
+                                        ,g.compressionEnum)
             
             notesFactory.resetFramesData()
             

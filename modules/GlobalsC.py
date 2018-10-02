@@ -16,6 +16,7 @@ def init():
     global switchRoiZoom
     global windowTwo
     global windowThree
+    global compressionEnum
 
     
 
