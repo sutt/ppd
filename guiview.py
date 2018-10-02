@@ -25,7 +25,7 @@ if False: from cv2 import *  # for vscode intellisense
     [x] handle orientation with img_rotate
     [x] handle scoring data
 
-[ ] controls
+[x] controls
     [x] button: write frame + frame-data + frame-scoring [ + advanceFrame]
     [x] compression radio button
     
@@ -38,8 +38,8 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] i/o images
     [ ] write to an existing video
     [ ] delete frame(s) from a video via script:
-    [ ] semi-preload; streaming
-        [ ] default for files_size * 25(?) > 1.5BG
+    [x] semi-preload; streaming
+        [x] default for files_size * 25(?) > 1.5BG
     [ ] filter videos played via metalog props
     [ ] filter frames played via metalog props
 

@@ -107,19 +107,27 @@ class FrameFactory:
             
             return True, self.frames[self.frameCounter]
             
+        elif self.semiloaded:
+
+            if self.semiloadCounter + len(self.frames) - 1 < self.frameCounter:
+                
+                ret, frame = self.cam.read()
+                
+                if ret:
+                    self.frames.append(frame)
+                    self.frames.pop(0)
+                    self.semiloadCounter += 1
+                else:
+                    self.cam.release()
+
+            else:
+                return True, self.frames[self.frameCounter]
+        
         else:
             
             ret, frame = self.cam.read()
             if not(ret):
                 self.cam.release()
-            
-            if self.semiloaded:
-                
-                if self.semiloadCounter + len(self.frames) - 1 < self.frameCounter:
-                    
-                    self.frames.append(frame)
-                    self.frames.pop(0)
-                    self.semiloadCounter += 1
                     
             return ret, frame
 

@@ -20,6 +20,8 @@
         [x] default to this when preloaded and file size is too large
         [x] demonstrate with output8
 
+    [x] bug in semiloaded: starts at last frame loaded
+
     [ ] keypress basics
 
     [ ] overwrite frame note template
