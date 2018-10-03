@@ -22,10 +22,6 @@ if False: from cv2 import *  # for vscode intellisense
 
 '''
 
-[x] Add notesFactory
-    [x] handle orientation with img_rotate
-    [x] handle scoring data
-
 [x] controls
     [x] button: write frame + frame-data + frame-scoring [ + advanceFrame]
     [x] compression radio button
@@ -33,11 +29,11 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] refactor gui to make
         [ ] does this enable debugging better?
     
-    [ ] keypress basic
+    [x] keypress basic
 
 [ ] functionality
     [ ] i/o images
-    [ ] write to an existing video
+    [~] write to an existing video
     [ ] delete frame(s) from a video via script:
     [x] semi-preload; streaming
         [x] default for files_size * 25(?) > 1.5BG
@@ -50,6 +46,8 @@ BUGS:
     [x] opens on frame1 (not frame0) for pause_on_open
     [ ] add other file extensions for vids
     [ ] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
+    [ ] holding down "a" (for advance) crashes the program
+    [ ] keypress doesn't work when focus on play?
 
     
 '''
@@ -75,6 +73,7 @@ g.windowTwo = True
 g.windowThree = False
 g.switchWriteScoring = False
 g.compressionEnum = 0
+g.trackingOn = False
 
 
 #High Level Options --------------------------
@@ -90,7 +89,6 @@ b_show = True
 framelog_pathfn = ""
 b_showscoring = False
 f_scoredelay = 1.0
-b_tracking = False
 b_zoomoff = False
 
 #CLI Flags ----------------------------------
@@ -181,7 +179,7 @@ if args["zoomoff"]:
     b_zoomoff = True
 
 if args["track"]:
-    b_tracking = True
+    g.trackingOn = True
 
 # Initalize Top Level Loop ----------------------------
 
@@ -239,7 +237,7 @@ while(True):
 
     display.reset()
 
-    trackFactory = TrackFactory(on=b_tracking)
+    trackFactory = TrackFactory(on=g.trackingOn)
     
     trackFactory.setInit(ballColor = notesFactory.getBallColor())
 
@@ -259,6 +257,7 @@ while(True):
                                 ,frameTotal=frameFactory.getFrameTotal()
                                 ,cumTimeTotal=timeFactory.cumTimeTotal()
                                 ,avgFrameFps=timeFactory.avgFrameFps()
+                                ,trackingOn=g.trackingOn
                                 )
     
     if b_test:
@@ -279,6 +278,8 @@ while(True):
         timeFactory.setPlay(g.playOn)
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
+
+        trackFactory.setCmd(trackingOn=g.trackingOn)
 
         display.setCmd(cmdSelectZoom=g.switchZoom
                       ,cmdSelectRoiMain=g.switchRoiMain
@@ -332,20 +333,27 @@ while(True):
         else:
             ret = False
 
-        if ret:
-            
+        
+        if ret or trackFactory.getTrackOnChange():
+
             trackFactory.setFrame(frame)
             trackFactory.trackFrame()
             
+            display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()
+                             ,circleTrack = trackFactory.getCurrentTrackCircle())
+
+            if trackFactory.getTrackOnChange():
+                display.resetOperators()
+
+        
+        if ret and not(trackFactory.getTrackOnChange()):
+
             display.setFrame(frame)
             display.setAnnotateMsg(directoryFactory.vidFn())
             
             display.setScoring(notesFactory.getFrameScoreCurrent())
             
             timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
-            
-            display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()
-                             ,circleTrack = trackFactory.getCurrentTrackCircle())
 
             display.alterFrame()
             display.drawOperators()

@@ -23,6 +23,9 @@ class TrackFactory:
         self.on = on
         self.currentFrame = None
         
+        self.trackingOnPrevious = None
+        self.bTrackingOnChange = False
+
         self.currentTrackSuccess = False
         self.currentTrackRoi = None
         self.currentTrackCircle = None
@@ -39,6 +42,30 @@ class TrackFactory:
         
         if self.declaredBallColor == "green":
             self.threshInitial = ( (29, 86, 6), (64, 255, 255) )
+
+    def setCmd(self, trackingOn):
+        self.on = trackingOn
+        
+        
+        if self.trackingOnPrevious is not None:
+        
+            if trackingOn != self.trackingOnPrevious:
+                self.bTrackingOnChange = True
+            else:
+                self.bTrackingOnChange = False
+        
+        self.trackingOnPrevious = trackingOn
+
+
+    def getTrackOnChange(self):
+        ''' return True to make a pass thru inner loop of guiview
+            only updating state related to tracking. This allows us to make
+            changes immediately apparent in Display'''
+
+        if self.bTrackingOnChange is None:
+            return False
+        else:
+            return self.bTrackingOnChange
     
     def getCurrentTrackRoi(self):
         if not(self.on): return None

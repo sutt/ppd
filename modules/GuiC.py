@@ -79,6 +79,18 @@ class ConstructGui:
     def cmd_delaySecsSet(self):
         g.delaySecs = float(self.sv_delaySecs.get())
 
+    def cmd_trackon(self):
+        g.trackingOn = bool(self.int_trackon.get())
+
+    def cmd_set_trackon(self, intTrackOn):
+        self.int_trackon.set(int(intTrackOn))
+
+    def cmd_sw_trackon(self):
+        self.int_trackon.set(int(
+                            not(bool(self.int_trackon.get()))
+                            ))
+        self.cmd_trackon()
+
     def set_int_compression(self, intCompressionEnum):
         self.int_compression.set(intCompressionEnum)
         self.cmd_compression()  #set global.compressionEnum
@@ -138,8 +150,11 @@ class ConstructGui:
             self.cmd_selectroizoom()
         if e.char == "w":
             self.cmd_writevid_sw()
-        elif e.char == "i":
+        if e.char == "i":
             self.cmd_initWritevid_sw()
+        if e.char == "t":
+            self.cmd_sw_trackon()
+        
         
             
 
@@ -304,7 +319,7 @@ class ConstructGui:
         fdisplay1 = tk.Frame(root)
         fdisplay1.pack(side = tk.TOP)
 
-        tk.Label(fdisplay1, text="Zoom Win:").pack(side=tk.LEFT)
+        tk.Label(fdisplay1, text="zoom win:").pack(side=tk.LEFT)
 
         self.int_windowTwo = tk.IntVar()
         self.int_windowTwo.set(1)
@@ -328,7 +343,7 @@ class ConstructGui:
         fdisplay2 = tk.Frame(root)
         fdisplay2.pack(side = tk.TOP)
 
-        tk.Label(fdisplay2, text="Diff Win:").pack(side=tk.LEFT)
+        tk.Label(fdisplay2, text="diff win:").pack(side=tk.LEFT)
 
         self.int_windowThree = tk.IntVar()
         self.int_windowThree.set(0)
@@ -353,7 +368,7 @@ class ConstructGui:
         f1a5b = tk.Frame(root)
         f1a5b.pack(side = tk.TOP)
 
-        tk.Label(f1a5b, text="True time:").pack(side=tk.LEFT)
+        tk.Label(f1a5b, text="true time:").pack(side=tk.LEFT)
 
         self.int_frameDelay = tk.IntVar()
         self.int_frameDelay.set(1)
@@ -398,6 +413,30 @@ class ConstructGui:
                 ,command = self.cmd_delaySecsSet
                 )
         self.delaySecs_button.pack(side=tk.LEFT)
+
+        ftrack1 = tk.Frame(root)
+        ftrack1.pack(side = tk.TOP)
+
+        tk.Label(ftrack1, text="Track:").pack(side=tk.LEFT)
+
+        self.int_trackon = tk.IntVar()
+        self.int_trackon.set(0)
+        
+        tk.Radiobutton(
+             ftrack1
+            ,text="on"
+            ,variable=self.int_trackon
+            ,value=1
+            ,command=self.cmd_trackon
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             ftrack1
+            ,text="off"
+            ,variable=self.int_trackon
+            ,value=0
+            ,command=self.cmd_trackon
+            ).pack(side=tk.LEFT)
 
         f0_1 = tk.Frame(root)
         f0_1.pack(side = tk.TOP)
@@ -597,6 +636,7 @@ class GuiInterface:
                     ,frameTotal=0
                     ,cumTimeTotal=None
                     ,avgFrameFps=(None, None)
+                    ,trackingOn=None
                     ):
         
         ''' call once per video '''        
@@ -614,6 +654,9 @@ class GuiInterface:
 
         if all([x is not None for x in avgFrameFps]):
             self.gui.guiHeader.set_sv_avgFrameFps(*avgFrameFps)
+
+        if trackingOn is not None:
+            self.gui.guiHeader.cmd_set_trackon(int(trackingOn))
 
 
     def updateByFrame( self

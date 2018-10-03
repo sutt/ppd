@@ -11,24 +11,37 @@
             [x] show in zoom window
                 [ ] show last zoomWindow when track fails
             [x] add cli option
-            [ ] add gui element
+            [x] add gui element
             [x] work with rotation
             [x] work with different size images
             [ ] handle obviously false-positive, e.g. whole screen
             [ ] pause on failed track
-
         
         [ ] add training agenda
 
         [ ] add iterThreshA
 
+        [ ] add a parameters module separate from code
+        [ ] add a way to view/edit params: maybe by file, 
+            [ ] then a reset-to-default button on gui
+            [ ] then a refresh tracking on gui
+        
         [ ] comparison module
+            [ ] two trackers, display both results
+                [ ] zoom_display enclosing for both
+
+        [ ] more videos
+            [ ] better organized
+            [ ] orange ball
 
     [ ] bugs discovered
         [ ] zoom_display freezes after video recycles
         [ ] show zoom_display previous when no track found 
             ("ball is likely near there, you'll want to investigate")
         [x] output6.avi fails on getFrame() and it's semiloaded
+
+    [ ] add a way to overwrite frame note attribute(s) in batch:
+        in notes/framenoteoveride.json
 
     [ ] add tests for guiview / Display
 

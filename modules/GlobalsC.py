@@ -17,6 +17,7 @@ def init():
     global windowTwo
     global windowThree
     global compressionEnum
+    global trackingOn
 
     
 
