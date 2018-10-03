@@ -302,6 +302,8 @@ while(True):
 
             notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
 
+            notesFactory.outputFrameNote()
+
             if b_gui:
 
                 guiInterface.updateByFrame(

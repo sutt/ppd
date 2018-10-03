@@ -119,6 +119,30 @@ class ConstructGui:
             lag1 = str(lag1)[:6]
         self.sv_lag1.set(str(lag1))
 
+    def cmd_keypress(self, e):
+        if e.char == "p" or e.char == "q":
+            self.cmd_play_sw()
+        if e.char == "s":
+            self.cmd_retreat()
+        if e.char == "a":
+            self.cmd_advance()
+        if e.char == "f":
+            self.cmd_snapWriteVid_sw()
+        if e.char == "g":
+            self.cmd_snapWriteScoring_sw()
+        if e.char == "z":
+            self.cmd_selectzoom()
+        if e.char == "c":
+            self.cmd_selectroimain()
+        if e.char == "x":
+            self.cmd_selectroizoom()
+        if e.char == "w":
+            self.cmd_writevid_sw()
+        elif e.char == "i":
+            self.cmd_initWritevid_sw()
+        
+            
+
         
     def init_gui(self, **kwargs):
         ''' from main loop, set initial state of gui elements '''
@@ -135,16 +159,19 @@ class ConstructGui:
         ''' attach the the gui boilerplate to the Tk() object passed in as root.
             if the element needs to be manipulated later, attach it to self as well.
         '''
+        
+        root.bind("<Key>", self.cmd_keypress)
 
         f1a = tk.Frame(root)
         f1a.pack(side = tk.TOP)
 
         self.play_button = tk.Button(
                 f1a
-                ,text = 'play toggle'
+                ,text = 'Play <Q>'
                 ,bg = 'gray'
                 ,command = self.cmd_play_sw
                 )
+        self.play_button.bind("<Key>", self.cmd_keypress)
         self.play_button.pack()
 
         
@@ -153,13 +180,13 @@ class ConstructGui:
         
         tk.Button(
              f1b
-            ,text = 'retreat'
+            ,text = 'retreat <S>'
             ,command = self.cmd_retreat
             ).pack(side=tk.LEFT)
         
         tk.Button(
              f1b
-            ,text = 'advance'
+            ,text = 'Advance'
             ,command = self.cmd_advance
             ).pack(side=tk.LEFT)
 
@@ -175,7 +202,7 @@ class ConstructGui:
 
         self.snapWriteScoring_button = tk.Button(
              f1b2
-            ,text = 'writeF+Scoring'
+            ,text = 'writef+scorinG'
             ,command = self.cmd_snapWriteScoring_sw
             )
         self.snapWriteScoring_button.pack(side=tk.LEFT)
@@ -200,19 +227,22 @@ class ConstructGui:
         
         tk.Button(
              fselect0
-            ,text = 'select zoom'
+            ,text = 'select Zoom'
             ,command = self.cmd_selectzoom
             ).pack(side=tk.LEFT)
         
+        fselect1 = tk.Frame(root)
+        fselect1.pack(side = tk.TOP)
+
         tk.Button(
-             fselect0
-            ,text = 'roi main'
+             fselect1
+            ,text = 'roi main <C>'
             ,command = self.cmd_selectroimain
             ).pack(side=tk.LEFT)
 
         tk.Button(
-             fselect0
-            ,text = 'roi zoom'
+             fselect1
+            ,text = 'roi zoom <X>'
             ,command = self.cmd_selectroizoom
             ).pack(side=tk.LEFT)
 
@@ -221,7 +251,7 @@ class ConstructGui:
 
         self.writevid_button = tk.Button(
                  fwrite0
-                ,text = 'writevid'
+                ,text = 'Writevid'
                 ,bg = 'gray'
                 ,command = self.cmd_writevid_sw
                 )
@@ -229,7 +259,7 @@ class ConstructGui:
 
         self.initWritevid_button = tk.Button(
                  fwrite0
-                ,text = 'init output'
+                ,text = 'Init output'
                 ,bg = 'gray'
                 ,command = self.cmd_initWritevid_sw
                 )
@@ -503,6 +533,15 @@ class ConstructGui:
                 )
         self.dir_entry.pack(side=tk.LEFT)
 
+        frame_keypress = tk.Frame(root)
+
+        tk.Radiobutton(
+             frame_keypress
+            ,text="on"
+            ,variable=self.int_windowTwo
+            ,value=1
+            ,command=self.cmd_windowTwo
+            ).pack(side=tk.LEFT)
 
         return root
 

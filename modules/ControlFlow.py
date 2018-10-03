@@ -595,6 +595,11 @@ class OutputFactory:
             self.framesData.append(frameData)
 
             fullNotes = baseNote
+            
+            proc_data = fullNotes.get('proc-data', {})
+            proc_data['last_write_compression_enum'] = g.compressionEnum
+            fullNotes['proc-data'] = proc_data
+            
             fullNotes['frames'] = self.framesData
 
             fullNotes = self.orderDict(copy.copy(fullNotes)
@@ -640,6 +645,7 @@ class NotesFactory:
         self.vidIsLoaded = False
         self.isProcessed = False
         self.dataVid = {}
+        self.frameNoteFailed = False
         
         self.orientation = 0
         self.compression = -1
@@ -653,6 +659,7 @@ class NotesFactory:
         
         self.frameLogInputPathFn = None
         self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
+        self.defaultFrameNotePathFn = "notes/framenote.json"
         
 
     def setFrameLog(self, frameLogPathFn):
@@ -753,6 +760,31 @@ class NotesFactory:
         else:
             return {}
     
+    def outputFrameNote(self):
+        ''' write out current frame note into a text file; edit if needed'''
+        if not(self.isProcessed):
+            return
+        try:
+            with open(self.defaultFrameNotePathFn, 'w') as f:
+                json.dump(self.getFrameNoteCurrent(),f, indent = 4)
+        except:
+            self.frameNoteFailed = True
+
+    def loadFrameNoteInput(self):
+        ''' read in frame note input, this will absorb any edits you made'''
+        if not(self.isProcessed):
+            return
+        try:
+            with open(self.defaultFrameNotePathFn, 'r') as f:
+                lines = f.readlines()
+            lines = "".join(lines)
+
+            frameNote = json.loads(lines)
+            return frameNote
+        except:
+            return self.getFrameNoteCurrent()
+
+
 
     def getFrameData(self):
         ''' return only current frameData; store all frame notes in outputFactory '''
@@ -761,9 +793,11 @@ class NotesFactory:
 
             #re-processing
 
-            #but how to handle overwrite of template prop's?
-            #write frameData to a tmp file where you can edit
-            frameData = self.getFrameNoteCurrent()
+            if self.frameNoteFailed:
+                frameData = self.getFrameNoteCurrent()
+            else:
+                frameData = self.loadFrameNoteInput()
+            
 
             # frameScoring is not None only when gui-cmd writeFrame+Data
             if self.frameScoring is not None:

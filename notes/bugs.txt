@@ -4,7 +4,7 @@
 
     [x] fix --dir with multiple orientations
 
-    [ ] add frames to existing video
+    [~] add frames to existing video (not possible AFAIK)
 
     [x] compression radio button
         [x] contorls vidwriter
@@ -14,7 +14,7 @@
 
     [x] dir is broken on data/proc/demo-proc folder
     
-    [ ] write processing-compressiontype in proc-data for output metalog
+    [x] write processing-compressiontype in proc-data for output metalog
 
     [x] semi-preload
         [x] default to this when preloaded and file size is too large
@@ -22,9 +22,9 @@
 
     [x] bug in semiloaded: starts at last frame loaded
 
-    [ ] keypress basics
+    [x] keypress basics
 
-    [ ] overwrite frame note template
+    [x] overwrite frame note template
     
 
 
