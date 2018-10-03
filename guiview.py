@@ -90,7 +90,8 @@ b_show = True
 framelog_pathfn = ""
 b_showscoring = False
 f_scoredelay = 1.0
-b_tracking = True
+b_tracking = False
+b_zoomoff = False
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -106,6 +107,8 @@ ap.add_argument("--noshow", action="store_true", default=False)
 ap.add_argument("--output", type=str, default="")
 ap.add_argument("--framelog", type=str, default="")
 ap.add_argument("--showscoring", action="store_true", default=False)
+ap.add_argument("--zoomoff", action="store_true", default=False)
+ap.add_argument("--track", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -172,6 +175,14 @@ if args["dontload"]:
 if args["showscoring"]:
     b_showscoring = True
 
+if args["zoomoff"]:
+    # suppress zoom window from automatically popping up 
+    # for showscoring or track-on cases
+    b_zoomoff = True
+
+if args["track"]:
+    b_tracking = True
+
 # Initalize Top Level Loop ----------------------------
 
 directoryFactory = DirectoryFactory()
@@ -199,6 +210,7 @@ if b_gui:
 display = Display()
 
 display.setInit(showOn=b_show
+                ,zoomOff=b_zoomoff
                 ,frameResize=b_resize
                 ,frameAnnotateFn=b_annotate_fn)
 
@@ -329,13 +341,14 @@ while(True):
             display.setAnnotateMsg(directoryFactory.vidFn())
             
             display.setScoring(notesFactory.getFrameScoreCurrent())
+            
             timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
             
-            display.alterFrame()
-            display.drawOperators()
-
             display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()
                              ,circleTrack = trackFactory.getCurrentTrackCircle())
+
+            display.alterFrame()
+            display.drawOperators()
             display.drawTrackers()
         
         display.show()

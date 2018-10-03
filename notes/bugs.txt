@@ -7,6 +7,16 @@
     [ ] add tracking algo module
 
         [x] basic tracking
+            [x] show in main window
+            [x] show in zoom window
+                [ ] show last zoomWindow when track fails
+            [x] add cli option
+            [ ] add gui element
+            [ ] work with rotation
+            [ ] work with different size images
+            [ ] handle obviously false-positive, e.g. whole screen
+            [ ] pause on failed track
+
         
         [ ] add training agenda
 

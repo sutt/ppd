@@ -58,6 +58,7 @@ class Display:
         self.zoomAnnotateSize = True
         
         self.zoomOn = False
+        self.zoomOff = False
         self.roiSelected = False
         self.orientChanged = False
         
@@ -121,11 +122,13 @@ class Display:
 
     def setInit( self
                 ,showOn=True
+                ,zoomOff=False
                 ,frameResize=True
                 ,frameAnnotateFn=True
                 ):
 
         self.showOn = showOn
+        self.zoomOff = zoomOff
         self.frameResize = frameResize
         self.frameAnnotateFn = frameAnnotateFn
 
@@ -168,7 +171,7 @@ class Display:
         self.annotateMsg = copy.copy(msg)
 
     def setScoring(self, frameScoring):
-        ''' set roiRectScore, is data is in correct form'''
+        ''' set roiRectScoring, is data is in correct form'''
         if frameScoring is None:
             self.roiRectScoring = None
             return
@@ -202,17 +205,43 @@ class Display:
         if self.frameAnnotateFn:
             self.frame = draw_text(self.frame, self.annotateMsg)
 
-        if self.orientation != 0:
-            pass   
+        #TODO
+        # if self.frameAnnotateTrackSuccess:
+        #     _color = 'blue' if self.circleTrack is not None else 'red'
+        #     self.frame = draw_rect(self.frame, (2,2,10,10), color = _color)
 
-        if self.roiRectScoring is not None:
+        if ((self.roiRectScoring is not None 
+            or self.roiTrack is not None
+            or self.circleTrack is not None)
+            and not(self.zoomOff)):
             
-            # zoomRect in terms of original
-            self.zoomRect =  self.rectOrigToMain(
-                                self.zoomInRect(self.roiRectScoring, b_zoomout = True)
-                                )
+            if self.roiRectScoring is not None:
+                protoZoomRect = self.roiRectScoring
+                zoomFct = 0.1
+            
+            elif self.roiTrack is not None:
+                protoZoomRect = self.roiTrack
+                zoomFct = 0.3
+            
+            elif self.circleTrack is not None:
+                protoZoomRect = self.circleToRect(self.circleTrack)
+                zoomFct = 0.3   
+
+            
+            if protoZoomRect[2] < 1 or protoZoomRect[3] < 1:
+                self.zoomRect = None
+                
+            else:
+            
+                # zoomRect in terms of original
+                self.zoomRect =  self.rectOrigToMain(
+                                    self.zoomInRect( protoZoomRect
+                                                    ,b_zoomout = True
+                                                    ,zoomFct = zoomFct
+                                                    )
+                                                )
         
-        if self.zoomOn:
+        if self.zoomOn and not(self.zoomOff):
             self.zoomFrame = self.buildZoomFrame()
             self.alterZoomFrame()
             
@@ -221,6 +250,9 @@ class Display:
         ''' make annotation to zoomFrame, but not resize; 
             need to call this each time you do a buildZoomFrame().        
         '''        
+
+        if self.zoomRect is None:
+            return
 
         msg = str(self.zoomFrame.shape[:2])
         msg += " <- "
@@ -233,8 +265,6 @@ class Display:
             self.zoomFrame = draw_text(self.zoomFrame, msg, fontscale = 0.5
                                        ,color= (0,0,0), b_bottom=True)
 
-        if self.orientation != 0:
-            pass    #rotate img
 
 
     def resetOperators(self):
@@ -316,6 +346,7 @@ class Display:
                                     ,thick = 1
                                     )
 
+        #TODO - refactor this into own function; call after drawTrackers()
         if self.orientation != 0:
 
             #rotate images here, to apply minimal amount of coord adjustment
@@ -323,7 +354,7 @@ class Display:
             self.frame = imutils.rotate_bound(self.frame
                                             ,self.orientation)
 
-            if self.zoomOn:
+            if self.zoomOn and not(self.zoomOff):
                 
                 self.zoomFrame = imutils.rotate_bound(self.zoomFrame
                                                     ,self.orientation)
@@ -333,6 +364,9 @@ class Display:
     def setTrack(self, roiTrack=None, circleTrack=None):
         self.roiTrack = roiTrack
         self.circleTrack = circleTrack
+        
+        if self.roiTrack is not None or self.circleTrack is not None:
+            self.zoomOn = True
     
     def drawTrackers(self):
         ''' Draw onto frame(s) based on data from trackFactory
@@ -341,6 +375,13 @@ class Display:
              
             x, y, radius = self.rectToCircle(self.roiTrack)
             
+        if self.circleTrack is not None:
+            
+            x, y, radius = self.circleTrack
+            
+        if (self.circleTrack is not None 
+            or self.roiTrack is not None):
+
             self.frame = draw_circle(self.frame
                                     ,x
                                     ,y
@@ -349,17 +390,19 @@ class Display:
                                     ,thick = 2
                                     )
 
-        if self.circleTrack is not None:
-            
-            x, y, radius = self.circleTrack
-            
-            self.frame = draw_circle(self.frame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'red'
-                                    ,thick = 2
-                                    )
+            if self.zoomOn and not(self.zoomOff) and self.zoomRect is not None:
+
+                rectOrig = self.circleToRect(self.circleTrack)
+                rectZoom = self.roiToZoom(input_rect=rectOrig)
+                x, y, radius = self.rectToCircle(rectZoom)
+                
+                self.zoomFrame = draw_circle(self.zoomFrame
+                                            ,x
+                                            ,y
+                                            ,radius
+                                            ,color = 'red'
+                                            ,thick = 1
+                                            )
         
 
     
@@ -368,6 +411,7 @@ class Display:
         
         if self.zoomRect is None:
             
+            #TODO - only create this once
             zoom_img = np.zeros(self.frame.shape)
             zoom_img = draw_text(zoom_img, "n/a")
         
@@ -474,7 +518,7 @@ class Display:
                 self.roiSelected = True
                 self.resetOperators()
         
-        if self.zoomOn and self.windowTwo:
+        if self.zoomOn and self.windowTwo and not(self.zoomOff):
         
             windowName = 'zoom_display'
             if self.orientation in (90,270): windowName += "_profile"    
@@ -614,7 +658,7 @@ class Display:
     @staticmethod
     def zoomInRect(rect, zoomFct = 0.1, b_zoomout=False):
 
-        zoomFct = 0.1
+        # zoomFct = 0.1
         c = 1
         
         if b_zoomout: 
@@ -759,6 +803,21 @@ class Display:
         radius = min( int(rect[2] / 2), int(rect[3] / 2) )
 
         return (x, y, radius)
+
+    @staticmethod
+    def circleToRect(input_circle):
+        ''' takes x,y, radius, fits to enclosing relative-format rect
+            (x,y, radius)  -> (x0,y0, d_x, d_y) 
+        '''
+
+        x, y, radius = copy.copy(input_circle)            
+
+        x0 = int(x - radius)
+        y0 = int(y - radius)
+        dx = int(2 * radius)
+        dy = int(2 * radius)
+
+        return (x0, y0, dx, dy)
 
 
 

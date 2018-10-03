@@ -740,8 +740,8 @@ class NotesFactory:
         ''' guiview calls this to check if there is a scoring event '''
         if not(self.bShowScoring):
             return None
-        note = self.getFrameNoteCurrent()
         try:
+            note = self.getFrameNoteCurrent()
             assert len(note['scoring']) == 4
             return note['scoring']
         except:
