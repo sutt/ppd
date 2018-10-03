@@ -117,8 +117,10 @@ class FrameFactory:
                     self.frames.append(frame)
                     self.frames.pop(0)
                     self.semiloadCounter += 1
+                    return True, frame
                 else:
                     self.cam.release()
+                    return False, None
 
             else:
                 return True, self.frames[self.frameCounter]

@@ -12,8 +12,8 @@
                 [ ] show last zoomWindow when track fails
             [x] add cli option
             [ ] add gui element
-            [ ] work with rotation
-            [ ] work with different size images
+            [x] work with rotation
+            [x] work with different size images
             [ ] handle obviously false-positive, e.g. whole screen
             [ ] pause on failed track
 
@@ -23,6 +23,12 @@
         [ ] add iterThreshA
 
         [ ] comparison module
+
+    [ ] bugs discovered
+        [ ] zoom_display freezes after video recycles
+        [ ] show zoom_display previous when no track found 
+            ("ball is likely near there, you'll want to investigate")
+        [x] output6.avi fails on getFrame() and it's semiloaded
 
     [ ] add tests for guiview / Display
 

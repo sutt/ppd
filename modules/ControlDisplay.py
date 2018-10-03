@@ -15,19 +15,13 @@ if False: from cv2 import *
 
 Features: 
 
-    [x] orientation adjust
-        [x] handle flow thru of bounding box adjust
-        [x] position windows side/side vs top/bottom
+    [ ] Gui for Tracking
 
     [ ] Control Agenda box with keys
 
 Refactors:
 
-    [x] remove hard coded dim size: 640, 320 etc.
-    [x] document resize behavior; including resize gy width
-    [x] transformRect - > absRect
-    [x] comment self data definitions
-    [x] better explanation of alterFrame vs drawOperators
+    [ ] only build "n/a" zoom frame once
     
     [ ] add unittests, can't test with guiview_test
         [ ] test for coord conversion between zoom and main
@@ -37,11 +31,10 @@ Refactors:
         [ ] test mod0 vs not-mod0
 
 Bugs:
-    [~] adjust resize for correct aspect ratio
     [ ] how to cancel an roi request?
-    [ ] can't exit on a zoom select request
-    [x] zoom_display annotation: wrong order
-    [~] zoom frame is too large; do a max of those dims
+    [ ] on --file, after reopen file zoomOn is off so zoom_display is frozen
+    [ ] can't z/x zoom unzoom with tracking roi
+
 
 
 '''
@@ -275,6 +268,7 @@ class Display:
         self.alterFrame()
         self.drawOperators()
         self.drawTrackers()
+        self.adjustOrient()
         
     
     def drawOperators(self):
@@ -346,10 +340,14 @@ class Display:
                                     ,thick = 1
                                     )
 
-        #TODO - refactor this into own function; call after drawTrackers()
+    def adjustOrient(self):
+        ''' rotate images here, to apply minimal amount of coord adjustment.
+            this is called immediately before show(), so all other processing
+            in Display occurs on original orientation. Within show(), we convert
+            selectRoi back into orig-orientation-coords. So, it's only going into
+            new orientation for user-view (imshow) / user-write (selectRoi).
+        '''
         if self.orientation != 0:
-
-            #rotate images here, to apply minimal amount of coord adjustment
             
             self.frame = imutils.rotate_bound(self.frame
                                             ,self.orientation)
@@ -365,19 +363,23 @@ class Display:
         self.roiTrack = roiTrack
         self.circleTrack = circleTrack
         
+        #TODO - this isn't exactly right, we're handling this downstream
+        #       and even if they fail to find an object they return (0,0,...)
         if self.roiTrack is not None or self.circleTrack is not None:
             self.zoomOn = True
     
+    
     def drawTrackers(self):
-        ''' Draw onto frame(s) based on data from trackFactory
+        ''' Draw onto frame(s) based on data from trackFactory.
+            All data is relative to Orig frame size; so we need to
+            convert to Main or convert to Zoom where nec.
         '''
-        if self.roiTrack is not None:
-             
-            x, y, radius = self.rectToCircle(self.roiTrack)
             
         if self.circleTrack is not None:
             
-            x, y, radius = self.circleTrack
+            rectOrig = self.circleToRect(self.circleTrack) 
+            rectMain = self.roiToMain(input_rect = rectOrig)
+            x, y, radius = self.rectToCircle(rectMain)
             
         if (self.circleTrack is not None 
             or self.roiTrack is not None):

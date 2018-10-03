@@ -350,6 +350,8 @@ while(True):
             display.alterFrame()
             display.drawOperators()
             display.drawTrackers()
+
+            display.adjustOrient()
         
         display.show()
         

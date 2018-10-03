@@ -54,6 +54,8 @@ class TrackFactory:
 
     def trackFrame(self):
 
+        if not(self.on): return
+
         tracking_blur = 1       # needs to be even or odd?
         repair_iterations = 1 
 
