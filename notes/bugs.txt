@@ -1,5 +1,32 @@
 #Tasks
 
+10/3
+
+    [ ] build training video on output8.avi
+
+    [ ] add tracking algo module
+
+        [x] basic tracking
+        
+        [ ] add training agenda
+
+        [ ] add iterThreshA
+
+        [ ] comparison module
+
+    [ ] add tests for guiview / Display
+
+        [ ] rotate
+        [ ] crop
+        [ ] modulo zero
+        [ ] overwrite frameNote
+        [ ] writeout scoring
+
+    [ ] build additional training videos:
+        [ ] Lossless
+        [ ] Mask for background
+        [ ] process the additional video
+
 10/2
 
     [x] fix --dir with multiple orientations

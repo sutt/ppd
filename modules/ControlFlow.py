@@ -694,6 +694,12 @@ class NotesFactory:
         if self.compression == 0:   # this is the code for lossless
             return 1    
         return 0
+
+    def getBallColor(self):
+        try:
+            return self.dataVid['notes']['details']['ball_color']
+        except:
+            return None
     
     def loadMetaLog(self, metalogPathFn):
         

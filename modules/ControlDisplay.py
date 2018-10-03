@@ -80,6 +80,9 @@ class Display:
         self.roiRect = None
 
         self.roiRectScoring = None
+
+        self.roiTrack = None
+        self.circleTrack = None
         
         self.selectRectMain = None  #needed this?
         self.selectRectZoom = None  #needed this?
@@ -241,6 +244,7 @@ class Display:
         self.frame = self.getOrigFrame()
         self.alterFrame()
         self.drawOperators()
+        self.drawTrackers()
         
     
     def drawOperators(self):
@@ -326,7 +330,37 @@ class Display:
 
 
 
-                
+    def setTrack(self, roiTrack=None, circleTrack=None):
+        self.roiTrack = roiTrack
+        self.circleTrack = circleTrack
+    
+    def drawTrackers(self):
+        ''' Draw onto frame(s) based on data from trackFactory
+        '''
+        if self.roiTrack is not None:
+             
+            x, y, radius = self.rectToCircle(self.roiTrack)
+            
+            self.frame = draw_circle(self.frame
+                                    ,x
+                                    ,y
+                                    ,radius
+                                    ,color = 'red'
+                                    ,thick = 2
+                                    )
+
+        if self.circleTrack is not None:
+            
+            x, y, radius = self.circleTrack
+            
+            self.frame = draw_circle(self.frame
+                                    ,x
+                                    ,y
+                                    ,radius
+                                    ,color = 'red'
+                                    ,thick = 2
+                                    )
+        
 
     
     

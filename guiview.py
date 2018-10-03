@@ -15,6 +15,7 @@ from modules.ControlFlow import TimeFactory
 from modules.ControlFlow import OutputFactory
 from modules.ControlFlow import NotesFactory
 from modules.ControlDisplay import Display
+from modules.ControlTracking import TrackFactory
 from modules.GraphicsCV import (draw_annotations, resize_img, draw_text)
 
 if False: from cv2 import *  # for vscode intellisense
@@ -89,6 +90,7 @@ b_show = True
 framelog_pathfn = ""
 b_showscoring = False
 f_scoredelay = 1.0
+b_tracking = True
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -225,6 +227,10 @@ while(True):
 
     display.reset()
 
+    trackFactory = TrackFactory(on=b_tracking)
+    
+    trackFactory.setInit(ballColor = notesFactory.getBallColor())
+
     timeFactory = TimeFactory()
 
     timeFactory.setFrametimeLog(directoryFactory.frametimePathFn())    
@@ -316,6 +322,9 @@ while(True):
 
         if ret:
             
+            trackFactory.setFrame(frame)
+            trackFactory.trackFrame()
+            
             display.setFrame(frame)
             display.setAnnotateMsg(directoryFactory.vidFn())
             
@@ -324,6 +333,10 @@ while(True):
             
             display.alterFrame()
             display.drawOperators()
+
+            display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()
+                             ,circleTrack = trackFactory.getCurrentTrackCircle())
+            display.drawTrackers()
         
         display.show()
         
