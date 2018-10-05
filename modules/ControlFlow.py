@@ -123,7 +123,7 @@ class FrameFactory:
                     return False, None
 
             else:
-                return True, self.frames[self.frameCounter]
+                return True, self.frames[self.frameCounter - self.semiloadCounter]
         
         else:
             

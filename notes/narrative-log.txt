@@ -1,3 +1,20 @@
+
+10/5
+
+lots of little bugs seem still present in guiview; mostly around the build/resize of zoom frame and how that changes each frame when tracking / scoring are providing the coords for thie display.
+need to divorce the zoom_display from tracking and scoring displays in order to interactively
+build experiment videos. Need to get to a real example of building an experiment video.
+
+10/2
+
+guiview is ready for action in processing training videos.
+Now we need to build in the tracking algo. 
+How to do an "online"/"live" tracking server and/or an already processed tracking result?
+How could I use this with Ipython? 
+    first, you could send the current image directly into Ipython while running with gui,
+    or you could query a batch from the main loop, into a list of frames and associated data
+
+
 9/28
 
 Finish up main problems with Display,

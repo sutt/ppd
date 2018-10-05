@@ -107,6 +107,7 @@ ap.add_argument("--framelog", type=str, default="")
 ap.add_argument("--showscoring", action="store_true", default=False)
 ap.add_argument("--zoomoff", action="store_true", default=False)
 ap.add_argument("--track", action="store_true", default=False)
+ap.add_argument("--startplay", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -180,6 +181,10 @@ if args["zoomoff"]:
 
 if args["track"]:
     g.trackingOn = True
+
+if args["startplay"]:
+    # helpful for running debug with --file and --nogui
+    g.playOn = True
 
 # Initalize Top Level Loop ----------------------------
 

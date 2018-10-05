@@ -244,7 +244,7 @@ class Display:
             need to call this each time you do a buildZoomFrame().        
         '''        
 
-        if self.zoomRect is None:
+        if self.zoomRect is None or self.zoomFrame is None:
             return
 
         msg = str(self.zoomFrame.shape[:2])
@@ -410,7 +410,11 @@ class Display:
     
     
     def buildZoomFrame(self):
-        
+        ''' create a zoom_img (that gets attached to -> self.zoomFrame) based on zoomRect.
+            we're concerned with modulo-zero resizes in here, when the zoomFrame is below
+            a certain size.
+        '''
+
         if self.zoomRect is None:
             
             #TODO - only create this once
@@ -441,6 +445,13 @@ class Display:
                 # use that for resize factor
                 widthZoom = int( int(self.widthZoomWindow / self.zoomRect[2]) 
                                       * self.zoomRect[2])
+        
+        if zoom_img.shape[0] < 1 or zoom_img.shape[1] < 1:
+            #sanity check / temporary hack. really shouldn't get here
+            # self.zoomRect = None
+            # return None
+            zoom_img = np.zeros(self.frame.shape)
+            zoom_img = draw_text(zoom_img, "n/a")
         
         zoom_img  = resize_img(zoom_img, True, (widthZoom, heightZoom))
 

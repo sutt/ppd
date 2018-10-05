@@ -1,6 +1,14 @@
 #Tasks
 
-10/3
+10/5
+
+    [x] add a --startplay for debugging
+
+    bugs:
+        [x] output7.avi - frame 220 has a a zoom_img with width=0, breaks
+        [x] output7.avi - frame 223, can't retreat frame
+
+10/3 - 10/5
 
     [ ] build training video on output8.avi
 
@@ -34,11 +42,16 @@
             [ ] better organized
             [ ] orange ball
 
+        [ ] Need to divorce tracking/scoring display from zoomRect
+
     [ ] bugs discovered
         [ ] zoom_display freezes after video recycles
         [ ] show zoom_display previous when no track found 
             ("ball is likely near there, you'll want to investigate")
         [x] output6.avi fails on getFrame() and it's semiloaded
+        [ ] can't do a separate zoom with trackOn, maybe make it a separate display? 
+        
+          
 
     [ ] add a way to overwrite frame note attribute(s) in batch:
         in notes/framenoteoveride.json
