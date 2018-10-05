@@ -13,6 +13,8 @@ from modules.Utils import MetaDataLog
 from modules.ImgProcs import threshA, transformA, repairA
 from modules.TrackA import find_xy, find_radius
 
+from modules.ImgUtils import crop_img
+
 # from modules import GlobalsC as g
 
 class TrackFactory:
@@ -34,6 +36,9 @@ class TrackFactory:
 
         self.declaredBallColor = ""
 
+        self.bPerformTrainOnNewData = True
+        self.trainingData = []
+
         # TrackingAlgo class inherits TrackingTemplate 
         # and is instantiated here?
 
@@ -42,6 +47,13 @@ class TrackFactory:
         
         if self.declaredBallColor == "green":
             self.threshInitial = ( (29, 86, 6), (64, 255, 255) )
+
+        if self.declaredBallColor == "orange":
+            self.threshInitial = ( (0, 96, 192), (88, 232, 255) )
+            
+        # From old notes:
+        # rgb: (orange ball) [  0  96 192] [ 88 232 255]
+        # green sharpie:  [ 15 106  86] [ 81 171 148]
 
     def setCmd(self, trackingOn):
         self.on = trackingOn
@@ -79,6 +91,49 @@ class TrackFactory:
         if not(self.on): return
         self.currentFrame = currentFrame
 
+    def setFrameScore(self, frameScoreData):
+        
+        if not(self.on): return
+
+        if frameScoreData is None: return
+        if len(frameScoreData) != 2: return
+        
+        frameType, frameScore = frameScoreData
+
+        if frameType == "training":
+            
+            datum = self. buildTrainingDatum(frameScore, self.currentFrame)
+            
+            if datum is not None:
+                self.trainingData.append(datum)
+
+                if self.bPerformTrainOnNewData:
+                    self.trainProc()
+            
+
+        if frameType == "scoring":
+            pass
+            #do evaluation
+
+    @classmethod
+    def buildTrainingDatum(cls, cropRect, img):
+        
+        if cropRect is None or img is None:
+            return None
+
+        try:
+            datum = {}
+            datum['cropRect'] = cropRect
+            datum['cropImg'] = crop_img(img.copy(), cls.absRect(cropRect))
+            return datum
+        except:
+            return None
+
+    def trainProc(self):
+        ''' take training data and build thresh hi/lo from them '''
+        print len(self.trainingData)
+
+    
     def trackFrame(self):
 
         if not(self.on): return
@@ -110,6 +165,33 @@ class TrackFactory:
 
             self.currentTrackRoi = None  #(x,y,20,20)
             self.currentTrackCircle = (x, y, radius)
+
+
+
+
+    # helper functions ------
+
+    @staticmethod
+    def absRect(input_rect):
+        ''' takes an (opencv style) relative rect, returns an absolute rect.
+                (x0,y0, d_x, d_y) -> ((xo,y0),(x1, y1)) 
+                note: must be tuples, not lists; to use in opencv functions
+        '''
+
+        x = copy.copy(input_rect)            
+
+        rect = ( 
+                     (
+                         int(x[0])
+                        ,int(x[1]) 
+                     )
+                    ,( 
+                         int(x[0] + x[2])
+                        ,int(x[1] + x[3]) 
+                     )
+                )
+
+        return rect
 
 
 

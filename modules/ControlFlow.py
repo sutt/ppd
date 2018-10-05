@@ -738,9 +738,9 @@ class NotesFactory:
     def getFrameNoteCurrent(self):
         return self.framesDataExisting[self.frameInd]
 
-    def getFrameScoreCurrent(self):
+    def getFrameScoreCurrent(self, b_bypass=False):
         ''' guiview calls this to check if there is a scoring event '''
-        if not(self.bShowScoring):
+        if not(self.bShowScoring) and not(b_bypass):
             return None
         try:
             note = self.getFrameNoteCurrent()
@@ -748,6 +748,20 @@ class NotesFactory:
             return note['scoring']
         except:
             return None
+
+    def getFrameType(self):
+        try:
+            frameNote = self.getFrameNoteCurrent()
+            return frameNote['frame_type']
+        except:
+            return None
+    
+    def getFrameScoreForTrack(self):
+        ''' returns relevant params from metalog to tracking module '''
+        try:
+            return self.getFrameType(), self.getFrameScoreCurrent(b_bypass=True)
+        except:
+            return None, None
 
     def loadFrameLogCurrent(self):
         ''' load data from notepad '''

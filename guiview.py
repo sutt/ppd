@@ -342,6 +342,9 @@ while(True):
         if ret or trackFactory.getTrackOnChange():
 
             trackFactory.setFrame(frame)
+
+            trackFactory.setFrameScore(notesFactory.getFrameScoreForTrack())
+            
             trackFactory.trackFrame()
             
             display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()

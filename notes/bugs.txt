@@ -4,6 +4,8 @@
 
     [x] add a --startplay for debugging
 
+    [ ] we can pre-train tracker and write output to .tracklog
+
     bugs:
         [x] output7.avi - frame 220 has a a zoom_img with width=0, breaks
         [x] output7.avi - frame 223, can't retreat frame
