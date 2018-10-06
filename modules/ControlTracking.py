@@ -10,10 +10,12 @@ from miscutils import uniqueFn
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
 
-from modules.ImgProcs import threshA, transformA, repairA
-from modules.TrackA import find_xy, find_radius
+from modules.ImgUtils import (crop_img, filter_pixels_circle
+                             ,pixlist_to_pseduoimg)
+from modules.ImgProcs import (threshA, transformA, repairA)
+from modules.TrackA import (find_xy, find_radius)
 
-from modules.ImgUtils import crop_img
+from modules.IterThresh import iterThreshA
 
 # from modules import GlobalsC as g
 
@@ -36,8 +38,9 @@ class TrackFactory:
 
         self.declaredBallColor = ""
 
-        self.bPerformTrainOnNewData = True
+        self.bPerformTrainOnNewData = False
         self.trainingData = []
+        self.trainingThreshes = []
 
         # TrackingAlgo class inherits TrackingTemplate 
         # and is instantiated here?
@@ -131,7 +134,33 @@ class TrackFactory:
 
     def trainProc(self):
         ''' take training data and build thresh hi/lo from them '''
-        print len(self.trainingData)
+        
+        if len(self.trainingData) < 1: return
+
+        # only run iterthresh on latest img
+        img = self.trainingData[len(self.trainingData) - 1].get('cropImg', None)
+
+        if img is None: return
+        if img.shape[0] < 1 or img.shape[1] < 1: return
+
+        circle_img = pixlist_to_pseduoimg(
+                            filter_pixels_circle(img)
+                            )
+
+        out_thresh = iterThreshA( circle_img
+                                 ,goal_pct = .95
+                                 ,steep = False)
+
+        _lo , _hi = out_thresh[1][3], out_thresh[1][4]
+        print str((_lo, _hi))
+        self.trainingThreshes.append((_lo, _hi))
+        
+        self.combine_threshes(self.trainingThreshes)
+        
+        self.threshInitial = (tuple(map(int, _lo)), tuple(map(int,_hi)))
+        print self.threshInitial
+
+
 
     
     def trackFrame(self):
@@ -192,6 +221,31 @@ class TrackFactory:
                 )
 
         return rect
+
+    @staticmethod
+    def combine_threshes(data, liberal = True ):
+        ''' data is a list of (lo, hi) 3-ple's; find the union '''
+        
+        if len(data) < 1:
+            return ( np.array( [0,0,0], dtype = 'uint8' ),
+                     np.array( [255,255,255], dtype = 'uint8' ) )
+        
+        _lo, _hi = [[255,255,255], [0,0,0]]
+
+        for row in data:
+            
+            lo, hi = row[0], row[1]
+        
+            for i,clr in enumerate(lo):
+                if clr < _lo[i]: 
+                    _lo[i] = clr
+        
+            for i,clr in enumerate(hi):
+                if clr > _hi[i]: 
+                    _hi[i] = clr
+        
+        return ( np.array( _lo, dtype = 'uint8') 
+                ,np.array( _hi, dtype = 'uint8') )
 
 
 

@@ -27,3 +27,48 @@ def crop_img(img, current_tracking_frame):
     x0,y0 = current_tracking_frame[0][0], current_tracking_frame[0][1]
     x1,y1 = current_tracking_frame[1][0], current_tracking_frame[1][1]
     return img[y0:y1,x0:x1,:]    
+
+
+def circle_xcoords(radius):
+    ''' returns list of length radius, with each x coord on the unit circle line'''    
+    list_x = []
+    for y in range(1, radius + 1):
+        list_x.append( (radius**2 - y**2)**(0.5) )
+    return list_x
+
+def filter_pixels_circle(img, b_inside=True):
+    
+    pix_list = []
+    
+    #make circle based on img-shape:
+    circle_x = int( img.shape[1] / 2)
+    circle_y = int( img.shape[0] / 2)
+    radius = min( int(img.shape[1] / 2), int(img.shape[0] / 2) )    
+    
+    #build the x_coords frontier contour
+    x_coords = map(int, circle_xcoords(radius)[::-1])
+    x_coords.extend(x_coords[::-1])
+    
+    #filter loop
+    for y in range(img.shape[0]):
+        for x in range(img.shape[1]):
+            
+            if (y <= circle_y - radius) or (y >= circle_y + radius):
+                if not(b_inside):
+                    pix_list.append(img[y,x])
+                else:
+                    continue
+            
+            _y = y - (circle_y - radius) 
+                
+            if (x > circle_x - x_coords[_y]) and (x < circle_x + x_coords[_y]):
+                if b_inside:
+                    pix_list.append(img[y,x])
+            else:
+                if not(b_inside):
+                    pix_list.append(img[y,x])
+    
+    return pix_list
+
+def pixlist_to_pseduoimg(pix_list):
+    return np.array(pix_list, dtype='uint8', ndmin = 3)
