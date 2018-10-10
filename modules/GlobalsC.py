@@ -18,6 +18,8 @@ def init():
     global windowThree
     global compressionEnum
     global trackingOn
-
+    global switchOutputParams
+    global switchAlterParams
+    global switchResetParams
     
 

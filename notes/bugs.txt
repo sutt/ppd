@@ -20,16 +20,24 @@
 
     [ ] .tracklog output
 
+    [ ] evaluation 
+
+    [ ] build more videos
+        [ ] blank background / with person-no-ball
+        [ ] with a bounce
+
+    [ ] cython for circle_pix
+
 10/9
 
     [ ] trackTimer
         [ ] output
         [x] to gui
 
-    [ ] trackParams
+    [x] trackParams
         [x] modularized
-        [ ] read/write from json
-        [ ] reset default
+        [x] read/write from json
+        [x] reset default
     
 
 10/7
@@ -43,7 +51,7 @@
     [ ] build filter_pix_circle in ipython
         [x] good demo cell on generated image
         [ ] demo on frame0 of output4 with score rect
-        [ ] build sruare_inside_circle
+        [~] build sruare_inside_circle
         [x] convert pix_list to be accepted by iterThreshA img arg
 
     [x] add filter_pix_circle to TrackFactory

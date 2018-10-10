@@ -13,3 +13,4 @@ scratch/
 .vscode
 .ipynb_checkpoints/
 notes/framenote.json
+notes/tracking_params.json

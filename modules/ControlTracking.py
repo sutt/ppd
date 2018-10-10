@@ -17,7 +17,7 @@ from modules.TrackA import (find_xy, find_radius)
 
 from modules.IterThresh import iterThreshA
 
-# from modules import GlobalsC as g
+from modules import GlobalsC as g
 
 class TrackFactory:
 
@@ -46,6 +46,8 @@ class TrackFactory:
         self.bTrackTimer = False
         self.trackTimerData = {}
 
+        self.savedParams = None
+
         # tp_: tracking parameters
         self.tp_tracking_blur = 1
         self.tp_repair_iterations = 1
@@ -58,27 +60,77 @@ class TrackFactory:
         self.declaredBallColor = ballColor
         
         if self.declaredBallColor == "green":
-            self.threshInitial = ( (29, 86, 6), (64, 255, 255) )
+            self.threshInitial = [ (29, 86, 6), (64, 255, 255) ]
 
         if self.declaredBallColor == "orange":
-            self.threshInitial = ( (0, 96, 192), (88, 232, 255) )
+            self.threshInitial = [ (0, 96, 192), (88, 232, 255) ]
             
         # From old notes:
         # rgb: (orange ball) [  0  96 192] [ 88 232 255]
         # green sharpie:  [ 15 106  86] [ 81 171 148]
 
-    def setCmd(self, trackingOn):
+    def setCmd( self 
+               ,trackingOn 
+               ,outputParams=None
+               ,alterParams=None
+               ,resetParams=None
+               ):
+        
         self.on = trackingOn
-        
-        
+                
+        # this is for forcing a display "redraw" when track toggles On/Off
         if self.trackingOnPrevious is not None:
-        
             if trackingOn != self.trackingOnPrevious:
                 self.bTrackingOnChange = True
             else:
                 self.bTrackingOnChange = False
-        
         self.trackingOnPrevious = trackingOn
+
+        
+        if outputParams is not None:
+            if outputParams:
+                self.outputParams()
+                g.switchOutputParams = False
+
+        if alterParams is not None:
+            if alterParams:
+                self.saveParams()
+                self.alterParams()
+                g.switchAlterParams = False
+                self.bTrackingOnChange = True
+
+        if resetParams is not None:
+            if resetParams:
+                self.restParams()
+                g.switchResetParams = False
+                self.bTrackingOnChange = True
+
+    def outputParams(self):
+        try:
+            with open("notes/tracking_params.json", "w") as f:
+                json.dump(self.getTrackParams(), f, indent = 4)
+        except:
+            print 'failed to output tracking params'
+
+    def alterParams(self):
+        try:
+            with open("notes/tracking_params.json", "r") as f:
+                d_params = json.load(f)
+        except Exception as e:
+            print 'failed to read in json'
+            print e.message
+
+        try:
+            self.setTrackParams(**d_params)
+        except Exception as e:
+            print 'failed to set track params from json'
+            print e
+
+    def saveParams(self):
+        self.savedParams = self.getTrackParams()
+
+    def restParams(self):
+        self.setTrackParams(**self.savedParams)
 
     def resetTracker(self):
         self.trackTimerData = {}
@@ -199,10 +251,10 @@ class TrackFactory:
             self.tp_repair_iterations = repair_iterations
 
         if thresh_lo is not None:
-            self.threshInitial[0] = thresh_lo
+            self.threshInitial[0] = tuple(thresh_lo)
 
         if thresh_hi is not None:
-            self.threshInitial[1] = thresh_hi
+            self.threshInitial[1] = tuple(thresh_hi)
 
     
     def getTrackParams(self):

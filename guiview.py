@@ -74,6 +74,9 @@ g.windowThree = True
 g.switchWriteScoring = False
 g.compressionEnum = 0
 g.trackingOn = False
+g.switchOutputParams = False
+g.switchAlterParams = False
+g.switchResetParams = False
 
 
 #High Level Options --------------------------
@@ -291,7 +294,10 @@ while(True):
         timeFactory.setDelay(g.frameDelay)
         timeFactory.setDelaySecs(g.delaySecs)
 
-        trackFactory.setCmd(trackingOn=g.trackingOn)
+        trackFactory.setCmd(trackingOn=g.trackingOn
+                           ,outputParams=g.switchOutputParams
+                           ,alterParams=g.switchAlterParams
+                           ,resetParams=g.switchResetParams)
 
         display.setCmd(cmdSelectZoom=g.switchZoom
                       ,cmdSelectRoiMain=g.switchRoiMain

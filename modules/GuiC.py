@@ -40,6 +40,15 @@ class ConstructGui:
     def cmd_windowThree(self):
         g.windowThree = bool(self.int_windowThree.get())
 
+    def cmd_outputParams(self):
+        g.switchOutputParams = True
+
+    def cmd_alterParams(self):
+        g.switchAlterParams = True
+
+    def cmd_resetParams(self):
+        g.switchResetParams = True
+
     def cmd_compression(self):
         g.compressionEnum = self.int_compression.get()
 
@@ -461,6 +470,30 @@ class ConstructGui:
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
+
+        ftrack3 = tk.Frame(root)
+        ftrack3.pack(side = tk.TOP)
+
+        tk.Label(ftrack3, text="track params:").pack(side=tk.LEFT)
+
+        tk.Button(
+             ftrack3
+            ,text = 'output'
+            ,command = self.cmd_outputParams
+            ).pack(side=tk.LEFT)
+
+        tk.Button(
+             ftrack3
+            ,text = 'alter'
+            ,command = self.cmd_alterParams
+            ).pack(side=tk.LEFT)
+
+        tk.Button(
+             ftrack3
+            ,text = 'reset'
+            ,command = self.cmd_resetParams
+            ).pack(side=tk.LEFT)
+
 
 
         f0_1 = tk.Frame(root)
