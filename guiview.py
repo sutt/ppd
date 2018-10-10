@@ -90,6 +90,7 @@ framelog_pathfn = ""
 b_showscoring = False
 f_scoredelay = 1.0
 b_zoomoff = False
+b_output_tracktimer = False
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -108,6 +109,7 @@ ap.add_argument("--showscoring", action="store_true", default=False)
 ap.add_argument("--zoomoff", action="store_true", default=False)
 ap.add_argument("--track", action="store_true", default=False)
 ap.add_argument("--startplay", action="store_true", default=False)
+ap.add_argument("--tracktimer", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -186,6 +188,9 @@ if args["startplay"]:
     # helpful for running debug with --file and --nogui
     g.playOn = True
 
+if args["tracktimer"]:
+    b_output_tracktimer = True
+
 # Initalize Top Level Loop ----------------------------
 
 directoryFactory = DirectoryFactory()
@@ -245,6 +250,8 @@ while(True):
     trackFactory = TrackFactory(on=g.trackingOn)
     
     trackFactory.setInit(ballColor = notesFactory.getBallColor())
+
+    trackFactory.setTrackTimer(b_output_tracktimer)
 
     timeFactory = TimeFactory()
 
@@ -326,6 +333,8 @@ while(True):
 
             notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
 
+            trackFactory.setFrameInd(frameFactory.getFrameCounter())
+
             notesFactory.outputFrameNote()
 
             if b_gui:
@@ -334,6 +343,7 @@ while(True):
                                      frameCurrent=frameFactory.getFrameCounter()
                                     ,cumTimeCurrent=timeFactory.cumTimeCurrent()
                                     ,lagTuple=timeFactory.lagTuple()
+                                    ,trackTimer=trackFactory.getTrackTimerDataCurrent()
                                     )
         else:
             ret = False

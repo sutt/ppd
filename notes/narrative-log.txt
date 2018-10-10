@@ -14,6 +14,14 @@ How could I use this with Ipython?
     first, you could send the current image directly into Ipython while running with gui,
     or you could query a batch from the main loop, into a list of frames and associated data
 
+10/9
+
+Locally, both spatially, and within frame, we can look for the ball contour, and expand the ROI to the full ball. Then we can grab the full range of color contained within.
+
+We can do a calibration stage where ball is put everywhere in the room, and then we'll have a (3D) segmented map of expected color.
+
+Note that reflection will have different color of ball b/c it's getting light from a different angle, the underside of the ball.
+
 
 9/28
 

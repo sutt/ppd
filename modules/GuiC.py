@@ -98,6 +98,14 @@ class ConstructGui:
     def set_sv_writevidFn(self, strWriteVidFn):
         self.sv_writevidFn.set(str(strWriteVidFn))
     
+    def set_sv_trackTimer(self, fTrackTimer):
+        sOutput = str(fTrackTimer)
+        if len(sOutput) >= 5:
+            sOutput = sOutput[:5]
+        if fTrackTimer == -1:
+            sOutput = "-1"
+        self.sv_trackTimer.set(sOutput)
+
     def set_sv_vidFn(self, strVidFn):
         self.sv_vidFn.set(str(strVidFn))
 
@@ -438,6 +446,23 @@ class ConstructGui:
             ,command=self.cmd_trackon
             ).pack(side=tk.LEFT)
 
+        ftrack2 = tk.Frame(root)
+        ftrack2.pack(side = tk.TOP)
+
+        tk.Label(ftrack2, text="track timer:").pack(side=tk.LEFT)
+
+        self.sv_trackTimer = tk.StringVar()
+        self.set_sv_trackTimer("n/a")
+        
+        self.dir_entry = tk.Entry(
+                ftrack2
+                ,textvariable = self.sv_trackTimer
+                ,width = 6
+                ,bg = 'white'
+                )
+        self.dir_entry.pack(side=tk.LEFT)
+
+
         f0_1 = tk.Frame(root)
         f0_1.pack(side = tk.TOP)
 
@@ -663,6 +688,7 @@ class GuiInterface:
                     ,frameCurrent=0
                     ,cumTimeCurrent=None
                     ,lagTuple=(None, None)
+                    ,trackTimer=None
                     ):
         
         ''' call every time frame is changed.
@@ -677,6 +703,9 @@ class GuiInterface:
 
         if all([x is not None for x in lagTuple]):
             self.gui.guiHeader.set_sv_lags(*lagTuple)
+
+        if trackTimer is not None:
+            self.gui.guiHeader.set_sv_trackTimer(trackTimer)
 
 
     def update( self, **kwargs):

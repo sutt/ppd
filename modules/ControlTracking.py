@@ -26,6 +26,7 @@ class TrackFactory:
     def __init__(self, on=False):
         self.on = on
         self.currentFrame = None
+        self.currentFrameInd = -1
         
         self.trackingOnPrevious = None
         self.bTrackingOnChange = False
@@ -34,13 +35,21 @@ class TrackFactory:
         self.currentTrackRoi = None
         self.currentTrackCircle = None
 
-        self.threshInitial = ( (0,0,0), (255,255,255) )
+        self.threshInitial = [ (0,0,0), (255,255,255) ]
 
         self.declaredBallColor = ""
 
         self.bPerformTrainOnNewData = False
         self.trainingData = []
         self.trainingThreshes = []
+
+        self.bTrackTimer = False
+        self.trackTimerData = {}
+
+        # tp_: tracking parameters
+        self.tp_tracking_blur = 1
+        self.tp_repair_iterations = 1
+        self.tp_b_hsv = False
 
         # TrackingAlgo class inherits TrackingTemplate 
         # and is instantiated here?
@@ -71,6 +80,8 @@ class TrackFactory:
         
         self.trackingOnPrevious = trackingOn
 
+    def resetTracker(self):
+        self.trackTimerData = {}
 
     def getTrackOnChange(self):
         ''' return True to make a pass thru inner loop of guiview
@@ -90,6 +101,9 @@ class TrackFactory:
         if not(self.on): return None
         return self.currentTrackCircle
 
+    def setFrameInd(self, frameInd):
+        self.currentFrameInd = frameInd
+    
     def setFrame(self, currentFrame):
         if not(self.on): return
         self.currentFrame = currentFrame
@@ -152,29 +166,69 @@ class TrackFactory:
                                  ,steep = False)
 
         _lo , _hi = out_thresh[1][3], out_thresh[1][4]
-        print str((_lo, _hi))
+        
         self.trainingThreshes.append((_lo, _hi))
         
         self.combine_threshes(self.trainingThreshes)
         
         self.threshInitial = (tuple(map(int, _lo)), tuple(map(int,_hi)))
-        print self.threshInitial
+        
+
+    def setTrackTimer(self, bTrackTimer):
+        if isinstance(bTrackTimer, bool):
+            self.bTrackTimer = bTrackTimer
+
+    def getTrackTimerData(self):
+        return self.trackTimerData
+
+    def getTrackTimerDataCurrent(self):
+        return self.trackTimerData.get(self.currentFrameInd - 1, -1)
 
 
+    def setTrackParams( self
+                        ,tracking_blur=None
+                        ,repair_iterations=None
+                        ,thresh_lo=None
+                        ,thresh_hi=None
+                        ):
+        
+        if tracking_blur is not None:
+            self.tp_tracking_blur = tracking_blur
+
+        if repair_iterations is not None:
+            self.tp_repair_iterations = repair_iterations
+
+        if thresh_lo is not None:
+            self.threshInitial[0] = thresh_lo
+
+        if thresh_hi is not None:
+            self.threshInitial[1] = thresh_hi
+
+    
+    def getTrackParams(self):
+        
+        params = {}
+
+        params['tracking_blur'] = self.tp_tracking_blur
+        params['repair_iterations'] = self.tp_repair_iterations
+        params['thresh_lo'] = self.threshInitial[0]
+        params['thresh_hi'] = self.threshInitial[1]
+
+        return params
 
     
     def trackFrame(self):
 
         if not(self.on): return
 
-        tracking_blur = 1       # needs to be even or odd?
-        repair_iterations = 1 
-
-        thresh_lo = (0,0,0)
-        thresh_hi = (255,255,255)
+        tracking_blur = self.tp_tracking_blur
+        repair_iterations = self.tp_repair_iterations 
 
         thresh_lo = self.threshInitial[0]
         thresh_hi = self.threshInitial[1]
+
+        if self.bTrackTimer:
+            t0 = time.time()
 
         img_t = transformA(self.currentFrame.copy(), tracking_blur)
         
@@ -194,6 +248,12 @@ class TrackFactory:
 
             self.currentTrackRoi = None  #(x,y,20,20)
             self.currentTrackCircle = (x, y, radius)
+
+        if self.bTrackTimer:
+            if self.currentFrameInd not in self.trackTimerData.keys():
+                t_proc = time.time() - t0
+                self.trackTimerData[self.currentFrameInd] = t_proc
+
 
 
 

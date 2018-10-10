@@ -1,5 +1,23 @@
 #Tasks
 
+10/9
+
+    [ ] trackTimer
+        [ ] output
+        [x] to gui
+
+    [ ] trackParams
+        [x] modularized
+        [ ] read/write from json
+        [ ] reset default
+    
+
+10/7
+
+    lots of copy()'s occur throughout trackFrame pipeline:
+        can these be turned off for optimal track perf?
+        what do we lose by eliminating them? e.g. writeout ability?
+
 10/6 
 
     [ ] build filter_pix_circle in ipython
@@ -11,7 +29,8 @@
     [x] add filter_pix_circle to TrackFactory
         [x] convert pix_list to be accepted by iterThreshA img arg
 
-    
+    [ ] Add same img processing (as are applied in track) to training images
+        before running iterThreshA
 
 10/5
 
@@ -40,11 +59,11 @@
             [ ] handle obviously false-positive, e.g. whole screen
             [ ] pause on failed track
         
-        [ ] add training agenda
+        [x] add training agenda
 
-        [ ] add iterThreshA
+        [x] add iterThreshA
 
-        [ ] add a parameters module separate from code
+        [x] add a parameters module separate from code
         [ ] add a way to view/edit params: maybe by file, 
             [ ] then a reset-to-default button on gui
             [ ] then a refresh tracking on gui
