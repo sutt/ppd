@@ -1,5 +1,25 @@
 #Tasks
 
+10/10
+
+    [x] Fix zoom_display logic
+        we want to be able to do zoom in the course of --track and --showscore
+
+        [x] isolate the problems:
+
+        [x] fix with refactor
+            [x] hello windowThree
+            [x] zoomOff should apply to windowThree; right now it disables winTwo
+                [x] refactor zoomOff -> scoreOff
+                [~] refactor alterZoomFrame -> alterSubFrames
+
+        [x] manually test for regressions
+
+    [ ] Add ipython module
+        [ ] sockets module, just a server?
+
+    [ ] .tracklog output
+
 10/9
 
     [ ] trackTimer
@@ -76,14 +96,14 @@
             [ ] better organized
             [ ] orange ball
 
-        [ ] Need to divorce tracking/scoring display from zoomRect
+        [x] Need to divorce tracking/scoring display from zoomRect
 
     [ ] bugs discovered
-        [ ] zoom_display freezes after video recycles
-        [ ] show zoom_display previous when no track found 
+        [x] zoom_display freezes after video recycles
+        [x] show zoom_display previous when no track found 
             ("ball is likely near there, you'll want to investigate")
         [x] output6.avi fails on getFrame() and it's semiloaded
-        [ ] can't do a separate zoom with trackOn, maybe make it a separate display? 
+        [x] can't do a separate zoom with trackOn, maybe make it a separate display? 
         
           
 

@@ -70,7 +70,7 @@ g.switchZoom = False
 g.switchRoiMain = False
 g.switchRoiZoom = False
 g.windowTwo = True
-g.windowThree = False
+g.windowThree = True
 g.switchWriteScoring = False
 g.compressionEnum = 0
 g.trackingOn = False
@@ -89,7 +89,7 @@ b_show = True
 framelog_pathfn = ""
 b_showscoring = False
 f_scoredelay = 1.0
-b_zoomoff = False
+b_scoreoff = False
 b_output_tracktimer = False
 
 #CLI Flags ----------------------------------
@@ -106,7 +106,7 @@ ap.add_argument("--noshow", action="store_true", default=False)
 ap.add_argument("--output", type=str, default="")
 ap.add_argument("--framelog", type=str, default="")
 ap.add_argument("--showscoring", action="store_true", default=False)
-ap.add_argument("--zoomoff", action="store_true", default=False)
+ap.add_argument("--scoreoff", action="store_true", default=False)
 ap.add_argument("--track", action="store_true", default=False)
 ap.add_argument("--startplay", action="store_true", default=False)
 ap.add_argument("--tracktimer", action="store_true", default=False)
@@ -176,10 +176,10 @@ if args["dontload"]:
 if args["showscoring"]:
     b_showscoring = True
 
-if args["zoomoff"]:
+if args["scoreoff"]:
     # suppress zoom window from automatically popping up 
     # for showscoring or track-on cases
-    b_zoomoff = True
+    b_scoreoff = True
 
 if args["track"]:
     g.trackingOn = True
@@ -218,7 +218,7 @@ if b_gui:
 display = Display()
 
 display.setInit(showOn=b_show
-                ,zoomOff=b_zoomoff
+                ,scoreOff=b_scoreoff
                 ,frameResize=b_resize
                 ,frameAnnotateFn=b_annotate_fn)
 

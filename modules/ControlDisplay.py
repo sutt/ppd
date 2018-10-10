@@ -51,7 +51,8 @@ class Display:
         self.zoomAnnotateSize = True
         
         self.zoomOn = False
-        self.zoomOff = False
+        self.scoreOn = False
+        self.scoreOff = False
         self.roiSelected = False
         self.orientChanged = False
         
@@ -64,10 +65,15 @@ class Display:
         # in alterFrames() and drawOperators()
         self.frame = None
         self.zoomFrame = None
+        self.scoreFrame = None
 
         #zoomRect in coord for (resized) frame; relative-rect format
         # (x,y,w,h)
         self.zoomRect = None
+        
+        #scoreRect formatted like zoomRect, but is for current-tracking-roi
+        # and for scoring-roi from metalog
+        self.scoreRect = None
         
         #roiRect in coords relative to origFrame; relative-rect format
         # (x,y,w,h)
@@ -92,7 +98,7 @@ class Display:
         self.cmdSelectRoiZoom = False
 
         self.windowTwo = True
-        self.windowThree = False
+        self.windowThree = True
 
         self.widthMainWindow = 640
         self.heightMainWindow = 480
@@ -115,13 +121,13 @@ class Display:
 
     def setInit( self
                 ,showOn=True
-                ,zoomOff=False
+                ,scoreOff=False
                 ,frameResize=True
                 ,frameAnnotateFn=True
                 ):
 
         self.showOn = showOn
-        self.zoomOff = zoomOff
+        self.scoreOff = scoreOff
         self.frameResize = frameResize
         self.frameAnnotateFn = frameAnnotateFn
 
@@ -176,7 +182,7 @@ class Display:
             return 
 
         self.roiRectScoring = frameScoring
-        self.zoomOn = True
+        self.scoreOn = True
     
     def getScoring(self, bNeedScore):
         ''' return the roiRect data '''
@@ -187,7 +193,7 @@ class Display:
         return copy.copy(self.roiRect)
 
     def alterFrame(self):
-        ''' make changes to frame, including resize. also, build zoomFrame here.
+        ''' make changes to frame, including resize. also, build zoomFrame and scoreFrame.
             need to call this every new frame and on resetOperators
         '''        
         
@@ -204,17 +210,12 @@ class Display:
         #     self.frame = draw_rect(self.frame, (2,2,10,10), color = _color)
 
         if ((self.roiRectScoring is not None 
-            or self.roiTrack is not None
             or self.circleTrack is not None)
-            and not(self.zoomOff)):
+            and not(self.scoreOff)):
             
             if self.roiRectScoring is not None:
                 protoZoomRect = self.roiRectScoring
                 zoomFct = 0.1
-            
-            elif self.roiTrack is not None:
-                protoZoomRect = self.roiTrack
-                zoomFct = 0.3
             
             elif self.circleTrack is not None:
                 protoZoomRect = self.circleToRect(self.circleTrack)
@@ -222,21 +223,24 @@ class Display:
 
             
             if protoZoomRect[2] < 1 or protoZoomRect[3] < 1:
-                self.zoomRect = None
+                self.scoreRect = None
                 
             else:
-            
-                # zoomRect in terms of original
-                self.zoomRect =  self.rectOrigToMain(
+
+                self.scoreRect =  self.rectOrigToMain(
                                     self.zoomInRect( protoZoomRect
                                                     ,b_zoomout = True
                                                     ,zoomFct = zoomFct
                                                     )
                                                 )
-        
-        if self.zoomOn and not(self.zoomOff):
+
+        if self.zoomOn: 
             self.zoomFrame = self.buildZoomFrame()
             self.alterZoomFrame()
+
+        if self.scoreOn and not(self.scoreOff):
+            self.scoreFrame = self.buildScoreFrame()
+            self.alterScoreFrame()
             
 
     def alterZoomFrame(self):
@@ -257,6 +261,26 @@ class Display:
         if self.zoomAnnotateSize:
             self.zoomFrame = draw_text(self.zoomFrame, msg, fontscale = 0.5
                                        ,color= (0,0,0), b_bottom=True)
+
+    def alterScoreFrame(self):
+        ''' make annotation to scoreFrame, but not resize; 
+            need to call this each time you do a buildScoreFrame().        
+        '''        
+
+        if self.scoreRect is None or self.scoreFrame is None:
+            return
+
+        msg = str(self.scoreFrame.shape[:2])
+        msg += " <- "
+        msg += str(self.rectMainToOrig(self.scoreRect)[2:4][::-1])
+        
+        if self.scoreFrame.shape[1] % self.rectMainToOrig(self.scoreRect)[2] == 0:
+            msg += " mod0"
+        
+        if self.zoomAnnotateSize:
+            self.scoreFrame = draw_text(self.scoreFrame, msg, fontscale = 0.5
+                                       ,color= (0,0,0), b_bottom=True)
+
 
 
 
@@ -325,20 +349,22 @@ class Display:
                                     ,x
                                     ,y
                                     ,radius
-                                    ,color = 'red'
+                                    ,color = 'blue'
                                     ,thick = 2
                                     )
 
             
-            x, y, radius = self.rectToCircle(self.roiToZoom(b_scoring=True))
+            if not(self.scoreOff):
             
-            self.zoomFrame = draw_circle(self.zoomFrame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'red'
-                                    ,thick = 1
-                                    )
+                x, y, radius = self.rectToCircle(self.roiToScore(b_scoring=True))
+                
+                self.scoreFrame = draw_circle(self.scoreFrame
+                                        ,x
+                                        ,y
+                                        ,radius
+                                        ,color = 'blue'
+                                        ,thick = 1
+                                        )
 
     def adjustOrient(self):
         ''' rotate images here, to apply minimal amount of coord adjustment.
@@ -352,9 +378,14 @@ class Display:
             self.frame = imutils.rotate_bound(self.frame
                                             ,self.orientation)
 
-            if self.zoomOn and not(self.zoomOff):
+            if self.zoomOn:
                 
                 self.zoomFrame = imutils.rotate_bound(self.zoomFrame
+                                                    ,self.orientation)
+
+            if self.scoreOn and not(self.scoreOff):
+
+                self.scoreFrame = imutils.rotate_bound(self.scoreFrame
                                                     ,self.orientation)
 
 
@@ -366,7 +397,7 @@ class Display:
         #TODO - this isn't exactly right, we're handling this downstream
         #       and even if they fail to find an object they return (0,0,...)
         if self.roiTrack is not None or self.circleTrack is not None:
-            self.zoomOn = True
+            self.scoreOn = True
     
     
     def drawTrackers(self):
@@ -392,7 +423,7 @@ class Display:
                                     ,thick = 2
                                     )
 
-            if self.zoomOn and not(self.zoomOff) and self.zoomRect is not None:
+            if self.zoomOn and self.zoomRect is not None:
 
                 rectOrig = self.circleToRect(self.circleTrack)
                 rectZoom = self.roiToZoom(input_rect=rectOrig)
@@ -405,8 +436,59 @@ class Display:
                                             ,color = 'red'
                                             ,thick = 1
                                             )
-        
+            
+            if self.scoreOn and not(self.scoreOff) and self.scoreRect is not None:
 
+                rectOrig = self.circleToRect(self.circleTrack)
+                rectZoom = self.roiToScore(input_rect=rectOrig)
+                x, y, radius = self.rectToCircle(rectZoom)
+                
+                self.scoreFrame = draw_circle(self.scoreFrame
+                                            ,x
+                                            ,y
+                                            ,radius
+                                            ,color = 'red'
+                                            ,thick = 1
+                                            )
+        
+    def buildScoreFrame(self):
+        ''' create a score_img (that gets attached to -> self.scoreFrame) based on scoreRect.
+            this is a clone of buildZoomFrame()
+        '''
+
+        if self.scoreRect is None:
+            
+            score_img = np.zeros(self.frame.shape)
+            score_img = draw_text(score_img, "n/a")
+        
+        else:
+            
+            score_img = crop_img( self.getOrigFrame()
+                                  ,self.absRect(
+                                    tuple( 
+                                     self.scaleMainToOrig(p) for p in self.scoreRect
+                                        )
+                                    )
+                                )
+        
+        widthZoom, heightZoom = self.widthZoomWindow,self.heightZoomWindow
+
+        if self.scoreRect is not None:
+            
+            if any(map(lambda x: x < self.modZeroSize, 
+                        self.rectMainToOrig(self.scoreRect)[2:4])):
+
+                #still ensure mod0 in score window
+                widthZoom = int( int(self.widthZoomWindow / self.scoreRect[2]) 
+                                      * self.scoreRect[2])
+        
+        if score_img.shape[0] < 1 or score_img.shape[1] < 1:
+            score_img = np.zeros(self.frame.shape)
+            score_img = draw_text(score_img, "n/a")
+        
+        score_img  = resize_img(score_img, True, (widthZoom, heightZoom))
+
+        return score_img
     
     
     def buildZoomFrame(self):
@@ -488,6 +570,14 @@ class Display:
                     windowName += "_profile"
                 
                 cv2.destroyWindow(windowName)
+
+            if self.scoreOn and not(self.scoreOff):
+                
+                windowName = "score_display"
+                if self.orientation not in PROFILES:
+                    windowName += "_profile"
+                
+                cv2.destroyWindow(windowName)
                 
         self.orientPrevious = self.orientation
     
@@ -531,7 +621,7 @@ class Display:
                 self.roiSelected = True
                 self.resetOperators()
         
-        if self.zoomOn and self.windowTwo and not(self.zoomOff):
+        if self.zoomOn and self.windowTwo:
         
             windowName = 'zoom_display'
             if self.orientation in (90,270): windowName += "_profile"    
@@ -562,30 +652,34 @@ class Display:
             # we don't need to ensure modulo-zero here, that has already been 
             # enforced (or not) in the choice of zoomFrame-width in buildZoomFrame()
 
-        if self.windowThree:
+        if self.scoreOn and self.windowThree and not(self.scoreOff):
 
-            windowName = 'diff_display'
-            cv2.imshow(windowName, self.zoomFrame)  #TODO add diffFrame
-            key2 = cv2.waitKey(1) & 0xFF
+            windowName = 'score_display'
+            if self.orientation in (90,270): windowName += "_profile"    
+
+            cv2.imshow(windowName, self.scoreFrame)
+            key3 = cv2.waitKey(1) & 0xFF
 
         #new func -----------
         if key == ord("s"):
             initBB = cv2.selectROI("img_display", self.frame, True, False )
 
         if self.zoomOn and self.zoomFrame is not None and self.windowTwo:
+            pass
+            #TODO - key2 only if windowTwo is shown
+            #TODO - add key3
+            # if key2 == ord('z'):
 
-            if key2 == ord('z'):
-
-                self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect))
+            #     self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect))
                 
-                self.resetOperators()
+            #     self.resetOperators()
                 
 
-            if key2 == ord('x'):
+            # if key2 == ord('x'):
 
-                self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect)
-                                                ,b_zoomout=True)
-                self.resetOperators()
+            #     self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect)
+            #                                     ,b_zoomout=True)
+            #     self.resetOperators()
                 
 
     
@@ -637,6 +731,34 @@ class Display:
         rectZoom = (x0, y0, dx, dy)
         
         return rectZoom
+
+    def roiToScore(self, b_scoring=False, input_rect=None):
+        ''' return a relative-rect roi relative to zoom-window coord's.
+                (there's cropping and stretching.)
+                (we don't assume it is modulo-zero; but if it is, 
+                 this function should preserve that.)
+        '''
+        rect = copy.copy(self.scoreRect)
+
+        if b_scoring:
+            rect = copy.copy(self.roiRectScoring)
+
+        if input_rect is not None:
+            rect = copy.copy(input_rect)
+        
+        #orig->main
+        x0, y0, dx, dy = map(self.scaleOrigToMain, rect)  
+        
+        #main->zoom
+        x0,y0 = self.coordMainToScore((x0,y0))
+        x0 = self.scaleMainToScore(x0)
+        y0 = self.scaleMainToScore(y0)
+        dx = self.scaleMainToScore(dx)
+        dy = self.scaleMainToScore(dy)
+
+        rectScore = (x0, y0, dx, dy)
+        
+        return rectScore
 
     def rectZoomToOrig(self, rectZoom):
         ''' convert rect coords from relative to zoom to relative to orig
@@ -737,6 +859,15 @@ class Display:
 
         return x,y
 
+    def coordMainToScore(self, coord_xy):
+        ''' convert the coord (a tuple of integers) in main window 
+            to the coord in zoom window '''
+        
+        x = coord_xy[0] - self.scoreRect[0]
+        y = coord_xy[1] - self.scoreRect[1]
+
+        return x,y
+
     def coordZoomToMain(self, coord_xy):
         ''' convert the coord (a tuple of integers) in zoom window 
             to the coord in main window '''
@@ -764,6 +895,12 @@ class Display:
         adj_val = round(float(val)*adj_factor, 0)
         return int(adj_val)
 
+    def scaleMainToScore(self, val):
+        ''' a stretch transform: does rounding nearest for non modulo-zero '''
+        adj_factor = float(self.scoreFrame.shape[1]) / float(self.scoreRect[2])
+        adj_val = round(float(val)*adj_factor, 0)    
+        return int(adj_val)
+    
     def scaleMainToZoom(self, val):
         ''' a stretch transform: does rounding nearest for non modulo-zero '''
         adj_factor = float(self.zoomFrame.shape[1]) / float(self.zoomRect[2])

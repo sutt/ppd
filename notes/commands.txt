@@ -1,3 +1,8 @@
+10/9
+
+    >python guiview.py --track --scoreoff
+
+
 10/1
 
     to view scored video frames:
