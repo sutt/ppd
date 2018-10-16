@@ -37,19 +37,21 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] filter frames played via metalog props
 
 BUGS:
-    [ ] pauseTime bug - doesn't account for retreat/advance
+    [x] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
     [x] opens on frame1 (not frame0) for pause_on_open
     [ ] add other file extensions for vids
     [x] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
     [ ] holding down "a" (for advance) crashes the program 
-        [doesn't seem to happen anymore? on 640 or 1280]
+        [x] doesn't seem to happen anymore? can we replicate?
+            yes, by holding spacebar down for gui Advance button, but not "a" keypress
     [ ] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
     [x] keypress doesn't work when focus on play? (only for "q")
-    [ ] pasueTime - after starting with "a" for many frames, on "q" we have a 
+    [x] pasueTime - after starting with "a" for many frames, on "q" we have a 
         pause before vid starts
     [ ] gui display for track timer is -1 even with --tracktimer, when turned on via 
         gui instead of via --track
+    [x] zoom display freezes after video refresh
     
 '''
 
@@ -289,15 +291,15 @@ while(True):
             stub.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
         
         # receive cmd data from gui
+        timeFactory.setPlay(g.playOn, g.switchAdvanceFrame)
+        timeFactory.setDelay(g.frameDelay)
+        timeFactory.setDelaySecs(g.delaySecs)
+        
         frameFactory.setPlay(g.playOn)
         frameFactory.setAdvanceFrame(g.switchAdvanceFrame)
         frameFactory.setRetreatFrame(g.switchRetreatFrame)
         frameFactory.setRewind(g.switchRewind)
         frameFactory.setFastforward(g.switchFastforward)
-        
-        timeFactory.setPlay(g.playOn)
-        timeFactory.setDelay(g.frameDelay)
-        timeFactory.setDelaySecs(g.delaySecs)
 
         trackFactory.setCmd(trackingOn=g.trackingOn
                            ,outputParams=g.switchOutputParams
@@ -341,6 +343,8 @@ while(True):
             ret, frame = frameFactory.getFrame()
             
             timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
+            
+            timeFactory.accumAdvanceTime()
 
             notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
 

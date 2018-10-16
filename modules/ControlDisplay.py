@@ -116,7 +116,7 @@ class Display:
             self.orientation = iOrientation
 
     def reset(self):
-        self.zoomOn = False
+        # self.zoomOn = False
         self.roiRectScoring = None
 
     def setInit( self

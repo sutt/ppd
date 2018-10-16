@@ -6,6 +6,10 @@
     [ ] cleanup notes / refresh concepts / fix tiny bugs
     [ ] manually test tracking_params edit
 
+    [ ] evaluation function
+
+    [ ] ipython output
+
 
 10/10
 

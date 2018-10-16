@@ -251,6 +251,9 @@ class TimeFactory:
     def __init__(self):
         self.b_delay = False
         self.t_0 = 0
+        self.switchAdvanceTime = False
+        self.advanceTime = 0
+        self.advanceTimeT0 = 0
         self.pauseT0 = 0
         self.pauseTime = 0
         self.play = True
@@ -353,15 +356,28 @@ class TimeFactory:
         return (_lag0, _lag1)
         
 
-    def setPlay(self, playOn):
+    def setPlay(self, playOn, advanceOn):
         if self.play == playOn: 
-            return
+            pass
         else:
+            
+            if self.switchAdvanceTime:
+                self.pauseTime -= self.advanceTime
+                self.switchAdvanceTime = False
+            
             if playOn == False:
                 self.pauseT0 = time.time()
             if playOn == True:
                 self.pauseTime += (time.time() - self.pauseT0)
             self.play = playOn
+            
+        if advanceOn:
+            if not(self.switchAdvanceTime):
+                self.switchAdvanceTime = True
+                try:
+                    self.advanceTimeT0 = self.cumtime[self.frameCurrent]
+                except:
+                    self.advanceTimeT0 = 0
 
     def setScoringDelay(self, scoringData):
         if scoringData is None:
@@ -369,6 +385,14 @@ class TimeFactory:
         else:
             self.anyDelaySecs = self.delaySecsScoring
 
+    def accumAdvanceTime(self):
+        ''' this offsets pauseTime by including lapsed time of frames seen thru
+            advanceFrame (instead of thru play); still not exactly right.'''
+        if self.switchAdvanceTime:
+            try:
+                self.advanceTime = self.cumtime[self.frameCurrent] - self.advanceTimeT0
+            except:
+                self.advanceTime = 0
 
     def delayFrame(self):
         ''' sleep in frame loop to match cumtime '''
@@ -789,6 +813,9 @@ class NotesFactory:
         try:
             with open(self.defaultFrameNotePathFn, 'w') as f:
                 json.dump(self.getFrameNoteCurrent(),f, indent = 4)
+            
+            self.frameNoteFailed = False
+
         except:
             self.frameNoteFailed = True
 
