@@ -22,14 +22,9 @@ if False: from cv2 import *  # for vscode intellisense
 
 '''
 
-[x] controls
-    [x] button: write frame + frame-data + frame-scoring [ + advanceFrame]
-    [x] compression radio button
+[ ] refactor gui to not use globals, instead thread-safe
+    [ ] does this enable debugging better?
     
-    [ ] refactor gui to make
-        [ ] does this enable debugging better?
-    
-    [x] keypress basic
 
 [ ] functionality
     [ ] i/o images
@@ -37,6 +32,7 @@ if False: from cv2 import *  # for vscode intellisense
     [ ] delete frame(s) from a video via script:
     [x] semi-preload; streaming
         [x] default for files_size * 25(?) > 1.5BG
+        [ ] add --semiload flag for --dir runs
     [ ] filter videos played via metalog props
     [ ] filter frames played via metalog props
 
@@ -45,10 +41,15 @@ BUGS:
     [ ] pauseTime - doesn't account for when called with no-delay
     [x] opens on frame1 (not frame0) for pause_on_open
     [ ] add other file extensions for vids
-    [ ] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
-    [ ] holding down "a" (for advance) crashes the program
-    [ ] keypress doesn't work when focus on play?
-
+    [x] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
+    [ ] holding down "a" (for advance) crashes the program 
+        [doesn't seem to happen anymore? on 640 or 1280]
+    [ ] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
+    [x] keypress doesn't work when focus on play? (only for "q")
+    [ ] pasueTime - after starting with "a" for many frames, on "q" we have a 
+        pause before vid starts
+    [ ] gui display for track timer is -1 even with --tracktimer, when turned on via 
+        gui instead of via --track
     
 '''
 
@@ -193,6 +194,10 @@ if args["startplay"]:
 
 if args["tracktimer"]:
     b_output_tracktimer = True
+
+if args["dir"] == "" and args["file"] == "":
+    print 'must run with --dir x/x/ or --file x/x/out.avi'
+    sys.exit()
 
 # Initalize Top Level Loop ----------------------------
 

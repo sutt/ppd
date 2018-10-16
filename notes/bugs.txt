@@ -1,5 +1,12 @@
 #Tasks
 
+10/16
+
+    [x] throw informative message: when no --dir and no --file 
+    [ ] cleanup notes / refresh concepts / fix tiny bugs
+    [ ] manually test tracking_params edit
+
+
 10/10
 
     [x] Fix zoom_display logic

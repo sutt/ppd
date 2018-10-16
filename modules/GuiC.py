@@ -203,7 +203,6 @@ class ConstructGui:
                 ,bg = 'gray'
                 ,command = self.cmd_play_sw
                 )
-        self.play_button.bind("<Key>", self.cmd_keypress)
         self.play_button.pack()
 
         
