@@ -3,12 +3,67 @@
 10/16
 
     [x] throw informative message: when no --dir and no --file 
-    [ ] cleanup notes / refresh concepts / fix tiny bugs
-    [ ] manually test tracking_params edit
+    [x] cleanup notes / refresh concepts / fix tiny bugs
+    [x] manually test tracking_params edit
+        output4, frame154 fails to track, alter param: 
+        "thresh_hi": [74, 255, 255]  (from 64,255,255) and it finds ball
+    [x] manually try changing a framenote on a proc'd video
+        works for changing a note-attr, but not scoring
+
+    [ ] Still lack features to alter framenotes on proc'd vid:
+        [ ] Can't easily batch alter a param, need to do indv each frame
+        [ ] Can't change score to new params with gui-roi
+        [ ] Can't apply track as score
+            [ ] add score_type: 'track-score'
+        [ ] Need multiple scores for multi-object tracking
+        [ ] An undo button for last frame proc
+            [ ] recursively this is just remove last frame
+        [ ] We writeframes even when they're duplicates with Writeframe-On;
+            don't do this b/c we want to forward reverse while proc-ing
+        [ ] Need to advance on writeFrame / writeScore
+        Notes:
+            wait, switchWriteScore does work on proc'd; but is it off=by-1?
+                no. the problem is duplicate frames
+
+        TODO:
+            [x] reorder gui
+            [x] gui don't write duplicate frames; default on
+                [ ] not correct: we still want to overwrite a frame
+                [ ] gui -> main
+            [ ] refactor outputFact to setCmd()
+            [ ] advance on writeFrame
+            [ ] blink on press of write frame
+            [ ] add button: writef + track as score
+                [ ] add functionality
+            [ ] add button: overwrite the param(s) for all
+                [ ] add functionality
+                [ ] how to do nested json update into nested dict
+            
+
+
 
     [ ] evaluation function
+        [ ] error function - diff (x,y); diff radius
+            [ ] diff color - 95% pixels in some range
+        [ ] TP/FP/TN/FN - for whole video
 
     [ ] ipython output
+        [ ] current frame img
+        [ ] current frame notes
+        [ ] zoom frame (coords and img)
+        [ ] tracker params
+        [ ] tracker stored data
+        [ ] tracker previous position
+        [ ] tracker diff
+
+    [ ] output various transforms of frame onto window3, etc
+
+    [ ] apply iterThreshB
+
+    Other possible bugs to be investigates:
+    
+        FrameFactory.getFrameSize doesn't use frameOrig for shape:
+            is this causing output video to have wrong orientation?
 
 
 10/10

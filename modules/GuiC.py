@@ -52,6 +52,9 @@ class ConstructGui:
     def cmd_compression(self):
         g.compressionEnum = self.int_compression.get()
 
+    def cmd_duplicates(self):
+        g.duplicatesEnum = self.int_duplicates.get()
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -221,23 +224,6 @@ class ConstructGui:
             ,command = self.cmd_advance
             ).pack(side=tk.LEFT)
 
-        f1b2 = tk.Frame(root)
-        f1b2.pack(side = tk.TOP)
-
-        self.snapWriteVid_button = tk.Button(
-             f1b2
-            ,text = 'writeFrame'
-            ,command = self.cmd_snapWriteVid_sw
-            )
-        self.snapWriteVid_button.pack(side=tk.LEFT)
-
-        self.snapWriteScoring_button = tk.Button(
-             f1b2
-            ,text = 'writef+scorinG'
-            ,command = self.cmd_snapWriteScoring_sw
-            )
-        self.snapWriteScoring_button.pack(side=tk.LEFT)
-
         f1c = tk.Frame(root)
         f1c.pack(side = tk.TOP)
         
@@ -277,6 +263,27 @@ class ConstructGui:
             ,command = self.cmd_selectroizoom
             ).pack(side=tk.LEFT)
 
+        f_output_label = tk.Frame(root)
+        f_output_label.pack(side = tk.TOP)
+        tk.Label(f_output_label, text="output controls:").pack(side=tk.LEFT)
+
+        f1b2 = tk.Frame(root)
+        f1b2.pack(side = tk.TOP)
+
+        self.snapWriteVid_button = tk.Button(
+             f1b2
+            ,text = 'writeFrame'
+            ,command = self.cmd_snapWriteVid_sw
+            )
+        self.snapWriteVid_button.pack(side=tk.LEFT)
+
+        self.snapWriteScoring_button = tk.Button(
+             f1b2
+            ,text = 'writef+scorinG'
+            ,command = self.cmd_snapWriteScoring_sw
+            )
+        self.snapWriteScoring_button.pack(side=tk.LEFT)
+
         fwrite0 = tk.Frame(root)
         fwrite0.pack(side = tk.TOP)
 
@@ -288,16 +295,35 @@ class ConstructGui:
                 )
         self.writevid_button.pack(side=tk.LEFT)
 
+        self.int_duplicates = tk.IntVar()
+        self.int_duplicates.set(g.duplicatesEnum)
+        
+        tk.Radiobutton(
+             fwrite0
+            ,text="no"
+            ,variable=self.int_duplicates
+            ,value=0
+            ,command=self.cmd_duplicates
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fwrite0
+            ,text="allow dup's"
+            ,variable=self.int_duplicates
+            ,value=1
+            ,command=self.cmd_duplicates
+            ).pack(side=tk.LEFT)
+
+        fwrite12 = tk.Frame(root)
+        fwrite12.pack(side = tk.TOP)
+
         self.initWritevid_button = tk.Button(
-                 fwrite0
+                 fwrite12
                 ,text = 'Init output'
                 ,bg = 'gray'
                 ,command = self.cmd_initWritevid_sw
                 )
         self.initWritevid_button.pack(side=tk.LEFT)
-
-        fwrite12 = tk.Frame(root)
-        fwrite12.pack(side = tk.TOP)
 
         self.int_compression = tk.IntVar()
         self.int_compression.set(0)
@@ -331,6 +357,11 @@ class ConstructGui:
                 ,bg = 'white'
                 )
         self.dir_entry.pack(side=tk.LEFT)
+
+        fdisplaylabel = tk.Frame(root)
+        fdisplaylabel.pack(side = tk.TOP)
+
+        tk.Label(fdisplaylabel, text="display/run options:").pack(side=tk.LEFT)
 
         fdisplay1 = tk.Frame(root)
         fdisplay1.pack(side = tk.TOP)

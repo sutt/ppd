@@ -521,8 +521,10 @@ class OutputFactory:
         self.bWriteFrameCmd = False
         self.bWriteFrameSnap = False
         self.bWriteScoreSnap = False
-
+        self.bAllowDuplicates = False
         self.framesData = []
+        self.framesInd = []
+        self.frameCounter = None
 
 
     def setOutputDir(self, outputDir):
@@ -530,6 +532,18 @@ class OutputFactory:
     
     def resetFramesData(self):
         self.framesData = []
+
+    def resetFramesInd(self):
+        self.framesInd = []
+        self.frameCounter = None
+
+    def setCmd( self
+                ,duplicatesEnum=None
+                ):
+        
+        if duplicatesEnum is not None:
+            self.bAllowDuplicates = True if duplicatesEnum == 1 else False
+
 
     def setInitWriteVid(self, bInitWriteVid):
         if bInitWriteVid:
@@ -549,9 +563,32 @@ class OutputFactory:
     def setWriteFrameCmd(self, bWriteFrame):
         self.bWriteFrameCmd = bWriteFrame
 
+    def setFrameCounter(self, iFrameCounter):
+        self.frameCounter = iFrameCounter
+    
+    def checkDuplicateFrame(self):
+        ''' return True if not duplicate / "already in output" '''
+        if self.frameCounter not in self.framesInd:
+            self.framesInd.append(self.frameCounter)
+            return True
+        else:
+            return False
+
+
+    def isDuplicate(self):
+        ''' return False if it's not-duplicate or you allow duplicates '''
+        if self.bAllowDuplicates:
+            return False
+        else:
+            if self.checkDuplicateFrame():
+                return False
+            else:
+                return True
+
     def checkWriteFrame(self):
         if ((self.bWriteFrameOn and self.bWriteFrameCmd)
             or self.bWriteFrameSnap or self.bWriteScoreSnap):
+            
             return True
         return False
 
@@ -607,18 +644,43 @@ class OutputFactory:
 
     def writeFrame(self, frame, timelogEntry, baseNote, frameData):
         ''' on advance or play, write previous frame '''
-        
-        if self.vidwriter is not None:
+
+        _bDuplicate = self.isDuplicate()
+
+        if self.vidwriter is not None and not(_bDuplicate):
         
             self.vidwriter.write(frame)
 
-        if self.timewriter is not None:
+        if self.timewriter is not None and not(_bDuplicate):
             
             self.timewriter.write(str(timelogEntry) + "\n")
 
         if self.metawriter is not None:
+            
+            # write this even if not(_bDuplicate) as it's an 
+            # overwrite on notes; remove previous frameData entry
+            if _bDuplicate:
+                
+                try:
+                    currentFrameData = self.framesData[self.frameCounter]
+                except:
+                    #rare, but sometimes this happens
+                    currentFrameData = {}
+                
+                if (currentFrameData.get('scoring', None) is not None
+                    and frameData.get('scoring', -1) in (None, -1)):
+                    # don't overwrite an existing score with a None score
+                    # still, this fails to overwrite the rest of the framenote
+                    return 
+                else:
+                    try:
+                        self.framesData[self.frameCounter] = frameData
+                    except:
+                        #rare, but happens
+                        self.framesData.append(frameData)
 
-            self.framesData.append(frameData)
+            else:
+                self.framesData.append(frameData)
 
             fullNotes = baseNote
             
@@ -701,6 +763,7 @@ class NotesFactory:
             print 'couldnt open framelog'
             self.frameLogInputPathFn = None
 
+    
     def resetFramesData(self):
         self.framesData = []
     

@@ -80,7 +80,7 @@ Primer: How to Add a Test
 
         add those functions to the vidByStr, frameByStr, exitByStr lookup functions
 
-            if you don't create custom function for these, they will
+            if you don't create custom function for these, they will default to dummy
 
     Finally, add a call to the GuiviewStagingClass.new_test_method() in a function at 
         the end with the word 'test_' in it; for collection 
@@ -686,7 +686,7 @@ class GuiviewStagingClass:
         assert not(TEST_DATA_FN_TXT in os.listdir(TEST_DATA_DIR))
         assert not(TEST_DATA_FN_VID in os.listdir(TEST_DATA_DIR))
 
-        cmd = '''python guiview.py --test meta_basic --nogui --noshow 
+        cmd = '''python guiview.py --test meta_basic --nogui --noshow --allowduplicates
                                     --file data/test/guiview/meta_basic/output4.avi'''
         args = self.argsFromCmd(cmd)
         

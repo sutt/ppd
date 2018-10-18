@@ -28,30 +28,17 @@ if False: from cv2 import *  # for vscode intellisense
 
 [ ] functionality
     [ ] i/o images
-    [~] write to an existing video
     [ ] delete frame(s) from a video via script:
-    [x] semi-preload; streaming
-        [x] default for files_size * 25(?) > 1.5BG
-        [ ] add --semiload flag for --dir runs
+    [~] add --semiload flag for --dir runs. (it's just --preload)
     [ ] filter videos played via metalog props
     [ ] filter frames played via metalog props
+    [ ] add other file extensions for vids
 
 BUGS:
-    [x] pauseTime bug - doesn't account for retreat/advance
     [ ] pauseTime - doesn't account for when called with no-delay
-    [x] opens on frame1 (not frame0) for pause_on_open
-    [ ] add other file extensions for vids
-    [x] new video resets outputFactory (?) and thus resets metalog when video is refreshed 
-    [ ] holding down "a" (for advance) crashes the program 
-        [x] doesn't seem to happen anymore? can we replicate?
-            yes, by holding spacebar down for gui Advance button, but not "a" keypress
-    [ ] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
-    [x] keypress doesn't work when focus on play? (only for "q")
-    [x] pasueTime - after starting with "a" for many frames, on "q" we have a 
-        pause before vid starts
-    [ ] gui display for track timer is -1 even with --tracktimer, when turned on via 
+    [~] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
+    [~] gui display for track timer is -1 even with --tracktimer, when turned on via 
         gui instead of via --track
-    [x] zoom display freezes after video refresh
     
 '''
 
@@ -80,6 +67,7 @@ g.trackingOn = False
 g.switchOutputParams = False
 g.switchAlterParams = False
 g.switchResetParams = False
+g.duplicatesEnum = 0
 
 
 #High Level Options --------------------------
@@ -116,6 +104,7 @@ ap.add_argument("--scoreoff", action="store_true", default=False)
 ap.add_argument("--track", action="store_true", default=False)
 ap.add_argument("--startplay", action="store_true", default=False)
 ap.add_argument("--tracktimer", action="store_true", default=False)
+ap.add_argument("--allowduplicates", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -196,6 +185,9 @@ if args["startplay"]:
 
 if args["tracktimer"]:
     b_output_tracktimer = True
+
+if args["allowduplicates"]:
+    g.duplicatesEnum = 1
 
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
@@ -312,6 +304,9 @@ while(True):
                       ,windowTwo=g.windowTwo
                       ,windowThree=g.windowThree)
 
+        outputFactory.setCmd(duplicatesEnum=g.duplicatesEnum)
+                            #add more
+        
         # output, handle before next frame
         if outputFactory.setInitWriteVid(g.initWriteVid):
             
@@ -320,6 +315,7 @@ while(True):
                                         ,g.compressionEnum)
             
             outputFactory.resetFramesData()
+            outputFactory.resetFramesInd()
             
             if b_gui:
                 guiInterface.update(writevidFn = outputFactory.getWritevidFn())
@@ -342,6 +338,7 @@ while(True):
             
             ret, frame = frameFactory.getFrame()
             
+            # refactor this
             timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
             
             timeFactory.accumAdvanceTime()
@@ -349,6 +346,8 @@ while(True):
             notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
 
             trackFactory.setFrameInd(frameFactory.getFrameCounter())
+
+            outputFactory.setFrameCounter(frameFactory.getFrameCounter())
 
             notesFactory.outputFrameNote()
 
@@ -406,6 +405,8 @@ while(True):
 
     if b_test:
         mock.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+    
+    outputFactory.resetFramesInd()
     
     directoryFactory.incrementPlayCounter()
 

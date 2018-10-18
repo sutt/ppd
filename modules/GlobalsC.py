@@ -21,5 +21,6 @@ def init():
     global switchOutputParams
     global switchAlterParams
     global switchResetParams
+    global duplicatesEnum
     
 
