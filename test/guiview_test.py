@@ -1302,6 +1302,9 @@ class GuiviewStub:
 
     def write_time_frame(self, *args):
         
+        # this could be wrong as of frameFactory.advanceAndWrite change to 
+        # advance frame after each write automatically
+
         if self.stubCounter == 1:
             g.initWriteVid = True
 
@@ -1338,15 +1341,20 @@ class GuiviewStub:
             g.switchWriteVid = True     #frame0
 
         if self.stubCounter == 3:
-            g.switchAdvanceFrame = True
+            # g.switchAdvanceFrame = True
+            pass
 
         if self.stubCounter == 4:
             g.switchAdvanceFrame = True
+            #keep this one, we advance additional frame
             
         if self.stubCounter == 5:
             g.switchWriteVid = True     #frame2
             
         if self.stubCounter == 6:
+            g.switchRetreatFrame = True     #back a frame b/c we've advanced
+
+        if self.stubCounter == 7:
             g.switchWriteVid = True     #frame2
 
         self.stubCounter += 1
@@ -1363,7 +1371,8 @@ class GuiviewStub:
             g.switchWriteVid = True     #frame0->out0
 
         if self.stubCounter == 3:
-            g.switchAdvanceFrame = True
+            # g.switchAdvanceFrame = True
+            pass
 
         if self.stubCounter == 4:
             g.switchWriteVid = True     #frame1->out1
@@ -1372,19 +1381,22 @@ class GuiviewStub:
             g.initWriteVid = True       #out1
 
         if self.stubCounter == 6:
-            g.switchAdvanceFrame = True
+            # g.switchAdvanceFrame = True
+            pass
             
         if self.stubCounter == 7:
             g.switchWriteVid = True     #frame2->out1
         
         if self.stubCounter == 8:
-            g.switchAdvanceFrame = True
+            # g.switchAdvanceFrame = True
+            pass
             
         if self.stubCounter == 9:
             g.switchWriteVid = True     #frame3->out1
 
         if self.stubCounter == 10:
-            g.switchAdvanceFrame = True
+            # g.switchAdvanceFrame = True
+            pass
             
         if self.stubCounter == 11:
             g.switchWriteVid = True     #frame4->out1

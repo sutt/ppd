@@ -20,6 +20,7 @@ class FrameFactory:
         self.play = False
         self.advanceFrame = False
         self.retreatFrame = False
+        self.writeAndAdvance = False
         self.rewindCmd = False
         self.fastforwardCmd = False
         self.preloaded = False
@@ -202,14 +203,20 @@ class FrameFactory:
             else:
                 return False
 
+    def setWriteAndAdvance(self, bWriteAndAdvance):
+        ''' if outputFacotry has written out a frame in lines above,
+            set this to True to allow queryNewFrame to advance a frame.
+        '''
+        self.writeAndAdvance = bWriteAndAdvance
     
     def queryNewFrame(self):
         
         if self.playOn:
             return self.deltaCounter(1, bypassValidation=True)
         
-        if self.advanceFrame:
+        if self.advanceFrame or self.writeAndAdvance:
             self.advanceFrame = False
+            self.writeAndAdvance = False
             return self.deltaCounter(1)
             
         if self.retreatFrame:
@@ -523,6 +530,7 @@ class OutputFactory:
         self.bWriteScoreSnap = False
         self.bAllowDuplicates = False
         self.bInitWriteVid = False
+        self.advanceFrame = False
         self.compressionEnum = 0
         self.framesData = []
         self.framesInd = []
@@ -563,16 +571,23 @@ class OutputFactory:
         if writevidOn is not None:
             self.bWriteVidOn = writevidOn
 
+        self.advanceFrame = False
+        
         if switchWriteFrame is not None:
             self.bWriteFrameSnap = switchWriteFrame
             if switchWriteFrame:
                 g.switchWriteVid = False
+                self.advanceFrame = True
+                
 
         if switchWriteScoring is not None:
             self.bWriteScoreSnap = switchWriteScoring
             if switchWriteScoring:
                 g.switchWriteScoring = False
+                g.advanceFrame = True
 
+    def getAdvanceFrame(self):
+        return self.advanceFrame
 
     def checkWriteVid(self):
         return self.bInitWriteVid

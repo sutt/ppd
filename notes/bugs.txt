@@ -20,10 +20,7 @@
             [ ] recursively this is just remove last frame
         [x] We writeframes even when they're duplicates with Writeframe-On;
             don't do this b/c we want to forward reverse while proc-ing
-        [ ] Need to advance on writeFrame / writeScore
-        Notes:
-            wait, switchWriteScore does work on proc'd; but is it off=by-1?
-                no. the problem is duplicate frames
+        [x] Need to advance on writeFrame / writeScore
 
         TODO:
             [x] reorder gui
@@ -33,7 +30,7 @@
                 [~] still not quite correct: can't overwrite a framenote attr
                     when that framenote has a score
             [x] refactor outputFact to setCmd()
-            [ ] advance on writeFrame
+            [x] advance on writeFrame
             [~] blink on press of write frame
             [ ] add button: writef + track as score
                 [ ] add functionality
@@ -41,8 +38,6 @@
                 [ ] add functionality
                 [ ] how to do nested json update into nested dict
             
-
-
 
     [ ] evaluation function
         [ ] error function - diff (x,y); diff radius

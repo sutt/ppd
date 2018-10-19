@@ -171,7 +171,7 @@ class TrackFactory:
 
         if frameType == "training":
             
-            datum = self. buildTrainingDatum(frameScore, self.currentFrame)
+            datum = self.buildTrainingDatum(frameScore, self.currentFrame)
             
             if datum is not None:
                 self.trainingData.append(datum)

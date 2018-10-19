@@ -335,6 +335,8 @@ while(True):
                                     ,timeFactory.getLagtimeCurrent()
                                     ,notesFactory.getBaseNote()
                                     ,notesFactory.getFrameData() )
+
+            frameFactory.setWriteAndAdvance(outputFactory.getAdvanceFrame())
         
         if frameFactory.queryNewFrame():
             
