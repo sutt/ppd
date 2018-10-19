@@ -12,13 +12,13 @@
 
     [ ] Still lack features to alter framenotes on proc'd vid:
         [ ] Can't easily batch alter a param, need to do indv each frame
-        [ ] Can't change score to new params with gui-roi
+        [x] Can't change score to new params with gui-roi
         [ ] Can't apply track as score
             [ ] add score_type: 'track-score'
         [ ] Need multiple scores for multi-object tracking
         [ ] An undo button for last frame proc
             [ ] recursively this is just remove last frame
-        [ ] We writeframes even when they're duplicates with Writeframe-On;
+        [x] We writeframes even when they're duplicates with Writeframe-On;
             don't do this b/c we want to forward reverse while proc-ing
         [ ] Need to advance on writeFrame / writeScore
         Notes:
@@ -28,11 +28,13 @@
         TODO:
             [x] reorder gui
             [x] gui don't write duplicate frames; default on
-                [ ] not correct: we still want to overwrite a frame
-                [ ] gui -> main
-            [ ] refactor outputFact to setCmd()
+                [x] not correct: we still want to overwrite a frame
+                [x] gui -> main
+                [~] still not quite correct: can't overwrite a framenote attr
+                    when that framenote has a score
+            [x] refactor outputFact to setCmd()
             [ ] advance on writeFrame
-            [ ] blink on press of write frame
+            [~] blink on press of write frame
             [ ] add button: writef + track as score
                 [ ] add functionality
             [ ] add button: overwrite the param(s) for all

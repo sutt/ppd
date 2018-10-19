@@ -304,27 +304,29 @@ while(True):
                       ,windowTwo=g.windowTwo
                       ,windowThree=g.windowThree)
 
-        outputFactory.setCmd(duplicatesEnum=g.duplicatesEnum)
-                            #add more
+        outputFactory.setCmd(duplicatesEnum=g.duplicatesEnum
+                            ,initWriteVid=g.initWriteVid
+                            ,compressionEnum=g.compressionEnum
+                            ,writevidOn=g.writevidOn
+                            ,switchWriteFrame=g.switchWriteVid
+                            ,switchWriteScoring=g.switchWriteScoring
+                            )
+                            
         
         # output, handle before next frame
-        if outputFactory.setInitWriteVid(g.initWriteVid):
+        if outputFactory.checkWriteVid():
             
             outputFactory.initVidWriter(frameFactory.getFrameSize()
-                                        ,directoryFactory.vidFn()
-                                        ,g.compressionEnum)
+                                        ,directoryFactory.vidFn())
             
             outputFactory.resetFramesData()
             outputFactory.resetFramesInd()
             
             if b_gui:
                 guiInterface.update(writevidFn = outputFactory.getWritevidFn())
-        
-        outputFactory.setWriteFrameOn(g.writevidOn, g.switchWriteVid, 
-                                      g.switchWriteScoring)
+
         
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
-        
         if outputFactory.checkWriteFrame():
         
             notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
@@ -338,17 +340,12 @@ while(True):
             
             ret, frame = frameFactory.getFrame()
             
-            # refactor this
             timeFactory.setFrameCurrent(frameFactory.getFrameCounter())
-            
-            timeFactory.accumAdvanceTime()
-
             notesFactory.setFrameCurrent(frameFactory.getFrameCounter())
-
             trackFactory.setFrameInd(frameFactory.getFrameCounter())
-
             outputFactory.setFrameCounter(frameFactory.getFrameCounter())
 
+            timeFactory.accumAdvanceTime()
             notesFactory.outputFrameNote()
 
             if b_gui:

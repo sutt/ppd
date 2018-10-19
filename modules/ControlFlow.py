@@ -517,11 +517,13 @@ class OutputFactory:
         self.writeVidFn = None
         self.writeTimeFn = None
         self.writeMetaFn = None
-        self.bWriteFrameOn = False
+        self.bWriteVidOn = False
         self.bWriteFrameCmd = False
         self.bWriteFrameSnap = False
         self.bWriteScoreSnap = False
         self.bAllowDuplicates = False
+        self.bInitWriteVid = False
+        self.compressionEnum = 0
         self.framesData = []
         self.framesInd = []
         self.frameCounter = None
@@ -539,20 +541,44 @@ class OutputFactory:
 
     def setCmd( self
                 ,duplicatesEnum=None
+                ,initWriteVid=None
+                ,compressionEnum=None
+                ,writevidOn=None
+                ,switchWriteFrame=None
+                ,switchWriteScoring=None
                 ):
         
         if duplicatesEnum is not None:
             self.bAllowDuplicates = True if duplicatesEnum == 1 else False
 
-
-    def setInitWriteVid(self, bInitWriteVid):
-        if bInitWriteVid:
+        if initWriteVid:
+            self.bInitWriteVid = True
             g.initWriteVid = False
-            return True
-        return False
+        else:
+            self.bInitWriteVid = False
 
-    def setWriteFrameOn(self, bWriteFrameOn, bSwtichWriteFrame, bSwitchWriteScoring):
-        self.bWriteFrameOn = bWriteFrameOn
+        if compressionEnum is not None:
+            self.compressionEnum = compressionEnum
+
+        if writevidOn is not None:
+            self.bWriteVidOn = writevidOn
+
+        if switchWriteFrame is not None:
+            self.bWriteFrameSnap = switchWriteFrame
+            if switchWriteFrame:
+                g.switchWriteVid = False
+
+        if switchWriteScoring is not None:
+            self.bWriteScoreSnap = switchWriteScoring
+            if switchWriteScoring:
+                g.switchWriteScoring = False
+
+
+    def checkWriteVid(self):
+        return self.bInitWriteVid
+
+    def setWriteFrameOn(self, bWriteVidOn, bSwtichWriteFrame, bSwitchWriteScoring):
+        self.bWriteVidOn = bWriteVidOn
         self.bWriteFrameSnap = bSwtichWriteFrame
         self.bWriteScoreSnap = bSwitchWriteScoring
         if bSwtichWriteFrame:
@@ -586,7 +612,7 @@ class OutputFactory:
                 return True
 
     def checkWriteFrame(self):
-        if ((self.bWriteFrameOn and self.bWriteFrameCmd)
+        if ((self.bWriteVidOn and self.bWriteFrameCmd)
             or self.bWriteFrameSnap or self.bWriteScoreSnap):
             
             return True
@@ -600,11 +626,11 @@ class OutputFactory:
     def stripExt(fn):
         return ".".join(fn.split(".")[:-1])
     
-    def initVidWriter(self, frameSize, vidFn, compressionEnum):
+    def initVidWriter(self, frameSize, vidFn):
 
         ext = "avi"
         fourcc = "h264"
-        if compressionEnum == 1:
+        if self.compressionEnum == 1:
             fourcc = 0      #request lossless encoding
         
         if self.vidwriter is not None:
@@ -657,26 +683,26 @@ class OutputFactory:
 
         if self.metawriter is not None:
             
-            # write this even if not(_bDuplicate) as it's an 
-            # overwrite on notes; remove previous frameData entry
+            # overwrite existing framenote. only for new score; other 
+            # framenote attr are not updated. to update other framenote
+            # attr's use a new output.
             if _bDuplicate:
                 
                 try:
                     currentFrameData = self.framesData[self.frameCounter]
                 except:
-                    #rare, but sometimes this happens
                     currentFrameData = {}
                 
                 if (currentFrameData.get('scoring', None) is not None
                     and frameData.get('scoring', -1) in (None, -1)):
-                    # don't overwrite an existing score with a None score
-                    # still, this fails to overwrite the rest of the framenote
+                    
+                    # if there's already a score, don't update this record
                     return 
+
                 else:
                     try:
                         self.framesData[self.frameCounter] = frameData
                     except:
-                        #rare, but happens
                         self.framesData.append(frameData)
 
             else:
@@ -686,6 +712,7 @@ class OutputFactory:
             
             proc_data = fullNotes.get('proc-data', {})
             proc_data['last_write_compression_enum'] = g.compressionEnum
+
             fullNotes['proc-data'] = proc_data
             
             fullNotes['frames'] = self.framesData
