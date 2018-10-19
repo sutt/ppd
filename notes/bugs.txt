@@ -1,5 +1,17 @@
 #Tasks
 
+10/19
+
+    [ ] override frame attr:
+        [x] build into gui
+        [x] run with hard coded edit, mergeDict off
+        [ ] write mergeDicts
+        [ ] test mergeDicts
+        [ ] demo on a proc'd video
+            [ ] can this override score delibeartely? inadvertantly?
+        [ ] add framenote-override.jsonc to .gitignore, guiview.jsonc too
+
+
 10/16
 
     [x] throw informative message: when no --dir and no --file 

@@ -68,6 +68,7 @@ g.switchOutputParams = False
 g.switchAlterParams = False
 g.switchResetParams = False
 g.duplicatesEnum = 0
+g.switchOverideNote = False
 
 
 #High Level Options --------------------------
@@ -304,12 +305,15 @@ while(True):
                       ,windowTwo=g.windowTwo
                       ,windowThree=g.windowThree)
 
+        notesFactory.setCmd(switchOverideNote=g.switchOverideNote)
+
         outputFactory.setCmd(duplicatesEnum=g.duplicatesEnum
                             ,initWriteVid=g.initWriteVid
                             ,compressionEnum=g.compressionEnum
                             ,writevidOn=g.writevidOn
                             ,switchWriteFrame=g.switchWriteVid
                             ,switchWriteScoring=g.switchWriteScoring
+                            ,switchOverideNote=g.switchOverideNote
                             )
                             
         
@@ -331,6 +335,8 @@ while(True):
         
             notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
         
+            # notesFactory.setNoteOveride(outputFactory.needOveride())
+            
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
                                     ,notesFactory.getBaseNote()

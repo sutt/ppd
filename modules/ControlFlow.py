@@ -554,6 +554,7 @@ class OutputFactory:
                 ,writevidOn=None
                 ,switchWriteFrame=None
                 ,switchWriteScoring=None
+                ,switchOverideNote=None
                 ):
         
         if duplicatesEnum is not None:
@@ -584,22 +585,20 @@ class OutputFactory:
             self.bWriteScoreSnap = switchWriteScoring
             if switchWriteScoring:
                 g.switchWriteScoring = False
-                g.advanceFrame = True
+                self.advanceFrame = True
+
+        if switchOverideNote is not None:
+            self.bWriteOverideSnap = switchOverideNote
+            if switchOverideNote:
+                g.switchOverideNote = False
+                self.advanceFrame = True
+
 
     def getAdvanceFrame(self):
         return self.advanceFrame
 
     def checkWriteVid(self):
         return self.bInitWriteVid
-
-    def setWriteFrameOn(self, bWriteVidOn, bSwtichWriteFrame, bSwitchWriteScoring):
-        self.bWriteVidOn = bWriteVidOn
-        self.bWriteFrameSnap = bSwtichWriteFrame
-        self.bWriteScoreSnap = bSwitchWriteScoring
-        if bSwtichWriteFrame:
-            g.switchWriteVid = False
-        if bSwitchWriteScoring:
-            g.switchWriteScoring = False
     
     def setWriteFrameCmd(self, bWriteFrame):
         self.bWriteFrameCmd = bWriteFrame
@@ -628,7 +627,8 @@ class OutputFactory:
 
     def checkWriteFrame(self):
         if ((self.bWriteVidOn and self.bWriteFrameCmd)
-            or self.bWriteFrameSnap or self.bWriteScoreSnap):
+            or self.bWriteFrameSnap or self.bWriteScoreSnap
+            or self.bWriteOverideSnap):
             
             return True
         return False
@@ -782,6 +782,7 @@ class NotesFactory:
 
         self.bShowScoring = False
         self.bFrameNotes = True
+        self.bOverideFramenote = False
         self.framesData = []
         self.framesDataExisting = []
         self.frameInd = None
@@ -831,7 +832,16 @@ class NotesFactory:
             return self.dataVid['notes']['details']['ball_color']
         except:
             return None
-    
+
+    def setCmd(self
+                ,switchOverideNote=None
+                ):
+        
+        if switchOverideNote is not None:
+            self.bOverideFramenote = switchOverideNote
+            # note: still need to read this below in 
+            # output.setCmd, don't alter global here.
+
     def loadMetaLog(self, metalogPathFn):
         
         try:
@@ -938,6 +948,21 @@ class NotesFactory:
         except:
             return self.getFrameNoteCurrent()
 
+    def loadFramenoteOveride(self):
+        if not(self.isProcessed):
+            return
+        try:
+            with open(self.defaultFrameNoteOveridePathFn, 'r') as f:
+                lines = f.readlines()
+            lines = "".join(lines)
+
+            lines = re.sub(r'\\\n', '', lines)      
+            lines = re.sub(r'//.*\n', '\n', lines)
+            
+            return json.loads(lines)
+        except:
+            return {}
+
 
 
     def getFrameData(self):
@@ -945,17 +970,23 @@ class NotesFactory:
 
         if self.isProcessed:
 
-            #re-processing
-
             if self.frameNoteFailed:
                 frameData = self.getFrameNoteCurrent()
             else:
                 frameData = self.loadFrameNoteInput()
-            
 
             # frameScoring is not None only when gui-cmd writeFrame+Data
             if self.frameScoring is not None:
                 frameData['scoring'] = self.frameScoring
+
+            
+            if self.bOverideFramenote:    
+                
+                # frameOveride = self.loadFramenoteOveride()
+
+                frameData['frame_type'] = "an overide!"
+                
+                # frameData = self.mergeDicts(main=frameData, update=frameOveride)
         
         else:
             
@@ -979,4 +1010,22 @@ class NotesFactory:
             pass  
         assert 'frames' not in baseNote.keys()
         return baseNote
+
+    @staticmethod
+    def mergeDicts(main, update):
+        ''' update only the member elements in main that are also in uodate '''
+
+        try:
+            assert isinstance(main, dict)
+            assert isinstance(update, dict)
+        except Exception as e:
+            print e.message
+            return
+
+        #build keys
+        # update_keys = recurse_keys(update)
+        # validate_keys(main, update_keys)
+
+
+
     

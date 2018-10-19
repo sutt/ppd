@@ -79,6 +79,9 @@ class ConstructGui:
     def cmd_snapWriteVid_sw(self):
         g.switchWriteVid = True
 
+    def cmd_snapWriteOveride_sw(self):
+        g.switchOverideNote = True
+
     def cmd_snapWriteScoring_sw(self):
         g.switchWriteScoring = True
 
@@ -162,6 +165,8 @@ class ConstructGui:
             self.cmd_snapWriteVid_sw()
         if e.char == "g":
             self.cmd_snapWriteScoring_sw()
+        if e.char == "h":
+            self.cmd_snapWriteOveride_sw()
         if e.char == "z":
             self.cmd_selectzoom()
         if e.char == "c":
@@ -283,6 +288,16 @@ class ConstructGui:
             ,command = self.cmd_snapWriteScoring_sw
             )
         self.snapWriteScoring_button.pack(side=tk.LEFT)
+
+        f1b2_add = tk.Frame(root)
+        f1b2_add.pack(side = tk.TOP)
+
+        self.snapWriteOveride_button = tk.Button(
+             f1b2_add
+            ,text = 'writef+overide<H>'
+            ,command = self.cmd_snapWriteOveride_sw
+            )
+        self.snapWriteOveride_button.pack(side=tk.LEFT)
 
         fwrite0 = tk.Frame(root)
         fwrite0.pack(side = tk.TOP)
