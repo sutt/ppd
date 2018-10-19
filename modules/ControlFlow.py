@@ -791,6 +791,7 @@ class NotesFactory:
         self.frameLogInputPathFn = None
         self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
         self.defaultFrameNotePathFn = "notes/framenote.json"
+        self.defaultFrameNoteOveridePathFn = "notes/framenote-override.jsonc"
         
 
     def setFrameLog(self, frameLogPathFn):
@@ -975,22 +976,22 @@ class NotesFactory:
             else:
                 frameData = self.loadFrameNoteInput()
 
-            # frameScoring is not None only when gui-cmd writeFrame+Data
             if self.frameScoring is not None:
+                #gui-cmd: writeFrame+Score
+                
                 frameData['scoring'] = self.frameScoring
 
-            
             if self.bOverideFramenote:    
+                #gui-cmd: writeFrame+Override                
                 
-                # frameOveride = self.loadFramenoteOveride()
-
-                frameData['frame_type'] = "an overide!"
+                frameOveride = self.loadFramenoteOveride()
                 
-                # frameData = self.mergeDicts(main=frameData, update=frameOveride)
+                if not(isinstance(frameOveride, dict)):
+                    print 'failed to load ', str(self.defaultFrameNoteOveridePathFn)
+                
+                frameData = self.mergeDicts(main=frameData, update=frameOveride)
         
         else:
-            
-            #new-processing
 
             frameData = self.loadFrameLogCurrent()
             
@@ -1011,21 +1012,87 @@ class NotesFactory:
         assert 'frames' not in baseNote.keys()
         return baseNote
 
-    @staticmethod
-    def mergeDicts(main, update):
-        ''' update only the member elements in main that are also in uodate '''
+    
+    @classmethod
+    def mergeDicts(cls, main, update):
+        ''' with terminal nodes in update(dict) overwrite the value at those
+            nodes in main(dict) if they exist:
+                main:   {"a": 1, "b": 2, "inner": {"z":1}} 
+                update: {"b":99, "inner":{"z": -99}}
+                ->     {"a": 1, "b": 99, "inner":{"z": -99}}
+        '''
 
         try:
             assert isinstance(main, dict)
             assert isinstance(update, dict)
         except Exception as e:
             print e.message
-            return
+            return main
 
-        #build keys
-        # update_keys = recurse_keys(update)
-        # validate_keys(main, update_keys)
+        updateKeys, updateVals = cls.recurseKeys(update)
+        
+        newMain = cls.recurseUpdate(copy.deepcopy(main), updateKeys, updateVals)
 
+        return  newMain
+        
+        
 
+    @classmethod
+    def recurseKeys(cls, inputDict):
+        ''' build [nested] list for keys and vals in inputDict:
+                inputDict:  {"a":1, "b":2, "c": {"c_a":17}}
+                ->:         ["a", "b", ["c", "c_a"]],   [1, [None, 17], 2])
+        '''
+        keyList, valList = [], []
+
+        for k in inputDict.keys():
+
+            if isinstance(inputDict[k], dict):
+                
+                tmpKey, tmpVal = cls.recurseKeys(inputDict[k])
+                
+                nestedKey = [k]
+                nestedVal = [None]
+
+                if len(tmpKey) > 0:
+                    nestedKey.extend(tmpKey)
+                    nestedVal.extend(tmpVal)
+
+                keyList.append(nestedKey)
+                valList.append(nestedVal)
+
+            else:
+                keyList.append(k)
+                valList.append(inputDict[k])
+
+        return keyList, valList
 
     
+    @classmethod
+    def recurseUpdate(cls, inputDict, listKeys, listVals):
+
+        if inputDict is None:
+            return None
+
+        for _key, _val in zip(listKeys, listVals):
+
+            if isinstance(_key, list):
+                
+                _dict = cls.recurseUpdate(  
+                                    copy.deepcopy(inputDict.get( _key[0], None))
+                                    , _key[1:]
+                                    , _val[1:]
+                                    )
+
+                inputDict[_key[0]] = _dict
+
+            else:
+                
+                if inputDict.has_key(_key):
+                    inputDict[_key] = _val
+                else:
+                    # main doesn't have that key
+                    pass
+
+        return inputDict
+
