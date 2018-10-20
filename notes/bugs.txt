@@ -11,6 +11,34 @@
             [ ] can this override score delibeartely? inadvertantly?
         [x] add framenote-override.jsonc to .gitignore, guiview.jsonc too
 
+    [ ] write-up workflow to commands.txt
+        [ ] initial processing: use guiview.jsonc to write params
+        [ ] re-processing: 
+            [ ] add hand scoring - new or modified
+                [ ] how you ran rewind even after write
+                [ ] why to turn "dup's on" to off
+            [ ] edit individual frames with framenote.jsonc
+                e.g. ball_occluded
+            [ ] batch edit params in existing framenote
+                e.g. approx_distance
+    
+    [x] deleteframes script
+    [~] undo button - remove previous frame written to output in vid, timelog, metalog
+        [~] this can be recursive
+        [~] retreat a frame on completion
+        Notes:
+            reset frameFact, timeFact, notesFact, outputFact (?)
+            maybe just write a script that deletes frame(s),
+            and you can even manually delete timelog, metalog entries
+
+    [ ] build scoring schema:
+        [ ] multi objects per frame
+        [ ] scoring types: 
+        [ ] how will this work with gui?
+        [ ] a ball diff is "two points" beginning and end
+
+
+
 
 10/16
 

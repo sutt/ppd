@@ -962,6 +962,7 @@ class NotesFactory:
             
             return json.loads(lines)
         except:
+            print 'failed to load ', str(self.defaultFrameNoteOveridePathFn)
             return {}
 
 
@@ -978,17 +979,12 @@ class NotesFactory:
 
             if self.frameScoring is not None:
                 #gui-cmd: writeFrame+Score
-                
                 frameData['scoring'] = self.frameScoring
 
             if self.bOverideFramenote:    
                 #gui-cmd: writeFrame+Override                
                 
                 frameOveride = self.loadFramenoteOveride()
-                
-                if not(isinstance(frameOveride, dict)):
-                    print 'failed to load ', str(self.defaultFrameNoteOveridePathFn)
-                
                 frameData = self.mergeDicts(main=frameData, update=frameOveride)
         
         else:

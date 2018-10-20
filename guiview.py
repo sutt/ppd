@@ -315,8 +315,7 @@ while(True):
                             ,switchWriteScoring=g.switchWriteScoring
                             ,switchOverideNote=g.switchOverideNote
                             )
-                            
-        
+
         # output, handle before next frame
         if outputFactory.checkWriteVid():
             
@@ -334,8 +333,6 @@ while(True):
         if outputFactory.checkWriteFrame():
         
             notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
-        
-            # notesFactory.setNoteOveride(outputFactory.needOveride())
             
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
