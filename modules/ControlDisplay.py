@@ -171,6 +171,7 @@ class Display:
 
     def setScoring(self, frameScoring):
         ''' set roiRectScoring, is data is in correct form'''
+        #TODO-SS
         if frameScoring is None:
             self.roiRectScoring = None
             return
@@ -191,6 +192,7 @@ class Display:
         if self.roiRect is None:
             return None
         return copy.copy(self.roiRect)
+        #TODO-SS
 
     def alterFrame(self):
         ''' make changes to frame, including resize. also, build zoomFrame and scoreFrame.
@@ -456,6 +458,7 @@ class Display:
             this is a clone of buildZoomFrame()
         '''
 
+        #TODO-SS
         if self.scoreRect is None:
             
             score_img = np.zeros(self.frame.shape)

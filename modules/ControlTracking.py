@@ -162,6 +162,7 @@ class TrackFactory:
 
     def setFrameScore(self, frameScoreData):
         
+        #TODO - SS
         if not(self.on): return
 
         if frameScoreData is None: return

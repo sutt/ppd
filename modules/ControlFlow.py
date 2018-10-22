@@ -7,6 +7,7 @@ from vidwriter import VidWriter
 from miscutils import uniqueFn
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
+from modules.DataSchemas import ScoreSchema
 from modules import GlobalsC as g
 
 class FrameFactory:
@@ -708,9 +709,13 @@ class OutputFactory:
                 except:
                     currentFrameData = {}
                 
+                #TODO-SS
                 if (currentFrameData.get('scoring', None) is not None
                     and frameData.get('scoring', -1) in (None, -1)):
                     
+                    # The problem here is frameData is already populated with score
+                    # before this function, we want score as a separate arg here
+
                     # if there's already a score, don't update this record
                     return 
 
@@ -786,7 +791,7 @@ class NotesFactory:
         self.framesData = []
         self.framesDataExisting = []
         self.frameInd = None
-        self.frameScoring = None
+        self.frameScoring = ScoreSchema()
         
         self.frameLogInputPathFn = None
         self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
@@ -818,7 +823,7 @@ class NotesFactory:
         self.bShowScoring = bShowScoring
     
     def setScoring(self, scoringData):
-        self.frameScoring = scoringData
+        self.frameScoring.addCircle(scoringData)
 
     def getOrientation(self):
         return self.orientation   #degrees clockwise
@@ -883,9 +888,9 @@ class NotesFactory:
         if not(self.bShowScoring) and not(b_bypass):
             return None
         try:
-            note = self.getFrameNoteCurrent()
-            assert len(note['scoring']) == 4
-            return note['scoring']
+            objScoring = ScoreSchema()
+            objScoring.loadLegacy(self.getFrameNoteCurrent().get('scoring', None))
+            return objScoring.getDefault()
         except:
             return None
 
@@ -977,13 +982,12 @@ class NotesFactory:
             else:
                 frameData = self.loadFrameNoteInput()
 
-            if self.frameScoring is not None:
+            if self.frameScoring.getDefault() is not None:
                 #gui-cmd: writeFrame+Score
-                frameData['scoring'] = self.frameScoring
+                frameData['scoring'] = self.frameScoring.getDefault()
 
             if self.bOverideFramenote:    
                 #gui-cmd: writeFrame+Override                
-                
                 frameOveride = self.loadFramenoteOveride()
                 frameData = self.mergeDicts(main=frameData, update=frameOveride)
         
@@ -993,7 +997,7 @@ class NotesFactory:
             
             frameData['orig_vid_index'] = self.frameInd
 
-            frameData['scoring'] = self.frameScoring
+            frameData['scoring'] = self.frameScoring.getDefault()
 
         return frameData
 

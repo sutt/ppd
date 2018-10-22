@@ -1,5 +1,18 @@
 #Tasks
 
+10/22
+
+    [ ] ScoreSchema
+
+        Checkpoints:
+        [x] Run thru with same functionality
+        [ ] Add functionality
+
+        Add functionality:
+        [ ] two points to define a bounce ray
+        
+        [ ] 
+
 10/19
 
     [x] override frame attr:
@@ -36,7 +49,16 @@
         [ ] scoring types: 
         [ ] how will this work with gui?
         [ ] a ball diff is "two points" beginning and end
+        Notes:
+            scoring is used for multiple things:
+                read-in from metalog
+                from display -> metalog
+                tracking evaluation
+            how does alterframe do both tracking and scoring?
+                b/c it's only building scoreRect which is for scoreFrame
+                Display: roiRectScoring, circleTrack keep track of points
 
+            we need a schema for score:
 
 
 
@@ -56,8 +78,8 @@
         [ ] Can't apply track as score
             [ ] add score_type: 'track-score'
         [ ] Need multiple scores for multi-object tracking
-        [ ] An undo button for last frame proc
-            [ ] recursively this is just remove last frame
+        [~] An undo button for last frame proc
+            [~] recursively this is just remove last frame
         [x] We writeframes even when they're duplicates with Writeframe-On;
             don't do this b/c we want to forward reverse while proc-ing
         [x] Need to advance on writeFrame / writeScore

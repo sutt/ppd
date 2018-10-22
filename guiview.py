@@ -369,7 +369,7 @@ while(True):
 
             trackFactory.setFrame(frame)
 
-            trackFactory.setFrameScore(notesFactory.getFrameScoreForTrack())
+            trackFactory.setFrameScore(notesFactory.getFrameScoreForTrack()) #TODO-SS
             
             trackFactory.trackFrame()
             
