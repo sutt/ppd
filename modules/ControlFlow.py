@@ -387,8 +387,8 @@ class TimeFactory:
                 except:
                     self.advanceTimeT0 = 0
 
-    def setScoringDelay(self, scoringData):
-        if scoringData is None:
+    def setScoringDelay(self, bScoringData):
+        if not(bScoringData):
             self.anyDelaySecs = self.delaySecs
         else:
             self.anyDelaySecs = self.delaySecsScoring
@@ -890,9 +890,15 @@ class NotesFactory:
         try:
             objScoring = ScoreSchema()
             objScoring.load(self.getFrameNoteCurrent().get('scoring', None))
-            return objScoring.getDefault()
+            return objScoring.getAll()
         except:
             return None
+
+    def checkFrameHasScore(self):
+        ''' return True is there's anything stored in framenote.scoring '''
+        if self.bShowScoring:
+            return self.getFrameNoteCurrent().get('scoring', None) is not None
+        return False
 
     def getFrameType(self):
         try:

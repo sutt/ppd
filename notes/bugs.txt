@@ -1,17 +1,51 @@
 #Tasks
 
+10/23
+
+    [ ] Misc Thoughts:
+        [ ] All those imports needed in guiview?
+        [ ] h264 encoding will change if frames are skipped (?)
+        [ ] sync framerate by pointing webcam at screen
+        [ ] build a ["realtime"] timeout tracking fucntion wrapper:
+            tracking processes untill time's up; returns best result
+            available at that time: e.g. 27 different thresholds
+        [ ] how to test roiSelect()?
+            in stub set a param on Display .bTesting
+        [ ] profile startup time to reduce it (+ tests run faster?)
+
+
 10/22
 
     [ ] ScoreSchema
 
         Checkpoints:
         [x] Run thru with same functionality
-        [ ] Add functionality
+        [ ] Add functionality:
+            [x] Draw multiple objects/object-types from inputScore/outputScore
+            [ ] Assign multiple object/object-types with gui+display
+            [ ] add scoreSchema to TrackFactory, and then to display.drawTrackers()
 
-        Add functionality:
-        [ ] two points to define a bounce ray
+        [ ] Additional Features:
+            [ ] assign a particluar obj enum to be zoomed-in in scoreDisplay
+
+        [ ] Refactors:
+            [ ] remove roiRect, roiRectScoring
+
+        Manual Testing:
+            [ ] legacyload -output-> ScoreSchema
+            [ ] view multiple objects
+            [ ] view ray object
+            [ ] draw multiple object
+            [ ] draw ray object
+            [ ] view multi and single scores
+                [ ] add a new score obj
+                [ ] overwrite existing scores
+            [ ] view trackers as scoreSchema
         
-        [ ] 
+        Bugs/Refactor:
+        [ ] output.writeFrame() should have separate arg for framenote scoring
+        [ ] display.outputScore.reset() called
+            [ ] needs to only reset other objects (?)
 
 10/19
 

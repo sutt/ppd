@@ -28,7 +28,7 @@ if False: from cv2 import *  # for vscode intellisense
 
 [ ] functionality
     [ ] i/o images
-    [ ] delete frame(s) from a video via script:
+    [x] delete frame(s) from a video via script:
     [~] add --semiload flag for --dir runs. (it's just --preload)
     [ ] filter videos played via metalog props
     [ ] filter frames played via metalog props
@@ -391,7 +391,7 @@ while(True):
             
             display.setScoring(notesFactory.getFrameScoreCurrent())
             
-            timeFactory.setScoringDelay(notesFactory.getFrameScoreCurrent())
+            timeFactory.setScoringDelay(notesFactory.checkFrameHasScore())
 
             display.alterFrame()
             display.drawOperators()

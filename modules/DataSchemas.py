@@ -27,9 +27,13 @@ import copy
     
     Notes:
         tagging #TODO-SS for relvant areas 
+        tagging #Leagcy-SS for cleanup areas
 
-    Display: .scoreRect .roiRectScoring | .circleTrack
-    NotesFactory:  .frameScoring  
+        in Display, roiRect holds pane -> notes scoring data
+                    roiRectScoring holds notes -> pane
+
+        Display: .scoreRect .roiRectScoring | .circleTrack
+        NotesFactory:  .frameScoring  
 
 '''
 
@@ -58,10 +62,17 @@ class ScoreSchema:
     def __init__(self):
         self.data = {}
         self.bLoaded = False
+        self.bHasContents = False
 
     def reset(self):
         self.data = {}
         self.bLoaded = False
+        self.bHasContents = False
+
+    def checkHasContents(self):
+        ''' return True if data has been poppulated;
+            a fast method for boolean type check '''
+        return self.bHasContents
     
     def load(self, objScoring):
         ''' load a dict object as data '''
@@ -70,12 +81,14 @@ class ScoreSchema:
             assert isinstance(objScoring, dict)
             self.data = copy.deepcopy(objScoring)
             self.bLoaded = True
+            self.bHasContents = True
         except:
             try:
                 self.loadLegacy(objScoring)
             except:
                 self.data = {}
                 self.bLoaded = False
+                self.bHasContents = False
 
     def loadLegacy(self, listScoring):
         ''' load legacy score which is type=circle and 
@@ -85,9 +98,11 @@ class ScoreSchema:
             assert all( [isinstance(x, int) for x in listScoring])
             self.addCircle(copy.copy(listScoring))
             self.bLoaded = True
+            self.bHasContents = True
         except:
             self.data = {}
             self.bLoaded = False
+            self.bHasContents = False
 
 
     def add(self, scoreData, scoreType=None, objEnum=0):
@@ -112,13 +127,17 @@ class ScoreSchema:
         _score['type'] = 'circle'
         _score['data'] = circleData
         self.data[objEnum] = _score
+        self.bHasContents = True
 
 
     def addRay(self, rayData):
+        ''' add a ray score '''
         _score = {}
         _score['type'] = 'ray'
         _score['data'] = rayData
         self.data[objEnum] = _score
+        self.bHasContents = True
+
 
     def addRayPoint(self, rayPoint, rayPointEnum, objEnum=0):
         
@@ -134,11 +153,16 @@ class ScoreSchema:
             pass
         
         if b_exists and not(b_overwrite):
+            
             _score = self.data[objEnum]
             _rayData = _score['data']
             _rayData[rayPointEnum] = rayPoint
             _score['data'] = _rayData
+            
+            if all([x is not None for x in _rayData]):
+                self.bHasContents = True
         else:
+            
             _score = {}
             _score['type'] = 'ray'
             _rayData = [None, None]
@@ -153,11 +177,26 @@ class ScoreSchema:
         ''' return True if valid scoreEntry '''
         pass
 
+    #TODO - getRect() return that enclosing rect for any type of score
+
+    #TODO - numObjs()
 
     def get(self, **kwargs):
         #select data record with certain attributes
         return self.data[0]
 
+    def getAll(self):
+        if self.data == {}:
+            return None
+        return copy.deepcopy(self.data)
+
+    def getListType(self, _type):
+        listCircles = []
+        for k in self.data.keys():
+            if self.data[k].get('type') == _type:
+                listCircles.append(self.data.get(k).get('data'))
+        return listCircles
+    
     def getDefault(self):
         if self.bLoaded:
             

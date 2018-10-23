@@ -34,6 +34,15 @@ def draw_circle(img, x,y,radius, color='yellow', thick=3):
     if color == 'red':
         COLOR = (0,0,255)
     cv2.circle(img, (int(x), int(y)), int(radius), COLOR, thick)
+    return img
+
+def draw_ray(img, xy0,xy1,radius, color='yellow', thick=3):
+    COLOR = (0, 255, 255)
+    if color == 'blue':
+        COLOR = (255,0,0)
+    if color == 'red':
+        COLOR = (0,0,255)
+    cv2.line(img, xy0, xy1, COLOR, thick)
     
     return img
 

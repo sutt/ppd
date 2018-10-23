@@ -4,6 +4,7 @@ import cv2
 import imutils
 import argparse
 
+from DataSchemas import ScoreSchema
 import GlobalsC as g
 from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle)
 from ImgUtils import crop_img
@@ -80,6 +81,12 @@ class Display:
         self.roiRect = None
 
         self.roiRectScoring = None
+
+        #input: notes -> display
+        self.inputScore = ScoreSchema()
+
+        #output: display -> notes
+        self.outputScore = ScoreSchema()
 
         self.roiTrack = None
         self.circleTrack = None
@@ -180,28 +187,22 @@ class Display:
 
     def setScoring(self, frameScoring):
         ''' set roiRectScoring, is data is in correct form'''
-        #TODO-SS
         if frameScoring is None:
-            self.roiRectScoring = None
+            self.roiRectScoring = None  #Legacy-SS
+            self.inputScore.reset()
             return
-        try:
-            assert len(frameScoring) == 4
-            assert all( [isinstance(frameScoring[i], int) for i in range(4)] )
-        except:
-            self.roiRectScoring = None
-            return 
 
         self.roiRectScoring = frameScoring
+        
+        #TODO - objEnum
+        self.inputScore.load(frameScoring)
         self.scoreOn = True
     
     def getScoring(self, bNeedScore):
         ''' return the roiRect data '''
-        if not(bNeedScore):
-            return None
-        if self.roiRect is None:
-            return None
-        return copy.copy(self.roiRect)
-        #TODO-SS
+        if bNeedScore:
+            return self.outputScore.getAll()
+        return None
 
     def alterFrame(self):
         ''' make changes to frame, including resize. also, build zoomFrame and scoreFrame.
@@ -220,23 +221,32 @@ class Display:
         #     _color = 'blue' if self.circleTrack is not None else 'red'
         #     self.frame = draw_rect(self.frame, (2,2,10,10), color = _color)
 
-        if ((self.roiRectScoring is not None 
-            or self.circleTrack is not None)
-            and not(self.scoreOff)):
+        if not(self.scoreOff):
             
-            if self.roiRectScoring is not None:
-                protoZoomRect = self.roiRectScoring
+            protoZoomRect = None
+            
+            if self.outputScore.checkHasContents():
+                protoZoomRect = self.outputScore.getDefault()
                 zoomFct = 0.1
             
+            if self.inputScore.checkHasContents():
+                #input overwrites output
+                protoZoomRect = self.inputScore.getDefault()
+                zoomFct = 0.1
+                
             elif self.circleTrack is not None:
                 protoZoomRect = self.circleToRect(self.circleTrack)
                 zoomFct = 0.3   
 
+            if protoZoomRect is None:
+                self.scoreRect = None
             
-            if protoZoomRect[2] < 1 or protoZoomRect[3] < 1:
+            elif protoZoomRect[2] < 1 or protoZoomRect[3] < 1:
                 self.scoreRect = None
                 
             else:
+                
+                #TODO-SS: handle scoreRect with multiple Scorings
 
                 self.scoreRect =  self.rectOrigToMain(
                                     self.zoomInRect( protoZoomRect
@@ -320,62 +330,94 @@ class Display:
                                     ,thick = 1
                                     )
 
-        if self.roiSelected:
-            #TODO-SS
-            x, y, radius = self.rectToCircle(self.roiToMain())
+        if self.outputScore.checkHasContents():
             
-            self.frame = draw_circle(self.frame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'yellow'
-                                    ,thick = 3
-                                    )
+            self.drawOntoPane( frame=self.frame
+                              ,data=self.outputScore
+                              ,coordsRelative='origToMain'
+                              ,color='yellow'
+                              ,thick=3)
+            
             # because when mainwindow has resize, modulo might not be 0,
             # so roiToMain in that case isn't a perfect match. But for 640 1280 1920, 
             # they are perfect modulo, so it should be a match
 
-        if self.roiSelected and self.zoomOn:
-            
-            x, y, radius = self.rectToCircle(self.roiToZoom())
-            
-            self.zoomFrame = draw_circle(self.zoomFrame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'yellow'
-                                    ,thick = 1
-                                    )
+        # if self.roiSelected and self.zoomOn:
+        if self.outputScore.checkHasContents() and self.zoomOn:
+
+            self.drawOntoPane( frame=self.zoomFrame
+                              ,data=self.outputScore
+                              ,coordsRelative='origToZoom'
+                              ,color='yellow'
+                              ,thick=1)
             # because when zoomwindow has resize, modulo might not be 0,
             # but whether it is or isn't, is decided in buildZoomFrame()
             # with the choice of width
 
-        if self.roiRectScoring is not None:
-            #TODO-SS
-            #show scoring data from loaded framenotes
-            
-            x, y, radius = self.rectToCircle(self.roiToMain(b_scoring=True))
-            
-            self.frame = draw_circle(self.frame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'blue'
-                                    ,thick = 2
-                                    )
+        # if self.roiRectScoring is not None:
+        if self.inputScore.checkHasContents():
+
+            self.drawOntoPane( frame=self.frame
+                              ,data=self.inputScore
+                              ,coordsRelative='origToMain'
+                              ,color='blue'
+                              ,thick=2)
 
             
             if not(self.scoreOff):
-            
-                x, y, radius = self.rectToCircle(self.roiToScore(b_scoring=True))
+    
+                self.drawOntoPane(frame=self.scoreFrame
+                              ,data=self.inputScore
+                              ,coordsRelative='origToScore'
+                              ,color='blue'
+                              ,thick=1)
                 
-                self.scoreFrame = draw_circle(self.scoreFrame
-                                        ,x
-                                        ,y
-                                        ,radius
-                                        ,color = 'blue'
-                                        ,thick = 1
-                                        )
+
+    def drawOntoPane(self, frame, data, coordsRelative, color, thick):
+        ''' draw both circle and ray shapes within [score]data onto a frame here:
+
+                frame - (np.array) reference to the frame to be dwarn upon
+                data - (ScoreSchema) either inputScore or outputScore
+                coordsRelative (str) the type of coords transform to perform before draw
+                color (str), thick (int) - formatting params
+        '''
+
+        for _circleData in data.getListType('circle'):
+                
+            if coordsRelative == 'origToMain':
+                rect = self.roiToMain(input_rect = _circleData)
+            
+            elif coordsRelative == 'origToZoom':
+                rect = self.roiToZoom(input_rect = _circleData)
+
+            elif coordsRelative == 'origToScore':
+                rect = self.roiToScore(input_rect= _circleData, b_scoring=True)
+
+            x, y, radius = self.rectToCircle(rect)
+        
+            frame = draw_circle(frame
+                                ,x
+                                ,y
+                                ,radius
+                                ,color = color
+                                ,thick = thick
+                                )
+
+        for _rayData in data.getListType('ray'):
+                
+            
+            #TODO - add coordRelative switchstatement here:
+            xy0 = (self.scaleOrigToMain(x) for x in _rayData[0])
+            xy1 = (self.scaleOrigToMain(x) for x in  _rayData[1])
+        
+            frame = draw_ray(frame
+                            ,xy0
+                            ,xy1
+                            ,radius
+                            ,color = color
+                            ,thick = thick
+                            #TODO - bOffsetRay so you can see the motion blur
+                            )
 
     def adjustOrient(self):
         ''' rotate images here, to apply minimal amount of coord adjustment.
@@ -416,15 +458,12 @@ class Display:
             All data is relative to Orig frame size; so we need to
             convert to Main or convert to Zoom where nec.
         '''
-            
+        #TODO-SS: use drawOntoPane here
         if self.circleTrack is not None:
             
             rectOrig = self.circleToRect(self.circleTrack) 
             rectMain = self.roiToMain(input_rect = rectOrig)
             x, y, radius = self.rectToCircle(rectMain)
-            
-        if (self.circleTrack is not None 
-            or self.roiTrack is not None):
 
             self.frame = draw_circle(self.frame
                                     ,x
