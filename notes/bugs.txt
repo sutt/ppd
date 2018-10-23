@@ -38,13 +38,14 @@
 
         [ ] Additional Features:
             [ ] assign a particluar obj enum to be zoomed-in in scoreDisplay
+                [ ] call from cli, parser
 
         [ ] Refactors:
             [ ] remove roiRect, roiRectScoring
                 keep: scoreRect, zoomRect
 
         Manual Testing:
-            [ ] legacyload -output-> ScoreSchema
+            [ ] legacyload -output-> ScoreSchema (doesn't work)
             [ ] view multiple objects
             [ ] view ray object
             [ ] draw multiple object

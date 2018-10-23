@@ -126,7 +126,7 @@ class ScoreSchema:
         _score = {}
         _score['type'] = 'circle'
         _score['data'] = circleData
-        self.data[objEnum] = _score
+        self.data[str(objEnum)] = _score
         self.bHasContents = True
 
 
@@ -135,15 +135,15 @@ class ScoreSchema:
         _score = {}
         _score['type'] = 'ray'
         _score['data'] = rayData
-        self.data[objEnum] = _score
+        self.data[str(objEnum)] = _score
         self.bHasContents = True
 
 
     def addRayPoint(self, rayPoint, rayPointEnum, objEnum=0):
         
         b_exists = False
-        if self.data.get(objEnum, None) is not None:
-            b_exits = True
+        if self.data.get(str(objEnum), None) is not None:
+            b_exists = True
 
         b_overwrite = False
         try:
@@ -154,7 +154,7 @@ class ScoreSchema:
         
         if b_exists and not(b_overwrite):
             
-            _score = self.data[objEnum]
+            _score = self.data[str(objEnum)]
             _rayData = _score['data']
             _rayData[rayPointEnum] = rayPoint
             _score['data'] = _rayData
@@ -169,7 +169,7 @@ class ScoreSchema:
             _rayData[rayPointEnum] = rayPoint
             _score['data'] = _rayData
 
-        self.data[objEnum] = _score
+        self.data[str(objEnum)] = _score
 
 
     @staticmethod
@@ -206,7 +206,7 @@ class ScoreSchema:
                 firstKey = keys[0]
 
             except:
-                fristKey = 0
+                fristKey = '0'
             
             scoreDict = self.data.get(firstKey, None)
             

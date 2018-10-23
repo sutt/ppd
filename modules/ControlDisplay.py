@@ -6,7 +6,8 @@ import argparse
 
 from DataSchemas import ScoreSchema
 import GlobalsC as g
-from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle)
+from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle
+                        ,draw_ray)
 from ImgUtils import crop_img
 
 if False: from cv2 import *
@@ -412,15 +413,13 @@ class Display:
 
         for _rayData in data.getListType('ray'):
                 
-            
             #TODO - add coordRelative switchstatement here:
-            xy0 = (self.scaleOrigToMain(x) for x in _rayData[0])
-            xy1 = (self.scaleOrigToMain(x) for x in  _rayData[1])
+            xy0 = tuple(self.scaleOrigToMain(x) for x in _rayData[0])
+            xy1 = tuple(self.scaleOrigToMain(x) for x in  _rayData[1])
         
             frame = draw_ray(frame
                             ,xy0
                             ,xy1
-                            ,radius
                             ,color = color
                             ,thick = thick
                             #TODO - bOffsetRay so you can see the motion blur
@@ -671,13 +670,44 @@ class Display:
             rect = self.adjOrientationRect(rect, self.frame.shape[:2][::-1])
             
             if self.cmdSelectZoom:
+                #Bug- does this need rotate_bounds as below?
                 self.zoomRect = rect
                 self.zoomOn = True
                 self.resetOperators()
 
             if self.cmdSelectRoiMain:
                 self.frame = imutils.rotate_bound(self.frame, - self.orientation)
-                self.roiRect = self.rectMainToOrig(rect)
+                _roiRect = self.rectMainToOrig(rect)
+                
+                self.roiRect = _roiRect     #Legacy-SS
+                
+                if self.trackTypeEnum == 0:     #circle
+
+                    self.outputScore.addCircle( _roiRect
+                                                ,self.trackObjEnum
+                                              )
+
+                elif self.trackTypeEnum == 1:   #ray
+
+                    self.outputScore.addRayPoint(
+                                         rayPoint = self.centerPointFromRect(_roiRect)
+                                        ,rayPointEnum = 0
+                                        ,objEnum = self.trackObjEnum
+                                        )
+                    
+                    rect2 = cv2.selectROI(windowName, self.frame, True, False )
+                    rect2 = self.adjOrientationRect(rect2, self.frame.shape[:2][::-1])
+                    #?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)
+                    _roiRect2 = self.rectMainToOrig(rect2)
+
+                    self.outputScore.addRayPoint(
+                                         rayPoint = self.centerPointFromRect(_roiRect2)
+                                        ,rayPointEnum = 1
+                                        ,objEnum = self.trackObjEnum
+                                        )
+
+                    print self.outputScore.getAll()
+                
                 self.roiSelected = True
                 self.resetOperators()
         
@@ -1030,6 +1060,16 @@ class Display:
         dy = int(2 * radius)
 
         return (x0, y0, dx, dy)
+
+    @staticmethod
+    def centerPointFromRect(input_rect):
+        ''' takes:   relative-format rect (x,y,dx,dy )
+            returns: (x1,y1)
+        '''
+
+        x, y, dx, dy = copy.copy(input_rect)            
+
+        return (x + int(dx / 2), y + int(dy / 2))
 
 
 

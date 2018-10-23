@@ -178,6 +178,38 @@ def test_mergedict_3():
     assert out["1"]["data"] == [0,0,0,0]
     assert out["7"]["data"] == [1,1,1,1]
 
+def test_mergedict_4():
+    ''' does it add and update? '''
+
+    # overwrite + add
+    main = {
+                "0":{
+                    "type":"circle",
+                    "data": [202, 162, 48, 43]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [100, 162, 48, 43]
+                }
+			}
+
+    update = {
+                "1":{
+                    "type":"circle",
+                    "data": [0,0,0,0]
+                },
+                "7":{
+                    "type":"ray",
+                    "data": [1,1,1,1]
+                },
+			}
+
+    out = NotesFactory.mergeDicts(main, update, b_add=True)
+
+    
+    assert len(out.keys()) == 3
+    assert out["1"]["data"] == [0,0,0,0]
+    assert out["7"]["data"] == [1,1,1,1]
 
 
 if __name__ == "__main__":

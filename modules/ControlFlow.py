@@ -821,6 +821,8 @@ class NotesFactory:
         self.frameScoring.addCircle(scoringData)
 
     def setDisplayScoring(self, scoringData):
+        #TODO - reset here?
+        # self.displayFrameScoring.reset()
         self.displayFrameScoring.load(scoringData)
 
     def getOrientation(self):
@@ -992,14 +994,15 @@ class NotesFactory:
                 frameData = self.getFrameNoteCurrent()
 
 
-            if self.displayFrameScoring.checkHasContents() is not None:
+            if self.displayFrameScoring.checkHasContents():
 
-                #gui-cmd: writeFrame+Score - update scoring dict
+                #gui-cmd: writeFrame+Score - update/add-to scoring dict 
+                #note: if gui-cmd is not called, displayFrameScoring has no contents     
 
                 frameData['scoring'] = self.mergeDicts(
-                                             main = frameScoring.getAll()
-                                            ,update = displayFrameScoring.getAll()
-                                            ,b_add=True
+                                             main = self.getFrameScoreCurrent()
+                                            ,update = self.displayFrameScoring.getAll()
+                                            ,b_add = True
                                             )
 
             if self.bOverideFramenote:    
@@ -1007,9 +1010,9 @@ class NotesFactory:
                 #gui-cmd: writeFrame+Override - add/overwrite params from notepad
 
                 frameData = self.mergeDicts(
-                                         main=frameData
-                                        ,update=self.loadFramenoteOveride()
-                                        ,b_add=False
+                                         main = frameData
+                                        ,update = self.loadFramenoteOveride()
+                                        ,b_add = False
                                         )
         
         else:
