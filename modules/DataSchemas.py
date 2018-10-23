@@ -10,9 +10,20 @@ import copy
     [ ] Circle vs Ray Score types
     [ ] score_types as training vs challenge
 
-    [ ] Add score types to data
-    [ ] Add score type to gui
-    [ ] add a .reset() method
+    [x] Add score types to data
+    [x] Add score type to gui
+    [x] add a .reset() method
+    [ ] Annotate objects with objEnum on frame
+
+
+
+
+    Goal:
+        [ ] Build sample video with new capbilities:
+            [ ] three objects, ball and eye, and a ray for arm
+            [ ] some frames have only 1 or 2 object types
+
+            [ ] Replay that sample video, showing the scoring
     
     Notes:
         tagging #TODO-SS for relvant areas 
@@ -26,13 +37,32 @@ import copy
 class ScoreSchema:
 
     '''
-        Here we store (multiple) entrie(s) and query it when needed.
+        Here we store values for a frameNote or for Display-class scoring:
+
+        data: {
+        
+                objEnum (int): {
+
+                    type: (str)  "circle" or "ray"
+                    data: (list of int)
+                }
+        }
+
+            objEnum - 0 to 3, corresponds to distinct object being tracked
+            type - scoring type, a circle or a ray
+            data - data which represents the scores position:
+                for circle: a rect
+                for ray, a 2-ple of (x,y)'s
     '''
     
     def __init__(self):
         self.data = {}
         self.bLoaded = False
 
+    def reset(self):
+        self.data = {}
+        self.bLoaded = False
+    
     def load(self, objScoring):
         ''' load a dict object as data '''
         try:
@@ -41,39 +71,110 @@ class ScoreSchema:
             self.data = copy.deepcopy(objScoring)
             self.bLoaded = True
         except:
-            self.data = {}
-            self.bLoaded = False
+            try:
+                self.loadLegacy(objScoring)
+            except:
+                self.data = {}
+                self.bLoaded = False
 
     def loadLegacy(self, listScoring):
-        ''' load legacy score which is stored as list of 4 int's '''
+        ''' load legacy score which is type=circle and 
+            stored as list of 4 int's '''
         try:
             assert len(listScoring) == 4
             assert all( [isinstance(x, int) for x in listScoring])
-            self.data['1'] = copy.copy(listScoring)
+            self.addCircle(copy.copy(listScoring))
             self.bLoaded = True
         except:
             self.data = {}
             self.bLoaded = False
 
 
-    def add(self, newScore):
-        #add attributes this record
-        self.data['1'] = newScore
+    def add(self, scoreData, scoreType=None, objEnum=0):
+        ''' a generalized way to add to data '''
+        
+        if scoreData is None:
+            return
+        
+        if scoreType is None:
+            self.addCircle(scoreData, objEnum=objEnum)
+        elif scoreType == 'circle':
+            self.addCircle(scoreData, objEnum=objEnum)
+        elif scoreType == 'ray':
+            self.addRay(scoreData, objEnum=objEnum)
+        else:
+            print 'failed to find scoreType add() to scoreSchema'
+        
 
-    def addCircle(self, newCircle):
+    def addCircle(self, circleData, objEnum=0):
         ''' add a simple circle score'''
-        self.data['1'] = newCircle
+        _score = {}
+        _score['type'] = 'circle'
+        _score['data'] = circleData
+        self.data[objEnum] = _score
 
-    def addRay(self, newRayTuple):
+
+    def addRay(self, rayData):
+        _score = {}
+        _score['type'] = 'ray'
+        _score['data'] = rayData
+        self.data[objEnum] = _score
+
+    def addRayPoint(self, rayPoint, rayPointEnum, objEnum=0):
+        
+        b_exists = False
+        if self.data.get(objEnum, None) is not None:
+            b_exits = True
+
+        b_overwrite = False
+        try:
+            if self.data.get(objEnum).get('type') != 'ray':
+                b_overwrite = True
+        except:
+            pass
+        
+        if b_exists and not(b_overwrite):
+            _score = self.data[objEnum]
+            _rayData = _score['data']
+            _rayData[rayPointEnum] = rayPoint
+            _score['data'] = _rayData
+        else:
+            _score = {}
+            _score['type'] = 'ray'
+            _rayData = [None, None]
+            _rayData[rayPointEnum] = rayPoint
+            _score['data'] = _rayData
+
+        self.data[objEnum] = _score
+
+
+    @staticmethod
+    def _validateScoreEntry(scoreEntry):
+        ''' return True if valid scoreEntry '''
         pass
+
 
     def get(self, **kwargs):
         #select data record with certain attributes
-        return self.data['1']
+        return self.data[0]
 
     def getDefault(self):
-        if not(self.bLoaded):
-            return None
-        return self.data.get('1', None)
+        if self.bLoaded:
+            
+            try:
+                keys = self.data.keys()
+                keys.sort()
+                firstKey = keys[0]
+
+            except:
+                fristKey = 0
+            
+            scoreDict = self.data.get(firstKey, None)
+            
+            if scoreDict is not None:
+
+                return scoreDict.get('data', None)
+
+        return None
 
 

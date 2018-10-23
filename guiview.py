@@ -69,6 +69,8 @@ g.switchAlterParams = False
 g.switchResetParams = False
 g.duplicatesEnum = 0
 g.switchOverideNote = False
+g.trackObjEnum = 0
+g.trackTypeEnum = 0
 
 
 #High Level Options --------------------------
@@ -302,10 +304,12 @@ while(True):
         display.setCmd(cmdSelectZoom=g.switchZoom
                       ,cmdSelectRoiMain=g.switchRoiMain
                       ,cmdSelectRoiZoom=g.switchRoiZoom
+                      ,trackObjEnum=g.trackObjEnum
+                      ,trackTypeEnum=g.trackTypeEnum
                       ,windowTwo=g.windowTwo
                       ,windowThree=g.windowThree)
 
-        notesFactory.setCmd(switchOverideNote=g.switchOverideNote)
+        notesFactory.setCmd( switchOverideNote=g.switchOverideNote)
 
         outputFactory.setCmd(duplicatesEnum=g.duplicatesEnum
                             ,initWriteVid=g.initWriteVid

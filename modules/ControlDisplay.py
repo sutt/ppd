@@ -97,6 +97,10 @@ class Display:
         self.cmdSelectRoiMain = False
         self.cmdSelectRoiZoom = False
 
+        # what does hand-score represent:
+        self.trackObjEnum = 0   # objects: 0,1,2,3
+        self.trackTypeEnum = 0   # 0=circle, 1=ray
+
         self.windowTwo = True
         self.windowThree = True
 
@@ -135,6 +139,8 @@ class Display:
                 ,cmdSelectZoom=False
                 ,cmdSelectRoiMain=False
                 ,cmdSelectRoiZoom=False
+                ,trackObjEnum=0
+                ,trackTypeEnum=0
                 ,windowTwo=None
                 ,windowThree=None
                 ):
@@ -143,6 +149,9 @@ class Display:
         self.cmdSelectRoiMain = cmdSelectRoiMain
         self.cmdSelectRoiZoom = cmdSelectRoiZoom
 
+        self.trackObjEnum = trackObjEnum
+        self.trackTypeEnum = trackTypeEnum
+        
         if windowTwo is not None:
             self.windowTwo = windowTwo
         if windowThree is not None:
@@ -312,7 +321,7 @@ class Display:
                                     )
 
         if self.roiSelected:
-            
+            #TODO-SS
             x, y, radius = self.rectToCircle(self.roiToMain())
             
             self.frame = draw_circle(self.frame
@@ -342,7 +351,7 @@ class Display:
             # with the choice of width
 
         if self.roiRectScoring is not None:
-
+            #TODO-SS
             #show scoring data from loaded framenotes
             
             x, y, radius = self.rectToCircle(self.roiToMain(b_scoring=True))
@@ -605,6 +614,8 @@ class Display:
 
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
             
+            #TODO-SS two roi-events for ray
+            
             windowName = 'img_display'
             if self.orientation in (90,270): windowName += "_profile"    
 
@@ -633,6 +644,8 @@ class Display:
             key2 = cv2.waitKey(1) & 0xFF
 
         if self.zoomOn and self.cmdSelectRoiZoom and self.windowTwo:
+
+            #TODO-SS two roi-events for ray
             
             windowName = 'zoom_display'
             if self.orientation in (90,270): windowName += "_profile"    

@@ -55,6 +55,12 @@ class ConstructGui:
     def cmd_duplicates(self):
         g.duplicatesEnum = self.int_duplicates.get()
 
+    def cmd_objenum(self):
+        g.trackObjEnum = self.int_objenum.get()
+
+    def cmd_scoretypeenum(self):
+        g.trackTypeEnum = self.int_scoretypeenum.get()
+
     def cmd_play_sw(self):
         ''' play/pause '''
         if g.playOn:
@@ -253,6 +259,10 @@ class ConstructGui:
             ,command = self.cmd_selectzoom
             ).pack(side=tk.LEFT)
         
+        fselect_label = tk.Frame(root)
+        fselect_label.pack(side = tk.TOP)
+        tk.Label(fselect_label, text="selection controls:").pack(side=tk.LEFT)
+        
         fselect1 = tk.Frame(root)
         fselect1.pack(side = tk.TOP)
 
@@ -267,6 +277,70 @@ class ConstructGui:
             ,text = 'roi zoom <X>'
             ,command = self.cmd_selectroizoom
             ).pack(side=tk.LEFT)
+
+        fselect2 = tk.Frame(root)
+        fselect2.pack(side = tk.TOP)
+
+        self.int_objenum = tk.IntVar()
+        self.int_objenum.set(0)
+        
+        tk.Label(fselect2, text="obj enum:").pack(side=tk.LEFT)
+        tk.Radiobutton(
+             fselect2
+            ,text="0"
+            ,variable=self.int_objenum
+            ,value=0
+            ,command=self.cmd_objenum
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fselect2
+            ,text="1"
+            ,variable=self.int_objenum
+            ,value=1
+            ,command=self.cmd_objenum
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fselect2
+            ,text="2"
+            ,variable=self.int_objenum
+            ,value=2
+            ,command=self.cmd_objenum
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fselect2
+            ,text="3"
+            ,variable=self.int_objenum
+            ,value=3
+            ,command=self.cmd_objenum
+            ).pack(side=tk.LEFT)
+
+        fselect3 = tk.Frame(root)
+        fselect3.pack(side = tk.TOP)
+
+        self.int_scoretypeenum = tk.IntVar()
+        self.int_scoretypeenum.set(0) #TODO-SS
+        
+        tk.Label(fselect3, text="score type:").pack(side=tk.LEFT)
+        tk.Radiobutton(
+             fselect3
+            ,text="circle"
+            ,variable=self.int_scoretypeenum
+            ,value=0
+            ,command=self.cmd_scoretypeenum
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             fselect3
+            ,text="ray"
+            ,variable=self.int_scoretypeenum
+            ,value=1
+            ,command=self.cmd_scoretypeenum
+            ).pack(side=tk.LEFT)
+
+
 
         f_output_label = tk.Frame(root)
         f_output_label.pack(side = tk.TOP)

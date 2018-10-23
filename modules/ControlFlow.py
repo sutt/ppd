@@ -889,7 +889,7 @@ class NotesFactory:
             return None
         try:
             objScoring = ScoreSchema()
-            objScoring.loadLegacy(self.getFrameNoteCurrent().get('scoring', None))
+            objScoring.load(self.getFrameNoteCurrent().get('scoring', None))
             return objScoring.getDefault()
         except:
             return None

@@ -23,5 +23,7 @@ def init():
     global switchResetParams
     global duplicatesEnum
     global switchOverideNote
+    global trackObjEnum
+    global trackTypeEnum
     
 

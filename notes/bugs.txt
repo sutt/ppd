@@ -34,6 +34,8 @@
                 e.g. ball_occluded
             [ ] batch edit params in existing framenote
                 e.g. approx_distance
+            [ ] how you can run with track=on to see where it fails to find, 
+                and score that as a challenge frame
     
     [x] deleteframes script
     [~] undo button - remove previous frame written to output in vid, timelog, metalog
