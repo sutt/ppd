@@ -9,6 +9,8 @@ from modules.ControlFlow import DirectoryFactory
 from modules.ControlFlow import NotesFactory
 import modules.GlobalsC as g
 
+
+
 def test_recursekeys_1():
     
     nf = NotesFactory
@@ -90,14 +92,93 @@ def test_mergedict_2():
     out = NotesFactory.mergeDicts(main, update)
     
     assert out["key2"]["subB"] == 99
+    assert not("not a key" in out.keys())
 
+def test_mergedict_3():
+    ''' test how this works for ScoreSchema situtations '''
 
-#TODO-SS: test mergeDict on ScoreSchemas
+    # simple add record
+    main = {
+                "0":{
+                    "type":"circle",
+                    "data": [202, 162, 48, 43]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [100, 162, 48, 43]
+                }
+			}
 
+    update = {
+                "7":{
+                    "type":"circle",
+                    "data": [202, 162, 48, 43]
+                }
+			}
+
+    
+    out = NotesFactory.mergeDicts(main, update, b_add=True)
+    print out
+
+    assert all( [k in ("0", "1", "7") for k in out.keys()] )
+    assert out["7"]["data"] == [202, 162, 48, 43]
+
+    # overwrite record
+    main = {
+                "0":{
+                    "type":"circle",
+                    "data": [202, 162, 48, 43]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [100, 162, 48, 43]
+                }
+			}
+
+    update = {
+                "1":{
+                    "type":"ray",
+                    "data": [0,0,0,0]
+                }
+			}
+
+    out = NotesFactory.mergeDicts(main, update, b_add=True)
+
+    assert len(out.keys()) == 2
+    assert out["1"]["type"] == "ray"
+    assert out["1"]["data"] == [0,0,0,0]
+
+    # overwrite + add
+    main = {
+                "0":{
+                    "type":"circle",
+                    "data": [202, 162, 48, 43]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [100, 162, 48, 43]
+                }
+			}
+
+    update = {
+                "1":{
+                    "type":"ray",
+                    "data": [0,0,0,0]
+                },
+                "7":{
+                    "type":"ray",
+                    "data": [1,1,1,1]
+                },
+			}
+
+    out = NotesFactory.mergeDicts(main, update, b_add=True)
+
+    
+    assert len(out.keys()) == 3
+    assert out["1"]["data"] == [0,0,0,0]
+    assert out["7"]["data"] == [1,1,1,1]
 
 
 
 if __name__ == "__main__":
-
-    test_mergedict_2()
-
+    test_mergedict_3()

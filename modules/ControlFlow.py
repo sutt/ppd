@@ -999,14 +999,18 @@ class NotesFactory:
                 frameData['scoring'] = self.mergeDicts(
                                              main = frameScoring.getAll()
                                             ,update = displayFrameScoring.getAll()
+                                            ,b_add=True
                                             )
 
             if self.bOverideFramenote:    
                 
                 #gui-cmd: writeFrame+Override - add/overwrite params from notepad
 
-                frameOveride = self.loadFramenoteOveride()
-                frameData = self.mergeDicts(main=frameData, update=frameOveride)
+                frameData = self.mergeDicts(
+                                         main=frameData
+                                        ,update=self.loadFramenoteOveride()
+                                        ,b_add=False
+                                        )
         
         else:
 
@@ -1039,15 +1043,23 @@ class NotesFactory:
         assert 'scoring' not in baseFrameNote.keys()
         return baseFrameNote
 
-    
+    #TODO - refactor to separate module    
     @classmethod
-    def mergeDicts(cls, main, update):
-        ''' with terminal nodes in update(dict) overwrite the value at those
-            nodes in main(dict) if they exist:
+    def mergeDicts(cls, main, update, b_add=False):
+        ''' 
+            with terminal nodes in update(dict) overwrite the value at those
+            nodes in main(dict) if they exist, or add them if b_add=True:
+            
+            b_add=False:
                 main:   {"a": 1, "b": 2, "inner": {"z":1}} 
-                update: {"b":99, "inner":{"z": -99}}
-                ->     {"a": 1, "b": 99, "inner":{"z": -99}}
-            (main should have updates and adds but never deletes)
+                update: {"b":99, "inner":{"z": -99}, "x":-55}
+                ->      {"a": 1, "b": 99, "inner":{"z": -99}}
+            b_add=True:
+                main:   {"a": 1, "b": 2, "inner": {"z":1}} 
+                update: {"b":99, "inner":{"z": -99}, "x":-55}
+                ->      {"a": 1, "b": 99, "inner":{"z": -99}, "x":-55}
+            
+            (output should have updates and (possibly) adds but never deletes)
         '''
 
         try:
@@ -1060,6 +1072,10 @@ class NotesFactory:
         updateKeys, updateVals = cls.recurseKeys(update)
         
         newMain = cls.recurseUpdate(copy.deepcopy(main), updateKeys, updateVals)
+
+        if b_add:
+            
+            newMain = cls.recurseAdd(copy.deepcopy(main), updateKeys, updateVals)
 
         return  newMain
         
@@ -1098,6 +1114,7 @@ class NotesFactory:
     
     @classmethod
     def recurseUpdate(cls, inputDict, listKeys, listVals):
+        ''' only update if key is in inputDict '''
 
         if inputDict is None:
             return None
@@ -1121,6 +1138,30 @@ class NotesFactory:
                 else:
                     # main doesn't have that key
                     pass
+
+        return inputDict
+
+    @classmethod
+    def recurseAdd(cls, inputDict, listKeys, listVals):
+
+        if inputDict is None:
+            inputDict = {}
+
+        for _key, _val in zip(listKeys, listVals):
+
+            if isinstance(_key, list):
+                
+                _dict = cls.recurseAdd(  
+                                    copy.deepcopy(inputDict.get( _key[0], None))
+                                    , _key[1:]
+                                    , _val[1:]
+                                    )
+
+                inputDict[_key[0]] = _dict
+
+            else:
+                
+                inputDict[_key] = _val
 
         return inputDict
 

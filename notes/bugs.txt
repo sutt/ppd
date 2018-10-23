@@ -13,8 +13,16 @@
             in stub set a param on Display .bTesting
         [ ] profile startup time to reduce it (+ tests run faster?)
 
-    [ ] Other:
+    [ ] VScode/misc:
         [ ] indentation in controlflow_test.py is wrong; fix
+            maybe b/c copy from notepad a json?
+        [ ] can't step into import for debug controlflow_test.py
+            a cwd thing?
+        [ ] how to assign hotkeys to debug tasks?
+            [ ] launch a particular file
+            [ ] launch with
+            [ ] assign breakpoints before running debug
+            [ ] clear all breakpoints
 
 
 10/22
