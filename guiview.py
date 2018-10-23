@@ -244,11 +244,11 @@ while(True):
 
     notesFactory.loadMetaLog(directoryFactory.metalogPathFn())
 
-    notesFactory.setFrameLog(framelog_pathfn)
-
-    notesFactory.setShowScoring(b_showscoring)
+    notesFactory.setFrameLogInput(framelog_pathfn)
 
     display.setOrientation(notesFactory.getOrientation())
+
+    display.setShowScoring(b_showscoring)
 
     display.reset()
 
@@ -336,7 +336,9 @@ while(True):
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if outputFactory.checkWriteFrame():
         
-            notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
+            # notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
+            #Legacy-SS
+            notesFactory.setDisplayScoring(display.getScoring(outputFactory.needScore()))
             
             outputFactory.writeFrame(frame
                                     ,timeFactory.getLagtimeCurrent()
@@ -391,7 +393,8 @@ while(True):
             
             display.setScoring(notesFactory.getFrameScoreCurrent())
             
-            timeFactory.setScoringDelay(notesFactory.checkFrameHasScore())
+            timeFactory.setScoringDelay( notesFactory.checkFrameHasScore()
+                                        ,display.getShowScoring())
 
             display.alterFrame()
             display.drawOperators()

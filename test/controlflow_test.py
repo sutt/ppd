@@ -92,6 +92,10 @@ def test_mergedict_2():
     assert out["key2"]["subB"] == 99
 
 
+#TODO-SS: test mergeDict on ScoreSchemas
+
+
+
 
 if __name__ == "__main__":
 

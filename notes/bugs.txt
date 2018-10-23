@@ -13,6 +13,9 @@
             in stub set a param on Display .bTesting
         [ ] profile startup time to reduce it (+ tests run faster?)
 
+    [ ] Other:
+        [ ] indentation in controlflow_test.py is wrong; fix
+
 
 10/22
 
@@ -30,6 +33,7 @@
 
         [ ] Refactors:
             [ ] remove roiRect, roiRectScoring
+                keep: scoreRect, zoomRect
 
         Manual Testing:
             [ ] legacyload -output-> ScoreSchema
@@ -46,6 +50,7 @@
         [ ] output.writeFrame() should have separate arg for framenote scoring
         [ ] display.outputScore.reset() called
             [ ] needs to only reset other objects (?)
+        [ ] frameData json can't use int's for dict keys
 
 10/19
 

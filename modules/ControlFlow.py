@@ -387,8 +387,8 @@ class TimeFactory:
                 except:
                     self.advanceTimeT0 = 0
 
-    def setScoringDelay(self, bScoringData):
-        if not(bScoringData):
+    def setScoringDelay(self, bScoringData, bShowScoring):
+        if not(bScoringData) or not(bShowScoring):
             self.anyDelaySecs = self.delaySecs
         else:
             self.anyDelaySecs = self.delaySecsScoring
@@ -785,13 +785,11 @@ class NotesFactory:
         self.orientation = 0
         self.compression = -1
 
-        self.bShowScoring = False
-        self.bFrameNotes = True
         self.bOverideFramenote = False
-        self.framesData = []
         self.framesDataExisting = []
         self.frameInd = None
-        self.frameScoring = ScoreSchema()
+        self.frameScoring = ScoreSchema()   #Legacy-SS
+        self.displayFrameScoring = ScoreSchema()
         
         self.frameLogInputPathFn = None
         self.defaultLogFrameInputPathFn = "notes/guiview.jsonc"
@@ -799,8 +797,10 @@ class NotesFactory:
         self.defaultFrameNoteOveridePathFn = "notes/framenote-override.jsonc"
         
 
-    def setFrameLog(self, frameLogPathFn):
-        
+    def setFrameLogInput(self, frameLogPathFn):
+        ''' set the path to framelog input which is json template for creation
+            of frameData-dict'''
+
         if frameLogPathFn == "":
             self.frameLogInputPathFn = self.defaultLogFrameInputPathFn
         else:
@@ -808,22 +808,20 @@ class NotesFactory:
 
         try:
             _f = open(self.frameLogInputPathFn, 'r')
+            _f.close()
         except:
-            print 'couldnt open framelog'
+            print 'couldnt open frameLogInput at: ', frameLogPathFn
             self.frameLogInputPathFn = None
 
     
-    def resetFramesData(self):
-        self.framesData = []
-    
     def setFrameCurrent(self, frameInd):
         self.frameInd = frameInd
-
-    def setShowScoring(self, bShowScoring):
-        self.bShowScoring = bShowScoring
     
     def setScoring(self, scoringData):
         self.frameScoring.addCircle(scoringData)
+
+    def setDisplayScoring(self, scoringData):
+        self.displayFrameScoring.load(scoringData)
 
     def getOrientation(self):
         return self.orientation   #degrees clockwise
@@ -881,12 +879,13 @@ class NotesFactory:
             self.framesDataExisting = []
 
     def getFrameNoteCurrent(self):
-        return self.framesDataExisting[self.frameInd]
+        ''' return a dict representing frame data '''
+        try:   return self.framesDataExisting[self.frameInd]
+        except: return {}
 
-    def getFrameScoreCurrent(self, b_bypass=False):
-        ''' guiview calls this to check if there is a scoring event '''
-        if not(self.bShowScoring) and not(b_bypass):
-            return None
+    
+    def getFrameScoreCurrent(self):
+        ''' return the score or None. '''
         try:
             objScoring = ScoreSchema()
             objScoring.load(self.getFrameNoteCurrent().get('scoring', None))
@@ -896,9 +895,7 @@ class NotesFactory:
 
     def checkFrameHasScore(self):
         ''' return True is there's anything stored in framenote.scoring '''
-        if self.bShowScoring:
-            return self.getFrameNoteCurrent().get('scoring', None) is not None
-        return False
+        return self.getFrameNoteCurrent().get('scoring', None) is not None
 
     def getFrameType(self):
         try:
@@ -979,31 +976,46 @@ class NotesFactory:
 
 
     def getFrameData(self):
-        ''' return only current frameData; store all frame notes in outputFactory '''
+        ''' Return frameData. If no existing data, create new frameData-dict. If 
+            frameData already exists and was loaded; there are multiple opportunites
+            to update/add/delete the existing data here, based on gui-cmd's and
+            editing files in an editor. Data is ultimately consumed by output.
+        '''
 
         if self.isProcessed:
 
-            if self.frameNoteFailed:
-                frameData = self.getFrameNoteCurrent()
-            else:
+            if not(self.frameNoteFailed):
+                #override any param for this frame in notepad
                 frameData = self.loadFrameNoteInput()
+            else:
+                #couldnt find/open txt file; keep the same
+                frameData = self.getFrameNoteCurrent()
 
-            if self.frameScoring.getDefault() is not None:
-                #gui-cmd: writeFrame+Score
-                frameData['scoring'] = self.frameScoring.getDefault()
+
+            if self.displayFrameScoring.checkHasContents() is not None:
+
+                #gui-cmd: writeFrame+Score - update scoring dict
+
+                frameData['scoring'] = self.mergeDicts(
+                                             main = frameScoring.getAll()
+                                            ,update = displayFrameScoring.getAll()
+                                            )
 
             if self.bOverideFramenote:    
-                #gui-cmd: writeFrame+Override                
+                
+                #gui-cmd: writeFrame+Override - add/overwrite params from notepad
+
                 frameOveride = self.loadFramenoteOveride()
                 frameData = self.mergeDicts(main=frameData, update=frameOveride)
         
         else:
 
+            #frameData is new; load the framedata from txt file
             frameData = self.loadFrameLogCurrent()
             
             frameData['orig_vid_index'] = self.frameInd
 
-            frameData['scoring'] = self.frameScoring.getDefault()
+            frameData['scoring'] = self.displayFrameScoring.getAll()
 
         return frameData
 
@@ -1013,10 +1025,19 @@ class NotesFactory:
         try:
             del baseNote['frames']
         except:
-            #some metalogs don't have frames
-            pass  
+            pass  #some metalogs don't have frames
         assert 'frames' not in baseNote.keys()
         return baseNote
+
+    def getBaseFrameNote(self, frameNote):
+        
+        baseFrameNote = copy.deepcopy(frameNote)
+        try:
+            del baseFrameNote['scoring']
+        except:
+            pass  #some frameNotes don't have scoring
+        assert 'scoring' not in baseFrameNote.keys()
+        return baseFrameNote
 
     
     @classmethod
@@ -1026,6 +1047,7 @@ class NotesFactory:
                 main:   {"a": 1, "b": 2, "inner": {"z":1}} 
                 update: {"b":99, "inner":{"z": -99}}
                 ->     {"a": 1, "b": 99, "inner":{"z": -99}}
+            (main should have updates and adds but never deletes)
         '''
 
         try:

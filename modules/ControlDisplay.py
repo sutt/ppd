@@ -53,7 +53,7 @@ class Display:
         
         self.zoomOn = False
         self.scoreOn = False
-        self.scoreOff = False
+        self.scoreOff = False   #TODO - refactor to bShowScoring
         self.roiSelected = False
         self.orientChanged = False
         
@@ -80,7 +80,7 @@ class Display:
         # (x,y,w,h)
         self.roiRect = None
 
-        self.roiRectScoring = None
+        self.roiRectScoring = None  #Legacy-SS
 
         #input: notes -> display
         self.inputScore = ScoreSchema()
@@ -110,6 +110,7 @@ class Display:
 
         self.windowTwo = True
         self.windowThree = True
+        self.bShowScoring = False
 
         self.widthMainWindow = 640
         self.heightMainWindow = 480
@@ -141,6 +142,12 @@ class Display:
         self.scoreOff = scoreOff
         self.frameResize = frameResize
         self.frameAnnotateFn = frameAnnotateFn
+
+    def setShowScoring(self, bShowScoring):
+        self.bShowScoring = bShowScoring
+
+    def getShowScoring(self):
+        return self.bShowScoring
 
     def setCmd( self
                 ,cmdSelectZoom=False
@@ -192,7 +199,7 @@ class Display:
             self.inputScore.reset()
             return
 
-        self.roiRectScoring = frameScoring
+        self.roiRectScoring = frameScoring  #Legacy-SS
         
         #TODO - objEnum
         self.inputScore.load(frameScoring)
@@ -259,7 +266,7 @@ class Display:
             self.zoomFrame = self.buildZoomFrame()
             self.alterZoomFrame()
 
-        if self.scoreOn and not(self.scoreOff):
+        if self.scoreOn and not(self.scoreOff) and self.bShowScoring:
             self.scoreFrame = self.buildScoreFrame()
             self.alterScoreFrame()
             
@@ -355,7 +362,7 @@ class Display:
             # with the choice of width
 
         # if self.roiRectScoring is not None:
-        if self.inputScore.checkHasContents():
+        if self.inputScore.checkHasContents() and self.bShowScoring:
 
             self.drawOntoPane( frame=self.frame
                               ,data=self.inputScore
@@ -707,7 +714,7 @@ class Display:
             # we don't need to ensure modulo-zero here, that has already been 
             # enforced (or not) in the choice of zoomFrame-width in buildZoomFrame()
 
-        if self.scoreOn and self.windowThree and not(self.scoreOff):
+        if self.scoreOn and self.windowThree and not(self.scoreOff) and self.bShowScoring:
 
             windowName = 'score_display'
             if self.orientation in (90,270): windowName += "_profile"    
