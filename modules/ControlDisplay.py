@@ -399,7 +399,7 @@ class Display:
                 rect = self.roiToZoom(input_rect = _circleData)
 
             elif coordsRelative == 'origToScore':
-                rect = self.roiToScore(input_rect= _circleData, b_scoring=True)
+                rect = self.roiToScore(input_rect= _circleData)
 
             x, y, radius = self.rectToCircle(rect)
         
@@ -413,9 +413,16 @@ class Display:
 
         for _rayData in data.getListType('ray'):
                 
-            #TODO - add coordRelative switchstatement here:
-            xy0 = tuple(self.scaleOrigToMain(x) for x in _rayData[0])
-            xy1 = tuple(self.scaleOrigToMain(x) for x in  _rayData[1])
+            
+            if coordsRelative == 'origToMain':
+                xy0 = tuple(self.scaleOrigToMain(x) for x in _rayData[0])
+                xy1 = tuple(self.scaleOrigToMain(x) for x in _rayData[1])
+            elif coordsRelative == 'origToZoom':
+                xy0 = self.pointOrigToZoom(_rayData[0])
+                xy1 = self.pointOrigToZoom(_rayData[1])
+            elif coordsRelative == 'origToScore':
+                xy0 = self.pointOrigToScore(_rayData[0])
+                xy1 = self.pointOrigToScore(_rayData[1])
         
             frame = draw_ray(frame
                             ,xy0
@@ -676,19 +683,22 @@ class Display:
                 self.resetOperators()
 
             if self.cmdSelectRoiMain:
+                
                 self.frame = imutils.rotate_bound(self.frame, - self.orientation)
                 _roiRect = self.rectMainToOrig(rect)
                 
                 self.roiRect = _roiRect     #Legacy-SS
                 
-                if self.trackTypeEnum == 0:     #circle
+                if self.trackTypeEnum == 0:     
 
+                    #circle
                     self.outputScore.addCircle( _roiRect
                                                 ,self.trackObjEnum
                                               )
 
-                elif self.trackTypeEnum == 1:   #ray
-
+                elif self.trackTypeEnum == 1:   
+                    
+                    #ray
                     self.outputScore.addRayPoint(
                                          rayPoint = self.centerPointFromRect(_roiRect)
                                         ,rayPointEnum = 0
@@ -705,8 +715,6 @@ class Display:
                                         ,rayPointEnum = 1
                                         ,objEnum = self.trackObjEnum
                                         )
-
-                    print self.outputScore.getAll()
                 
                 self.roiSelected = True
                 self.resetOperators()
@@ -735,9 +743,38 @@ class Display:
             self.frame = imutils.rotate_bound(self.frame, -self.orientation)
             self.zoomFrame = imutils.rotate_bound(self.zoomFrame, -self.orientation)
             
-            rect = self.rectZoomToOrig(rect)
+            _roiRect = self.rectZoomToOrig(rect)
 
-            self.roiRect = rect 
+            self.roiRect = _roiRect 
+
+            if self.trackTypeEnum == 0:     
+
+                #circle
+                self.outputScore.addCircle( _roiRect
+                                            ,self.trackObjEnum
+                                            )
+
+            elif self.trackTypeEnum == 1:   
+                
+                #ray
+                self.outputScore.addRayPoint(
+                                     rayPoint = self.centerPointFromRect(_roiRect)
+                                    ,rayPointEnum = 0
+                                    ,objEnum = self.trackObjEnum
+                                    )
+                
+                rect2 = cv2.selectROI(windowName, self.zoomFrame, True, False )
+
+                rect2 = self.adjOrientationRect(rect2, self.zoomFrame.shape[:2][::-1])
+                
+                _roiRect2 = self.rectZoomToOrig(rect2)
+
+                self.outputScore.addRayPoint(
+                                     rayPoint = self.centerPointFromRect(_roiRect2)
+                                    ,rayPointEnum = 1
+                                    ,objEnum = self.trackObjEnum
+                                    )
+                                    
             self.roiSelected = True
             self.resetOperators()
 
@@ -825,7 +862,7 @@ class Display:
         return rectZoom
 
     def roiToScore(self, b_scoring=False, input_rect=None):
-        ''' return a relative-rect roi relative to zoom-window coord's.
+        ''' return a relative-rect roi relative to score-window coord's.
                 (there's cropping and stretching.)
                 (we don't assume it is modulo-zero; but if it is, 
                  this function should preserve that.)
@@ -968,6 +1005,20 @@ class Display:
         y = coord_xy[1] + self.zoomRect[1]
 
         return x,y
+
+    def pointOrigToZoom(self, xy):
+        ''' given point in coords-relative-to-rect, return point relative-to-zoom'''
+        _xy = tuple(self.scaleOrigToMain(x) for x in xy)
+        _xy = tuple(map(int, self.coordMainToZoom(_xy)))
+        _xy = tuple(self.scaleMainToZoom(x) for x in _xy)
+        return _xy
+    
+    def pointOrigToScore(self, xy):
+        ''' given point in coords-relative-to-rect, return point relative-to-score'''
+        _xy = tuple(self.scaleOrigToMain(x) for x in xy)
+        _xy = tuple(map(int, self.coordMainToScore(_xy)))
+        _xy = tuple(self.scaleMainToScore(x) for x in _xy)
+        return _xy
 
     def scaleOrigToMain(self, val):
         ''' convert val (an integer) from origFrame to (potentially resized) 

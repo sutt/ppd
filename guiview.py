@@ -336,8 +336,6 @@ while(True):
         outputFactory.setWriteFrameCmd(frameFactory.checkWriteFrame())
         if outputFactory.checkWriteFrame():
         
-            # notesFactory.setScoring(display.getScoring(outputFactory.needScore()))
-            #Legacy-SS
             notesFactory.setDisplayScoring(display.getScoring(outputFactory.needScore()))
             
             outputFactory.writeFrame(frame

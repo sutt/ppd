@@ -1,6 +1,52 @@
 #Tasks
 
+10/24
+
+    [x] finish display.show() roi Zoom
+    [x] display.drawOntoPane() add coordRelative switch statement
+    [ ] selectROI for ray should be selectFromCenter = True (4 places to ammend code in display.show())
+    [ ] remove Legacy-SS
+    [ ] scoreRect for rays, scoreRect for dif objEnum's
+    [ ] build new demo-proc's with scoringschema in their metalog
+
+    [ ] investigate "#Bug- does this need rotate_bounds as below?"
+    [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"
+
+    [ ] annotate enums to obj's
+
+    Notes:
+        display.roiRect holds display.outputScore (hand drawn markers)
+        display.roiRectScoring holds displau.inputScore (read from notes)
+
 10/23
+
+    [ ] Enumerate Tests:
+        
+        Display:
+            types of tests / questions:
+                - Compare image ANSWER to method result
+                    for drawing, zooming, cropping, etc
+                - How to avoid selectRoi?
+
+            test instances:
+                [ ] Test zoom on rotation, is zoomFrame correct?
+                [ ] draw_ray w/w/o bOffset
+        
+        guirecord <-> guiview
+        [ ] record -> benchmark -> view (tests encoding/decoding codec)
+        [ ] create synthetic benchmark: np.zeros(x,x,x)+cv2.draw and then load
+
+        [ ] writeFrame bDuplicate overriding frameData w/w/o score
+        [ ] scoring output
+            [ ] just from display
+            [ ] just from notes
+            [ ] a merge of notes and display (update/add)
+        [ ] modulo zero stuff
+
+    328e4adf
+    79e31b0b
+
+
 
     [ ] Misc Thoughts:
         [ ] All those imports needed in guiview?
@@ -33,7 +79,7 @@
         [x] Run thru with same functionality
         [ ] Add functionality:
             [x] Draw multiple objects/object-types from inputScore/outputScore
-            [ ] Assign multiple object/object-types with gui+display
+            [x] Assign multiple object/object-types with gui+display
             [ ] add scoreSchema to TrackFactory, and then to display.drawTrackers()
 
         [ ] Additional Features:

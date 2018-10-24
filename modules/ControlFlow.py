@@ -816,14 +816,11 @@ class NotesFactory:
     
     def setFrameCurrent(self, frameInd):
         self.frameInd = frameInd
-    
-    def setScoring(self, scoringData):
-        self.frameScoring.addCircle(scoringData)
+
 
     def setDisplayScoring(self, scoringData):
-        #TODO - reset here?
-        # self.displayFrameScoring.reset()
         self.displayFrameScoring.load(scoringData)
+        # if scoringData is None, displayFrameScoring get's reset
 
     def getOrientation(self):
         return self.orientation   #degrees clockwise

@@ -147,7 +147,7 @@ class ScoreSchema:
 
         b_overwrite = False
         try:
-            if self.data.get(objEnum).get('type') != 'ray':
+            if self.data.get(str(objEnum), {}).get('type') != 'ray':
                 b_overwrite = True
         except:
             pass
