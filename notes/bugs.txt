@@ -3,20 +3,22 @@
 10/25
     [x] cli for obj to show in score_display
         [x] does this throw an error if object is wrong?
-    [ ] what happens when ray is vetical, does the resize by width make it too big?
-        [ ] test this
+    [ ] vertical score_display is too large
+        [x] test this
+        [ ] fix this
 
 10/24
 
     [x] finish display.show() roi Zoom
     [x] display.drawOntoPane() add coordRelative switch statement
     [ ] selectROI for ray should be selectFromCenter = True (4 places to ammend code in display.show())
-    [ ] remove Legacy-SS
+    [x] remove Legacy-SS
     [x] scoreRect for rays, scoreRect for dif objEnum's
     [ ] build new demo-proc's with scoringschema in their metalog
 
     [ ] investigate "#Bug- does this need rotate_bounds as below?"
     [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"
+    [ ] investigate "#BUG-check if zoomRect is in bounds in new video"
 
     [ ] annotate enums to obj's
 

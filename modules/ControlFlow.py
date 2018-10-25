@@ -788,7 +788,6 @@ class NotesFactory:
         self.bOverideFramenote = False
         self.framesDataExisting = []
         self.frameInd = None
-        self.frameScoring = ScoreSchema()   #Legacy-SS
         self.displayFrameScoring = ScoreSchema()
         
         self.frameLogInputPathFn = None

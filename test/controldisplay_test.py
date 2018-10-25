@@ -159,5 +159,28 @@ def test_mindimsforrect_6():
     assert out == (620, 100, 20, 100)
 
 
+def test_display_rectToCircle():
+    
+    rect = (0,0,10,10)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 5
+    assert y == 5 
+    assert r == 5
+
+    rect = (2,1,10,12)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 7
+    assert y == 7 
+    assert r == 5
+
+    rect = (2,1,11,12)
+    x,y,r = Display.rectToCircle(rect)
+
+    assert x == 7
+    assert y == 7 
+    assert r == 5
+
 if __name__ == "__main__":
     test_mindimsforrect_1()

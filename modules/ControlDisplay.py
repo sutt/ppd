@@ -17,9 +17,7 @@ if False: from cv2 import *
 
 Features: 
 
-    [x] Gui for Tracking
-
-    [~] Control Agenda box with keys
+    [ ] New resize method for when score_display wants to be vertical
 
 Refactors:
 
@@ -36,6 +34,8 @@ Bugs:
     [ ] how to cancel an roi request?
     [ ] on --file, after reopen file zoomOn is off so zoom_display is frozen
     [ ] can't z/x zoom unzoom with tracking roi
+    [ ] in a --dir run, old zoomframe can be OOB for new vid's frames
+        "#BUG-check if zoomRect is in bounds in new video"
 
 
 
@@ -76,12 +76,6 @@ class Display:
         #scoreRect formatted like zoomRect, but is for current-tracking-roi
         # and for scoring-roi from metalog
         self.scoreRect = None
-        
-        #roiRect in coords relative to origFrame; relative-rect format
-        # (x,y,w,h)
-        self.roiRect = None         #Legacy-SS
-
-        self.roiRectScoring = None  #Legacy-SS
 
         #input: notes -> display
         self.inputScore = ScoreSchema()
@@ -134,9 +128,10 @@ class Display:
         self.scoreDisplayObjEnum = int(scoreDisplayObjEnum)
 
     def reset(self):
+        self.inputScore.reset()
         # self.zoomOn = False
-        self.roiRectScoring = None
-
+        #BUG-check if zoomRect is in bounds in new video
+        
     def setInit( self
                 ,showOn=True
                 ,scoreOff=False
@@ -202,15 +197,11 @@ class Display:
         self.annotateMsg = copy.copy(msg)
 
     def setScoring(self, frameScoring):
-        ''' set roiRectScoring, is data is in correct form'''
+        ''' set roiRectScoring, if data is in correct form'''
         if frameScoring is None:
-            self.roiRectScoring = None  #Legacy-SS
             self.inputScore.reset()
             return
-
-        self.roiRectScoring = frameScoring  #Legacy-SS
         
-        #TODO - objEnum
         self.inputScore.load(frameScoring)
         self.scoreOn = True
     
@@ -696,8 +687,6 @@ class Display:
                 self.frame = imutils.rotate_bound(self.frame, - self.orientation)
                 _roiRect = self.rectMainToOrig(rect)
                 
-                self.roiRect = _roiRect     #Legacy-SS
-                
                 if self.trackTypeEnum == 0:     
 
                     #circle
@@ -753,8 +742,6 @@ class Display:
             self.zoomFrame = imutils.rotate_bound(self.zoomFrame, -self.orientation)
             
             _roiRect = self.rectZoomToOrig(rect)
-
-            self.roiRect = _roiRect 
 
             if self.trackTypeEnum == 0:     
 
@@ -824,37 +811,25 @@ class Display:
     # main helpers ---------------------
     # (roiRect (which is relative to origFrame coors) <-> to main/zoom)
 
-    def roiToMain(self, b_scoring=False, input_rect=None):
+    def roiToMain(self, input_rect):
         ''' return relative-rect roi relative to main-window coord's.
                 (since there's no cropping, we only stretch.)
                 (we expect the stretch to be modulo-zero as 
                  640 1280 1920 are multiple )
         '''
-        rect = copy.copy(self.roiRect)
-        
-        if b_scoring:
-            rect = copy.copy(self.roiRectScoring)
-
-        if input_rect is not None:
-            rect = copy.copy(input_rect)
+        rect = copy.copy(input_rect)
 
         rectMain = tuple(map(self.scaleOrigToMain, rect))
         
         return rectMain
 
-    def roiToZoom(self, b_scoring=False, input_rect=None):
+    def roiToZoom(self, input_rect):
         ''' return a relative-rect roi relative to zoom-window coord's.
                 (there's cropping and stretching.)
                 (we don't assume it is modulo-zero; but if it is, 
                  this function should preserve that.)
         '''
-        rect = copy.copy(self.roiRect)
-
-        if b_scoring:
-            rect = copy.copy(self.roiRectScoring)
-
-        if input_rect is not None:
-            rect = copy.copy(input_rect)
+        rect = copy.copy(input_rect)
         
         #orig->main
         x0, y0, dx, dy = map(self.scaleOrigToMain, rect)  
@@ -870,19 +845,13 @@ class Display:
         
         return rectZoom
 
-    def roiToScore(self, b_scoring=False, input_rect=None):
+    def roiToScore(self, input_rect):
         ''' return a relative-rect roi relative to score-window coord's.
                 (there's cropping and stretching.)
                 (we don't assume it is modulo-zero; but if it is, 
                  this function should preserve that.)
         '''
-        rect = copy.copy(self.scoreRect)
-
-        if b_scoring:
-            rect = copy.copy(self.roiRectScoring)
-
-        if input_rect is not None:
-            rect = copy.copy(input_rect)
+        rect = copy.copy(input_rect)
         
         #orig->main
         x0, y0, dx, dy = map(self.scaleOrigToMain, rect)  
@@ -1263,143 +1232,5 @@ class Display:
         modified_rect = map(int, modified_rect)
         
         return tuple(modified_rect)
-
-        
-
-
-        
-
-
-
-if __name__ == "__main__" and False:
-    
-    display = Display()
-    display.setInit(showOn=True, frameResize=True, frameAnnotateFn=True)
-    
-    vidPathFn = "../data/proc/hello-training-data/output4.avi"
-    vidPathFn = "../data/proc/hello-training-data/output7.avi"
-    cam = cv2.VideoCapture(vidPathFn)
-
-    ret, frame = cam.read()
-
-    display.setFrame(frame)
-    display.setAnnotateMsg("dummy")
-    display.alterFrame()
-    display.zoomOn = True
-
-    cmdSelectZoom = False
-    cmdSelectRoiMain = False
-    cmdSelectRoiZoom = False
-
-    display.zoomOn = True   #debugZoom
-
-    i = 0
-    while(True):
-
-        #to debug pause and set these in console
-        display.setCmd(cmdSelectZoom=cmdSelectZoom
-                        ,cmdSelectRoiMain=cmdSelectRoiMain
-                        ,cmdSelectRoiZoom=cmdSelectRoiZoom
-                        )
-        
-        display.alterFrame()
-        
-        display.drawOperators()
-        
-        display.show()
-        
-        i += 1
-        if i % 5*10**3 == 0:
-            
-            display.rectZoom = (20,20, 40,40)   #debugZoom
-        #     print 'cmdSelectZoom'
-        #     display.setCmd(cmdSelectZoom=True)
-        
-
-    cv2.destroyAllWindows()
-
-
-
-
-def test_display_rectToCircle():
-    
-    rect = (0,0,10,10)
-    x,y,r = Display.rectToCircle(rect)
-
-    assert x == 5
-    assert y == 5 
-    assert r == 5
-
-    rect = (2,1,10,12)
-    x,y,r = Display.rectToCircle(rect)
-
-    assert x == 7
-    assert y == 7 
-    assert r == 5
-
-    rect = (2,1,11,12)
-    x,y,r = Display.rectToCircle(rect)
-
-    assert x == 7
-    assert y == 7 
-    assert r == 5
-
-def test_display_zoom1():
-    ''' test how image resizing works '''
-    pass
-    
-    # assert img.shape == (320, 240)
-
-def test_display_zoom_crop_1():
-    ''' send picture data thru, see the transforms '''
-    
-    #test data
-    X,Y = 480,640
-    x0,x1 = 150,250
-    y0,y1= 300,400
-
-    rect = (x0,y0,x1,y1)
-    img = np.zeros(shape=(X,Y,3))
-    img = np.array(img, dtype=np.uint8)
-    for x in range(x0,x1):
-        for y in range (y0,y1):
-            img[x,y] = np.array([255,255,255] ,dtype=np.uint8)
-
-    #dont even need the actual image here; just go off roiRect
-
-    ZOOM = (100,100,200,200)
-    ROI = (150, 200, 120, 170)
-    
-    display = Display()
-    display.setInit(showOn=True)
-    display.setFrame(img)
-    display.zoomOn = True
-    display.zoomRect = ZOOM
-    display.roiRect = ROI
-    display.resetOperators()
-    
-    x0, y0, dx, dy = copy.copy(ROI)
-    x0,y0 = display.coordMainToZoom((x0,y0))
-    x0,y0 = display.scaleMainToZoom(x0), display.scaleMainToZoom(y0)
-    dx, dy = display.scaleMainToZoom(dx), display.scaleMainToZoom(dy)
-    rectZoom = (x0, y0, dx, dy)
-
-    display.drawOperators()
-    while(True):
-        display.show()
-
-    assert rectZoom == (1)
-
-
-if __name__ == "__main__":
-    pass
-    # test_display_zoom_crop_1()
-    # test_rotate_1()
-
-    #resizeIt
-    #cropIt 
-    #roiSelectIt, 
-    
-    # assert all([pix == (255,255,255)  for pix in cropped_region])
 
     
