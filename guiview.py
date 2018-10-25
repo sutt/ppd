@@ -85,6 +85,7 @@ str_test = ""
 b_show = True
 framelog_pathfn = ""
 b_showscoring = False
+i_scoringenum = 0
 f_scoredelay = 1.0
 b_scoreoff = False
 b_output_tracktimer = False
@@ -103,6 +104,7 @@ ap.add_argument("--noshow", action="store_true", default=False)
 ap.add_argument("--output", type=str, default="")
 ap.add_argument("--framelog", type=str, default="")
 ap.add_argument("--showscoring", action="store_true", default=False)
+ap.add_argument("--scoringenum", type=str, default="")
 ap.add_argument("--scoreoff", action="store_true", default=False)
 ap.add_argument("--track", action="store_true", default=False)
 ap.add_argument("--startplay", action="store_true", default=False)
@@ -173,6 +175,10 @@ if args["dontload"]:
 
 if args["showscoring"]:
     b_showscoring = True
+    
+if args["scoringenum"] != "":
+        try: i_scoringenum = int(args["scoringenum"])
+        except: pass
 
 if args["scoreoff"]:
     # suppress zoom window from automatically popping up 
@@ -249,6 +255,8 @@ while(True):
     display.setOrientation(notesFactory.getOrientation())
 
     display.setShowScoring(b_showscoring)
+
+    display.setScoreDisplayObjEnum(i_scoringenum)
 
     display.reset()
 

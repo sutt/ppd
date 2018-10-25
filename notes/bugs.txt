@@ -1,12 +1,18 @@
 #Tasks
 
+10/25
+    [x] cli for obj to show in score_display
+        [x] does this throw an error if object is wrong?
+    [ ] what happens when ray is vetical, does the resize by width make it too big?
+        [ ] test this
+
 10/24
 
     [x] finish display.show() roi Zoom
     [x] display.drawOntoPane() add coordRelative switch statement
     [ ] selectROI for ray should be selectFromCenter = True (4 places to ammend code in display.show())
     [ ] remove Legacy-SS
-    [ ] scoreRect for rays, scoreRect for dif objEnum's
+    [x] scoreRect for rays, scoreRect for dif objEnum's
     [ ] build new demo-proc's with scoringschema in their metalog
 
     [ ] investigate "#Bug- does this need rotate_bounds as below?"
@@ -60,10 +66,10 @@
         [ ] profile startup time to reduce it (+ tests run faster?)
 
     [ ] VScode/misc:
-        [ ] indentation in controlflow_test.py is wrong; fix
+        [~] indentation in controlflow_test.py is wrong; fix
             maybe b/c copy from notepad a json?
-        [ ] can't step into import for debug controlflow_test.py
-            a cwd thing?
+        [x] can't step into import for debug controlflow_test.py
+            a cwd thing? no: we need to copy test function to root level to get debug
         [ ] how to assign hotkeys to debug tasks?
             [ ] launch a particular file
             [ ] launch with
@@ -83,29 +89,29 @@
             [ ] add scoreSchema to TrackFactory, and then to display.drawTrackers()
 
         [ ] Additional Features:
-            [ ] assign a particluar obj enum to be zoomed-in in scoreDisplay
-                [ ] call from cli, parser
+            [x] assign a particluar obj enum to be zoomed-in in scoreDisplay
+                [x] call from cli, parser
 
         [ ] Refactors:
             [ ] remove roiRect, roiRectScoring
                 keep: scoreRect, zoomRect
 
         Manual Testing:
-            [ ] legacyload -output-> ScoreSchema (doesn't work)
-            [ ] view multiple objects
-            [ ] view ray object
-            [ ] draw multiple object
-            [ ] draw ray object
+            [~] legacyload -output-> ScoreSchema (doesn't work)
+            [x] view multiple objects
+            [x] view ray object
+            [x] draw multiple object
+            [x] draw ray object
             [ ] view multi and single scores
                 [ ] add a new score obj
                 [ ] overwrite existing scores
             [ ] view trackers as scoreSchema
         
         Bugs/Refactor:
-        [ ] output.writeFrame() should have separate arg for framenote scoring
-        [ ] display.outputScore.reset() called
-            [ ] needs to only reset other objects (?)
-        [ ] frameData json can't use int's for dict keys
+        [~] output.writeFrame() should have separate arg for framenote scoring
+        [x] display.outputScore.reset() called
+            [x] needs to only reset other objects (?)
+        [x] frameData json can't use int's for dict keys
 
 10/19
 
@@ -130,6 +136,7 @@
                 e.g. approx_distance
             [ ] how you can run with track=on to see where it fails to find, 
                 and score that as a challenge frame
+            [ ] deleteframes.py script
     
     [x] deleteframes script
     [~] undo button - remove previous frame written to output in vid, timelog, metalog

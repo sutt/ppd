@@ -122,16 +122,16 @@ class ScoreSchema:
         
 
     def addCircle(self, circleData, objEnum=0):
-        ''' add a simple circle score'''
+        ''' add a circle score. data format: (x,y,w,h) '''
         _score = {}
         _score['type'] = 'circle'
-        _score['data'] = circleData
+        _score['data'] = circleData         
         self.data[str(objEnum)] = _score
         self.bHasContents = True
 
 
     def addRay(self, rayData):
-        ''' add a ray score '''
+        ''' add a ray score. data format: ((x0,y0), (x1,y1))'''
         _score = {}
         _score['type'] = 'ray'
         _score['data'] = rayData
@@ -140,7 +140,10 @@ class ScoreSchema:
 
 
     def addRayPoint(self, rayPoint, rayPointEnum, objEnum=0):
-        
+        ''' for adding a ray object, but with only 1 point 
+            available at the time. note: we want a convention
+            on whether point 0 is start or end of bounce '''
+
         b_exists = False
         if self.data.get(str(objEnum), None) is not None:
             b_exists = True
@@ -177,13 +180,39 @@ class ScoreSchema:
         ''' return True if valid scoreEntry '''
         pass
 
-    #TODO - getRect() return that enclosing rect for any type of score
+    def getObjRect(self, objEnum):
+        ''' return relative rect bounding score-obj'''
 
-    #TODO - numObjs()
+        _data = self.data.get(str(objEnum), {}).get('data', None)
+        _type = self.data.get(str(objEnum), {}).get('type', None)
+        
+        if _data is None or _type is None: 
+            return None
 
-    def get(self, **kwargs):
-        #select data record with certain attributes
-        return self.data[0]
+        if _type == 'circle':
+            return tuple(_data)
+
+        minX = min(_data, key=lambda elem: elem[0])[0]
+        maxX = max(_data, key=lambda elem: elem[0])[0]
+        minY = min(_data, key=lambda elem: elem[1])[1]
+        maxY = max(_data, key=lambda elem: elem[1])[1]
+
+        x, y = minX, minY
+        dx = max(maxX - minX, 1)
+        dy = max(maxY - minY, 1)
+
+        return (x, y, dx, dy)
+
+    
+    def getNumObjs(self):
+        try: return len(self.data.keys())
+        except: return 0
+
+    def get(self, objEnum=0):
+        return self.data.get(str(objEnum), None)
+
+    def getData(self, objEnum=0):
+        return self.data.get(str(objEnum),{}).get('data', None)
 
     def getAll(self):
         if self.data == {}:
@@ -198,6 +227,8 @@ class ScoreSchema:
         return listCircles
     
     def getDefault(self):
+        ''' legacy method, should not be used except for convenience'''
+
         if self.bLoaded:
             
             try:
@@ -217,3 +248,47 @@ class ScoreSchema:
         return None
 
 
+def test_getObjRect_1():
+    
+    score = {
+                "0":{
+                    "type":"ray",
+                    "data": [[100,50], [200, 75]]
+                },
+                "1":{
+                    "type":"ray",
+                    "data": [[200, 75], [100,50]]
+                }
+			}
+
+    ss = ScoreSchema()
+    ss.load(score)
+
+    assert ss.getObjRect(0) == ss.getObjRect(1)
+
+    assert ss.getObjRect(0) == (100, 50, 100, 25)
+
+    score = {
+                "0":{
+                    "type":"ray",
+                    "data": [[100,50], [200, 25]]
+                }
+			}
+
+    ss.load(score)
+
+    ss.getObjRect(0) == (100, 25, 100, 25)
+
+def test_getObjRect_2():
+    
+    score = {
+                "1":{
+                    "type":"circle",
+                    "data": [100,50, 99, 99]
+                }
+			}
+
+    ss = ScoreSchema()
+    ss.load(score)
+
+    assert ss.getObjRect(1) == (100, 50, 99, 99)

@@ -17,9 +17,9 @@ if False: from cv2 import *
 
 Features: 
 
-    [ ] Gui for Tracking
+    [x] Gui for Tracking
 
-    [ ] Control Agenda box with keys
+    [~] Control Agenda box with keys
 
 Refactors:
 
@@ -79,7 +79,7 @@ class Display:
         
         #roiRect in coords relative to origFrame; relative-rect format
         # (x,y,w,h)
-        self.roiRect = None
+        self.roiRect = None         #Legacy-SS
 
         self.roiRectScoring = None  #Legacy-SS
 
@@ -113,6 +113,8 @@ class Display:
         self.windowThree = True
         self.bShowScoring = False
 
+        self.scoreDisplayObjEnum = 2
+
         self.widthMainWindow = 640
         self.heightMainWindow = 480
         self.widthZoomWindow = 320
@@ -127,6 +129,9 @@ class Display:
             self.orientation = 0
         else:
             self.orientation = iOrientation
+
+    def setScoreDisplayObjEnum(self, scoreDisplayObjEnum):
+        self.scoreDisplayObjEnum = int(scoreDisplayObjEnum)
 
     def reset(self):
         # self.zoomOn = False
@@ -189,6 +194,9 @@ class Display:
 
     def getOrigFrame(self):
         return self.origFrame
+
+    def getOrigFrameDims(self):
+        return self.origFrame.shape[:2]
     
     def setAnnotateMsg(self, msg):
         self.annotateMsg = copy.copy(msg)
@@ -233,16 +241,19 @@ class Display:
             
             protoZoomRect = None
             
-            if self.outputScore.checkHasContents():
-                protoZoomRect = self.outputScore.getDefault()
-                zoomFct = 0.1
-            
-            if self.inputScore.checkHasContents():
-                #input overwrites output
-                protoZoomRect = self.inputScore.getDefault()
+            if self.inputScore.getData(self.scoreDisplayObjEnum) is not None:
+                
+                protoZoomRect = self.inputScore.getObjRect(self.scoreDisplayObjEnum)
+                
+                protoZoomRect = self.minDimsForRect(
+                                                    protoZoomRect
+                                                    ,self.getOrigFrameDims()
+                                                    ,min_scalar_width = 10
+                                                    ,max_multiple_width = 3
+                                                    )
                 zoomFct = 0.1
                 
-            elif self.circleTrack is not None:
+            elif self.circleTrack is not None:    
                 protoZoomRect = self.circleToRect(self.circleTrack)
                 zoomFct = 0.3   
 
@@ -253,8 +264,6 @@ class Display:
                 self.scoreRect = None
                 
             else:
-                
-                #TODO-SS: handle scoreRect with multiple Scorings
 
                 self.scoreRect =  self.rectOrigToMain(
                                     self.zoomInRect( protoZoomRect
@@ -372,7 +381,7 @@ class Display:
                               ,thick=2)
 
             
-            if not(self.scoreOff):
+            if self.scoreRect is not None and not(self.scoreOff):
     
                 self.drawOntoPane(frame=self.scoreFrame
                               ,data=self.inputScore
@@ -1121,6 +1130,144 @@ class Display:
         x, y, dx, dy = copy.copy(input_rect)            
 
         return (x + int(dx / 2), y + int(dy / 2))
+
+    @staticmethod
+    def minDimsForRect(  input_rect
+                        ,output_bounds
+                        ,min_scalar_width = 1
+                        ,max_multiple_width = 5
+                        ):
+        ''' returns: relative-format-rect with potentially expanded dimensions.
+                     (used for better viewing in score_display.
+                      output_bounds allow us to not go out of index)
+            input_rect: (x,y, dx, dy)
+            output_bounds: (h,w) tuple
+            min_scalar_width: int or None; if None, don't process this condition
+            max_multiple_width: int or None; if None, don't process this condition
+        '''
+
+        #set inputs
+        b_scalar = False if (min_scalar_width is not None) else True
+        b_multiple = False if (max_multiple_width is not None) else True
+
+        x, y, dx, dy = copy.copy(input_rect)
+        h, w = output_bounds
+
+        #check conditions
+        if not(b_scalar):
+            if ((dx > min_scalar_width) and
+                (dy > min_scalar_width)):
+                b_scalar = True
+        
+        if not(b_multiple):
+            if ((dy*max_multiple_width > dx) and
+                (dx*max_multiple_width > dy)):
+                b_multiple = True
+
+        #early return
+        if b_scalar and b_multiple:
+            return input_rect
+
+        #find needed expansion to satisfy condition
+        if not(b_scalar):
+            
+            x_expand_s = max(min_scalar_width - dx, 0)
+            y_expand_s = max(min_scalar_width - dy, 0)
+
+            x_delta_s = round(x_expand_s / 2, 0)
+            y_delta_s = round(y_expand_s / 2, 0)
+
+        else:
+            x_expand_s, y_expand_s = 0, 0
+            x_delta_s, y_delta_s = 0, 0
+
+        if not(b_multiple):
+            
+            x_expand_m = max(int((dy / max_multiple_width) - dx), 0)
+            y_expand_m = max(int((dx / max_multiple_width) - dy), 0)
+
+            x_delta_m = round(x_expand_m / 2, 0)
+            y_delta_m = round(y_expand_m / 2, 0)
+
+        else:
+            x_expand_m, y_expand_m = 0, 0
+            x_delta_m, y_delta_m = 0, 0
+
+        x_expand = max(x_expand_s, x_expand_m)
+        y_expand = max(y_expand_s, y_expand_m)
+
+        x_delta = max(x_delta_m, x_delta_s)
+        y_delta = max(y_delta_m, y_delta_s)
+
+        
+        #do expansion                
+        if x_delta > 0:
+        
+            x_diff = [el[0] + el[1] for el in zip([x, x+dx], [-x_delta, x_delta])]
+            
+            x_diff[0] = max(0, x_diff[0])
+            x_diff[1] = min(w, x_diff[1])
+
+            #remainder
+            x_delta_2 = max(0, x_expand - ((x_diff[1] - x_diff[0]) - dx))
+            
+            if x_delta_2 > 0:
+                
+                ind = 1 if ((x - x_delta) < x_diff[0]) else 0
+                
+                new_val = (x_diff[ind] +
+                            ([-1,1][ind] * x_delta_2)
+                            )
+                                        
+                if ind == 0:
+                    new_val = max(new_val, 0)
+                elif ind == 1:
+                    new_val = min(new_val, w)
+
+                x_diff[ind] = new_val
+
+            #modify output
+            x, dx = x_diff[0], x_diff[1] - x_diff[0]
+
+        if y_delta > 0:
+
+            y_diff = [el[0] + el[1] for el in zip([y, y+dy], [-y_delta, y_delta])]
+            
+            y_diff[0] = max(0, y_diff[0])
+            y_diff[1] = min(h, y_diff[1])
+
+            #remainder
+            y_delta_2 = max(0, y_expand - ((y_diff[1] - y_diff[0]) - dy))
+            
+            if y_delta_2 > 0:
+                
+                ind = 1 if ((y - y_delta) < y_diff[0]) else 0
+                
+                new_val = (y_diff[ind] +
+                            ([-1,1][ind] * y_delta_2)
+                            )
+                                        
+                if ind == 0:
+                    new_val = max(new_val, 0)
+                elif ind == 1:
+                    new_val = min(new_val, h)
+
+                y_diff[ind] = new_val
+
+            #modify output
+            y, dy = y_diff[0], y_diff[1] - y_diff[0]
+
+
+        #clean and return
+        modified_rect = (x, y, dx, dy)
+        modified_rect = map(int, modified_rect)
+        
+        return tuple(modified_rect)
+
+        
+
+
+        
 
 
 
