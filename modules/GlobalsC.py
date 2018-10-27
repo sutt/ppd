@@ -25,5 +25,6 @@ def init():
     global switchOverideNote
     global trackObjEnum
     global trackTypeEnum
+    global annotateObjEnum
     
 

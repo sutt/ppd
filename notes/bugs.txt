@@ -1,11 +1,67 @@
 #Tasks
 
+10/26
+
+    [x] annotate enums
+        [x] get color correct on display.outputObjs
+    [ ] build some tests
+    [ ] investigate the bugs
+
+    List of other bugs, features:
+        [ ] draw_ray( bOffSetRay)
+
 10/25
     [x] cli for obj to show in score_display
         [x] does this throw an error if object is wrong?
     [ ] vertical score_display is too large
         [x] test this
         [ ] fix this
+    [ ] need to reset display.outputScore so we 
+        [ ] a) don't rewrite an old score onto new frame?
+        [ ] b) don't have a cluttered view
+    [~] file debug import/step-into from root/test/
+        [~] reproduce: CAN'T
+            KEY: it only works when you don't call with erroneous arg's
+    [ ] file output-panel pop-up bug
+        [ ] reproduce in blank workspace
+
+    Research on VSCode issues
+
+        import cv2
+        https://stackoverflow.com/questions/50612169/pylint-not-recognizing-cv2-members/51916065#51916065
+        https://github.com/Microsoft/vscode-python/issues/2879
+        https://github.com/skvark/opencv-python/issues/131
+
+        popping up output panel
+        https://github.com/Microsoft/vscode-python/issues/2262
+        https://github.com/Microsoft/vscode-python/issues/2412
+        https://github.com/MicrosoftDocs/intellicode/issues/12
+        https://github.com/Microsoft/vscode-python/issues/2017
+            tells you how to: installl a dev build of the extension
+        https://github.com/MicrosoftDocs/intellicode/issues/9
+            suggested fix: "vsintellicode.python.completionsEnabled": false
+        https://github.com/angular/vscode-ng-language-service/issues/187
+            related appraently
+
+            How to reproduce:
+                in scratch/ create a new folder: demo_popup/
+                create a file called demo.py in demo_popup/
+                open demo.py:
+                    import os, sys
+                    def foo():
+                        x=1
+                        return x
+                save file
+                do to another file in editor, but leave demo.py oepn as a tab
+                go into explore, close the exapnded demo_popup/ folder
+                then delte that folder
+                should cause:
+                [Error - 6:30:21 PM] One or more errors occurred. (failed to parse file file:///c:/Users/wsutt/Desktop/files/ppd/ppd/scratch/repro_popup/demo.py)
+
+
+
+
+        
 
 10/24
 
@@ -51,10 +107,6 @@
             [ ] a merge of notes and display (update/add)
         [ ] modulo zero stuff
 
-    328e4adf
-    79e31b0b
-
-
 
     [ ] Misc Thoughts:
         [ ] All those imports needed in guiview?
@@ -94,8 +146,8 @@
             [x] assign a particluar obj enum to be zoomed-in in scoreDisplay
                 [x] call from cli, parser
 
-        [ ] Refactors:
-            [ ] remove roiRect, roiRectScoring
+        [x] Refactors:
+            [x] remove roiRect, roiRectScoring
                 keep: scoreRect, zoomRect
 
         Manual Testing:
@@ -149,11 +201,11 @@
             maybe just write a script that deletes frame(s),
             and you can even manually delete timelog, metalog entries
 
-    [ ] build scoring schema:
-        [ ] multi objects per frame
-        [ ] scoring types: 
-        [ ] how will this work with gui?
-        [ ] a ball diff is "two points" beginning and end
+    [x] build scoring schema:
+        [x] multi objects per frame
+        [x] scoring types: 
+        [x] how will this work with gui?
+        [x] a ball diff is "two points" beginning and end
         Notes:
             scoring is used for multiple things:
                 read-in from metalog

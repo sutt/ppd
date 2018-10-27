@@ -97,6 +97,9 @@ class ConstructGui:
     def cmd_frameDelay(self):
         g.frameDelay = bool(self.int_frameDelay.get())
 
+    def cmd_annotateEnum(self):
+        g.annotateObjEnum = bool(self.int_annotateEnum.get())
+
     def cmd_delaySecsSet(self):
         g.delaySecs = float(self.sv_delaySecs.get())
 
@@ -523,6 +526,30 @@ class ConstructGui:
             ,variable=self.int_frameDelay
             ,value=0
             ,command=self.cmd_frameDelay
+            ).pack(side=tk.LEFT)
+
+        f_annotate_enum = tk.Frame(root)
+        f_annotate_enum.pack(side = tk.TOP)
+
+        tk.Label(f_annotate_enum, text="annotate obj:").pack(side=tk.LEFT)
+
+        self.int_annotateEnum = tk.IntVar()
+        self.int_annotateEnum.set(0)
+        
+        tk.Radiobutton(
+             f_annotate_enum
+            ,text="off"
+            ,variable=self.int_annotateEnum
+            ,value=0
+            ,command=self.cmd_annotateEnum
+            ).pack(side=tk.LEFT)
+
+        tk.Radiobutton(
+             f_annotate_enum
+            ,text="on"
+            ,variable=self.int_annotateEnum
+            ,value=1
+            ,command=self.cmd_annotateEnum
             ).pack(side=tk.LEFT)
         
         f0_1a = tk.Frame(root)

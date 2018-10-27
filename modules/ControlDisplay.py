@@ -7,7 +7,7 @@ import argparse
 from DataSchemas import ScoreSchema
 import GlobalsC as g
 from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle
-                        ,draw_ray)
+                        ,draw_ray, convert_color)
 from ImgUtils import crop_img
 
 if False: from cv2 import *
@@ -105,9 +105,11 @@ class Display:
 
         self.windowTwo = True
         self.windowThree = True
+        
         self.bShowScoring = False
+        self.bAnnotateObjEnum = False
 
-        self.scoreDisplayObjEnum = 2
+        self.scoreDisplayObjEnum = 0
 
         self.widthMainWindow = 640
         self.heightMainWindow = 480
@@ -158,6 +160,7 @@ class Display:
                 ,trackTypeEnum=0
                 ,windowTwo=None
                 ,windowThree=None
+                ,annotateObjEnum=None
                 ):
         
         self.cmdSelectZoom = cmdSelectZoom
@@ -171,6 +174,12 @@ class Display:
             self.windowTwo = windowTwo
         if windowThree is not None:
             self.windowThree = windowThree
+        
+        if annotateObjEnum is not None:
+            
+            if self.bAnnotateObjEnum != annotateObjEnum:
+                self.bAnnotateObjEnum = annotateObjEnum
+                self.resetOperators()
 
         g.switchZoom = False
         g.switchRoiMain = False
@@ -344,7 +353,8 @@ class Display:
                               ,data=self.outputScore
                               ,coordsRelative='origToMain'
                               ,color='yellow'
-                              ,thick=3)
+                              ,thick=3
+                              ,b_annotate = self.bAnnotateObjEnum)
             
             # because when mainwindow has resize, modulo might not be 0,
             # so roiToMain in that case isn't a perfect match. But for 640 1280 1920, 
@@ -369,7 +379,8 @@ class Display:
                               ,data=self.inputScore
                               ,coordsRelative='origToMain'
                               ,color='blue'
-                              ,thick=2)
+                              ,thick=2
+                              ,b_annotate = self.bAnnotateObjEnum)
 
             
             if self.scoreRect is not None and not(self.scoreOff):
@@ -379,9 +390,10 @@ class Display:
                               ,coordsRelative='origToScore'
                               ,color='blue'
                               ,thick=1)
+
                 
 
-    def drawOntoPane(self, frame, data, coordsRelative, color, thick):
+    def drawOntoPane(self, frame, data, coordsRelative, color, thick, b_annotate=False):
         ''' draw both circle and ray shapes within [score]data onto a frame here:
 
                 frame - (np.array) reference to the frame to be dwarn upon
@@ -390,7 +402,9 @@ class Display:
                 color (str), thick (int) - formatting params
         '''
 
-        for _circleData in data.getListType('circle'):
+        for _circleObj in data.getListType('circle'):
+
+            _circleEnum, _circleData = _circleObj
                 
             if coordsRelative == 'origToMain':
                 rect = self.roiToMain(input_rect = _circleData)
@@ -410,9 +424,19 @@ class Display:
                                 ,color = color
                                 ,thick = thick
                                 )
-
-        for _rayData in data.getListType('ray'):
+            
+            if b_annotate:
+                frame = draw_text(frame
+                                 ,msg = str(_circleEnum)
+                                 ,fontscale = 0.5
+                                 ,color = convert_color(color)
+                                 ,pos = self.annotatePointFromRect(rect)
+                                 )
                 
+
+        for _rayObj in data.getListType('ray'):
+                
+            _rayEnum, _rayData = _rayObj
             
             if coordsRelative == 'origToMain':
                 xy0 = tuple(self.scaleOrigToMain(x) for x in _rayData[0])
@@ -431,6 +455,16 @@ class Display:
                             ,thick = thick
                             #TODO - bOffsetRay so you can see the motion blur
                             )
+            
+            if b_annotate:
+                frame = draw_text(frame
+                                 ,msg = str(_rayEnum)
+                                 ,fontscale = 0.5
+                                 ,color = convert_color(color)
+                                 ,pos = self.annotatePointFromRect(
+                                            self.pointsToRelativeRect(xy0, xy1)
+                                            )
+                                 )
 
     def adjustOrient(self):
         ''' rotate images here, to apply minimal amount of coord adjustment.
@@ -1099,6 +1133,40 @@ class Display:
         x, y, dx, dy = copy.copy(input_rect)            
 
         return (x + int(dx / 2), y + int(dy / 2))
+
+    @staticmethod
+    def annotatePointFromRect(input_rect, offset = 20):
+        ''' takes:   relative-format rect (x,y,dx,dy )
+            returns: (x,y)
+        '''
+
+        x, y, dx, dy = copy.copy(input_rect)
+
+        x_return = int(x + int(dx / 2))
+        y_return = y - offset
+
+        if y_return < 0:
+            #this will insure no OOB error
+            return self.centerPointFromRect(input_rect)
+        else:
+            return (x_return, y_return)
+        
+
+    @staticmethod
+    def pointsToRelativeRect(point0, point1):
+        ''' takes two tuples of int's: point0 (x0,y0), point1 (x1, y1)
+            returns (x,y, dx, dy)
+            note: point0, point1 are not nec. in order
+        '''
+
+        x = min(point0[0], point1[0])
+        y = min(point0[1], point1[1])
+        dx = max(point0[0], point1[0]) - x
+        dy = max(point0[1], point1[1]) - y
+
+        #minDims(min_scalar_width = 1)
+
+        return (x, y, dx, dy)
 
     @staticmethod
     def minDimsForRect(  input_rect

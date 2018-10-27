@@ -220,11 +220,12 @@ class ScoreSchema:
         return copy.deepcopy(self.data)
 
     def getListType(self, _type):
-        listCircles = []
+        ''' return list of (enum, data) for each obj of type _type'''
+        listObjs = []
         for k in self.data.keys():
             if self.data[k].get('type') == _type:
-                listCircles.append(self.data.get(k).get('data'))
-        return listCircles
+                listObjs.append((k, self.data.get(k).get('data')))
+        return listObjs
     
     def getDefault(self):
         ''' legacy method, should not be used except for convenience'''

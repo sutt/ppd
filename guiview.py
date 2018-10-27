@@ -71,6 +71,7 @@ g.duplicatesEnum = 0
 g.switchOverideNote = False
 g.trackObjEnum = 0
 g.trackTypeEnum = 0
+g.annotateObjEnum = False
 
 
 #High Level Options --------------------------
@@ -315,7 +316,8 @@ while(True):
                       ,trackObjEnum=g.trackObjEnum
                       ,trackTypeEnum=g.trackTypeEnum
                       ,windowTwo=g.windowTwo
-                      ,windowThree=g.windowThree)
+                      ,windowThree=g.windowThree
+                      ,annotateObjEnum=g.annotateObjEnum)
 
         notesFactory.setCmd( switchOverideNote=g.switchOverideNote)
 

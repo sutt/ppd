@@ -90,6 +90,15 @@ def resize_img(img, resize, resize_dims = (640,480)):
     else:
         return img
 
+def convert_color(str_color):
+    ''' takes the color by string, converts to numeric color '''
+    numeric_color = (0,255,255) #default yellow
+    if str_color == 'blue':
+        numeric_color = (255,0,0)
+    if str_color == 'red':
+        numeric_color = (0,0,255)
+    return numeric_color
+
 def ShowImages(**kwargs):
     
     b_flip = not(kwargs.get('dont_mirror',False))
