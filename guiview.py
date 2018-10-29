@@ -287,7 +287,7 @@ while(True):
                                 )
     
     if b_test:
-        stub.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+        stub.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory, display)
 
     while(frameFactory.isOpened()):
         
@@ -417,10 +417,10 @@ while(True):
         timeFactory.delayFrame()
 
         if b_test:
-            mock.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+            mock.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory, display)
 
     if b_test:
-        mock.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+        mock.vidByStr(str_test)(frameFactory, timeFactory, directoryFactory, display)
     
     outputFactory.resetFramesInd()
     

@@ -977,6 +977,7 @@ class GuiviewMock:
                     ,_frameFactory
                     ,_timeFactory
                     ,_directoryFactory
+                    ,_display
                     ):
 
         if _frameFactory.getFrameCounter() == 5:
@@ -996,6 +997,7 @@ class GuiviewMock:
                             _frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
         
         #this opens on pause, frame counter should start here,
@@ -1006,6 +1008,7 @@ class GuiviewMock:
                             _frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
         
         #deliberately trigger an assert error here
@@ -1020,6 +1023,7 @@ class GuiviewMock:
                         ,_frameFactory
                         ,_timeFactory
                         ,_directoryFactory
+                        ,_display
                         ):
 
         #check that program flow was as expected: 1 pass through frameloop
@@ -1044,6 +1048,7 @@ class GuiviewMock:
                             ,_frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
 
         if _frameFactory.getFrameCounter() == 5:
@@ -1076,6 +1081,7 @@ class GuiviewMock:
                             ,_frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
 
         if _frameFactory.getFrameCounter() == 5:
@@ -1098,6 +1104,7 @@ class GuiviewMock:
                             ,_frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
 
         # verify that frame advances and retreats,
@@ -1125,6 +1132,7 @@ class GuiviewMock:
                             ,_frameFactory
                             ,_timeFactory
                             ,_directoryFactory
+                            ,_display
                             ):
         
         if self.mockCounter == 4:
@@ -1154,6 +1162,7 @@ class GuiviewMock:
                         # ,_frameFactory
                         # ,_timeFactory
                         # ,_directoryFactory
+                        # ,_display
                         # ):
         
         if self.mockCounter == 0:
@@ -1282,6 +1291,7 @@ class GuiviewStub:
                             # ,_frameFactory
                             # ,_timeFactory
                             # ,_directoryFactory
+                            # ,_display
                             # ):
         
         if self.stubCounter < 5:
