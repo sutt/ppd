@@ -1,36 +1,19 @@
 import copy
 
 '''
-    [ ] How to modify an existing score
+    [x] How to modify an existing score
     [ ] Object Types: an enum
         BALL_A - a stationary ball
         BALL_B - a ball in motion
         BALL_C - something in between?
-    [ ] Object Enums, e.g. 1=ball, 2= ball reflection, 3=drone, 4=drone reflection
-    [ ] Circle vs Ray Score types
+    [x] Object Enums, e.g. 1=ball, 2= ball reflection, 3=drone, 4=drone reflection
+    [x] Circle vs Ray Score types
     [ ] score_types as training vs challenge
 
-    [x] Add score types to data
-    [x] Add score type to gui
-    [x] add a .reset() method
-    [ ] Annotate objects with objEnum on frame
+    [x] Annotate objects with objEnum on frame
 
-
-
-
-    Goal:
-        [ ] Build sample video with new capbilities:
-            [ ] three objects, ball and eye, and a ray for arm
-            [ ] some frames have only 1 or 2 object types
-
-            [ ] Replay that sample video, showing the scoring
-    
     Notes:
         tagging #TODO-SS for relvant areas 
-        tagging #Leagcy-SS for cleanup areas
-
-        in Display, roiRect holds pane -> notes scoring data
-                    roiRectScoring holds notes -> pane
 
         Display: .scoreRect .roiRectScoring | .circleTrack
         NotesFactory:  .frameScoring  
@@ -45,7 +28,7 @@ class ScoreSchema:
 
         data: {
         
-                objEnum (int): {
+                objEnum (str): {
 
                     type: (str)  "circle" or "ray"
                     data: (list of int)

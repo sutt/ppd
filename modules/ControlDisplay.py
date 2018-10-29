@@ -83,8 +83,8 @@ class Display:
         #output: display -> notes
         self.outputScore = ScoreSchema()
 
-        self.roiTrack = None
-        self.circleTrack = None
+        #trackFactory -> this class
+        self.trackScore = ScoreSchema()
         
         self.selectRectMain = None  #needed this?
         self.selectRectZoom = None  #needed this?
@@ -241,20 +241,12 @@ class Display:
             
             protoZoomRect = None
             
-            if self.inputScore.getData(self.scoreDisplayObjEnum) is not None:
-                
+            if self.inputScore.getData(self.scoreDisplayObjEnum) is not None:               
                 protoZoomRect = self.inputScore.getObjRect(self.scoreDisplayObjEnum)
-                
-                protoZoomRect = self.minDimsForRect(
-                                                    protoZoomRect
-                                                    ,self.getOrigFrameDims()
-                                                    ,min_scalar_width = 10
-                                                    ,max_multiple_width = 3
-                                                    )
                 zoomFct = 0.1
                 
-            elif self.circleTrack is not None:    
-                protoZoomRect = self.circleToRect(self.circleTrack)
+            elif self.trackScore.checkHasContents():    
+                protoZoomRect = self.trackScore.getObjRect(self.scoreDisplayObjEnum)
                 zoomFct = 0.3   
 
             if protoZoomRect is None:
@@ -264,6 +256,13 @@ class Display:
                 self.scoreRect = None
                 
             else:
+
+                protoZoomRect = self.minDimsForRect(
+                                             protoZoomRect
+                                            ,self.getOrigFrameDims()
+                                            ,min_scalar_width = 10
+                                            ,max_multiple_width = 3
+                                                    )
 
                 self.scoreRect =  self.rectOrigToMain(
                                     self.zoomInRect( protoZoomRect
@@ -490,13 +489,13 @@ class Display:
 
 
 
-    def setTrack(self, roiTrack=None, circleTrack=None):
-        self.roiTrack = roiTrack
-        self.circleTrack = circleTrack
+    def setTrack(self, roiTrack=None, circleTrack=None, trackScore=None):
+
+        self.trackScore.load(trackScore)
         
         #TODO - this isn't exactly right, we're handling this downstream
         #       and even if they fail to find an object they return (0,0,...)
-        if self.roiTrack is not None or self.circleTrack is not None:
+        if self.trackScore.checkHasContents():
             self.scoreOn = True
     
     
@@ -505,55 +504,44 @@ class Display:
             All data is relative to Orig frame size; so we need to
             convert to Main or convert to Zoom where nec.
         '''
-        #TODO-SS: use drawOntoPane here
-        if self.circleTrack is not None:
+        
+        if self.trackScore.checkHasContents():
             
-            rectOrig = self.circleToRect(self.circleTrack) 
-            rectMain = self.roiToMain(input_rect = rectOrig)
-            x, y, radius = self.rectToCircle(rectMain)
-
-            self.frame = draw_circle(self.frame
-                                    ,x
-                                    ,y
-                                    ,radius
-                                    ,color = 'red'
-                                    ,thick = 2
-                                    )
+            self.drawOntoPane(frame = self.frame
+                             ,data = self.trackScore
+                             ,coordsRelative = 'origToMain'
+                             ,color = 'red'
+                             ,thick = 2
+                             ,b_annotate = self.bAnnotateObjEnum
+                             )
 
             if self.zoomOn and self.zoomRect is not None:
 
-                rectOrig = self.circleToRect(self.circleTrack)
-                rectZoom = self.roiToZoom(input_rect=rectOrig)
-                x, y, radius = self.rectToCircle(rectZoom)
-                
-                self.zoomFrame = draw_circle(self.zoomFrame
-                                            ,x
-                                            ,y
-                                            ,radius
-                                            ,color = 'red'
-                                            ,thick = 1
-                                            )
-            
-            if self.scoreOn and not(self.scoreOff) and self.scoreRect is not None:
+                self.drawOntoPane(frame = self.zoomFrame
+                                ,data = self.trackScore
+                                ,coordsRelative = 'origToZoom'
+                                ,color = 'red'
+                                ,thick = 1
+                                ,b_annotate = False
+                                )
 
-                rectOrig = self.circleToRect(self.circleTrack)
-                rectZoom = self.roiToScore(input_rect=rectOrig)
-                x, y, radius = self.rectToCircle(rectZoom)
-                
-                self.scoreFrame = draw_circle(self.scoreFrame
-                                            ,x
-                                            ,y
-                                            ,radius
-                                            ,color = 'red'
-                                            ,thick = 1
-                                            )
-        
+            if (self.scoreOn and not(self.scoreOff) 
+                and self.scoreRect is not None):
+
+                self.drawOntoPane(frame = self.scoreFrame
+                                ,data = self.trackScore
+                                ,coordsRelative = 'origToScore'
+                                ,color = 'red'
+                                ,thick = 1
+                                ,b_annotate = False
+                                )
+
+
     def buildScoreFrame(self):
         ''' create a score_img (that gets attached to -> self.scoreFrame) based on scoreRect.
             this is a clone of buildZoomFrame()
         '''
 
-        #TODO-SS
         if self.scoreRect is None:
             
             score_img = np.zeros(self.frame.shape)
@@ -700,8 +688,6 @@ class Display:
 
         if self.cmdSelectRoiMain or self.cmdSelectZoom:
             
-            #TODO-SS two roi-events for ray
-            
             windowName = 'img_display'
             if self.orientation in (90,270): windowName += "_profile"    
 
@@ -760,8 +746,6 @@ class Display:
             key2 = cv2.waitKey(1) & 0xFF
 
         if self.zoomOn and self.cmdSelectRoiZoom and self.windowTwo:
-
-            #TODO-SS two roi-events for ray
             
             windowName = 'zoom_display'
             if self.orientation in (90,270): windowName += "_profile"    

@@ -383,12 +383,11 @@ while(True):
 
             trackFactory.setFrame(frame)
 
-            trackFactory.setFrameScore(notesFactory.getFrameScoreForTrack()) #TODO-SS
+            trackFactory.setFrameScore(notesFactory.getFrameScoreForTrack())
             
             trackFactory.trackFrame()
             
-            display.setTrack( roiTrack = trackFactory.getCurrentTrackRoi()
-                             ,circleTrack = trackFactory.getCurrentTrackCircle())
+            display.setTrack(trackScore = trackFactory.getTrackScore())
 
             if trackFactory.getTrackOnChange():
                 display.resetOperators()

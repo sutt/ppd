@@ -324,7 +324,7 @@ class ConstructGui:
         fselect3.pack(side = tk.TOP)
 
         self.int_scoretypeenum = tk.IntVar()
-        self.int_scoretypeenum.set(0) #TODO-SS
+        self.int_scoretypeenum.set(0)
         
         tk.Label(fselect3, text="score type:").pack(side=tk.LEFT)
         tk.Radiobutton(

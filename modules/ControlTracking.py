@@ -17,6 +17,8 @@ from modules.TrackA import (find_xy, find_radius)
 
 from modules.IterThresh import iterThreshA
 
+from modules.DataSchemas import ScoreSchema
+
 from modules import GlobalsC as g
 
 class TrackFactory:
@@ -32,8 +34,7 @@ class TrackFactory:
         self.bTrackingOnChange = False
 
         self.currentTrackSuccess = False
-        self.currentTrackRoi = None
-        self.currentTrackCircle = None
+        self.currentTrackScore = ScoreSchema()
 
         self.threshInitial = [ (0,0,0), (255,255,255) ]
 
@@ -144,14 +145,10 @@ class TrackFactory:
             return False
         else:
             return self.bTrackingOnChange
-    
-    def getCurrentTrackRoi(self):
-        if not(self.on): return None
-        return self.currentTrackRoi
 
-    def getCurrentTrackCircle(self):
+    def getTrackScore(self):
         if not(self.on): return None
-        return self.currentTrackCircle
+        return self.currentTrackScore.getAll()
 
     def setFrameInd(self, frameInd):
         self.currentFrameInd = frameInd
@@ -162,7 +159,6 @@ class TrackFactory:
 
     def setFrameScore(self, frameScoreData):
         
-        #TODO - SS
         if not(self.on): return
 
         if frameScoreData is None: return
@@ -170,9 +166,14 @@ class TrackFactory:
         
         frameType, frameScore = frameScoreData
 
+        #TODO-SS
+        objScoring = ScoreSchema()
+        objScoring.load(frameScore)
+        circleDataObj0 = objScoring.getData(objEnum=0)
+
         if frameType == "training":
             
-            datum = self.buildTrainingDatum(frameScore, self.currentFrame)
+            datum = self.buildTrainingDatum(circleDataObj0, self.currentFrame)
             
             if datum is not None:
                 self.trainingData.append(datum)
@@ -299,8 +300,10 @@ class TrackFactory:
             if radius > 0:
                 self.currentTrackSuccess = True
 
-            self.currentTrackRoi = None  #(x,y,20,20)
-            self.currentTrackCircle = (x, y, radius)
+            self.currentTrackScore.addCircle(
+                                     self.circleToRect((x,y,radius))
+                                    ,objEnum=0   #TODO-SS
+                                    )
 
         if self.bTrackTimer:
             if self.currentFrameInd not in self.trackTimerData.keys():
@@ -335,6 +338,21 @@ class TrackFactory:
 
         return rect
 
+    @staticmethod
+    def circleToRect(input_circle):
+        ''' takes x,y, radius, fits to enclosing relative-format rect
+            (x,y, radius)  -> (x0,y0, d_x, d_y) 
+        '''
+
+        x, y, radius = copy.copy(input_circle)            
+
+        x0 = int(x - radius)
+        y0 = int(y - radius)
+        dx = int(2 * radius)
+        dy = int(2 * radius)
+
+        return (x0, y0, dx, dy)
+    
     @staticmethod
     def combine_threshes(data, liberal = True ):
         ''' data is a list of (lo, hi) 3-ple's; find the union '''

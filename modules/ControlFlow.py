@@ -905,7 +905,7 @@ class NotesFactory:
     def getFrameScoreForTrack(self):
         ''' returns relevant params from metalog to tracking module '''
         try:
-            return self.getFrameType(), self.getFrameScoreCurrent(b_bypass=True)
+            return self.getFrameType(), self.getFrameScoreCurrent()
         except:
             return None, None
 
