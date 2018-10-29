@@ -1,4 +1,8 @@
 
+10/29
+
+Now can account for multiple tracking objects thoughout workflow: this will help with tracking reflection object in future training videos. Need to quickly close out wokr in guiview and move onto: building training data, refining tracker, batch evaluation. Final big steps are unit testing for guiview and guirecord.
+
 10/5
 
 lots of little bugs seem still present in guiview; mostly around the build/resize of zoom frame and how that changes each frame when tracking / scoring are providing the coords for thie display.

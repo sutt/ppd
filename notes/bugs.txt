@@ -1,14 +1,25 @@
 #Tasks
 
+10/29
+
+    [x] display.circleTrack -> trackScore
+    [x] trackFactory: multi object tracking
+
 10/26
 
     [x] annotate enums
         [x] get color correct on display.outputObjs
+    [x] trackFactory scoreSchema
+        [x] "#TODO-SS" is still commented here
+    [x] does deleting __init__ in test/ matter? to debug? or pytest?
     [ ] build some tests
     [ ] investigate the bugs
+    [ ] consolidate test runs with a script
 
     List of other bugs, features:
         [ ] draw_ray( bOffSetRay)
+        [ ] TODO-SS in trackFactory - not truly multi-object yet
+            [ ] depends
 
 10/25
     [x] cli for obj to show in score_display
@@ -67,7 +78,7 @@
 
     [x] finish display.show() roi Zoom
     [x] display.drawOntoPane() add coordRelative switch statement
-    [ ] selectROI for ray should be selectFromCenter = True (4 places to ammend code in display.show())
+    [~] selectROI for ray should be selectFromCenter = True (4 places to ammend code in display.show())
     [x] remove Legacy-SS
     [x] scoreRect for rays, scoreRect for dif objEnum's
     [ ] build new demo-proc's with scoringschema in their metalog
@@ -76,7 +87,7 @@
     [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"
     [ ] investigate "#BUG-check if zoomRect is in bounds in new video"
 
-    [ ] annotate enums to obj's
+    [x] annotate enums to obj's
 
     Notes:
         display.roiRect holds display.outputScore (hand drawn markers)
@@ -133,7 +144,7 @@
 
 10/22
 
-    [ ] ScoreSchema
+    [x] ScoreSchema
 
         Checkpoints:
         [x] Run thru with same functionality
@@ -156,10 +167,10 @@
             [x] view ray object
             [x] draw multiple object
             [x] draw ray object
-            [ ] view multi and single scores
-                [ ] add a new score obj
-                [ ] overwrite existing scores
-            [ ] view trackers as scoreSchema
+            [x] view multi and single scores
+                [x] add a new score obj
+                [x] overwrite existing scores
+            [~] view trackers as scoreSchema
         
         Bugs/Refactor:
         [~] output.writeFrame() should have separate arg for framenote scoring
