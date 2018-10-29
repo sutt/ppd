@@ -824,10 +824,16 @@ class Display:
             #                                     ,b_zoomout=True)
             #     self.resetOperators()
                 
+    # test helpers --------------------
+    # use these only for test stubs
+
+    def _test_set_outputScore(self, outputScore):
+
+        self.outputScore = outputScore
 
     
     # main helpers ---------------------
-    # (roiRect (which is relative to origFrame coors) <-> to main/zoom)
+    # converting coords and shapes b/w orig, main, zoom, score windows
 
     def roiToMain(self, input_rect):
         ''' return relative-rect roi relative to main-window coord's.

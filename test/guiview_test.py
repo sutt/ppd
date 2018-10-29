@@ -6,6 +6,8 @@ sys.path.append("../")
 from modules.ControlFlow import FrameFactory
 from modules.ControlFlow import TimeFactory
 from modules.ControlFlow import DirectoryFactory
+from modules.ControlDisplay import Display
+from modules.DataSchemas import ScoreSchema
 import modules.GlobalsC as g
 
 '''
@@ -37,25 +39,7 @@ Todo:
         [ ] returncode is always 1 b/c error thrown in stub.exitByStr()
 
     Tests:
-    [x] basic_dir
-    [x] basic_file
-    [x] a true positive: find an exception err 
-    [x] file not found
-    [x] a video that cant be read within a dir of valid vids
-    [x] true time vs nodelay
-    [x] firstN
-    [x] advance + retreat frame
-    [x] no logs
-    [x] frame lag on delay vid
-    [x] check for metalog
-        check for properties:
-        [x] vid notes
-        [x] added vid proc data
-        [x] orig_vid_index
-        [x] FrameLogInput
-    [x] use custom --framelog
-        [x] check what happens for no associated metalog
-        [x] check two outputs for metalog
+
     [ ] Need to check frame pixel values against a benchmark: a diff
 
 
@@ -826,6 +810,85 @@ class GuiviewStagingClass:
             print "\n".join(msg)
             raise Exception("TEST FAIL: meta_adv")
 
+    def write_score(self):
+        ''' test meta log score output: use a stub to mimin do a selectROI for a 
+            "hand-drawn" score and see if that gets output into metalog.
+            
+                details: frame1 should have a score
+                         frame2 should have no score
+                         frame3 should have a repeat of frame1 score
+                         
+        '''
+
+        cmd = '''python guiview.py --test write_score --nogui --noshow 
+                                    --file data/test/guiview/write_score/output4.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_score/"
+        TEST_DATA_FN = "output4.proc1.metalog"
+        TEST_DATA_ALL = ["output4.proc1.avi", "output4.proc1.txt", "output4.proc1.metalog"]
+
+        for f in TEST_DATA_ALL:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in TEST_DATA_ALL:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        #Assess output for details ------------------
+        if not(bErrors):
+            try:        
+                
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                assert json_data.get('frames', None) is not None
+                assert len(json_data['frames']) == 3
+                
+                scoring = json_data['frames'][0]['scoring']
+                assert scoring is not None
+                assert scoring.get('0').get('type') == 'circle'
+                assert scoring.get('0').get('data') == [100,100,50,60]
+
+                scoring = json_data['frames'][1]['scoring']
+                assert scoring is None
+
+                scoring = json_data['frames'][2]['scoring']
+                assert scoring is not None
+                assert scoring.get('0').get('type') == 'circle'
+                assert scoring.get('0').get('data') == [100,100,50,60]
+
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog / metalog data is not as expected"]
+                msg += [str(e.message)]
+                # msg += [sys.tr]
+
+        #Output test result -------------------------
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_score")
+
+    
+
 
 
 class GuiviewMock:
@@ -1103,6 +1166,7 @@ class GuiviewMock:
         self.mockCounter += 1
 
 
+
         
 
 class GuiviewStub:
@@ -1159,6 +1223,8 @@ class GuiviewStub:
             return self.meta_basic_frame
         elif strTest == 'meta_adv':
             return self.meta_adv_frame
+        elif strTest == 'write_score':
+            return self.write_score_frame
         else:
             return self.dummy
 
@@ -1407,8 +1473,43 @@ class GuiviewStub:
             g.callExit = True
     
 
+    def write_score_frame(self
+                        ,_frameFactory
+                        ,_timeFactory
+                        ,_directoryFactory
+                        ,_display
+                        ):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True      
+
+        if self.stubCounter == 2:
+            
+            outputScore = ScoreSchema()
+            roiStub = (100,100,50,60)
+            outputScore.addCircle(roiStub, objEnum = 0)
+            _display._test_set_outputScore(copy.deepcopy(outputScore))
+
+            g.switchWriteScoring = True
+        
+        if self.stubCounter == 3:
+            g.switchWriteVid = True   #don't write scoring data
+
+        if self.stubCounter == 4:
+            g.switchWriteScoring = True #write scoring data, is it carried over from 2-frames-before?
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 5:
+            g.callExit = True
+    
+
 
 #For collection by pytest ------------------------
+
+def test_write_score():
+    stage = GuiviewStagingClass()
+    stage.write_score()
 
 def test_meta_adv():
     stage = GuiviewStagingClass()
@@ -1475,6 +1576,6 @@ def test_true_time():
     stage.true_time()
 
 if __name__ == "__main__":
-    test_meta_adv()
+    test_write_score()
     pass
 

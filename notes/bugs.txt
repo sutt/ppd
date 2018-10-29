@@ -5,6 +5,14 @@
     [x] display.circleTrack -> trackScore
     [x] trackFactory: multi object tracking
 
+    [x] build a new test
+    [ ] add display to all stubs and all mocks in guiview
+    [ ] get a recipe for debug where you can write to file a display window's state
+        in outputConsole: from modules.TestHelpers import outputDisplayState(args)
+        then call outputDisplayState or something
+        or just write it as a method in Display class
+        -> use this for matching display state
+
 10/26
 
     [x] annotate enums

@@ -292,7 +292,7 @@ while(True):
     while(frameFactory.isOpened()):
         
         if b_test:
-            stub.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory)
+            stub.frameByStr(str_test)(frameFactory, timeFactory, directoryFactory, display)
         
         # receive cmd data from gui
         timeFactory.setPlay(g.playOn, g.switchAdvanceFrame)
