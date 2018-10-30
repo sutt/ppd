@@ -5,8 +5,8 @@
     [x] reset display.outputScore
         [x] add this to test_write_score
     [x] gui. annotate obj: reverse radio labels
-    [ ] add test write_adv_score
-        [ ] and added write_score details
+    [x] add test write_adv_score
+        [x] and added write_score details
     [ ] add test custom_framelog
         [ ] document the git diff for documentation in guiview_test
 

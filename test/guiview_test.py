@@ -37,10 +37,24 @@ Todo:
     [ ] modify test video files to be shorter
     [ ] modify watchProcess: not catching tests that error
         [ ] returncode is always 1 b/c error thrown in stub.exitByStr()
+    [ ] document a git command showing how to add one test "git diff abcdef zwxyaa"
 
     Tests:
 
     [ ] Need to check frame pixel values against a benchmark: a diff
+    [ ] writeFrame bDuplicate overriding frameData w/w/o score
+    [ ] scoring output
+        [ ] just from display
+        [ ] just from notes
+        [ ] a merge of notes and display (update/add)
+    [ ] modulo zero stuff
+
+    Features to test:
+
+    [ ] --allowduplicates
+    [ ] --customframelog
+    [ ] --showscoring on/off
+    [ ] --scoringenum for multiple objects
 
 
 Primer: How to Add a Test
@@ -814,9 +828,10 @@ class GuiviewStagingClass:
         ''' test meta log score output: use a stub to mimin do a selectROI for a 
             "hand-drawn" score and see if that gets output into metalog.
             
-                details: frame1 should have a score
-                         frame2 should have no score
-                         frame3 should have a repeat of frame1 score
+                details: frame0 should have a score
+                         frame1 should have no score
+                         frame2 should have a repeat of frame1 score
+                         frame3 should have no score
                          
         '''
 
@@ -861,7 +876,7 @@ class GuiviewStagingClass:
                 json_data = json.loads(line)
 
                 assert json_data.get('frames', None) is not None
-                assert len(json_data['frames']) == 3
+                assert len(json_data['frames']) == 4
                 
                 scoring = json_data['frames'][0]['scoring']
                 assert scoring is not None
@@ -876,6 +891,9 @@ class GuiviewStagingClass:
                 assert scoring.get('0').get('type') == 'circle'
                 assert scoring.get('0').get('data') == [100,100,50,60]
 
+                scoring = json_data['frames'][3]['scoring']
+                assert scoring is None
+
             except Exception as e:
                 bErrors = True
                 msg += ["TEST DATA: metalog / metalog data is not as expected"]
@@ -887,7 +905,107 @@ class GuiviewStagingClass:
             print "\n".join(msg)
             raise Exception("TEST FAIL: write_score")
 
-    
+    def write_adv_score(self):
+        ''' test meta log score output on an already proc'd vid with scores.
+            (try overwriting/copying/adding duplicates etc) 
+
+                data: output0.avi is first 10 frames of output4.avi
+                        0: score circle0
+                        2: switch param ball_present: false->true
+                        3: score ray1
+                        4: score ray1, circle2
+                        5: score ray1, circle2 (same)
+                        6: switch param ball_present: true->false
+                        9: score circle3
+
+                TODO:
+                    [x] overwrite same obj enum
+                    [x] leave current score intact
+                    [x] add diff obj enum to existing score
+                    [x] go back over already written frames to adjust score
+                         
+        '''
+
+        cmd = '''python guiview.py --test write_adv_score --nogui --noshow 
+                                    --file data/test/guiview/write_adv_score/output0.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/write_adv_score/"
+        TEST_DATA_FN = "output0.proc1.metalog"
+        TEST_DATA_ALL = ["output0.proc1.avi", "output0.proc1.txt", "output0.proc1.metalog"]
+
+        for f in TEST_DATA_ALL:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in TEST_DATA_ALL:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        #Assess output for details ------------------
+        if not(bErrors):
+            try:        
+                
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                assert json_data.get('frames', None) is not None
+                assert len(json_data['frames']) == 7
+                
+                # test adding obj1 to existing obj0
+                scoring = json_data['frames'][0]['scoring']
+                assert scoring is not None
+                assert scoring.get('0').get('data') == [203, 170, 47, 59]
+                assert scoring.get('1').get('type') == 'circle'
+                assert scoring.get('1').get('data') == [200, 200, 50, 50]
+                        
+                # test overwriting obj1
+                scoring = json_data['frames'][3]['scoring']
+                assert scoring.get('1').get('type') == 'circle'
+                assert scoring.get('1').get('data') == [200, 200, 50, 50]
+
+                # test copying without altering: obj0, obj1 stay preserved
+                scoring = json_data['frames'][4]['scoring']
+                assert len(scoring.keys()) == 2
+                assert scoring.get('1').get('data') == [[105, 354], [239, 239]]
+                assert scoring.get('2').get('data') == [166, 131, 39, 39]
+
+                #test bypass, then rewind, then return and overwrite
+                #there's an overwrite on obj2 and an add for obj3, obj1 is preserved
+                scoring = json_data['frames'][5]['scoring']
+                assert len(scoring.keys()) == 3
+                assert scoring.get('1').get('data') == [[105, 354], [239, 239]]
+                assert scoring.get('2').get('data') == [200, 200, 50, 50]
+                assert scoring.get('3').get('data') == [300, 300, 50, 50]
+
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog / metalog data is not as expected"]
+
+
+        #Output test result -------------------------
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: write_score")
+
+
 
 
 
@@ -1234,6 +1352,8 @@ class GuiviewStub:
             return self.meta_adv_frame
         elif strTest == 'write_score':
             return self.write_score_frame
+        elif strTest == 'write_adv_score':
+            return self.write_adv_score_frame
         else:
             return self.dummy
 
@@ -1506,16 +1626,93 @@ class GuiviewStub:
             g.switchWriteVid = True   #don't write scoring data
 
         if self.stubCounter == 4:
-            g.switchWriteScoring = True #write scoring data, is it carried over from 2-frames-before?
+            g.switchWriteScoring = True #write scoring data, it's carried over from previous select
+
+        if self.stubCounter == 5:
+            g.switchSelectReset = True  #reset scoring data     
+
+        if self.stubCounter == 6:
+            g.switchWriteScoring = True  #write scoring, but ut has no data, should write null     
 
         self.stubCounter += 1
         
-        if self.stubCounter > 5:
+        if self.stubCounter > 7:
             g.callExit = True
     
 
+    def write_adv_score_frame(self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ,_display
+                            ):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True      
+
+        if self.stubCounter == 2:       
+            
+            outputScore = ScoreSchema()
+            roiStub = (200,200,50,50)
+            outputScore.addCircle(roiStub, objEnum = 1)
+            _display._test_set_outputScore(copy.deepcopy(outputScore))
+
+            g.switchWriteScoring = True     #frame0-score add
+        
+        if self.stubCounter == 3:
+            g.switchWriteVid = True         #frame1-noscore
+
+        if self.stubCounter == 4:
+            g.switchWriteVid = True         #frame2-noscore
+
+        if self.stubCounter == 5:
+            
+            outputScore = ScoreSchema()
+            roiStub = (200,200,50,50)
+            outputScore.addCircle(roiStub, objEnum = 1)
+            _display._test_set_outputScore(copy.deepcopy(outputScore))
+
+            g.switchWriteScoring = True     #frame3-score overwrite
+        
+        if self.stubCounter == 6:
+            g.switchWriteVid = True         #frame4-no additional score
+
+        #now we'll go past frame 5 and then rewind, then return and overwrite score
+
+        if self.stubCounter == 7:
+            g.switchWriteVid = True         #frame5-write w/o score edit
+
+        if self.stubCounter == 8:
+            g.switchWriteVid = True         #frame6-write 
+
+        if self.stubCounter == 9:
+            g.switchRetreatFrame = True     #we're on frame7, rewind to frame6 
+
+        if self.stubCounter == 10:
+            g.switchRetreatFrame = True     #we're on frame6, rewind to frame5
+
+        if self.stubCounter == 11:
+            
+            outputScore = ScoreSchema()
+            roiStub = (200,200,50,50)
+            outputScore.addCircle(roiStub, objEnum = 2)  #overwrites
+            roiStub = (300,300,50,50)
+            outputScore.addCircle(roiStub, objEnum = 3)  #adds
+            _display._test_set_outputScore(copy.deepcopy(outputScore))
+
+            g.switchWriteScoring = True     #frame5-score overwrite + score add
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 15:
+            g.callExit = True
+
 
 #For collection by pytest ------------------------
+
+def test_write_adv_score():
+    stage = GuiviewStagingClass()
+    stage.write_adv_score()
 
 def test_write_score():
     stage = GuiviewStagingClass()
@@ -1586,6 +1783,6 @@ def test_true_time():
     stage.true_time()
 
 if __name__ == "__main__":
-    test_write_score()
-    pass
+    test_write_adv_score()
+    
 
