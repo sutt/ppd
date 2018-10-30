@@ -72,6 +72,7 @@ g.switchOverideNote = False
 g.trackObjEnum = 0
 g.trackTypeEnum = 0
 g.annotateObjEnum = False
+g.switchSelectReset = False
 
 
 #High Level Options --------------------------
@@ -317,7 +318,8 @@ while(True):
                       ,trackTypeEnum=g.trackTypeEnum
                       ,windowTwo=g.windowTwo
                       ,windowThree=g.windowThree
-                      ,annotateObjEnum=g.annotateObjEnum)
+                      ,annotateObjEnum=g.annotateObjEnum
+                      ,cmdSelectReset=g.switchSelectReset)
 
         notesFactory.setCmd( switchOverideNote=g.switchOverideNote)
 

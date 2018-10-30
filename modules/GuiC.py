@@ -34,6 +34,9 @@ class ConstructGui:
     def cmd_selectroizoom(self):
         g.switchRoiZoom = True
 
+    def cmd_selectreset(self):
+        g.switchSelectReset = True
+
     def cmd_windowTwo(self):
         g.windowTwo = bool(self.int_windowTwo.get())
 
@@ -188,6 +191,8 @@ class ConstructGui:
             self.cmd_initWritevid_sw()
         if e.char == "t":
             self.cmd_sw_trackon()
+        if e.char == "r":
+            self.cmd_selectreset()
         
         
             
@@ -279,6 +284,12 @@ class ConstructGui:
              fselect1
             ,text = 'roi zoom <X>'
             ,command = self.cmd_selectroizoom
+            ).pack(side=tk.LEFT)
+
+        tk.Button(
+             fselect1
+            ,text = 'Reset'
+            ,command = self.cmd_selectreset
             ).pack(side=tk.LEFT)
 
         fselect2 = tk.Frame(root)
@@ -538,17 +549,17 @@ class ConstructGui:
         
         tk.Radiobutton(
              f_annotate_enum
-            ,text="off"
+            ,text="on"
             ,variable=self.int_annotateEnum
-            ,value=0
+            ,value=1
             ,command=self.cmd_annotateEnum
             ).pack(side=tk.LEFT)
 
         tk.Radiobutton(
              f_annotate_enum
-            ,text="on"
+            ,text="off"
             ,variable=self.int_annotateEnum
-            ,value=1
+            ,value=0
             ,command=self.cmd_annotateEnum
             ).pack(side=tk.LEFT)
         

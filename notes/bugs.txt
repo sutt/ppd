@@ -1,12 +1,22 @@
 #Tasks
 
+10/30
+
+    [x] reset display.outputScore
+        [x] add this to test_write_score
+    [x] gui. annotate obj: reverse radio labels
+    [ ] add test write_adv_score
+        [ ] and added write_score details
+    [ ] add test custom_framelog
+        [ ] document the git diff for documentation in guiview_test
+
 10/29
 
     [x] display.circleTrack -> trackScore
     [x] trackFactory: multi object tracking
 
     [x] build a new test
-    [ ] add display to all stubs and all mocks in guiview
+    [x] add display to all stubs and all mocks in guiview
     [ ] get a recipe for debug where you can write to file a display window's state
         in outputConsole: from modules.TestHelpers import outputDisplayState(args)
         then call outputDisplayState or something

@@ -98,6 +98,7 @@ class Display:
         self.cmdSelectZoom = False
         self.cmdSelectRoiMain = False
         self.cmdSelectRoiZoom = False
+        self.cmdSelectReset = False
 
         # what does hand-score represent:
         self.trackObjEnum = 0   # objects: 0,1,2,3
@@ -161,11 +162,13 @@ class Display:
                 ,windowTwo=None
                 ,windowThree=None
                 ,annotateObjEnum=None
+                ,cmdSelectReset=False
                 ):
         
         self.cmdSelectZoom = cmdSelectZoom
         self.cmdSelectRoiMain = cmdSelectRoiMain
         self.cmdSelectRoiZoom = cmdSelectRoiZoom
+        self.cmdSelectReset = cmdSelectReset
 
         self.trackObjEnum = trackObjEnum
         self.trackTypeEnum = trackTypeEnum
@@ -181,9 +184,15 @@ class Display:
                 self.bAnnotateObjEnum = annotateObjEnum
                 self.resetOperators()
 
+        if cmdSelectReset:
+
+            self.outputScore.reset()
+            self.resetOperators()
+
         g.switchZoom = False
         g.switchRoiMain = False
         g.switchRoiZoom = False
+        g.switchSelectReset = False
 
         if not(g.windowTwo):
             cv2.destroyWindow("zoom_display")

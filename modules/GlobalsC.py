@@ -26,5 +26,6 @@ def init():
     global trackObjEnum
     global trackTypeEnum
     global annotateObjEnum
+    global switchSelectReset
     
 
