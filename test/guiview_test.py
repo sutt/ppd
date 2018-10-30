@@ -59,6 +59,9 @@ Todo:
 
 Primer: How to Add a Test
 
+    [Use this diff to view the pattern: git diff 27b57b3 44d6aa7
+     (this was for adding test_custom_framelog_1)               ]
+
     Make a new method in GuiviewStagingClass:
         
         figure out the params to call the script with.
@@ -1025,14 +1028,6 @@ class GuiviewStagingClass:
                     [x] test param types bool, str, int, float
                     [x] change custom framelog contents within run, check its reflected in output
 
-                FURTHER TESTS:
-                    
-                    [ ] in test_2: proc'd vid w/ exisiting framenotes
-                        [ ] does proc+custom merge the notes or overwrite?
-
-                    [ ] use framenote-override.jsonc for batch override
-                    [ ] edit framenote.json for indv frame edits
-                         
         '''
 
         cmd = '''python guiview.py --test custom_framelog_1 --nogui --noshow 
@@ -1042,7 +1037,7 @@ class GuiviewStagingClass:
         #Setup Test Data Dir -------------------------
         TEST_DATA_DIR = "../data/test/guiview/custom_framelog_1/"
         TEST_DATA_FN = "output4.proc1.metalog"
-        TEST_DATA_ALL = ["output4.proc1.avi", "output4.proc1.txt", "output0.proc1.metalog"]
+        TEST_DATA_ALL = ["output4.proc1.avi", "output4.proc1.txt", "output4.proc1.metalog"]
 
         for f in TEST_DATA_ALL:
             try:
@@ -1111,6 +1106,118 @@ class GuiviewStagingClass:
             print "\n".join(msg)
             raise Exception("TEST FAIL: custom_framelog_1")
 
+
+    def edit_framenote(self):
+        ''' test output metalog framenotes from a proc'd input vid.
+            also test how scoring is affected by other param changes
+
+                note: since the videos are proc'd and therefore framenotes already
+                      exist, what happens to default guiview.jsonc doesn't affect
+                      this. 
+                      also, if you go back with rewind and then rewrite the frame,
+                      without editing framenote again,
+                
+                data: output0.avi, is proc'd first 10 frames of output4, 
+                                   with scorings at some frames
+
+                TODO:
+                    [x] edit framenote.json
+                    [x] test changes relected in output
+                    [~] test that old score is preserved
+                    [x] test that new score is added
+                    
+        '''
+
+        cmd = '''python guiview.py --test edit_framenote --nogui --noshow 
+                                    --file data/test/guiview/edit_framenote/output0.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/edit_framenote/"
+        TEST_DATA_FN = "output0.proc1.metalog"
+        TEST_DATA_ALL = ["output0.proc1.avi", "output0.proc1.txt", "output0.proc1.metalog"]
+
+        for f in TEST_DATA_ALL:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in TEST_DATA_ALL:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        #Assess output for details ------------------
+        if not(bErrors):
+            try:        
+                
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                # test basic prop's of how the output should look
+                assert json_data.get('frames', None) is not None
+                assert len(json_data['frames']) == 6
+                assert json_data['processed'] == True
+
+                
+                # test that original framenote is copied and preserved
+                dictFrameNote = json.loads("""{
+                    "frame_type": "sutton demo", 
+                    "notes": "adding a demo frame", 
+                    "details": {
+                        "ball_partial_occluded": true, 
+                        "ball_is_close": "medium", 
+                        "ball_present": false
+                    }, 
+                    "orig_vid_index": 0, 
+                    "details-type": "details1"
+                }""")
+                assert json_data['frames'][0]['notes'] == dictFrameNote['notes']
+                assert json_data['frames'][0]['orig_vid_index'] == dictFrameNote['orig_vid_index']
+                assert json_data['frames'][0]['frame_type'] == dictFrameNote['frame_type']
+                assert (json_data['frames'][0]['details']['ball_present'] == 
+                        dictFrameNote['details']['ball_present'] )
+
+                # test that a param has changed based on original processing
+                assert json_data['frames'][2]['details']['ball_present'] == True
+
+                # test that editing the framenote makes changes
+                assert json_data['frames'][3].get('new_param', None) == True
+                assert json_data['frames'][3].get('frame_type', None) is None
+
+                # test that editing the framenote makes changes, and scoring can be added, at sametime
+                assert json_data['frames'][4].get('new_param', None) == False
+                assert json_data['frames'][4].get('scoring', None) is not None
+                assert len(json_data['frames'][4].get('scoring', {}).keys()) == 3
+                assert json_data['frames'][4]['scoring']['0']['data'] == [300,300,50,50]
+
+                #test that the edit doesn't affect framenotes downstream
+                assert json_data['frames'][5].get('new_param', None) is None
+                assert json_data['frames'][5].get('frame_type', None) is not None
+
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog / metalog data is not as expected"]
+                msg += [str(e.message)]
+
+        #Output test result -------------------------
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: edit_framenote")
 
 
 class GuiviewMock:
@@ -1460,6 +1567,8 @@ class GuiviewStub:
             return self.write_adv_score_frame
         elif strTest == 'custom_framelog_1':
             return self.custom_framelog_1_frame
+        elif strTest == 'edit_framenote':
+            return self.edit_framenote_frame
         else:
             return self.dummy
 
@@ -1873,9 +1982,79 @@ class GuiviewStub:
             g.callExit = True
 
 
+    def edit_framenote_frame(self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ,_display
+                            ):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True      
+
+        if self.stubCounter == 2:       
+            g.switchWriteVid = True         #frame0-copy framenotes
+
+        if self.stubCounter == 3:       
+            g.switchWriteVid = True         #frame1-copy framenotes
+
+        if self.stubCounter == 4:       
+            g.switchWriteVid = True         #frame2-copy framenotes
+            
+        if self.stubCounter == 5:       
+
+            #edit framenote
+            editParams = '''
+            {
+                "new_param": true,
+                "scoring": null
+            }
+            '''
+            _f = open("notes/framenote.json", 'w')
+            _f.truncate(0)
+            _f.write(editParams)
+            _f.close()
+            
+            g.switchWriteVid = True         #frame3 - overwrite framenote
+        
+        if self.stubCounter == 6:       
+            
+            #edit framenote
+            editParams = '''
+            {
+                "new_param": false,
+                "scoring": null
+            }
+            '''
+            _f = open("notes/framenote.json", 'w')
+            _f.truncate(0)
+            _f.write(editParams)
+            _f.close()
+
+            outputScore = ScoreSchema()
+            roiStub = (300,300,50,50)
+            outputScore.addCircle(roiStub, objEnum = 0)
+            _display._test_set_outputScore(copy.deepcopy(outputScore))
+
+            g.switchWriteScoring = True         #frame4 - overwrite framenote + addscore
+
+        if self.stubCounter == 7:       
+            g.switchWriteVid = True             #frame5-copy framenote
+
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 10:
+            g.callExit = True
+
+
 
 
 #For collection by pytest ------------------------
+
+def test_edit_framenote():
+    stage = GuiviewStagingClass()
+    stage.edit_framenote()
 
 def test_custom_framelog_1():
     stage = GuiviewStagingClass()
@@ -1954,6 +2133,6 @@ def test_true_time():
     stage.true_time()
 
 if __name__ == "__main__":
-    test_write_adv_score()
+    test_edit_framenote()
     
 

@@ -7,8 +7,25 @@
     [x] gui. annotate obj: reverse radio labels
     [x] add test write_adv_score
         [x] and added write_score details
-    [ ] add test custom_framelog
-        [ ] document the git diff for documentation in guiview_test
+    [x] add test custom_framelog_1
+        [x] document the git diff for documentation in guiview_test
+            git diff 27b57b3 44d6aa7
+    [~] add test custom_framelog_2
+        custom-framelog does not work on proc'd vids?
+            -> b/c you need to overwrite in framenote.jsonc
+    [x] add test edit_framenote:
+        [x] try with param edit while also new scoring
+        [x] make sure old scoring does not get lost
+        [~] try with back-and-forth, are originals note edits preserved? no they are not
+    [ ] add test edit_framenote_override
+        [ ] try with back and forth
+        [ ] try with scoring, is it overwritten, is it preserved?
+
+
+    Thinking of more tests:
+        [ ] orientation, selectZoom selectROI on these
+        [ ] resizing zoomFrame / scoreFrame
+        [ ] preload vs semiload
 
 10/29
 
