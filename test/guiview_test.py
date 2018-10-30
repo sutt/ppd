@@ -52,7 +52,7 @@ Todo:
     Features to test:
 
     [ ] --allowduplicates
-    [ ] --customframelog
+    [x] --customframelog
     [ ] --showscoring on/off
     [ ] --scoringenum for multiple objects
 
@@ -1005,7 +1005,111 @@ class GuiviewStagingClass:
             print "\n".join(msg)
             raise Exception("TEST FAIL: write_score")
 
+    
+    def custom_framelog_1(self):
+        ''' test metalog frame notes using a custom framelog on a non-proc'd vid.
+            this also tests how you can alter the params each frame.
 
+                note: we haven't been able to test frame note params until this test
+                      as default framelog (in notes/guiview.jsonc) is subject to change
+                      and thus will change b/w initial benchmark run and subsequent
+                      test runs.
+                
+                data: output4.avi is virgin, has no framenotes
+                      (in test_2, output0.avi has been proc'd with guiview.json)
+
+                TODO:
+                    [x] use --framelog with a custom jsonc file
+                    [x] do this from non-proc'd vid
+                    [x] edit framelog within run
+                    [x] test param types bool, str, int, float
+                    [x] change custom framelog contents within run, check its reflected in output
+
+                FURTHER TESTS:
+                    
+                    [ ] in test_2: proc'd vid w/ exisiting framenotes
+                        [ ] does proc+custom merge the notes or overwrite?
+
+                    [ ] use framenote-override.jsonc for batch override
+                    [ ] edit framenote.json for indv frame edits
+                         
+        '''
+
+        cmd = '''python guiview.py --test custom_framelog_1 --nogui --noshow 
+                                    --framelog data/test/guiview/custom_framelog_1/guiview-custom.jsonc
+                                    --file data/test/guiview/custom_framelog_1/output4.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/custom_framelog_1/"
+        TEST_DATA_FN = "output4.proc1.metalog"
+        TEST_DATA_ALL = ["output4.proc1.avi", "output4.proc1.txt", "output0.proc1.metalog"]
+
+        for f in TEST_DATA_ALL:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in TEST_DATA_ALL:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        #Assess output for details ------------------
+        if not(bErrors):
+            try:        
+                
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                # test basic prop's of how the output should look
+                assert json_data.get('frames', None) is not None
+                assert len(json_data['frames']) == 3
+                
+                # test initial params have the correct type
+                framenotes = json_data['frames'][0]
+                assert framenotes['int_param'] == 12
+                assert framenotes['bool_param'] == True
+                assert framenotes['none_param'] is None
+                assert framenotes['float_param'] == 9.999
+                assert framenotes['str_param'] == "bring it to me"
+
+                # test that params have changed in next frame
+                framenotes = json_data['frames'][1]
+                assert framenotes['int_param'] == 13
+                assert framenotes['bool_param'] == False
+
+                # test that params remain that you skipped a frame
+                framenotes = json_data['frames'][2]
+                assert framenotes['orig_vid_index'] == 3
+                assert framenotes['none_param'] == "these are the altered params"
+
+                # test vid-level params
+                assert json_data['processed'] == True
+
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog / metalog data is not as expected"]
+                msg += [str(e.message)]
+
+        #Output test result -------------------------
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: custom_framelog_1")
 
 
 
@@ -1354,6 +1458,8 @@ class GuiviewStub:
             return self.write_score_frame
         elif strTest == 'write_adv_score':
             return self.write_adv_score_frame
+        elif strTest == 'custom_framelog_1':
+            return self.custom_framelog_1_frame
         else:
             return self.dummy
 
@@ -1707,8 +1813,73 @@ class GuiviewStub:
         if self.stubCounter > 15:
             g.callExit = True
 
+    
+    def custom_framelog_1_frame(self
+                                ,_frameFactory
+                                ,_timeFactory
+                                ,_directoryFactory
+                                ,_display
+                                ):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True      
+            baseParams = '''
+            {
+                "bool_param": true,
+                "int_param": 12,
+                "str_param": "bring it to me",
+                "float_param": 9.999,
+                "none_param": null
+            }
+            '''
+            _f = open("data/test/guiview/custom_framelog_1/guiview-custom.jsonc", 'w')
+            _f.truncate(0)
+            _f.write(baseParams)
+            _f.close()
+
+        if self.stubCounter == 2:       
+            g.switchWriteVid = True         #frame0-initial framelog
+
+        if self.stubCounter == 3:       
+            
+            #edit the custom framelog
+            editParams = '''
+            {
+                "bool_param": false,
+                "int_param": 13,
+                "str_param": "",
+                "float_param": -9.999,
+                "none_param": "these are the altered params",
+                "nested_dict": {"inside_param":0}
+            }
+            '''
+            _f = open("data/test/guiview/custom_framelog_1/guiview-custom.jsonc", 'w')
+            _f.truncate(0)
+            _f.write(editParams)
+            _f.close()
+        
+        if self.stubCounter == 4:       
+            g.switchWriteVid = True         #frame1-altered framelog
+
+        if self.stubCounter == 5:
+            g.switchAdvanceFrame = True     #go to frame3 w/o writing
+
+        if self.stubCounter == 6:       
+            g.switchWriteVid = True         #frame3-altered framelog
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 10:
+            g.callExit = True
+
+
+
 
 #For collection by pytest ------------------------
+
+def test_custom_framelog_1():
+    stage = GuiviewStagingClass()
+    stage.custom_framelog_1()
 
 def test_write_adv_score():
     stage = GuiviewStagingClass()
