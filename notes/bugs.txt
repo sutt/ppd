@@ -17,15 +17,24 @@
         [x] try with param edit while also new scoring
         [x] make sure old scoring does not get lost
         [~] try with back-and-forth, are originals note edits preserved? no they are not
-    [ ] add test edit_framenote_override
-        [ ] try with back and forth
-        [ ] try with scoring, is it overwritten, is it preserved?
+    [x] add test edit_framenote_override
+        [x] try with back and forth
+        [x] try with scoring, is it overwritten, is it preserved?
 
 
     Thinking of more tests:
         [ ] orientation, selectZoom selectROI on these
         [ ] resizing zoomFrame / scoreFrame
         [ ] preload vs semiload
+
+    Misc Features:
+        [ ] framenote-override doesn't ADD to framenote (only overwrites). Change this?
+                see: guiview_test:test_override_framenote
+
+    List of other bugs, features:
+        [ ] draw_ray( bOffSetRay)
+        [ ] TODO-SS in trackFactory - not truly multi-object yet
+            [ ] depends
 
 10/29
 
@@ -47,14 +56,10 @@
     [x] trackFactory scoreSchema
         [x] "#TODO-SS" is still commented here
     [x] does deleting __init__ in test/ matter? to debug? or pytest?
-    [ ] build some tests
+    [x] build some tests
     [ ] investigate the bugs
     [ ] consolidate test runs with a script
 
-    List of other bugs, features:
-        [ ] draw_ray( bOffSetRay)
-        [ ] TODO-SS in trackFactory - not truly multi-object yet
-            [ ] depends
 
 10/25
     [x] cli for obj to show in score_display
@@ -62,14 +67,15 @@
     [ ] vertical score_display is too large
         [x] test this
         [ ] fix this
-    [ ] need to reset display.outputScore so we 
-        [ ] a) don't rewrite an old score onto new frame?
-        [ ] b) don't have a cluttered view
+    [x] need to reset display.outputScore so we 
+        [x] a) don't rewrite an old score onto new frame?
+        [x] b) don't have a cluttered view
     [~] file debug import/step-into from root/test/
         [~] reproduce: CAN'T
             KEY: it only works when you don't call with erroneous arg's
-    [ ] file output-panel pop-up bug
-        [ ] reproduce in blank workspace
+    [x] file output-panel pop-up bug
+        [x] reproduce in blank workspace
+        [ ] file the bug
 
     Research on VSCode issues
 
@@ -104,10 +110,6 @@
                 should cause:
                 [Error - 6:30:21 PM] One or more errors occurred. (failed to parse file file:///c:/Users/wsutt/Desktop/files/ppd/ppd/scratch/repro_popup/demo.py)
 
-
-
-
-        
 
 10/24
 
@@ -186,9 +188,9 @@
         [ ] Add functionality:
             [x] Draw multiple objects/object-types from inputScore/outputScore
             [x] Assign multiple object/object-types with gui+display
-            [ ] add scoreSchema to TrackFactory, and then to display.drawTrackers()
+            [x] add scoreSchema to TrackFactory, and then to display.drawTrackers()
 
-        [ ] Additional Features:
+        [x] Additional Features:
             [x] assign a particluar obj enum to be zoomed-in in scoreDisplay
                 [x] call from cli, parser
 
@@ -280,7 +282,7 @@
         [x] Can't change score to new params with gui-roi
         [ ] Can't apply track as score
             [ ] add score_type: 'track-score'
-        [ ] Need multiple scores for multi-object tracking
+        [x] Need multiple scores for multi-object tracking
         [~] An undo button for last frame proc
             [~] recursively this is just remove last frame
         [x] We writeframes even when they're duplicates with Writeframe-On;

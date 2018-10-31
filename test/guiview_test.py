@@ -1115,7 +1115,8 @@ class GuiviewStagingClass:
                       exist, what happens to default guiview.jsonc doesn't affect
                       this. 
                       also, if you go back with rewind and then rewrite the frame,
-                      without editing framenote again,
+                      without editing framenote again, you won't get altered
+                      data in the output
                 
                 data: output0.avi, is proc'd first 10 frames of output4, 
                                    with scorings at some frames
@@ -1208,6 +1209,108 @@ class GuiviewStagingClass:
                 #test that the edit doesn't affect framenotes downstream
                 assert json_data['frames'][5].get('new_param', None) is None
                 assert json_data['frames'][5].get('frame_type', None) is not None
+
+            except Exception as e:
+                bErrors = True
+                msg += ["TEST DATA: metalog / metalog data is not as expected"]
+                msg += [str(e.message)]
+
+        #Output test result -------------------------
+        if bErrors:
+            print "\n".join(msg)
+            raise Exception("TEST FAIL: edit_framenote")
+
+    
+    
+    def override_framenote(self):
+        ''' test using framenote-override.jsonc to alter params in a proc'd vid.
+            also test how scoring is affected by these changes
+
+                note: 
+                
+                data: output0.avi, is proc'd first 10 frames of output4, 
+                                   with scorings at some frames
+
+                TODO:
+                    [x] edit framenote-override.jsonc
+                    [x] test it changes frames
+                        [x] overwrites
+                        [x] add (?) NO
+                        [x] scoring preserved (?)
+                    [x] bDuplicates, go back and forth
+                    
+        '''
+
+        cmd = '''python guiview.py --test override_framenote --nogui --noshow 
+                                    --file data/test/guiview/override_framenote/output0.avi'''
+
+        #Setup Test Data Dir -------------------------
+        TEST_DATA_DIR = "../data/test/guiview/override_framenote/"
+        TEST_DATA_FN = "output0.proc1.metalog"
+        TEST_DATA_ALL = ["output0.proc1.avi", "output0.proc1.txt", "output0.proc1.metalog"]
+
+        for f in TEST_DATA_ALL:
+            try:
+                os.remove(os.path.join(TEST_DATA_DIR, f))
+            except:
+                pass
+        for f in TEST_DATA_ALL:
+            assert not(f in os.listdir(TEST_DATA_DIR))
+
+        #Run Test -----------------------------------
+        args = self.argsFromCmd(cmd)
+        
+        p = self.launchProcess(args)
+        
+        msg, ret = self.watchProcess(p)
+
+        bErrors = self.parseErrors(msg)
+
+        #Test output data ---------------------------
+        list_files = os.listdir(TEST_DATA_DIR)
+        if not(TEST_DATA_FN in list_files):
+            bErrors = True
+            msg += ["TEST DATA: could not find output file in test data directory"]
+
+        #Assess output for details ------------------
+        if not(bErrors):
+            try:        
+                
+                with open(os.path.join(TEST_DATA_DIR, TEST_DATA_FN), 'r') as f:
+                    lines = f.readlines()
+                line = ''.join(lines)
+                json_data = json.loads(line)
+
+                # test basic prop's of how the output should look
+                assert json_data.get('frames', None) is not None
+                assert len(json_data['frames']) == 8
+                assert json_data['processed'] == True
+
+                
+                # test that original framenote is copied and preserved
+                assert json_data['frames'][0]['frame_type'] == "sutton demo"
+                assert json_data['frames'][0].get('new_param', None) is None
+
+                # test that params have changed based on override, but not added
+                assert json_data['frames'][1]['frame_type'] == "overwritten"
+                assert json_data['frames'][0].get('new_param', None) is None
+                
+                # test that we switch back to original framenotes
+                assert json_data['frames'][2]['frame_type'] == "sutton demo"
+                assert json_data['frames'][2].get('new_param', None) is None
+
+                # test that editing the framenote makes changes
+                assert json_data['frames'][3]['details']['ball_is_close'] == "lightyears"
+                assert json_data['frames'][3]['details']['ball_partial_occluded'] == True
+                assert json_data['frames'][3]['scoring']['1']['data'] == [[105, 354], [239, 239]]
+
+                # test that we switch back to original framenotes
+                assert json_data['frames'][4]['details']['ball_is_close'] == "medium"
+
+                # test the "twice-over" frames, they've been requested written to output twice
+                assert json_data['frames'][5]['details']['ball_is_close'] == "lightyears"
+                assert json_data['frames'][6]['details']['ball_is_close'] == "medium"
+
 
             except Exception as e:
                 bErrors = True
@@ -1569,6 +1672,8 @@ class GuiviewStub:
             return self.custom_framelog_1_frame
         elif strTest == 'edit_framenote':
             return self.edit_framenote_frame
+        elif strTest == 'override_framenote':
+            return self.override_framenote_frame
         else:
             return self.dummy
 
@@ -2048,9 +2153,67 @@ class GuiviewStub:
             g.callExit = True
 
 
+    def override_framenote_frame(self
+                            ,_frameFactory
+                            ,_timeFactory
+                            ,_directoryFactory
+                            ,_display
+                            ):
+        
+        if self.stubCounter == 1:
+            g.initWriteVid = True      
+
+            editParams = '''{ "new_param": true, "frame_type": "overwritten"}'''
+            _f = open("notes/framenote-override.jsonc", 'w')
+            _f.truncate(0)
+            _f.write(editParams)
+            _f.close()
+
+        if self.stubCounter == 2:       
+            g.switchWriteVid = True             #frame0 - copy framenotes
+
+        if self.stubCounter == 3:       
+            g.switchOverideNote = True          #frame1 - override framenotes
+
+        if self.stubCounter == 4:       
+            g.switchWriteVid = True             #frame2 - copy framenotes
+            
+        if self.stubCounter == 5:                   
+            g.switchOverideNote = True          #frame3 - overwrite framenote
+
+            editParams = '''{"details": {"ball_is_close": "lightyears"}}'''
+            _f = open("notes/framenote-override.jsonc", 'w')
+            _f.truncate(0)
+            _f.write(editParams)
+            _f.close()
+        
+        if self.stubCounter == 6:  
+            g.switchWriteVid = True             #frame4 - copy framenote     
+
+        if 6 < self.stubCounter  < 10:  
+            g.switchWriteVid = True             #frame5,6,7 - copy framenote     
+
+        if 10 <= self.stubCounter <= 12:        #frame7 -> frame6 -> frame5
+            g.switchRetreatFrame = True
+
+        if self.stubCounter == 13:
+            g.switchOverideNote = True          #frame5 override
+
+        if 13 < self.stubCounter <= 15:
+            g.swtichWriteVid = True             #frame6, frame7 copy
+
+        self.stubCounter += 1
+        
+        if self.stubCounter > 20:
+            g.callExit = True
+
 
 
 #For collection by pytest ------------------------
+
+def test_override_framenote():
+    stage = GuiviewStagingClass()
+    stage.override_framenote()
 
 def test_edit_framenote():
     stage = GuiviewStagingClass()
@@ -2133,6 +2296,6 @@ def test_true_time():
     stage.true_time()
 
 if __name__ == "__main__":
-    test_edit_framenote()
+    test_override_framenote()
     
 
