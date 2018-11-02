@@ -38,7 +38,7 @@ class StagingDisplay:
          self
         ,b_show         = False
         ,b_scoreoff     = False
-        ,b_resize       = False
+        ,b_resize       = True
         ,b_annotate_fn  = False
         ,b_showscoring  = False
         ,i_scoringenum  = 0

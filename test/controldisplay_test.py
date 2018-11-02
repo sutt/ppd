@@ -7,6 +7,7 @@ if False: from cv2 import *
 
 from controldisplay_staging import StagingDisplay
 from utils import ImgDiff
+from utils import verifyAction
 
 sys.path.append("../")
 from modules.ControlDisplay import Display
@@ -16,10 +17,11 @@ from modules.DataSchemas import ScoreSchema
 '''
 
 TESTS:
-    [ ] show_scoring_on_off_1
-    [ ] show_scoring_on_off_2
-        [ ] diff stub_frame size: 1280
-        [ ] scoring_display check
+    [x] show_scoring_on_off_1
+    [x] show_scoring_on_off_2
+        [x] diff stub_frame size: 1280
+    
+    [ ] scoring_display check
     [ ] show_tracking_on_off_1
     
     [ ] test score_display exists
@@ -31,6 +33,20 @@ TEST FEATURES:
     [ ] stub_frame smaller than 640
     [ ] annotateObjEnums
 
+DOCUMENTATION:
+
+    on a test fail:
+        we can examine the change two ways:
+            1. numerical diffs should be printed to stdout, and returned in pytest
+            2. visually with an image in data/test/guiview/displayclass/log
+    
+    >python controldisplay_test.py --rebench
+
+        this allows you to take data created during test and write to test's benchmark data
+        
+        note: you want to rebench data-img's with bench_ prefix, but stub_frame etc
+              should remain unchanged.
+
 '''
 
 
@@ -38,16 +54,16 @@ TEST_PARENT_DIR = "../data/test/guiview/displayclass/"
 DIFF_LOG_DIR = "../data/test/guiview/displayclass/log/"
 
 
-def test_show_scoring_on_off_1():
+def show_scoring_on_off_1(input_test_child_dir, input_circle_data, b_rebench=False):
     ''' test that turning show_scoring on/off affects main display panel
         test that show_scoring=on + no scoring data is handled
             
-            details: different data will be different sizes
+            input params:  - tests have dif size frames
+                           - tests have dif scoring-data
     '''
 
-
-    #TODO - this goes in argument
-    TEST_CHILD_DIR = "test_show_scoring_on_off_1"
+    # setup ------
+    TEST_CHILD_DIR = input_test_child_dir
     
     stub_frame          = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
                                                     "stubframe.png"))
@@ -57,7 +73,7 @@ def test_show_scoring_on_off_1():
                                                     "bench_no_score.png"))
 
     some_scoring = ScoreSchema()
-    some_scoring.addCircle([202, 162, 48, 43])
+    some_scoring.addCircle(input_circle_data)
     stub_some_score = some_scoring.getAll()
 
     none_scoring = ScoreSchema()
@@ -65,6 +81,7 @@ def test_show_scoring_on_off_1():
 
     diff = ImgDiff(log_path = DIFF_LOG_DIR)
     
+    # run test -----
     stage = StagingDisplay()
     stage.all_display_methods( b_showscoring=True 
                               ,stub_frame=stub_frame.copy()
@@ -85,8 +102,18 @@ def test_show_scoring_on_off_1():
                               ,stub_scorecurrent=copy.deepcopy(stub_none_score)    #test-variable
                               )   
     scoring_none_output = stage.mock_get_frame()
-    
-    
+
+    #rebench ---
+    if b_rebench:
+        verifyAction()
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "bench_yes_score.png")
+                    ,scoring_on_output)
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "bench_no_score.png")
+                    ,scoring_off_output)
+        return
+        
+
+    # verify ----
     assert diff.diffImgs(bench_yes_scoring, scoring_on_output)
 
     assert diff.diffImgs(bench_no_scoring, scoring_off_output)
@@ -96,11 +123,16 @@ def test_show_scoring_on_off_1():
     assert diff.diffImgs(scoring_on_output, scoring_off_output, noLog=True) == False
 
 
-#TODO - make the test methods
-# def test_show_scoring_on_off_1():
-#     test_show_scoring_on_off_1(DATA_DIR=1)
-# def test_show_scoring_on_off_2():
-#     test_show_scoring_on_off_1(DATA_DIR=2)
+def test_show_scoring_on_off_1():
+    
+    show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_1", 
+                            input_circle_data = [202, 162, 48, 43])
+
+def test_show_scoring_on_off_2():
+    
+    show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_2", 
+                            input_circle_data = [375, 321, 153, 132])
+
 
 
 # Indv. Method Tests -----------------------
@@ -283,4 +315,27 @@ def test_display_rectToCircle():
     assert r == 5
 
 if __name__ == "__main__":
-    test_show_scoring_on_off_1()
+    
+    # test_show_scoring_on_off_1()
+
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--rebench",  action="store_true", default=False)
+    args = vars(ap.parse_args())
+
+    if args["rebench"]:
+
+        # comment these on/off to control rebench activity
+        # may want to copy all tests directories into a tmp folder temporarilly
+        # for rollback capabilities
+
+        show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_1", 
+                                input_circle_data = [202, 162, 48, 43],
+                                b_rebench=True)
+        
+        show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_2", 
+                                input_circle_data = [375, 321, 153, 132],
+                                b_rebench = True)
+
+
+

@@ -5,6 +5,16 @@
     [ ] then do with arg
     [ ] then re-run with if-blocks
 
+    [x] this could get annoying if we need to constantly update benchmark in tests
+        -> need an automated re-bench function for each test
+
+    [x] next commit
+        [x] pattern dif folder
+        [x] collect 2nd test data
+        [x] 2nd test
+        [x] rebench pattern
+            [x] test rebench
+
     
     [x] verify in ipython theres actual diffs b/w test images: no, so is staging func wrong?
     [x] why is viz_diff showing diffs wrong?
@@ -33,10 +43,12 @@
 10/31
 
     [ ] build test pattern for display, framefactory, etc
-        [ ] display pattern
+        [x] display pattern
             [ ] _test_get_frame, other test helper methods
         [ ] tests:
             [ ] view scoring
+                [x] main_display
+                [ ] score_display
             [ ] view hand-drawn selection
             [ ] view zoomFrame
             [ ] allowduplicates=off and try to add duplicates; try with back-and-forth

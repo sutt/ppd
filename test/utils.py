@@ -28,7 +28,16 @@ RECIPE:
     >bench_data.size            #to validate it exists
 
 '''
-    
+
+def verifyAction(msg="press Y to continue; N to exit\n"):
+    ret = raw_input(msg)
+    if ret.capitalize() == "Y":
+        print 'proceeding...'
+        return
+    else:
+        print 'exiting the script'
+        sys.exit()
+
 
 class ImgDiff:
 
@@ -94,7 +103,7 @@ class ImgDiff:
         except:
             print 'imgs not same size. '
             print '      imgBenchmark: %s' % str(imgBenchmark.shape)
-            print '      imgTest     : %s'% str(imgBenchmark.shape)
+            print '      imgTest     : %s'% str(imgTest.shape)
             return 
         
         try:
@@ -207,3 +216,7 @@ def test_viz_diff_imgs_1():
     except:
         print 'couldnt cleanup up files in test_viz_diff_1()'
 
+
+# if __name__ == "__main__":
+#     verifyAction()
+#     print 'continued..'
