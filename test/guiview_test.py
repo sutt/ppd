@@ -1226,7 +1226,8 @@ class GuiviewStagingClass:
         ''' test using framenote-override.jsonc to alter params in a proc'd vid.
             also test how scoring is affected by these changes
 
-                note: 
+                note: can't add new params to a framenote currently; 
+                      we may want to change that
                 
                 data: output0.avi, is proc'd first 10 frames of output4, 
                                    with scorings at some frames

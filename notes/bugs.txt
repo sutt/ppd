@@ -1,5 +1,46 @@
 #Tasks
 
+11/2
+    [ ] test_show_score_on_off_1() basic run pass
+    [ ] then do with arg
+    [ ] then do a debug indv.
+    [ ] then do a fail indv.
+    [ ] then do a fail within pytest
+        [ ] prints out summary
+        [ ] writes out diff
+    [ ] then re-run with if-blocks
+
+11/1
+
+    [ ] guiview_test - split into staging module
+        [ ] this allows us to develop staging routine better
+        [ ] better develop file delete routines
+        [ ] better develop reading the test data file as function
+        [ ] asserts in tests should not be wrapped in try
+    [ ] controldisplay_test -> split
+        [ ] controldisplay_staging
+        [ ] helperfunctions
+
+
+10/31
+
+    [ ] build test pattern for display, framefactory, etc
+        [ ] display pattern
+            [ ] _test_get_frame, other test helper methods
+        [ ] tests:
+            [ ] view scoring
+            [ ] view hand-drawn selection
+            [ ] view zoomFrame
+            [ ] allowduplicates=off and try to add duplicates; try with back-and-forth
+        [ ] sections for display testing: Class-level tests, Method-level tests
+
+    [ ] single command to run all the tests
+        [ ] see chess workspace, but not the .bat
+
+    [ ] finally, refactor vidwriter and miscutils
+
+    [ ] experimental vids
+
 10/30
 
     [x] reset display.outputScore
@@ -34,7 +75,11 @@
     List of other bugs, features:
         [ ] draw_ray( bOffSetRay)
         [ ] TODO-SS in trackFactory - not truly multi-object yet
-            [ ] depends
+        [ ] trackAlgo: trackLargestDiffInDesignatedRect
+                a bounce can be found via largest diff, but sometimes background diffs
+                will be larger, therefore we can rule those out with
+                a hand-drawn rect deignates the areas where the bounce will occur,
+                this can be encoded as say obj4?
 
 10/29
 
@@ -48,6 +93,8 @@
         then call outputDisplayState or something
         or just write it as a method in Display class
         -> use this for matching display state
+
+
 
 10/26
 
@@ -149,10 +196,10 @@
         [ ] create synthetic benchmark: np.zeros(x,x,x)+cv2.draw and then load
 
         [ ] writeFrame bDuplicate overriding frameData w/w/o score
-        [ ] scoring output
-            [ ] just from display
-            [ ] just from notes
-            [ ] a merge of notes and display (update/add)
+        [x] scoring output
+            [x] just from display
+            [x] just from notes
+            [x] a merge of notes and display (update/add)
         [ ] modulo zero stuff
 
 

@@ -163,6 +163,7 @@ class Display:
                 ,windowThree=None
                 ,annotateObjEnum=None
                 ,cmdSelectReset=False
+                ,globalsOn=True
                 ):
         
         self.cmdSelectZoom = cmdSelectZoom
@@ -189,16 +190,18 @@ class Display:
             self.outputScore.reset()
             self.resetOperators()
 
-        g.switchZoom = False
-        g.switchRoiMain = False
-        g.switchRoiZoom = False
-        g.switchSelectReset = False
+        if globalsOn:
+            
+            g.switchZoom = False
+            g.switchRoiMain = False
+            g.switchRoiZoom = False
+            g.switchSelectReset = False
 
-        if not(g.windowTwo):
-            cv2.destroyWindow("zoom_display")
+            if not(g.windowTwo):
+                cv2.destroyWindow("zoom_display")
 
-        if not(g.windowThree):
-            cv2.destroyWindow("diff_display")
+            if not(g.windowThree):
+                cv2.destroyWindow("diff_display")
 
 
     def setFrame(self, _frame):
