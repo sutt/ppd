@@ -57,44 +57,44 @@ def test_show_scoring_on_off_1():
                                                     "bench_no_score.png"))
 
     some_scoring = ScoreSchema()
-    some_scoring.addCircle([202, 162, 48, 43])    
+    some_scoring.addCircle([202, 162, 48, 43])
     stub_some_score = some_scoring.getAll()
 
     none_scoring = ScoreSchema()
-    stub_none_score = some_scoring.getAll()
+    stub_none_score = none_scoring.getAll()
 
     diff = ImgDiff(log_path = DIFF_LOG_DIR)
     
     stage = StagingDisplay()
     stage.all_display_methods( b_showscoring=True 
-                              ,stub_frame=stub_frame
-                              ,stub_scorecurrent=stub_some_score
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_some_score)
                               )
     scoring_on_output = stage.mock_get_frame()
 
     stage = StagingDisplay()
     stage.all_display_methods( b_showscoring=False                  #test-variable
-                              ,stub_frame=stub_frame
-                              ,stub_scorecurrent=stub_some_score
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_some_score)
                               )
     scoring_off_output = stage.mock_get_frame()
 
     stage = StagingDisplay()
     stage.all_display_methods( b_showscoring=True 
-                              ,stub_frame=stub_frame
-                              ,stub_scorecurrent=stub_none_score    #test-variable
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_none_score)    #test-variable
                               )   
     scoring_none_output = stage.mock_get_frame()
     
-    # assert diff.diffImgs(scoring_on_output, scoring_off_output)
     
     assert diff.diffImgs(bench_yes_scoring, scoring_on_output)
 
-    assert diff.diff_imgs(bench_no_scoring, scoring_off_output)
+    assert diff.diffImgs(bench_no_scoring, scoring_off_output)
 
-    assert diff.diff_imgs(bench_no_scoring, scoring_none_output)
+    assert diff.diffImgs(bench_no_scoring, scoring_none_output)
 
-    assert not(diff.diff_imgs(scoring_on_output, scoring_off_output))
+    assert diff.diffImgs(scoring_on_output, scoring_off_output, noLog=True) == False
+
 
 #TODO - make the test methods
 # def test_show_scoring_on_off_1():

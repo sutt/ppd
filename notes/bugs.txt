@@ -1,14 +1,16 @@
 #Tasks
 
 11/2
-    [ ] test_show_score_on_off_1() basic run pass
+    [x] test_show_score_on_off_1() basic run pass
     [ ] then do with arg
     [ ] then re-run with if-blocks
 
     
     [x] verify in ipython theres actual diffs b/w test images: no, so is staging func wrong?
     [x] why is viz_diff showing diffs wrong?
-    [ ] why does test_show_scoring not work? on which alleged asserts?
+    
+    [x] why does test_show_scoring not work? on which alleged asserts?
+        [x] need to re-collect the data all based off 1-video
 
     notes:
         good np primer

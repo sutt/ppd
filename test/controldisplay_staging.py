@@ -14,10 +14,6 @@ from modules.DataSchemas import ScoreSchema
 
 '''
 DEV-MODULE:
-    [x] basic whole class test
-    [x] build pattern for testing whole class
-    [x] build recipe for outputting images
-    [x] where to save data? data/test/guiview/displayclass/test_x/
 
     [ ] pass in args via pytest, turn diff logging on/off
     [ ] debug indv test under __main__ with diff params
@@ -25,9 +21,7 @@ DEV-MODULE:
     [ ] do IF-block's in all_display_methods
 
     [x] build diff helpers
-        [ ] test diff helpers
-
-    [x] what is extension for noncompressed image? png
+        [x] test diff helpers
 
     [ ] test_ -> tmethod(data_dir) 
             + test_1 calls tmethod(data_dir_1) 

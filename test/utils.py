@@ -8,33 +8,24 @@ from modules.ImgUtils import binary_diff
 ''' 
 
 TODO:
-    [x] finish imgdiff
-        [x] copy funcs from book
-    [x] test with a failed test
-    [x] test an outputlog
-    [x] add tests here
+    
+    [x] supress log output for expected bErrors
     [ ] update relevant regions for rgb vs grayscale
 
 BUGS:
-    [ ] why in test_viz_diff_imgs_1() does the scoring outline not get highlighted 
-        by output vizdifflog?
-    [ ] and why is benchmark NOT highlighting the scoring outline, when one img has it
-        and the other img doesn't
-
+    
 
 RECIPE:
     use this recipe during debug to capture benchmark-data / stub-data 
     for use in displayclass tests:
 
-    >pathfn = "data/test/guiview/display/scratch/stubframe.png" #write to scratch-dir
+    >pathfn = "data/test/guiview/displayclass/scratch/stubframe.png" #write to scratch-dir
     >stubframe = display.getOrigFrame()                         #from guiview context
     >cv2.imwrite(stubframe, pathfn)                             #should print "True"
 
     for bench data:
     >bench_data = display.frame
     >bench_data.size            #to validate it exists
-
-    # data extraction recipe: should we grab origFrame or frame?
 
 '''
     
@@ -59,7 +50,7 @@ class ImgDiff:
 
         bAssert = self.diff_imgs(imgBenchmark, imgTest)
 
-        if not(bAssert):
+        if not(bAssert) and not(kwargs.get('noLog', False)):
             try:
                 
                 self.summarize_diff_imgs(imgBenchmark, imgTest)
