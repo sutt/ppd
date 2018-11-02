@@ -72,3 +72,26 @@ def filter_pixels_circle(img, b_inside=True):
 
 def pixlist_to_pseduoimg(pix_list):
     return np.array(pix_list, dtype='uint8', ndmin = 3)
+    #flatten? ndmin (sic?) pseduo (sic?)
+
+def binary_diff(inputDiff):
+    ''' return a diff as an binary (0 or 255) for each pixel'''
+
+    imgDiff = cv2.cvtColor(inputDiff, cv2.COLOR_BGR2GRAY)
+
+    h, w = imgDiff.shape
+    binaryDiff = np.zeros(shape =(h,w,3))
+
+    for x in range(w-1):
+        for y in range(h-1):
+            
+            #TODO - allow single channel output as well
+            # binaryDiff[y,x] = 0 if (imgDiff[y,x] == 0) else 255
+            
+            binaryDiff[y,x] = (
+                        np.array([0,0,0], dtype = np.uint8) 
+                        if (imgDiff[y,x] == 0) else  
+                        np.array([255,255,255], dtype = np.uint8)
+            )
+
+    return binaryDiff

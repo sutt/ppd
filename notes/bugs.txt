@@ -3,12 +3,18 @@
 11/2
     [ ] test_show_score_on_off_1() basic run pass
     [ ] then do with arg
-    [ ] then do a debug indv.
-    [ ] then do a fail indv.
-    [ ] then do a fail within pytest
-        [ ] prints out summary
-        [ ] writes out diff
     [ ] then re-run with if-blocks
+
+    
+    [x] verify in ipython theres actual diffs b/w test images: no, so is staging func wrong?
+    [x] why is viz_diff showing diffs wrong?
+    [ ] why does test_show_scoring not work? on which alleged asserts?
+
+    notes:
+        good np primer
+        https://realpython.com/numpy-array-programming/
+
+        [ ] why doesn't pytest enter __name__ == "__main__"
 
 11/1
 
@@ -17,9 +23,9 @@
         [ ] better develop file delete routines
         [ ] better develop reading the test data file as function
         [ ] asserts in tests should not be wrapped in try
-    [ ] controldisplay_test -> split
-        [ ] controldisplay_staging
-        [ ] helperfunctions
+    [x] controldisplay_test -> split
+        [x] controldisplay_staging
+        [x] helperfunctions
 
 
 10/31

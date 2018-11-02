@@ -24,7 +24,7 @@ DEV-MODULE:
 
     [ ] do IF-block's in all_display_methods
 
-    [ ] build diff helpers
+    [x] build diff helpers
         [ ] test diff helpers
 
     [x] what is extension for noncompressed image? png

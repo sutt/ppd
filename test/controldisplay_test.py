@@ -35,6 +35,7 @@ TEST FEATURES:
 
 
 TEST_PARENT_DIR = "../data/test/guiview/displayclass/"
+DIFF_LOG_DIR = "../data/test/guiview/displayclass/log/"
 
 
 def test_show_scoring_on_off_1():
@@ -62,7 +63,7 @@ def test_show_scoring_on_off_1():
     none_scoring = ScoreSchema()
     stub_none_score = some_scoring.getAll()
 
-    diff = ImgDiff()    #TODO - pass in log output, pass in b_log, etc.
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
     
     stage = StagingDisplay()
     stage.all_display_methods( b_showscoring=True 
@@ -85,7 +86,7 @@ def test_show_scoring_on_off_1():
                               )   
     scoring_none_output = stage.mock_get_frame()
     
-    #TODO - diff_imgs() -> diffImgs(), the wrapper
+    # assert diff.diffImgs(scoring_on_output, scoring_off_output)
     
     assert diff.diffImgs(bench_yes_scoring, scoring_on_output)
 
