@@ -8,6 +8,9 @@
     [x] this could get annoying if we need to constantly update benchmark in tests
         -> need an automated re-bench function for each test
 
+    [ ] tracking is broken:
+        [ ] figure out how to use git to revert to a working time
+
     [x] next commit
         [x] pattern dif folder
         [x] collect 2nd test data
