@@ -29,14 +29,19 @@ RECIPE:
 
 '''
 
-def verifyAction(msg="press Y to continue; N to exit\n"):
-    ret = raw_input(msg)
+def verifyAction(msg="press Y to continue; N to exit\n", prefix=""):
+    ''' allow user input to cancel next action '''
+    
+    display_message = prefix + " \n" + msg
+    
+    ret = raw_input(display_message)
+    
     if ret.capitalize() == "Y":
         print 'proceeding...'
-        return
+        return False
     else:
-        print 'exiting the script'
-        sys.exit()
+        print 'exiting the current function'
+        return True
 
 
 class ImgDiff:

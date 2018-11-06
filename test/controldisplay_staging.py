@@ -113,7 +113,16 @@ class StagingDisplay:
         self.data = display
 
     def mock_get_frame(self):
-        ''' getFrame from Display in data '''
         assert self.data.__class__.__name__ == "Display"
-        frame = copy.copy(self.data.frame)
-        return frame
+        try:
+            return self.data.frame.copy()
+        except:
+            return None
+
+    def mock_get_score_frame(self):
+        assert self.data.__class__.__name__ == "Display"
+        try:
+            return self.data.scoreFrame.copy()
+        except:
+            return None
+        

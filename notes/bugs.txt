@@ -1,5 +1,31 @@
 #Tasks
 
+11/6
+
+    [ ] more tests
+        [ ] modulo zero on show_tracking
+            [ ] get data
+        [ ] new pattern
+
+11/5
+
+    [x] tracking is broken:
+        [x] figure out how to use git to revert to a working time
+            git checkout  5c40a25ab2046125d6ded4c1b30d0bf675f1f60b
+            (git checkkout master reverts this)
+        [x] debug it:
+            demo-proc/output4.avi -> breaks w/ only --track
+            -> works with --track and --showscoring
+        [ ] it doesn't error, but it doesn't show score_display either:
+            ->need to separate window three logic from --showscoring (which should be 
+                just for displaying metalog-score data)
+        [x] add test to cement it
+
+    [x] better verifyAction
+
+    writing tests for stockfish
+    http://tests.stockfishchess.org/tests
+
 11/2
     [x] test_show_score_on_off_1() basic run pass
     [ ] then do with arg
@@ -7,9 +33,6 @@
 
     [x] this could get annoying if we need to constantly update benchmark in tests
         -> need an automated re-bench function for each test
-
-    [ ] tracking is broken:
-        [ ] figure out how to use git to revert to a working time
 
     [x] next commit
         [x] pattern dif folder

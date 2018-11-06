@@ -105,7 +105,8 @@ def show_scoring_on_off_1(input_test_child_dir, input_circle_data, b_rebench=Fal
 
     #rebench ---
     if b_rebench:
-        verifyAction()
+        if verifyAction(prefix = "rebench:" + input_test_child_dir):
+            return
         cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "bench_yes_score.png")
                     ,scoring_on_output)
         cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "bench_no_score.png")
@@ -133,7 +134,103 @@ def test_show_scoring_on_off_2():
     show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_2", 
                             input_circle_data = [375, 321, 153, 132])
 
+def show_tracking_on_off_1(input_test_child_dir, input_circle_data, b_rebench=False):
+    ''' test that turning tracking on/off affecta main_display
+        and that it affects score_display
+            
+            input params:  - tests have dif size frames
+                           - tests have dif scoring-data
 
+        TODO:
+            [ ] modulo zero resize
+    '''
+
+    # setup ------
+    TEST_CHILD_DIR = input_test_child_dir
+    
+    stub_frame          = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "stubframe.png"))
+    bench_yes_tracking   = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_yes_track_main.png"))
+    bench_no_tracking    = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_no_track_main.png"))
+    bench_score         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_yes_track_score.png"))
+
+    some_scoring = ScoreSchema()
+    some_scoring.addCircle(input_circle_data)
+    stub_some_score = some_scoring.getAll()
+
+    none_scoring = ScoreSchema()
+    stub_none_score = none_scoring.getAll()
+
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
+    
+    # run test -----
+    
+    #1:
+    stage = StagingDisplay()
+    stage.all_display_methods( stub_frame=stub_frame.copy()
+                              ,stub_trackscore=copy.deepcopy(stub_some_score)
+                              )
+    main1 = stage.mock_get_frame()
+    score1 = stage.mock_get_score_frame()
+    
+
+    #2:
+    stage = StagingDisplay()
+    stage.all_display_methods( stub_frame=stub_frame.copy()
+                              ,stub_trackscore=copy.deepcopy(stub_none_score)   #test-variable
+                              )
+    main2 = stage.mock_get_frame()
+    score2 = stage.mock_get_score_frame()
+
+    #3:
+    stage = StagingDisplay()
+    stage.all_display_methods( b_showscoring=True                                 #test-variable
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_trackscore=copy.deepcopy(stub_some_score)    
+                              )   
+    main3 = stage.mock_get_frame()
+    score3 = stage.mock_get_score_frame()
+
+    #rebench ---
+    if b_rebench:
+        
+        if verifyAction(prefix = "rebench:" + input_test_child_dir):
+            return
+
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                ,"bench_yes_track_main.png"), main1)
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                ,"bench_no_track_main.png"), main2)
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                ,"bench_yes_track_score.png"), score3)
+        return
+        
+
+    # verify ----
+
+    assert diff.diffImgs(bench_yes_tracking, main1)
+
+    assert diff.diffImgs(bench_no_tracking, main2)
+
+    assert diff.diffImgs(bench_yes_tracking, main3)
+
+    assert diff.diffImgs(main1, main2, noLog=True) == False
+
+    assert diff.diffImgs(bench_score, score1)
+    
+    assert score2 is None
+
+    assert diff.diffImgs(bench_score, score3)
+
+
+
+def test_show_tracking_on_off_1():
+    
+    show_tracking_on_off_1(  input_test_child_dir= "test_show_tracking_on_off_1", 
+                            input_circle_data = [202, 162, 48, 43])
 
 # Indv. Method Tests -----------------------
 
@@ -314,9 +411,11 @@ def test_display_rectToCircle():
     assert y == 7 
     assert r == 5
 
+
 if __name__ == "__main__":
     
-    # test_show_scoring_on_off_1()
+    # test_show_tracking_on_off_1()
+    # sys.exit()
 
     import argparse
     ap = argparse.ArgumentParser()
@@ -336,6 +435,9 @@ if __name__ == "__main__":
         show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_2", 
                                 input_circle_data = [375, 321, 153, 132],
                                 b_rebench = True)
-
+    
+        show_tracking_on_off_1(  input_test_child_dir= "test_show_tracking_on_off_1", 
+                                 input_circle_data = [202, 162, 48, 43],
+                                 b_rebench = True)
 
 

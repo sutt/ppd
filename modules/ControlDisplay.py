@@ -55,6 +55,7 @@ class Display:
         self.zoomOn = False
         self.scoreOn = False
         self.scoreOff = False   #TODO - refactor to bShowScoring
+        self.trackOn = False
         self.roiSelected = False
         self.orientChanged = False
         
@@ -287,7 +288,8 @@ class Display:
             self.zoomFrame = self.buildZoomFrame()
             self.alterZoomFrame()
 
-        if self.scoreOn and not(self.scoreOff) and self.bShowScoring:
+        if ((self.scoreOn and not(self.scoreOff) and self.bShowScoring)
+            or self.trackOn):
             self.scoreFrame = self.buildScoreFrame()
             self.alterScoreFrame()
             
@@ -508,7 +510,7 @@ class Display:
         #TODO - this isn't exactly right, we're handling this downstream
         #       and even if they fail to find an object they return (0,0,...)
         if self.trackScore.checkHasContents():
-            self.scoreOn = True
+            self.trackOn = True
     
     
     def drawTrackers(self):
