@@ -21,7 +21,7 @@ RECIPE:
 
     >pathfn = "data/test/guiview/displayclass/scratch/stubframe.png" #write to scratch-dir
     >stubframe = display.getOrigFrame()                         #from guiview context
-    >cv2.imwrite(stubframe, pathfn)                             #should print "True"
+    >cv2.imwrite(pathfn, stubframe)                             #should print "True"
 
     for bench data:
     >bench_data = display.frame
@@ -40,7 +40,7 @@ def verifyAction(msg="press Y to continue; N to exit\n", prefix=""):
         print 'proceeding...'
         return False
     else:
-        print 'exiting the current function'
+        print 'exiting the current function...'
         return True
 
 

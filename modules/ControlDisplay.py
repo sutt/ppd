@@ -809,7 +809,9 @@ class Display:
             # we don't need to ensure modulo-zero here, that has already been 
             # enforced (or not) in the choice of zoomFrame-width in buildZoomFrame()
 
-        if self.scoreOn and self.windowThree and not(self.scoreOff) and self.bShowScoring:
+        if (self.windowThree and 
+            ((self.scoreOn and not(self.scoreOff) and self.bShowScoring)
+            or self.trackOn)):
 
             windowName = 'score_display'
             if self.orientation in (90,270): windowName += "_profile"    

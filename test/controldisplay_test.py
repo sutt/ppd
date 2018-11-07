@@ -21,13 +21,14 @@ TESTS:
     [x] show_scoring_on_off_2
         [x] diff stub_frame size: 1280
     
-    [ ] scoring_display check
-    [ ] show_tracking_on_off_1
+    [x] scoring_display check
+    [x] show_tracking_on_off_1
     
-    [ ] test score_display exists
-    [ ] test score_display shows appropriate annotations
-    [ ] test scoring_enum=2 affects this
-    [ ] diff frame size
+    [x] test score_display exists
+    [x] test score_display shows appropriate annotations
+    [x] test scoring_enum=2 affects this
+    [x] diff frame size
+    [ ] zoomFrame with scoring + tracking
 
 TEST FEATURES:
     [ ] stub_frame smaller than 640
@@ -105,7 +106,7 @@ def show_scoring_on_off_1(input_test_child_dir, input_circle_data, b_rebench=Fal
 
     #rebench ---
     if b_rebench:
-        if verifyAction(prefix = "rebench:" + input_test_child_dir):
+        if verifyAction(prefix = "\nrebench:" + input_test_child_dir):
             return
         cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "bench_yes_score.png")
                     ,scoring_on_output)
@@ -142,7 +143,7 @@ def show_tracking_on_off_1(input_test_child_dir, input_circle_data, b_rebench=Fa
                            - tests have dif scoring-data
 
         TODO:
-            [ ] modulo zero resize
+            [x] modulo zero resize
     '''
 
     # setup ------
@@ -197,7 +198,7 @@ def show_tracking_on_off_1(input_test_child_dir, input_circle_data, b_rebench=Fa
     #rebench ---
     if b_rebench:
         
-        if verifyAction(prefix = "rebench:" + input_test_child_dir):
+        if verifyAction(prefix = "\nrebench:" + input_test_child_dir):
             return
 
         cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
@@ -231,6 +232,110 @@ def test_show_tracking_on_off_1():
     
     show_tracking_on_off_1(  input_test_child_dir= "test_show_tracking_on_off_1", 
                             input_circle_data = [202, 162, 48, 43])
+
+def test_show_tracking_on_off_2():
+    
+    show_tracking_on_off_1(  input_test_child_dir= "test_show_tracking_on_off_2", 
+                            input_circle_data = [668, 489, 14, 14])
+                            
+
+def scoring_obj_enum(input_test_child_dir, input_obj_enum, b_wrong=False, b_rebench=False):
+    ''' test that turning tracking on/off affecta main_display
+        and that it affects score_display
+            
+            input params:  - different scores (stored as json file in test dir)
+                           - different scoringenum's to focus on with score_display
+                           - b_wrong: if True, then there is no score with that
+                                       input_obj_enum, thus no score_display
+        TODO:
+            [x] load a score from a json file in test
+            [x] build score data:
+                [x] ray and circle in score
+                [x] different orientation/sizes for ray veritcal, horiz, diag
+            [x] tests for each objenum
+            [x] test for "default" no input on scoring enum
+            [x] tests w/o 0-3 all populated, e.g. only obj2 has a score
+
+    '''
+
+    # setup ------
+    TEST_CHILD_DIR = input_test_child_dir
+    
+    stub_frame          = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "stubframe.png"))
+    bench_main         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_main.png"))
+    bench_score         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_score.png"))
+    bench_naframe       = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "naframe.png"))
+
+    stub_score_obj = ScoreSchema()
+
+    with open(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "stubscore.json"), "r") as f:
+        stub_score_obj.load(json.load(f))
+    
+    stub_score = stub_score_obj.getAll()
+    
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
+    
+    # run test -----
+    
+    stage = StagingDisplay()
+    stage.all_display_methods( stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_score)
+                              ,b_showscoring = True
+                              ,i_scoringenum=input_obj_enum         #test-variable
+                              )
+    main1 = stage.mock_get_frame()
+    score1 = stage.mock_get_score_frame()
+
+    #rebench ---
+    if b_rebench:
+        
+        if verifyAction(prefix = "\nrebench:" + input_test_child_dir):
+            return
+
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                ,"bench_main.png"), main1)
+        
+        if not(b_wrong):
+
+            cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                    ,"bench_score.png"), score1)
+        return
+        
+
+    # verify ----
+
+    assert diff.diffImgs(bench_main, main1)
+
+    if b_wrong:
+        assert diff.diffImgs(bench_naframe, score1)
+    else:
+        assert diff.diffImgs(bench_score, score1)
+
+
+def test_scoring_obj_enum_1():
+    scoring_obj_enum("test_scoring_obj_enum_1", 0)
+
+def test_scoring_obj_enum_2():
+    scoring_obj_enum("test_scoring_obj_enum_2", 1)
+
+def test_scoring_obj_enum_3():
+    scoring_obj_enum("test_scoring_obj_enum_3", 2)
+
+def test_scoring_obj_enum_4():
+    scoring_obj_enum("test_scoring_obj_enum_4", 3)
+
+def test_scoring_obj_enum_5():
+    scoring_obj_enum("test_scoring_obj_enum_5", 2)
+
+# def test_scoring_obj_enum_6():
+#       #problem: img arrays are different types: float64 vs uint8, they don't compare
+        #TODO - add type checking to ImgDiff class
+#     scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True)
+
 
 # Indv. Method Tests -----------------------
 
@@ -417,6 +522,9 @@ if __name__ == "__main__":
     # test_show_tracking_on_off_1()
     # sys.exit()
 
+    scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True)
+    # sys.exit()
+
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--rebench",  action="store_true", default=False)
@@ -427,6 +535,9 @@ if __name__ == "__main__":
         # comment these on/off to control rebench activity
         # may want to copy all tests directories into a tmp folder temporarilly
         # for rollback capabilities
+
+        #note: the args in these params need to remain aligned with the tests above
+        #       or the the rebench won't pass the test
 
         show_scoring_on_off_1(  input_test_child_dir= "test_show_scoring_on_off_1", 
                                 input_circle_data = [202, 162, 48, 43],
@@ -440,4 +551,18 @@ if __name__ == "__main__":
                                  input_circle_data = [202, 162, 48, 43],
                                  b_rebench = True)
 
+        show_tracking_on_off_1(  input_test_child_dir= "test_show_tracking_on_off_2", 
+                                 input_circle_data = [668, 489, 14, 14],
+                                 b_rebench = True)
 
+        scoring_obj_enum("test_scoring_obj_enum_1", 0, b_rebench=True)
+
+        scoring_obj_enum("test_scoring_obj_enum_2", 1, b_rebench=True)
+
+        scoring_obj_enum("test_scoring_obj_enum_3", 2, b_rebench=True)
+
+        scoring_obj_enum("test_scoring_obj_enum_4", 3, b_rebench=True)
+
+        scoring_obj_enum("test_scoring_obj_enum_5", 2, b_rebench=True)
+
+        # scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True, b_rebench=True)

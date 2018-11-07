@@ -1,11 +1,38 @@
 #Tasks
 
+11/7
+
+
+
 11/6
 
     [ ] more tests
-        [ ] modulo zero on show_tracking
-            [ ] get data
-        [ ] new pattern
+        [x] show score_display with w/ only tracking
+        [D] draw tracking onto score_display
+        [x] modulo zero on show_tracking
+            [x] get data
+        [ ] new pattern with if statements
+
+    [ ] build data
+        [ ] 3 bounce vids
+            [ ] background
+            [ ] agent no ball
+            [ ] bounce
+
+    [ ] post data
+        [ ] repo inside repo, test with dummy repo
+
+    [ ] process data
+        [ ] add some rays for bounce
+
+    [ ] add documentation
+        [ ] add repo
+        [ ] add readme
+        [ ] jupyter notebooks for:
+            [ ] guiview
+            [ ] guirecord
+            [ ] timelog
+            [ ] adaptive thresh
 
 11/5
 
