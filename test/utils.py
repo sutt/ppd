@@ -120,9 +120,16 @@ class ImgDiff:
 
         try:
             frame_diff = cv2.absdiff(imgBenchmark, imgTest)
-            
+            #TODO - implement this; where are pix dif?
         except:
             print 'couldnt print out diff pix index'
+
+        try:
+            assert imgBenchmark.dtype.name == imgTest.dtype.name
+        except:
+            print 'imgs not the same dtype. '
+            print '      imgBenchmark: %s' % str(imgBenchmark.dtype.name)
+            print '      imgTest     : %s'% str(imgTest.dtype.name)
             
 
     @staticmethod

@@ -2,7 +2,11 @@
 
 11/7
 
-
+    [x] utils.ImgDiff should handle diff pixel number types:
+    [x] get test_Scoring_obj_enum_6 running
+    [x] if block
+    [x] annotate obj enum test
+    [ ] selectRoi test for zoom
 
 11/6
 
@@ -101,7 +105,7 @@
         [ ] tests:
             [ ] view scoring
                 [x] main_display
-                [ ] score_display
+                [x] score_display
             [ ] view hand-drawn selection
             [ ] view zoomFrame
             [ ] allowduplicates=off and try to add duplicates; try with back-and-forth

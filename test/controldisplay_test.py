@@ -17,22 +17,11 @@ from modules.DataSchemas import ScoreSchema
 '''
 
 TESTS:
-    [x] show_scoring_on_off_1
-    [x] show_scoring_on_off_2
-        [x] diff stub_frame size: 1280
-    
-    [x] scoring_display check
-    [x] show_tracking_on_off_1
-    
-    [x] test score_display exists
-    [x] test score_display shows appropriate annotations
-    [x] test scoring_enum=2 affects this
-    [x] diff frame size
     [ ] zoomFrame with scoring + tracking
 
 TEST FEATURES:
     [ ] stub_frame smaller than 640
-    [ ] annotateObjEnums
+    [x] annotateObjEnums
 
 DOCUMENTATION:
 
@@ -247,15 +236,6 @@ def scoring_obj_enum(input_test_child_dir, input_obj_enum, b_wrong=False, b_rebe
                            - different scoringenum's to focus on with score_display
                            - b_wrong: if True, then there is no score with that
                                        input_obj_enum, thus no score_display
-        TODO:
-            [x] load a score from a json file in test
-            [x] build score data:
-                [x] ray and circle in score
-                [x] different orientation/sizes for ray veritcal, horiz, diag
-            [x] tests for each objenum
-            [x] test for "default" no input on scoring enum
-            [x] tests w/o 0-3 all populated, e.g. only obj2 has a score
-
     '''
 
     # setup ------
@@ -299,7 +279,11 @@ def scoring_obj_enum(input_test_child_dir, input_obj_enum, b_wrong=False, b_rebe
         cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
                                 ,"bench_main.png"), main1)
         
-        if not(b_wrong):
+        if b_wrong:
+            
+            cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                    ,"naframe.png"), score1)
+        else:
 
             cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
                                     ,"bench_score.png"), score1)
@@ -309,7 +293,7 @@ def scoring_obj_enum(input_test_child_dir, input_obj_enum, b_wrong=False, b_rebe
     # verify ----
 
     assert diff.diffImgs(bench_main, main1)
-
+    
     if b_wrong:
         assert diff.diffImgs(bench_naframe, score1)
     else:
@@ -331,10 +315,82 @@ def test_scoring_obj_enum_4():
 def test_scoring_obj_enum_5():
     scoring_obj_enum("test_scoring_obj_enum_5", 2)
 
-# def test_scoring_obj_enum_6():
-#       #problem: img arrays are different types: float64 vs uint8, they don't compare
-        #TODO - add type checking to ImgDiff class
-#     scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True)
+def test_scoring_obj_enum_6():
+    scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True)
+
+
+def scoring_annotate_obj(input_test_child_dir, b_rebench=False):
+    ''' test that turning tracking on/off affecta main_display
+        and that it affects score_display
+            
+            input params:  - different scores (stored as json file in test dir)
+                           - different scoringenum's to focus on with score_display
+                           - b_wrong: if True, then there is no score with that
+                                       input_obj_enum, thus no score_display
+    '''
+
+    # setup ------
+    TEST_CHILD_DIR = input_test_child_dir
+    
+    stub_frame          = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "stubframe.png"))
+    bench_main         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_main.png"))
+    bench_score         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_score.png"))
+    bench_naframe       = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "naframe.png"))
+
+    stub_score_obj = ScoreSchema()
+
+    with open(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR, "stubscore.json"), "r") as f:
+        stub_score_obj.load(json.load(f))
+    
+    stub_score = stub_score_obj.getAll()
+    
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
+    
+    # run test -----
+    
+    stage = StagingDisplay()
+    stage.some_display_methods( p_all = True
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_score)
+                              ,b_showscoring = True
+                              ,annotateObjEnum = False
+                              )
+    stage.some_display_methods( p_all_byframe = True
+                               ,p_input = True
+                              ,stub_frame=stub_frame.copy()
+                              ,stub_scorecurrent=copy.deepcopy(stub_score)
+                              ,b_showscoring = True
+                              ,annotateObjEnum = True
+                              )
+    main1 = stage.mock_get_frame()
+    score1 = stage.mock_get_score_frame()
+
+    #rebench ---
+    if b_rebench:
+        
+        if verifyAction(prefix = "\nrebench:" + input_test_child_dir):
+            return
+
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                ,"bench_main.png"), main1)
+        
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                    ,"bench_score.png"), score1)
+        return
+        
+
+    # verify ----
+
+    assert diff.diffImgs(bench_main, main1)
+    assert diff.diffImgs(bench_score, score1)
+
+    
+def test_scoring_annotate_obj_1():
+    scoring_annotate_obj("test_scoring_annotate_obj_1")
 
 
 # Indv. Method Tests -----------------------
@@ -519,11 +575,6 @@ def test_display_rectToCircle():
 
 if __name__ == "__main__":
     
-    # test_show_tracking_on_off_1()
-    # sys.exit()
-
-    scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True)
-    # sys.exit()
 
     import argparse
     ap = argparse.ArgumentParser()
@@ -565,4 +616,6 @@ if __name__ == "__main__":
 
         scoring_obj_enum("test_scoring_obj_enum_5", 2, b_rebench=True)
 
-        # scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True, b_rebench=True)
+        scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True, b_rebench=True)
+
+        scoring_annotate_obj("test_scoring_annotate_obj_1", b_rebench=True)

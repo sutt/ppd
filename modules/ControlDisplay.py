@@ -558,7 +558,7 @@ class Display:
 
         if self.scoreRect is None:
             
-            score_img = np.zeros(self.frame.shape)
+            score_img = np.zeros(self.frame.shape, dtype='uint8')
             score_img = draw_text(score_img, "n/a")
         
         else:
