@@ -229,4 +229,17 @@ class StagingDisplay:
             return self.data.scoreFrame.copy()
         except:
             return None
+
+    def mock_get_zoom_frame(self):
+        assert self.data.__class__.__name__ == "Display"
+        try:
+            return self.data.zoomFrame.copy()
+        except:
+            return None
+
+    def stub_set_zoom_roi(self, zoom_roi):
+        ''' zoom_roi: (x,y,dx,dy) tuple '''
+        assert self.data.__class__.__name__ == "Display"
+        self.data.zoomRect = copy.copy(zoom_roi)
+        self.data.zoomOn = True
         

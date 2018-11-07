@@ -229,8 +229,8 @@ def test_show_tracking_on_off_2():
                             
 
 def scoring_obj_enum(input_test_child_dir, input_obj_enum, b_wrong=False, b_rebench=False):
-    ''' test that turning tracking on/off affecta main_display
-        and that it affects score_display
+    ''' test that showscoring with properly formed is drawn to main_display and
+        score_display
             
             input params:  - different scores (stored as json file in test dir)
                            - different scoringenum's to focus on with score_display
@@ -320,13 +320,11 @@ def test_scoring_obj_enum_6():
 
 
 def scoring_annotate_obj(input_test_child_dir, b_rebench=False):
-    ''' test that turning tracking on/off affecta main_display
-        and that it affects score_display
+    ''' test that we annotate score objects in main_display
+
+            note: we can't initialize with annotateObjEnum=True or we get unhandled err
             
             input params:  - different scores (stored as json file in test dir)
-                           - different scoringenum's to focus on with score_display
-                           - b_wrong: if True, then there is no score with that
-                                       input_obj_enum, thus no score_display
     '''
 
     # setup ------
@@ -356,8 +354,8 @@ def scoring_annotate_obj(input_test_child_dir, b_rebench=False):
     stage.some_display_methods( p_all = True
                               ,stub_frame=stub_frame.copy()
                               ,stub_scorecurrent=copy.deepcopy(stub_score)
-                              ,b_showscoring = True
-                              ,annotateObjEnum = False
+                              ,b_showscoring = True   
+                              ,annotateObjEnum = False   #note
                               )
     stage.some_display_methods( p_all_byframe = True
                                ,p_input = True
@@ -392,6 +390,60 @@ def scoring_annotate_obj(input_test_child_dir, b_rebench=False):
 def test_scoring_annotate_obj_1():
     scoring_annotate_obj("test_scoring_annotate_obj_1")
 
+
+def select_zoom_1(input_test_child_dir, input_zoom_roi, b_rebench=False):
+    ''' test selecting an roi region and how it displays
+
+            note: we can't fully test user input, we're only assuming that is handled
+                  properly in display.show()
+            
+            input params:  - different scores (stored as json file in test dir)
+    '''
+
+    # setup ------
+    TEST_CHILD_DIR = input_test_child_dir
+    
+    stub_frame          = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "stubframe.png"))
+    bench_main         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_main.png"))
+    bench_zoom         = cv2.imread(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR,
+                                                    "bench_zoom.png"))
+
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
+    
+    # run test -----
+    
+    stage = StagingDisplay()
+    stage.some_display_methods( p_all = True
+                              ,stub_frame=stub_frame.copy()
+                              )
+    stage.stub_set_zoom_roi(input_zoom_roi)
+    stage.some_display_methods( p_all_byframe = True
+                               ,p_input = True
+                               ,stub_frame=stub_frame.copy()
+                              )
+    main1 = stage.mock_get_frame()
+    zoom1 = stage.mock_get_zoom_frame()
+
+    #rebench ---
+    if b_rebench:
+        if verifyAction(prefix = "\nrebench:" + input_test_child_dir):
+            return
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                    ,"bench_main.png"), main1)
+        cv2.imwrite(os.path.join(TEST_PARENT_DIR, TEST_CHILD_DIR
+                                    ,"bench_zoom.png"), zoom1)
+        return
+        
+
+    # verify ----
+
+    assert diff.diffImgs(bench_main, main1)
+    assert diff.diffImgs(bench_zoom, zoom1)
+
+def test_select_zoom_1():
+    select_zoom_1("test_select_zoom_1", (180, 140, 100, 70))
 
 # Indv. Method Tests -----------------------
 
@@ -575,7 +627,8 @@ def test_display_rectToCircle():
 
 if __name__ == "__main__":
     
-
+    
+    
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--rebench",  action="store_true", default=False)
@@ -619,3 +672,5 @@ if __name__ == "__main__":
         scoring_obj_enum("test_scoring_obj_enum_6", 0, b_wrong=True, b_rebench=True)
 
         scoring_annotate_obj("test_scoring_annotate_obj_1", b_rebench=True)
+
+        select_zoom_1("test_select_zoom_1", (180, 140, 100, 70), b_rebench=True)
