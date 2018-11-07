@@ -6,16 +6,74 @@
     [x] get test_Scoring_obj_enum_6 running
     [x] if block
     [x] annotate obj enum test
-    [ ] selectRoi test for zoom
+    [x] selectRoi test for zoom
+        [ ] test that tracker draws from main show up in score_display and vice-versa
+        [ ] test on diff framesize
+        [ ] test mod0
+    [ ] can we test selectRoi-in-zoom for a score?
+        no we'll need to add stubs into the class itself: ControlDisplay line708: override rect
+
+    Collect some deferred tasks here:
+        [ ] draw tracking onto score_display  (11/6)
+        [ ] destroy windowThree from gui   (11/7)
+            when you set track=ON, and you bring up score_display, 
+            but then turn track=OFF, you're stuck with an n/a-frame 
+        [ ] refactoring guiview_test      (11/1)
+        [ ] draw_ray( bOffSetRay)         (10/30)
+        [ ] TODO-SS in trackFactory - not truly multi-object yet   (10/30)
+        [ ] orientation resize of score_display: should be by height=320  (?)
+        [ ] can't add a param with framenote-override           (10/30)
+        [ ] frame_sync using camera pointed at screen
+        [ ] investigate "#Bug- does this need rotate_bounds as below?"  (10/24)
+        [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"  (10/24)
+        [ ] investigate "#BUG-check if zoomRect is in bounds in new video"  (10/24)
+        [ ] All those imports needed in guiview?  (10/23)
+
+        Other thoughts:
+            - what other tests exist besides in test/ folder? can't we just run
+                >pytest -vv  in test/ for run all
+
+                + vidwriter / miscutils have tests
+
+            - profile startup time to reduce it (+ tests run faster?)
+
+            - build a ["realtime"] timeout tracking fucntion wrapper:
+              tracking processes untill time's up; returns best result
+              available at that time: e.g. 27 different thresholds
+
+            - h264 encoding will change if frames are skipped (?)
+        
+        Collect deferred tests here:
+
+            [ ] orientation
+            [ ] guirecord <-> guiview
+                [ ] record -> benchmark -> view (tests encoding/decoding codec)
+                [ ] create synthetic benchmark: np.zeros(x,x,x)+cv2.draw and then load
+            [ ] writeFrame bDuplicate overriding frameData w/w/o score
+            [ ] modulo zero stuff
+            [ ] view hand-drawn selection
+            [ ] view zoomFrame
+                [ ] track-on/off; score-on/off
+            [ ] semi-loaded vs preloaded
+
+    Main Tasks outstanding:
+
+        [ ] evaluation (10/16)
+        [ ] ipython-interproc (10/16)
+        [ ] apply iterThreshB
+        [ ] documentation of guiview
+        [ ] refactor vidwriter /miscutils
+        [ ] single test command / test heirarchy
+            
 
 11/6
 
-    [ ] more tests
+    [x] more tests
         [x] show score_display with w/ only tracking
-        [D] draw tracking onto score_display
+        [~] draw tracking onto score_display
         [x] modulo zero on show_tracking
             [x] get data
-        [ ] new pattern with if statements
+        [x] new pattern with if statements
 
     [ ] build data
         [ ] 3 bounce vids
@@ -47,7 +105,7 @@
         [x] debug it:
             demo-proc/output4.avi -> breaks w/ only --track
             -> works with --track and --showscoring
-        [ ] it doesn't error, but it doesn't show score_display either:
+        [x] it doesn't error, but it doesn't show score_display either:
             ->need to separate window three logic from --showscoring (which should be 
                 just for displaying metalog-score data)
         [x] add test to cement it
@@ -59,8 +117,8 @@
 
 11/2
     [x] test_show_score_on_off_1() basic run pass
-    [ ] then do with arg
-    [ ] then re-run with if-blocks
+    [~] then do with arg
+    [x] then re-run with if-blocks
 
     [x] this could get annoying if we need to constantly update benchmark in tests
         -> need an automated re-bench function for each test
@@ -99,24 +157,24 @@
 
 10/31
 
-    [ ] build test pattern for display, framefactory, etc
+    [x] build test pattern for display, framefactory, etc
         [x] display pattern
             [ ] _test_get_frame, other test helper methods
-        [ ] tests:
-            [ ] view scoring
+        [x] tests:
+            [x] view scoring
                 [x] main_display
                 [x] score_display
-            [ ] view hand-drawn selection
-            [ ] view zoomFrame
-            [ ] allowduplicates=off and try to add duplicates; try with back-and-forth
-        [ ] sections for display testing: Class-level tests, Method-level tests
+            [~] view hand-drawn selection
+            [~] view zoomFrame
+            [~] allowduplicates=off and try to add duplicates; try with back-and-forth
+        [x] sections for display testing: Class-level tests, Method-level tests
 
-    [ ] single command to run all the tests
-        [ ] see chess workspace, but not the .bat
+    [~] single command to run all the tests
+        [~] see chess workspace, but not the .bat
 
-    [ ] finally, refactor vidwriter and miscutils
+    [~] finally, refactor vidwriter and miscutils
 
-    [ ] experimental vids
+    [~] experimental vids
 
 10/30
 
@@ -141,17 +199,17 @@
 
 
     Thinking of more tests:
-        [ ] orientation, selectZoom selectROI on these
-        [ ] resizing zoomFrame / scoreFrame
-        [ ] preload vs semiload
+        [x] orientation, selectZoom selectROI on these
+        [x] resizing zoomFrame / scoreFrame
+        [x] preload vs semiload
 
     Misc Features:
-        [ ] framenote-override doesn't ADD to framenote (only overwrites). Change this?
+        [~] framenote-override doesn't ADD to framenote (only overwrites). Change this?
                 see: guiview_test:test_override_framenote
 
     List of other bugs, features:
-        [ ] draw_ray( bOffSetRay)
-        [ ] TODO-SS in trackFactory - not truly multi-object yet
+        [~] draw_ray( bOffSetRay)
+        [~] TODO-SS in trackFactory - not truly multi-object yet
         [ ] trackAlgo: trackLargestDiffInDesignatedRect
                 a bounce can be found via largest diff, but sometimes background diffs
                 will be larger, therefore we can rule those out with
@@ -165,7 +223,7 @@
 
     [x] build a new test
     [x] add display to all stubs and all mocks in guiview
-    [ ] get a recipe for debug where you can write to file a display window's state
+    [x] get a recipe for debug where you can write to file a display window's state
         in outputConsole: from modules.TestHelpers import outputDisplayState(args)
         then call outputDisplayState or something
         or just write it as a method in Display class
@@ -181,14 +239,14 @@
         [x] "#TODO-SS" is still commented here
     [x] does deleting __init__ in test/ matter? to debug? or pytest?
     [x] build some tests
-    [ ] investigate the bugs
-    [ ] consolidate test runs with a script
+    [x] investigate the bugs
+    [x] consolidate test runs with a script
 
 
 10/25
     [x] cli for obj to show in score_display
         [x] does this throw an error if object is wrong?
-    [ ] vertical score_display is too large
+    [~] vertical score_display is too large
         [x] test this
         [ ] fix this
     [x] need to reset display.outputScore so we 
@@ -244,9 +302,9 @@
     [x] scoreRect for rays, scoreRect for dif objEnum's
     [ ] build new demo-proc's with scoringschema in their metalog
 
-    [ ] investigate "#Bug- does this need rotate_bounds as below?"
-    [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"
-    [ ] investigate "#BUG-check if zoomRect is in bounds in new video"
+    [~] investigate "#Bug- does this need rotate_bounds as below?"
+    [~] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"
+    [~] investigate "#BUG-check if zoomRect is in bounds in new video"
 
     [x] annotate enums to obj's
 
@@ -256,7 +314,7 @@
 
 10/23
 
-    [ ] Enumerate Tests:
+    [x] Enumerate Tests:
         
         Display:
             types of tests / questions:
@@ -265,31 +323,31 @@
                 - How to avoid selectRoi?
 
             test instances:
-                [ ] Test zoom on rotation, is zoomFrame correct?
-                [ ] draw_ray w/w/o bOffset
+                [~] Test zoom on rotation, is zoomFrame correct?
+                [~] draw_ray w/w/o bOffset
         
         guirecord <-> guiview
-        [ ] record -> benchmark -> view (tests encoding/decoding codec)
-        [ ] create synthetic benchmark: np.zeros(x,x,x)+cv2.draw and then load
+        [~] record -> benchmark -> view (tests encoding/decoding codec)
+        [~] create synthetic benchmark: np.zeros(x,x,x)+cv2.draw and then load
 
-        [ ] writeFrame bDuplicate overriding frameData w/w/o score
+        [~] writeFrame bDuplicate overriding frameData w/w/o score
         [x] scoring output
             [x] just from display
             [x] just from notes
             [x] a merge of notes and display (update/add)
-        [ ] modulo zero stuff
+        [~] modulo zero stuff
 
 
-    [ ] Misc Thoughts:
-        [ ] All those imports needed in guiview?
-        [ ] h264 encoding will change if frames are skipped (?)
-        [ ] sync framerate by pointing webcam at screen
-        [ ] build a ["realtime"] timeout tracking fucntion wrapper:
+    [~] Misc Thoughts:
+        [~] All those imports needed in guiview?
+        [~] h264 encoding will change if frames are skipped (?)
+        [~] sync framerate by pointing webcam at screen
+        [~] build a ["realtime"] timeout tracking fucntion wrapper:
             tracking processes untill time's up; returns best result
             available at that time: e.g. 27 different thresholds
-        [ ] how to test roiSelect()?
+        [~] how to test roiSelect()?
             in stub set a param on Display .bTesting
-        [ ] profile startup time to reduce it (+ tests run faster?)
+        [~] profile startup time to reduce it (+ tests run faster?)
 
     [ ] VScode/misc:
         [~] indentation in controlflow_test.py is wrong; fix
@@ -569,7 +627,7 @@
         
           
 
-    [ ] add a way to overwrite frame note attribute(s) in batch:
+    [x] add a way to overwrite frame note attribute(s) in batch:
         in notes/framenoteoveride.json
 
     [ ] add tests for guiview / Display
