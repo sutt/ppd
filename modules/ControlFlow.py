@@ -237,8 +237,11 @@ class FrameFactory:
     def _validCurrentFrame(self):
         if self.frameCounter < 0:
             return False
-        if self.frameCounter > len(self.frames) - 1:
-            return False
+        if self.semiloaded:
+            return True
+        else:
+            if self.frameCounter > len(self.frames) - 1:
+                return False
         return True
     
     def checkWriteFrame(self):
