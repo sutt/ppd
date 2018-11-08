@@ -16,9 +16,13 @@
 
             what is IPythonHistorySavingThread in debug call stack?
 
-    [ ] second commit:
-        [ ] fix ray select in zoom window
-            [ ] this will pickup another deferred bug
+    [x] second commit:
+        [x] fix ray select in zoom window
+            [~] this will pickup another deferred bug
+                can't find exact match to these; looks like they should be OK thoughts
+                we can reject these defects with a unit test on display:
+                    just need to validate that the region selected is region saved and displayed when orientation != 0
+
         [x] fix profile view for score_dsiplay
             only happens when track turned on initially, eventually corrects itself...but now doesn't
             oh so this is connected to bug below
@@ -29,6 +33,9 @@
         [x] new bug: output3.proc1 w/o and cmds: unhandled err on frame_i=29
             note: display.scoreOn basically means notesFactory at that frame has a non-null scoring entry
             not that we've request a score_display
+
+    [ ] action 2.5, more bugs:
+        [ ] why can't I write scores to output3.proc1 ?
 
     [ ] third action:
         [ ] research repo in repo
@@ -77,6 +84,9 @@
 
         Ergonomics:
             very annoying to go back and forth focus between windows
+                -> we can pass waitkey vals from opencv to tkinter
+                    no need for even a select statement, just pass the byte/decoded val
+                    from display.show() -> guiInterface() -> guiHeader e.g. cmd_sw_initVid()
             need a new way to draw rays - one click
             need a better key then enter for selectRoi confirm
             arrows to move zoom window would be nice

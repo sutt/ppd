@@ -792,9 +792,17 @@ class Display:
                                     ,objEnum = self.trackObjEnum
                                     )
                 
+                #to fix bug: otherwise it will be wrong view rotation on 2nd point select
+                self.frame = imutils.rotate_bound(self.frame, self.orientation)
+                self.zoomFrame = imutils.rotate_bound(self.zoomFrame, self.orientation)
+                
                 rect2 = cv2.selectROI(windowName, self.zoomFrame, True, False )
 
                 rect2 = self.adjOrientationRect(rect2, self.zoomFrame.shape[:2][::-1])
+
+                #to fix bug: otherwise it will be wrong view rotation on 2nd point select
+                self.frame = imutils.rotate_bound(self.frame, -self.orientation)
+                self.zoomFrame = imutils.rotate_bound(self.zoomFrame, -self.orientation)
                 
                 _roiRect2 = self.rectZoomToOrig(rect2)
 
