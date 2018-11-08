@@ -1,11 +1,11 @@
 {
-    "frame_type": "sutton demo" //"training" "scoring"
+    "frame_type": "end" //"training" "scoring"
    
    //,"category": "distant_find" //"motion" "background"
    
-   ,"notes": "adding a demo frame"
+   ,"notes": null
 
-   ,"details-type": "details1"
+   ,"details-type": null
    
    ,"details": {
 
@@ -13,6 +13,6 @@
    
        ,"ball_partial_occluded": false
        
-       ,"ball_is_close": "medium"  // "far"
+       ,"ball_is_close": "medium"   //"medium"  // "far"
    }
 }

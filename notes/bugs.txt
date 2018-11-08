@@ -1,17 +1,132 @@
 #Tasks
 
+11/8
+
+    [x] first commit
+        [x] fix 361 bug
+        [x] prove by processing nov2018/output3
+        notes:
+            debug recipe:
+            g.initWriteVid = True
+            g.writevidOn = True
+            g.playOn = True
+
+            outputFact.checkWriteFrame()
+                self.bWriteFrameCmd = False on 361
+
+            what is IPythonHistorySavingThread in debug call stack?
+
+    [ ] second commit:
+        [ ] fix ray select in zoom window
+        [ ] this will pickup another deferred bug
+        [ ] fix profile view for score_dsiplay
+
+    [ ] third action:
+        [ ] research repo in repo
+        [ ] dummy repo in repo
+            [ ] check git status
+        [ ] save data/ in grandparent directory
+        [ ] organize data/ delete most
+        [ ] add data repo/
+        [ ] add data-repo-gitignore
+        [ ] verify git status in two directories works as expected
+
 11/7
+
+    Vid Processing + Other notes:
+        - guirecord has "ball_color": "green", at top level, 
+          guiview thinks it should be in details:{}
+        - git update-index --assume-unchanged notes/guirecord.jsonc
+          (for all .json's)
+        - why is 640 resolution messed up on guirecord? and sys camera?
+        - how to get MS IR camera on surfacebook?
+        - november bounce data dimensions:
+            camera 1 ft from back wall
+            table is 4 ft long
+            camera is 3 ft above table
+            throwing position 8 ft from camera (0.5 feet from table begin)
+            table end is 3.5 feet from camera in z-distance (but also 3 ft below)
+        - for output1 - output6, out3 and out4 have no timelog (why?)
+            are they the longest?
+            did I just exit from gui to quick?
+
+        [x] calc speed
+            ~1.5 mph towards the camera
+            [ ] build calc speed function
+
+        proc conventions:
+            frame_type: 
+                "mask" - just background, no ball
+                "mask_agent" - background + person, no ball
+                "calibration" - ball is near and still
+                "setup" - ball + person is moving near to far
+                "throw" - ball is in motion
+            (for output1)
+            objEnum:
+                "0": ball
+                "1": ball in throw at high point
+
+        Ergonomics:
+            very annoying to go back and forth focus between windows
+            need a new way to draw rays - one click
+            need a better key then enter for selectRoi confirm
+            arrows to move zoom window would be nice
+                or maybe scroll wheel on mouse or
+
+
+        Other thoughts:
+            - a better way to build these vids is bouncing against 
+              the wall and having it come back, and re-throwing. also, you
+              can edit out the catching / throwing.
+            - use git diff --no-index file.metalog file2.metalog
+              (but it doesn't highlight all diffs, how to do?)
+                --word-diff [nope]
+                --find-renames
+
+        Tasks:
+            [ ] a good output1
+                [x] frame_types
+                [x] ball_is_present
+                [ ] full scoring
+            [ ] a good output3
+                [x] orienetation
+
+        Bugs Found:
+            [ ] orientation on score_display does not go profile
+            [ ] select ray in score_display with 90-orientation is fubar
+            [x] after awhile, Writevid=ON does not work; maybe on selection-controls reset
+                 - for output3, at frame361
+                    [x] let's try w/o starting at exact beginning: same
+            [ ] orientation does not get set in guirecord / guiview pipeline
+                [ ] add to guiview.jsonc ?
+
+        
+
+
+    afternoon todos:
+    [ ] process data
+        [ ] set orientation
+        [ ] validate other inputs
+        [ ] erase end of video
+        [ ] build quick vids of just bounce (after they've been scored)
+        [ ] add scores
+            [ ] basic - ball circles
+            [ ] basic - bounce rays
+            [ ] add training scores; how?
+            [ ] add training masks; how?
+
 
     [x] utils.ImgDiff should handle diff pixel number types:
     [x] get test_Scoring_obj_enum_6 running
     [x] if block
     [x] annotate obj enum test
     [x] selectRoi test for zoom
-        [ ] test that tracker draws from main show up in score_display and vice-versa
         [ ] test on diff framesize
         [ ] test mod0
     [ ] can we test selectRoi-in-zoom for a score?
         no we'll need to add stubs into the class itself: ControlDisplay line708: override rect
+        [ ] test that tracker draws from main show up in score_display and vice-versa
+    
 
     Collect some deferred tasks here:
         [ ] draw tracking onto score_display  (11/6)
@@ -55,6 +170,8 @@
             [ ] view zoomFrame
                 [ ] track-on/off; score-on/off
             [ ] semi-loaded vs preloaded
+            [ ] --dir run with different sizes, orientations, scores yes/no, zooms on/off
+            [ ] output video, especially towards end, e.g. w/ frameFact._validCurrentFrame()
 
     Main Tasks outstanding:
 

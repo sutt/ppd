@@ -84,7 +84,7 @@ while(not(Globals.gui_cmd_quit)):
     Globals.sw_camera_reset = False
 
     
-    init_savedir = "data/sept2018/misc/"
+    init_savedir = "data/nov2018/"
     ext = "avi"
     time_to_record = 999
     b_show = True
