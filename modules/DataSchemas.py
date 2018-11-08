@@ -56,6 +56,21 @@ class ScoreSchema:
         ''' return True if data has been poppulated;
             a fast method for boolean type check '''
         return self.bHasContents
+
+    def checkHasValid(self):
+        ''' return True if any shape has a reasonable trackRoi '''
+        try:
+            for k in self.data.keys():
+                _type = self.data[k]['type']
+                _data = self.data[k]['data']
+                if _type != 'circle': 
+                    continue
+                if all([x >= 0 for x in _data]):
+                    return True
+            return False
+        except:
+            return False
+        
     
     def load(self, objScoring):
         ''' load a dict object as data '''
@@ -276,3 +291,40 @@ def test_getObjRect_2():
     ss.load(score)
 
     assert ss.getObjRect(1) == (100, 50, 99, 99)
+
+def test_checkHasValid_1():
+
+    score = {
+                "0":{
+                    "type":"circle",
+                    "data": [20, 40, 50, 60]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [-10, -20, 40, 40]
+                }
+			}
+
+    ss = ScoreSchema()
+    ss.load(score)
+
+    assert ss.checkHasValid()
+
+    score = {
+                "0":{
+                    "type":"circle",
+                    "data": [-10, 20, 40, 40]
+                },
+                "1":{
+                    "type":"circle",
+                    "data": [10, 20, -40, 40]
+                }
+			}
+
+    ss = ScoreSchema()
+    ss.load(score)
+
+    assert ss.checkHasValid() == False
+
+if __name__ == "__main__":
+    test_checkHasValid_1()

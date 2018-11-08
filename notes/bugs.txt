@@ -18,8 +18,17 @@
 
     [ ] second commit:
         [ ] fix ray select in zoom window
-        [ ] this will pickup another deferred bug
-        [ ] fix profile view for score_dsiplay
+            [ ] this will pickup another deferred bug
+        [x] fix profile view for score_dsiplay
+            only happens when track turned on initially, eventually corrects itself...but now doesn't
+            oh so this is connected to bug below
+            [x] why does notesScoring interspace between tracking? in output3.proc1
+                b/c soreRect is being built but we're keeping bShowScore=False, but trackOn=True
+            [x] why does a non valid track roi get drawn onto score_display?
+                -> need to reset display score each frame?
+        [x] new bug: output3.proc1 w/o and cmds: unhandled err on frame_i=29
+            note: display.scoreOn basically means notesFactory at that frame has a non-null scoring entry
+            not that we've request a score_display
 
     [ ] third action:
         [ ] research repo in repo
@@ -90,6 +99,8 @@
                 [ ] full scoring
             [ ] a good output3
                 [x] orienetation
+                [ ] obj0 and 1 for green and orange ball respectively
+                [ ] bounce scoring
 
         Bugs Found:
             [ ] orientation on score_display does not go profile
@@ -149,6 +160,7 @@
                 >pytest -vv  in test/ for run all
 
                 + vidwriter / miscutils have tests
+                + dataschemas has tests
 
             - profile startup time to reduce it (+ tests run faster?)
 

@@ -491,12 +491,13 @@ class Display:
             self.frame = imutils.rotate_bound(self.frame
                                             ,self.orientation)
 
-            if self.zoomOn:
+            if self.zoomOn and self.zoomFrame is not None:
                 
                 self.zoomFrame = imutils.rotate_bound(self.zoomFrame
                                                     ,self.orientation)
 
-            if self.scoreOn and not(self.scoreOff):
+            if (self.scoreFrame is not None and 
+                ((self.scoreOn and not(self.scoreOff)) or self.trackOn)):
 
                 self.scoreFrame = imutils.rotate_bound(self.scoreFrame
                                                     ,self.orientation)
@@ -507,10 +508,10 @@ class Display:
 
         self.trackScore.load(trackScore)
         
-        #TODO - this isn't exactly right, we're handling this downstream
-        #       and even if they fail to find an object they return (0,0,...)
+        self.trackOn = False
         if self.trackScore.checkHasContents():
-            self.trackOn = True
+            if self.trackScore.checkHasValid():
+                self.trackOn = True
     
     
     def drawTrackers(self):
@@ -519,7 +520,7 @@ class Display:
             convert to Main or convert to Zoom where nec.
         '''
         
-        if self.trackScore.checkHasContents():
+        if self.trackOn:
             
             self.drawOntoPane(frame = self.frame
                              ,data = self.trackScore
