@@ -894,6 +894,13 @@ class NotesFactory:
         except:
             return None
 
+    def getFrameScoreCurrentDict(self):
+        ''' return the score or empty dict; like a wrapper for getFrameScoreCurrent'''
+        result = self.getFrameScoreCurrent()
+        if result is None:
+            return {}
+        return result
+
     def checkFrameHasScore(self):
         ''' return True is there's anything stored in framenote.scoring '''
         return self.getFrameNoteCurrent().get('scoring', None) is not None
@@ -999,7 +1006,7 @@ class NotesFactory:
                 #note: if gui-cmd is not called, displayFrameScoring has no contents     
 
                 frameData['scoring'] = self.mergeDicts(
-                                             main = self.getFrameScoreCurrent()
+                                             main = self.getFrameScoreCurrentDict()
                                             ,update = self.displayFrameScoring.getAll()
                                             ,b_add = True
                                             )

@@ -15,6 +15,17 @@
                 self.bWriteFrameCmd = False on 361
 
             what is IPythonHistorySavingThread in debug call stack?
+                ->When running basic-run or guiview or some kind of launch item...
+                  this is seen in console:
+                    Python 2.7.13 (v2.7.13:a06454b1afa1, Dec 17 2016, 20:42:59) [MSC v.1500 32 bit (Intel)]
+                    Type "copyright", "credits" or "license" for more information.
+
+                    IPython 5.3.0 -- An enhanced Interactive Python.
+                    ?         -> Introduction and overview of IPython's features.
+                    %quickref -> Quick reference.
+                    help      -> Python's own help system.
+                    object?   -> Details about 'object', use 'object??' for extra details.
+                    PyDev console: using IPython 5.3.0
 
     [x] second commit:
         [x] fix ray select in zoom window
@@ -34,8 +45,19 @@
             note: display.scoreOn basically means notesFactory at that frame has a non-null scoring entry
             not that we've request a score_display
 
-    [ ] action 2.5, more bugs:
-        [ ] why can't I write scores to output3.proc1 ?
+    [x] action 2.5, more bugs:
+        [x] why can't I write scores to output3.proc1 ?
+            debug recipe:
+                g.initWriteVid = True
+                display.outputScore.addCircle( (100,100,50,50),0)
+                g.switchWriteScoring = True
+            problem:
+                main = self.getFrameScoreCurrent() is None instead of {}
+
+    [ ] action 2.75
+        [ ] can't write a ray roi to main_display with orientation != 0
+            (how has this just popped up? or have I never tested it?)
+
 
     [ ] third action:
         [ ] research repo in repo
@@ -194,6 +216,7 @@
             [ ] semi-loaded vs preloaded
             [ ] --dir run with different sizes, orientations, scores yes/no, zooms on/off
             [ ] output video, especially towards end, e.g. w/ frameFact._validCurrentFrame()
+            [ ] add score to frames in already proc'd video
 
     Main Tasks outstanding:
 
