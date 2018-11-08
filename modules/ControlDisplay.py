@@ -738,9 +738,15 @@ class Display:
                                         ,objEnum = self.trackObjEnum
                                         )
                     
+                    #to fix bug: otherwise it will be wrong view rotation on 2nd point select
+                    self.frame = imutils.rotate_bound(self.frame, self.orientation)
+                    
                     rect2 = cv2.selectROI(windowName, self.frame, True, False )
                     rect2 = self.adjOrientationRect(rect2, self.frame.shape[:2][::-1])
-                    #?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)
+                    
+                    #to fix bug: otherwise it will be wrong view rotation on 2nd point select
+                    self.frame = imutils.rotate_bound(self.frame, -self.orientation)
+
                     _roiRect2 = self.rectMainToOrig(rect2)
 
                     self.outputScore.addRayPoint(

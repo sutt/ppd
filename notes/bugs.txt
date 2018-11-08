@@ -29,7 +29,7 @@
 
     [x] second commit:
         [x] fix ray select in zoom window
-            [~] this will pickup another deferred bug
+            [x] this will pickup another deferred bug
                 can't find exact match to these; looks like they should be OK thoughts
                 we can reject these defects with a unit test on display:
                     just need to validate that the region selected is region saved and displayed when orientation != 0
@@ -54,9 +54,8 @@
             problem:
                 main = self.getFrameScoreCurrent() is None instead of {}
 
-    [ ] action 2.75
-        [ ] can't write a ray roi to main_display with orientation != 0
-            (how has this just popped up? or have I never tested it?)
+    [x] action 2.75
+        [x] can't write a ray roi to main_display with orientation != 0
 
 
     [ ] third action:
@@ -68,6 +67,14 @@
         [ ] add data repo/
         [ ] add data-repo-gitignore
         [ ] verify git status in two directories works as expected
+
+    [ ] fourth action
+        [ ] displayclass test for simulated selectRay / selectCircle
+        
+        [ ] then maybe you can refactor display.show() for orientation handling
+            the main issue appears to be that coordConversion routines need
+            the class data in the non-rotated form to convert coords; that causes
+            us to have to rotate back and forth each time
 
 11/7
 
@@ -183,7 +190,7 @@
         [ ] can't add a param with framenote-override           (10/30)
         [ ] frame_sync using camera pointed at screen
         [ ] investigate "#Bug- does this need rotate_bounds as below?"  (10/24)
-        [ ] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"  (10/24)
+        [x] investigate "#?# self.frame = imutils.rotate_bound(self.frame, - self.orientation)"  (10/24)
         [ ] investigate "#BUG-check if zoomRect is in bounds in new video"  (10/24)
         [ ] All those imports needed in guiview?  (10/23)
 
