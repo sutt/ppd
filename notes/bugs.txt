@@ -58,15 +58,28 @@
         [x] can't write a ray roi to main_display with orientation != 0
 
 
-    [ ] third action:
-        [ ] research repo in repo
-        [ ] dummy repo in repo
-            [ ] check git status
-        [ ] save data/ in grandparent directory
-        [ ] organize data/ delete most
-        [ ] add data repo/
-        [ ] add data-repo-gitignore
-        [ ] verify git status in two directories works as expected
+    [x] third action:
+        [x] research repo in repo
+        [x] dummy repo in repo
+            [x] check git status
+        [x] .gitattributes
+            "*.avi binary"
+            https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#_binary_files
+        [x] save data/ in grandparent directory
+        [x] add the one discovered file to data folder
+        [x] build .gitattributes w/ all media extensions: .avi .png .jpg .mp4 .h264
+        [x] remove current data/ contents from git parent
+        [x] organize data/ delete most
+        [x] add data repo/
+        [x] add data-repo-gitignore
+        [x] assume unchanged the sub-repo readme from this repo
+        [x] verify git status in two directories works as expected
+
+        notes:
+            suggest "git submodules"
+            https://stackoverflow.com/questions/1811730/how-do-i-work-with-a-git-repository-within-another-repository
+
+
 
     [ ] fourth action
         [ ] displayclass test for simulated selectRay / selectCircle
