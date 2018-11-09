@@ -2,23 +2,32 @@
 
 11/9
 
-    [ ] make sure data repo is considering media files as binary with git diff
-    [ ] what commands to clone the both repos from github (w/o file renaming)
-        [ ] add this to documentation
-    [ ] add dependency like .dlls to data-sub-repo
-    [ ] update any paths in books or timelog_bench to the data folder
+    BUGS
 
-    [ ] add documentation folder
-    [ ] add project readme
-        [ ] link to ppd_data
-        [ ] link to documentation
-    [ ] add documentation notebooks
+        
+    
+    TODOS
+    
+    [x] make sure data repo is considering media files as binary with git diff
+    [x] what commands to clone the both repos from github (w/o file renaming)
+        [x] add this to documentation
+    [x] add dependency like .dlls to data-sub-repo
+    [x] update any paths in books or timelog_bench to the data folder
+
+    [x] add documentation folder
+         https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
+    [x] add .gitattributes with png
+    [x] add project readme
+        [x] link to ppd_data
+        [x] link to documentation
+    [x] add documentation notebooks
 
     [ ] refactor miscutils + data
         [ ] refactor apps/modules that reference them
         [ ] refactor their own tests paths to data
     [ ] refactor tests in extraneous 
     [ ] one click testing
+    [ ] remove .cache / .pycache from ppd root dir
     
     [ ] diagnose and eliminate ipython from launch.json (see notes/adapt_thresh.ipynb)
     [ ] build module reload ipy template
