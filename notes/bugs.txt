@@ -2,9 +2,11 @@
 
 11/9
 
-    BUGS
+    BUGS + FEATURES
 
-        
+    [ ] guiview --output is unused
+    [ ] guiview gui  'diff win' -> score window
+    [ ] stop at certain frame (or start at that frame)
     
     TODOS
     
@@ -21,6 +23,12 @@
         [x] link to ppd_data
         [x] link to documentation
     [x] add documentation notebooks
+    
+    [ ] add documentation overview / markdown
+        [ ] "todo" for the doc's missing
+    [ ] search commands.txt for lost options
+    [ ] better markdown bullet list formatting
+    [ ] add helpful hints like how to debug, how to write tests, etc.
 
     [ ] refactor miscutils + data
         [ ] refactor apps/modules that reference them
