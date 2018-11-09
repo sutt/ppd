@@ -1,5 +1,48 @@
 #Tasks
 
+11/9
+
+    [ ] make sure data repo is considering media files as binary with git diff
+    [ ] what commands to clone the both repos from github (w/o file renaming)
+        [ ] add this to documentation
+    [ ] add dependency like .dlls to data-sub-repo
+    [ ] update any paths in books or timelog_bench to the data folder
+
+    [ ] add documentation folder
+    [ ] add project readme
+        [ ] link to ppd_data
+        [ ] link to documentation
+    [ ] add documentation notebooks
+
+    [ ] refactor miscutils + data
+        [ ] refactor apps/modules that reference them
+        [ ] refactor their own tests paths to data
+    [ ] refactor tests in extraneous 
+    [ ] one click testing
+    
+    [ ] diagnose and eliminate ipython from launch.json (see notes/adapt_thresh.ipynb)
+    [ ] build module reload ipy template
+    [ ] clean ppd's parent folder
+    [ ] clean scratch/
+    [ ] clean notes
+    [ ] move .json's out of notes/
+    [ ] assume-unchanged the .json's
+    [ ] add ppd_papers to data
+    [ ] collate .txt's into 1 notes
+    [ ] separate notes into categories
+        [ ] collect a savoire-fair list of cli tricks
+    [ ] build some media-rich ppt's of notes; and a narrative breakdown
+
+    [ ] refactor app's into scripts/ or something
+        [ ] horizontal imports?
+        [ ] 
+    [ ] separate relevant scripts from legacy scripts
+    [ ] build requirements.txt
+    [ ] build a venv that runs the workspace: scripts + pass tests
+    [ ] try workspace in wsl: that'll be hard for graphics of the video windows
+    [ ] add vscode to personal github repo
+
+
 11/8
 
     [x] first commit
@@ -155,8 +198,8 @@
                 [ ] bounce scoring
 
         Bugs Found:
-            [ ] orientation on score_display does not go profile
-            [ ] select ray in score_display with 90-orientation is fubar
+            [x] orientation on score_display does not go profile
+            [x] select ray in score_display with 90-orientation is fubar
             [x] after awhile, Writevid=ON does not work; maybe on selection-controls reset
                  - for output3, at frame361
                     [x] let's try w/o starting at exact beginning: same
