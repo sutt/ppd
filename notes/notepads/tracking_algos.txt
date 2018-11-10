@@ -1,0 +1,14 @@
+
+
+
+demo of OpenCV on ping pong
+	https://www.youtube.com/watch?v=j0POMSWufq4
+
+Tracking, highspeed home rolled
+	
+	https://www.youtube.com/watch?v=X6rPdRZzgjg
+
+	https://www.dropbox.com/s/67gtew15zn2rpun/motionTracking.cpp?dl=0
+	
+A picamera frame-diff:
+    https://github.com/osmaa/pinymotion/blob/master/pinymotion.py

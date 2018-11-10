@@ -1,0 +1,173 @@
+
+
+7/5
+
+
+setup on pi
+
+	For using the VGA cable
+	http://elinux.org/R-Pi_configuration_file
+	http://elinux.org/RPiconfig
+
+		sudo nano /boot/config.txt
+		uncomment #hdmi_safe=1   [this is failsafe]
+		hdmi_mode=16 			[this works best Set monitor resolution to 1024x768 XGA 60 Hz (HDMI_DMT_XGA_60)]
+
+	
+	According to docs, up to 42-49 with full FOV
+		https://www.raspberrypi.org/blog/new-camera-mode-released/
+
+		1920×1080 1-30fps, video mode, 1080p30 cropped
+		1296×972 1-42fps, video mode, 4:3 aspect binned full FOV. Used for stills preview in raspistill.
+
+
+	using opencv on pi
+
+		get virtualenv, when you go to startx
+			export WORKON_HOME=$HOME/.virtualenvs
+			source /usr/local/bin/virtualenvwrapper.sh
+
+			-> need to save these to profile, see setup video
+
+		http://www.pyimagesearch.com/2015/03/30/accessing-the-raspberry-pi-camera-with-opencv-and-python/
+
+
+		very interesting on YUV420 
+		http://picamera.readthedocs.io/en/release-1.10/recipes2.html
+		
+	to setup ssh on rpi:
+
+		ip addr show
+		arp -a
+		ping rpi.ip.addr.xx
+		sudo raspi-config ~ enable ssh
+		pscp pi@192.168.43.243:Desktop/camera1/vid1.h264 myvid.h264
+
+
+Encode a 5s camera stream and send the image data to stdout:
+		-https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+
+how to stream on pi
+	http://www.raspberry-projects.com/pi/pi-hardware/raspberry-pi-camera/streaming-video-using-vlc-player
+
+	https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+
+	how to use vlc to stream over opencv stdout
+	https://stackoverflow.com/questions/36579542/sending-opencv-output-to-vlc-stream
+
+getting vlc
+
+	sudo apt-get install vlc
+
+	https://www.techjunkie.com/video-frame-by-frame-vlc/
+
+
+To open an image from a request:
+    img_a  = Image.open(StringIO(r.content))
+
+img sizes:
+
+    140kb 640x480 @30fps
+    ~108kb boxed-FOV "640x480" @60fps
+
+	
+	
+picamera manuals:
+
+    http://picamera.readthedocs.io/en/release-1.10/recipes1.html
+    http://picamera.readthedocs.io/en/release-1.10/api_camera.html
+	
+
+streaming benchmarks (12/16/16)
+
+	Now we're doing 14FPS preview at 640 over ethernet
+	Now we're doing 10FPS preview at 1280 over ethernet
+
+	Now we're doing 14FPS preview at 640 over ethernet
+	Now we're doing 9FPS preview at 1280 over ethernet
+
+
+	TaskManager says 38-44% network in use during stream
+
+	a pretty constant 13 FPS over ethernet
+	there once was a time when got 17 FPS over wifi
+	now getting more like 11 FPS over wifi
+
+	
+	
+7/1/17
+
+this copies from pi -> laptop
+	
+	(reverse arg order for laptop -> pi)
+	
+	pscp pi@192.168.43.243:Desktop/camera1/vid1.h264 myvi
+
+
+to play a h264 on the pi:
+	
+		omxplayer file.h264
+		
+	to play at correct speed
+	
+		MP4Box -fps files_fps -add file.h264 file.mp4
+			(also this shows how many frames)
+	
+		omxplayer file.mp4 [--fps desired_fps]
+		
+
+to preview the FOV of cam:
+	
+	raspistill [-rot 270] [-vf] [-hf] -t 0 -p 200,200,640,480 -w 640 -h 480
+		
+		(but rotation doesn't work on raspivid)
+		
+
+to take a video with raspivid:
+
+	raspivid -w 640 -h480 -ss 5000[ms] -fps 30 -o output.h264 -t 5000[ms] 
+	
+		(ss and fps are sometimes conflicting, whichever one comes last overwrites)
+		
+		fps also alters FOV with > 30ish dropping down to half-FOV
+
+For Help:
+	raspivid 2>&1 | less
+	
+To make videos playable
+	sudo apt-get install -y gpac
+	MP4Box -add pivideo.h264 pivideo.mp4
+	omxplayer pivideo.mp4
+
+https://www.raspberrypi.org/blog/new-camera-mode-released/
+
+	sudo rpi-update
+	
+	raspivid -w 640 -h 480 -fps 90 -t 10000 -o test90fps.h264
+	
+	
+https://www.raspberrypi.org/forums/viewtopic.php?f=43&t=76909
+
+	No Shutter as of May2014
+	
+	Setting fps to 0 tells the camera to use dynamic frame rates. You will get 30 fps until your exposure time is too long to archive 30fps. To enforce a fixed frame rates (i.e. 30fps) the maximum shutter speed needs to be limited to 1/fps. All settings of ss over 33333 will be limited to 33333.
+
+
+picamera commands
+	
+	#camera = PiCamera(resolution=(1280, 720), framerate=30)
+	#camera = PiCamera()
+	#camera.resolution = (640, 480)
+	#camera.start_preview()
+
+	#camera = PiCamera()
+	#camera.start_preview()
+	#camera.iso = 100
+	# Wait for the automatic gain control to settle
+	#time.sleep(2)
+	# Now fix the values
+	#camera.shutter_speed = camera.exposure_speed
+	#camera.exposure_mode = 'off'
+	#g = camera.awb_gains
+	#camera.awb_mode = 'off'
+	#camera.awb_gains = g

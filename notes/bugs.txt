@@ -24,9 +24,13 @@
         [x] link to documentation
     [x] add documentation notebooks
     
-    [ ] add documentation overview / markdown
-        [ ] "todo" for the doc's missing
+    [x] add documentation overview / markdown
+        [x] "todo" for the doc's missing
     [ ] search commands.txt for lost options
+        --framelog
+        --scoreoff
+        tail -f x/x/outputX.metalog -n 10
+        
     [ ] better markdown bullet list formatting
     [ ] add helpful hints like how to debug, how to write tests, etc.
 

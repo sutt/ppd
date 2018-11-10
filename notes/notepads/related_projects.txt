@@ -1,0 +1,27 @@
+
+
+Learning to fly by crashing
+	http://spectrum.ieee.org/automaton/robotics/drones/drone-uses-ai-and-11500-crashes-to-learn-how-to-fly
+	
+	https://news.ycombinator.com/item?id=14316917
+	
+	
+Pong Table Electronics			
+
+	http://www.theverge.com/2016/5/1/11551624/ping-pong-table-data-visualization-thomas-mayer
+	http://www.designboom.com/technology/thomas-mayer-table-tennis-trainer-05-01-2016/
+	http://thomas-mayer.de/
+	http://ttt3000.de/
+	
+Using rpi to play gameboy
+	https://courses.ece.cornell.edu/ece5990/ECE5990_Spring16_FinalProjects/hj424_ww424/index.html
+	
+
+Parrot Bebop controlled by python
+https://github.com/robotika/katarina
+
+    Project page
+    https://robotika.cz/robots/katarina/en
+
+    The dev board used for Mavlink
+    http://wiki.paparazziuav.org/wiki/Main_Page

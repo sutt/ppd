@@ -1,4 +1,32 @@
 
+11/7
+
+guiview is essentially the skeleton of a training-data management system. it references frame-data, time-data, note-data, interfaces with track-calcs, so this is how we'd build a total dataset evaluation. it's not just a custom photoshop-like program for hand edits, but a template for app development.
+
+the thorniness of the problem is that
+first, the a tracker at frametime = t, depends on data from input-data from time in [0, t) in a complex hierarchy, e.g.
+    what was the position last frame?
+    which direction was it moving last frame?
+    what is the range of threshholds set during calibration
+    what does the background mask look like?
+    what does the agent mask look like from beginning of vid?
+and there's no automated way to specify these features during record, only with hand processing. So frames depend on the frames before them so we can't consider them as independant records. [*0]
+
+second, that while each video is independant, there are differing variables like ball-color, frame-size, frame-speed, lighting-level, that vary between them.
+
+third, that the parameters for the tracking algo affect the calibration phase which then affects the evaluation stage, so updating the tracker at frame_t requires first updating previous frames with the parameters.
+
+basically: we're trying to find a way to build a bunch of videos with a calibration phase that then do well* in the evaluation. *well meaning accurate and fast, and the cost of accuracy is very subtle because say we can afford to miss one frame within a bounce if we reliably track the two adjacent frames.
+
+another aspect is that we don't have a ground-truth, it's costly to build it by hand. so we need an iterative process to do that: find the false-negatives visually, score it by hand, then save it for future automatic evaluation.
+
+one other thing of note: once trackers get good enough, they can be used construct pseudo-ground-truths, and that automates construction of the ground truth, our dataset bootstraps! Once there's a large availability of training data (diversity of frames and diversity of conditions), then that can be used to train a potentially more accurate blackbox. but starting out we can only build models by hand using intuition, and trial and error using visual evaluation.
+
+[*0]: but this is what we want; we want to utilize the limititation assumptions of a cooperative agent - "the human player" - with a defined task - throwing a ball at a vertain vector range - and use those to optimize the accuracy and speed of the algo.
+opencv-contrib object detectors are superior for the general case of object detection (and general case of liberal assumptions) no doubt, but we're writing a workspace that finds how much we can accuracy/perf we can squeeze out of those assumptions, and still work in a variety of situations.
+
+another note: I think the bounce will really be a much different algo, maybe even easier in some ways b/c it will ruthlessly look for ray-type diffs but the semi-static object tracker is neccesary for drone positioning.
+
 10/29
 
 Now can account for multiple tracking objects thoughout workflow: this will help with tracking reflection object in future training videos. Need to quickly close out wokr in guiview and move onto: building training data, refining tracker, batch evaluation. Final big steps are unit testing for guiview and guirecord.

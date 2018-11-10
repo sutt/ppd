@@ -1,14 +1,11 @@
-
-Skills
-
-    GIT
+GIT
     
     if changes keep showing up in 'git status' but you don't care; 
     only wanted to commit it once to makr its place
 
     >git update-index --assume-unchanged notes/guirecord.jsonc
 
-    WINDOW POSITIONING
+WINDOW POSITIONING
 
     tkinter opens to "second to last place" you moved it.
     Thus to get default to change:
@@ -17,21 +14,9 @@ Skills
 
     opencv associates window names with open positions
 
-    PYTHON
+PYTHON
 
     dir(obj) shows all methods available to object
 
     signal.SIGALRM is available in wsl, but not windows
 
-
-
-Parrot Bebop controlled by python
-https://github.com/robotika/katarina
-
-    Project page
-    https://robotika.cz/robots/katarina/en
-
-    The dev board used for Mavlink
-    http://wiki.paparazziuav.org/wiki/Main_Page
-
-    
