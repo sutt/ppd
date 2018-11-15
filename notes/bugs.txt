@@ -4,9 +4,9 @@
 
     [x] timelog - interval
 
-        [ ] examine some intervals in nov_throw_1/
+        [x] examine some intervals corresponding to motion
     
-    [ ] what do both columns mean?
+    [x] what do both columns mean?
         specifically is one interval contained within the other? yes, 2nd is contained within first
         1st column timelog.log_frame_time (list)
         2nd column timelog.log_start_Time (list)
@@ -18,7 +18,7 @@
         individually, this could affect frame-t to frame-t+1 but overall, this shouldn't
         affect fps over a broad interval as log_frame_time is 
 
-            [ ] unless they impact each other in methods? verify they don't
+            [x] unless they impact each other in methods? verify they don't
         
         [~] timelog - data = [x[0] for x in data] is worng should include both columns
             -> no, 2nd column is contained in first
@@ -43,22 +43,28 @@
 
         [x] fix timelog issue
         [x] make sure ret handling will be noisy and apparent
-        [ ] repair existing datasets timelog
-        [ ] guirecord.jsonc populated
-        [ ] new data sets
-        [ ] calibrate light to high fps
-        [ ] extract speed data
-        [ ] examine intervals corresponding to motion frames; do peaks
-            correspond to perceived longer exposure?
+        [x] repair existing datasets timelog
+        [x] guirecord.jsonc populated
+        [x] new data sets
+        [x] calibrate light to high fps
+        [x] build example low-light/low-fps example vid
+            [x] build a book for this
+        [x] extract speed data
+            [x] throw_1/out7
+            [~] throw_1/out3
+            [x] throw_2/...
+        [~] examine intervals corresponding to motion frames; do peaks
+            correspond to perceived longer exposure? of-by-one?
     
 
 11/13
 
     [ ] organize demo speed data 
+        [ ] add excel to binary .gitattributes
 
-    [ ] build a book showing fps diff in low light conditions
+    [x] build a book showing fps diff in low light conditions
 
-    [ ] fix timelog to account for 
+    [x] fix timelog to account for 
 
         [x] why did I never account for both columns before?
         [x] what do the two columns mean exactly?
@@ -66,7 +72,7 @@
 
 11/12
 
-    [ ] do some speed calc vids
+    [x] do some speed calc vids
         [x] lob ~17 mph  - output1
         [x] hard throw  - output3 / output7
         [x] easy throw  - output3 / output7
@@ -91,35 +97,35 @@
                     nov_calib_1/output8 - just light
                     nov_calib_1/output9 - switch b/w light and dark
     
-    [ ] test discrepancies b/w videos
-        [ ] does apparent speed match calc'd speed?
-        -> it's different b/w dif videos
+    [x] test discrepancies b/w videos
+        [x] does apparent speed match calc'd speed?
+        -> looks about right b/w dif vid's have same apparent and calc'd speed: 10-20 feet/sec
 
-    [ ] can we see a timelog over a short interval?
-        [ ] if not, add this
-        [ ] how much different could off-by-1 or off-by-2 vids be?
+    [x] can we see a timelog over a short interval?
+        [x] if not, add this
+        [x] how much different could off-by-1 or off-by-2 vids be? +50% / -33% with logtiech
 
-    [ ] why does 'true time' not work for output3? (it plays at ~2x speed)
-        [ ] why does output3, at 17 fps have 30 fps lag times for indv frames?
-            [ ] roughly 2800 frames for output3 according to timelog?
+    [x] why does 'true time' not work for output3? (it plays at ~2x speed)
+        [x] why does output3, at 17 fps have 30 fps lag times for indv frames?
+            [x] roughly 2800 frames for output3 according to timelog?
 
-        [ ] why is total cumtime in output3, output7 so wrong 143 and 193 respectively?
-            [ ] bc they are semi-loaded?
-            [ ] but output1 is fine?
-                [ ] it's not semiloaded
-            [ ] output1 has 350 frames while output3 and out7 have 3,500 frmaes?
+        [x] why is total cumtime in output3, output7 so wrong 143 and 193 respectively?
+            [x] bc they are semi-loaded?
+            [x] but output1 is fine?
+                [x] it's not semiloaded
+            [x] output1 has 350 frames while output3 and out7 have 3,500 frmaes?
                 according to guiview out3 has ~420 frames, output7 ~740 frames
                 (note: b/c the fps is much higher in )
-            [ ] is it because ret=False and guirecord doesn't handle that?
-                [ ] can't replicate though, even with darkness
-            [ ] try making a shor proc video that won't be semi-loaded
+            [x] is it because ret=False and guirecord doesn't handle that?
+                [x] can't replicate though, even with darkness
+            [x] try making a shor proc video that won't be semi-loaded
 
             -> b/c "end time" 2nd column is not included in analysis
 
-            [ ] does output3.txt has 3500 entries?
-                [ ] i think it starts logging when before record is toggled?
+            [x] does output3.txt has 3500 entries?
+                [x] i think it starts logging when before record is toggled?
                     no...
-                [ ] because it keeps logging after record is off?
+                [x] because it keeps logging after record is off?
                     [ ] is this on 2nd video of seesions or 1st?
 
 
