@@ -1,5 +1,84 @@
 #Tasks
 
+11/15
+
+    [x] timelog - interval
+    
+    [ ] what do both columns mean?
+        specifically is one interval contained within the other?
+        [ ] timelog - data = [x[0] for x in data] is worng should include both columns
+
+11/13
+
+    [ ] organize demo speed data 
+
+    [ ] build a book showing fps diff in low light conditions
+
+    [ ] fix timelog to account for 
+
+        [ ] why did I never account for both columns before?
+        [ ] what do the two columns mean exactly?
+
+
+11/12
+
+    [ ] do some speed calc vids
+        [x] lob ~17 mph  - output1
+        [x] hard throw  - output3 / output7
+        [x] easy throw  - output3 / output7
+
+            output1, first attempt 15fps, lobs
+            output3, second attempt, 17fps variety pack
+            output5 dummy living room, 15 fps
+            output4 - another try, no divorce
+            output6 big lamp turned on, working
+            outout7 - in earnest
+
+    [x] why is logitech giving us 15fps not 30fps?
+        -> too dark => too slow
+
+    [x] can't replicate in kitchen, try again?
+        [x] 17fps observed in production
+        [x] timelog indicates regime shift: 30 -> 15 fps at frame ~900
+            [x] why not in long vid?
+            [x] looks like it's low light in living room vs kitchen (high light) 
+                that's setting to 15 fps
+                [x] verify this w/ low light kitchen
+                    nov_calib_1/output8 - just light
+                    nov_calib_1/output9 - switch b/w light and dark
+    
+    [ ] test discrepancies b/w videos
+        [ ] does apparent speed match calc'd speed?
+        -> it's different b/w dif videos
+
+    [ ] can we see a timelog over a short interval?
+        [ ] if not, add this
+        [ ] how much different could off-by-1 or off-by-2 vids be?
+
+    [ ] why does 'true time' not work for output3? (it plays at ~2x speed)
+        [ ] why does output3, at 17 fps have 30 fps lag times for indv frames?
+            [ ] roughly 2800 frames for output3 according to timelog?
+
+        [ ] why is total cumtime in output3, output7 so wrong 143 and 193 respectively?
+            [ ] bc they are semi-loaded?
+            [ ] but output1 is fine?
+                [ ] it's not semiloaded
+            [ ] output1 has 350 frames while output3 and out7 have 3,500 frmaes?
+                according to guiview out3 has ~420 frames, output7 ~740 frames
+                (note: b/c the fps is much higher in )
+            [ ] is it because ret=False and guirecord doesn't handle that?
+                [ ] can't replicate though, even with darkness
+            [ ] try making a shor proc video that won't be semi-loaded
+
+            -> b/c "end time" 2nd column is not included in analysis
+
+            [ ] does output3.txt has 3500 entries?
+                [ ] i think it starts logging when before record is toggled?
+                    no...
+                [ ] because it keeps logging after record is off?
+                    [ ] is this on 2nd video of seesions or 1st?
+
+
 11/9
 
     BUGS + FEATURES
@@ -7,6 +86,11 @@
     [ ] guiview --output is unused
     [ ] guiview gui  'diff win' -> score window
     [ ] stop at certain frame (or start at that frame)
+    [ ] only view frames where track doesn't find a ball, and notes
+        indicate that ball_present=true; this will help us review for
+        "challenge" locations to mark, or override notes and set 
+        ball_present=false; name this concept:
+    
     
     TODOS
     
@@ -30,9 +114,13 @@
         --framelog
         --scoreoff
         tail -f x/x/outputX.metalog -n 10
-        
+
     [ ] better markdown bullet list formatting
     [ ] add helpful hints like how to debug, how to write tests, etc.
+    [ ] add a wiki for open questions, and past progress, diagrams, etc.
+        [ ] diagram to registering ball against screen
+        [ ] video of drone actuation
+        [ ] video of drone flight, with measuring stick -> accel params
 
     [ ] refactor miscutils + data
         [ ] refactor apps/modules that reference them
@@ -43,15 +131,15 @@
     
     [ ] diagnose and eliminate ipython from launch.json (see notes/adapt_thresh.ipynb)
     [ ] build module reload ipy template
-    [ ] clean ppd's parent folder
-    [ ] clean scratch/
-    [ ] clean notes
+    [x] clean ppd's parent folder
+    [x] clean scratch/
+    [x] clean notes
     [ ] move .json's out of notes/
     [ ] assume-unchanged the .json's
-    [ ] add ppd_papers to data
-    [ ] collate .txt's into 1 notes
-    [ ] separate notes into categories
-        [ ] collect a savoire-fair list of cli tricks
+    [x] add ppd_papers to data
+    [x] collate .txt's into 1 notes
+    [x] separate notes into categories
+        [x] collect a savoire-fair list of cli tricks
     [ ] build some media-rich ppt's of notes; and a narrative breakdown
 
     [ ] refactor app's into scripts/ or something
