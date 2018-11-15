@@ -84,7 +84,8 @@ while(not(Globals.gui_cmd_quit)):
     Globals.sw_camera_reset = False
 
     
-    init_savedir = "data/nov2018/"
+    init_savedir = "data/usr/nov_calib_1/"
+    # init_savedir = "data/usr/nov_throw_2/"
     ext = "avi"
     time_to_record = 999
     b_show = True
@@ -181,7 +182,12 @@ while(not(Globals.gui_cmd_quit)):
                              ,local_sw_record_start
                             )
             
-            if ret:
+            if not(ret):
+            
+                print '~~~~~~~~~~~~~~~~~~no ret from camera grab \n'
+                assert False
+            
+            else:
 
                 if Globals.sw_preview_frame:
                     

@@ -130,6 +130,7 @@ class TimeLog:
         self.log_frame_time = []
         self.log_start_time = []
         self.log_schema_vars = []
+        self.first_record_frame = None
 
         
     def load_log_file(self, path_fn):

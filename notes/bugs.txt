@@ -3,10 +3,54 @@
 11/15
 
     [x] timelog - interval
+
+        [ ] examine some intervals in nov_throw_1/
     
     [ ] what do both columns mean?
-        specifically is one interval contained within the other?
-        [ ] timelog - data = [x[0] for x in data] is worng should include both columns
+        specifically is one interval contained within the other? yes, 2nd is contained within first
+        1st column timelog.log_frame_time (list)
+        2nd column timelog.log_start_Time (list)
+
+        log_start_time is the time spent on the cam.read() api call
+        
+        log_frame_time is the time spent in the whole loop
+
+        individually, this could affect frame-t to frame-t+1 but overall, this shouldn't
+        affect fps over a broad interval as log_frame_time is 
+
+            [ ] unless they impact each other in methods? verify they don't
+        
+        [~] timelog - data = [x[0] for x in data] is worng should include both columns
+            -> no, 2nd column is contained in first
+
+    Ben H Bell - ServiceBot, NLP ala Alexa
+
+    So columns are OK as is, why is my data not making sense?
+        [~] the no ret-handling in guirecord
+
+        [~] the data is making sense; you're interpreting it wrong
+            -> this data was collected incorrectly (output3, output7) 
+               so we can't align the frames in th video to the timelog 
+               entries, and there is significant drift for fps, so we
+               will not be able to extract speed from this data; need to redo
+            (actually, we can by counting frames in video, N, and taking last N
+            entries in timelog)
+
+        [x] why is timelog so long for output3 and output7; reproduce
+            [x] do two recordings - YES, this is the problem
+
+    Needed steps:
+
+        [x] fix timelog issue
+        [x] make sure ret handling will be noisy and apparent
+        [ ] repair existing datasets timelog
+        [ ] guirecord.jsonc populated
+        [ ] new data sets
+        [ ] calibrate light to high fps
+        [ ] extract speed data
+        [ ] examine intervals corresponding to motion frames; do peaks
+            correspond to perceived longer exposure?
+    
 
 11/13
 
@@ -16,8 +60,8 @@
 
     [ ] fix timelog to account for 
 
-        [ ] why did I never account for both columns before?
-        [ ] what do the two columns mean exactly?
+        [x] why did I never account for both columns before?
+        [x] what do the two columns mean exactly?
 
 
 11/12

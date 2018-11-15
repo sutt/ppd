@@ -3,7 +3,8 @@ import random
 
 def parseCommas(strArg, bInt=True, bFloat=False):
     '''
-        return a tuple from a string; useful for argparse
+        return a tuple from a string representing numbers separated by commas;
+            useful for argparse 
         "1,2,3" -> (1,2,3) [ or (1.0,2.0,3.0) if bFloat]
     '''
     
