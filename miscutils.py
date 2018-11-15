@@ -1,6 +1,26 @@
 import os
 import random
 
+def parseCommas(strArg, bInt=True, bFloat=False):
+    '''
+        return a tuple from a string; useful for argparse
+        "1,2,3" -> (1,2,3) [ or (1.0,2.0,3.0) if bFloat]
+    '''
+    
+    elems = strArg.split(",")
+    elems = [filter(lambda char: char.isdigit(), elem) for elem in elems]
+    elems = filter(lambda elem: len(elem) > 0, elems)
+    
+    if bInt:
+        elems = map(lambda elem: int(elem), elems)
+    elif bFloat:
+        elems = map(lambda elem: float(elem), elems)
+    
+    if len(elems) > 0:
+        return tuple(elems)
+    else:
+        return None
+
 def uniqueFn(fn_base
             ,fn_dir = None
             ,fn_ext = None
@@ -205,8 +225,23 @@ def test_uniqueFn_7():
         
         assert elem not in _results2
 
-        
+def test_parseCommas_1():
+    
+    arg_1 = "1,2,3"
+    arg_3 = "(1,2,3)"
+    
+    assert parseCommas(arg_1, bInt=True) == (1,2,3)
+    assert parseCommas(arg_3, bInt=True) == (1,2,3)
+    
 
-
-
+def test_parseCommas_2():
+    
+    assert True
+    
+    # arg_2 = "1.2,2.9999,3"
+    # arg_4 = "[1,2.2,3]"
+    #TODO - add bFloat examples
+    
+    # assert parseCommas(arg_2, bInt=True) == (1,2,3)
+    # assert parseCommas(arg_3, bInt=True) == (1,2,3)
     

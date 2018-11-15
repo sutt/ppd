@@ -195,6 +195,7 @@ class TimeLog:
     def interpret_log(  self
                         ,path_fn
                         ,skip_first_n=0
+                        ,x_range=None
                         ,b_hz=False
                         ,filter_schema_var=""
                         ,filter_schema_val=None
@@ -213,8 +214,11 @@ class TimeLog:
 
         data = data[skip_first_n:]
 
+        if x_range is not None:
+            data = data[x_range[0]:x_range[1]]
+        
         data = [x[0] for x in data]
-
+        
         if b_hz:
             data = map(lambda x: 1/x, data)
         
