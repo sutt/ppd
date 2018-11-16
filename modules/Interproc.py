@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, copy, time
 import numpy as np
 import pickle
 import sqlite3
@@ -10,25 +10,12 @@ from modules.DataSchemas import ScoreSchema
 
     Ideas:
 
-        can just reload functionality in ipython
-
-        can go over a database
-
-        we'll need to pack media like images
-
-        ultimately, we'll need lists of these @frame instance
+        Ultimately, need a list of these frames
 
     Dataset:
 
-        orig-img
-        zoom-window
-        score-window
-        timelog cumtime, lag intervals
-        noteslog - score
-        display.current_score
+        lag intervals
         
-        display parameters, e.g. zoom window
-
         tracker-state
 
     Need Common operations methods on 
@@ -45,7 +32,10 @@ from modules.DataSchemas import ScoreSchema
         [x] add functionality to guiview
         [x] test w/ ipy
         [ ] add pathToData() function (see chess workspace)
-        [ ] add id as primary_key increment function (?)
+        [x] add id as primary_key increment function (?)
+        [ ] test that ScoreSchemas load from pickle?
+        [ ] add datetime to state_tbl
+            [ ] then helper function like get all from 'last 30 seconds'
 
 
 
@@ -56,37 +46,111 @@ class GuiviewState:
     def __init__(self):
         
         self.serial_origFrame = None
-        self.frameCounter = None
-        self.displayOutputScore = None
         self.displayInputScore = None
-        self.trackParams = None
+        self.displayOutputScore = None
+        self.zoomRect = None
+        self.scoreRect = None
+
+        self.frameCounter = None
         
-        self.dummy = None
-        self.img = None
+        self.trackParams = None
 
+        self.currentCumTime = None
 
-    def saveState(self, display, frameFactory, trackFactory):
+        self.orientation = None
+        self.currentFrameNote = None
+        self.vidBaseNote = None
+        
+        
+    def setState( self
+                 ,display
+                 ,frameFactory
+                 ,trackFactory
+                 ,timeFactory
+                 ,notesFactory
+                 ):
 
+        
+        #display
         self.serial_origFrame = display.getOrigFrame().dumps()
-
-        self.frameCounter = frameFactory.getFrameCounter()
-        print self.frameCounter
-
         self.displayInputScore = display.inputScore.getAll()
-
         self.displayOutputScore = display.outputScore.getAll()
+        self.zoomRect = copy.copy(display.zoomRect)
+        self.scoreRect = copy.copy(display.scoreRect)
+        
+        #frame
+        self.frameCounter = frameFactory.getFrameCounter()
 
+        #track
         self.trackParams = trackFactory.getTrackParams()
+
+        #time
+        self.currentCumTime = timeFactory.cumTimeCurrent()
+
+        #notes
+        self.currentFrameNote = notesFactory.getFrameNoteCurrent()
+        self.vidBaseNote = notesFactory.getBaseMetaLog()
+        self.orientation = notesFactory.getOrientation()
 
     
     def save(self):
         
         return pickle.dumps(self)
 
-    
+
+    # helpers ---------
+
     def getOrigFrame(self):
+        ''' returns origFrame as numpy obj, instead of a 
+            serialized string '''
         return np.loads(self.serial_origFrame)
 
+    
+    def getZoomWindow(self):
+        ''' returns a zoom window from origFrame + zoomRect'''
+        
+        if (self.zoomRect is None) or (self.serial_origFrame is None):
+            return None
+
+        frame = self.getOrigFrame()
+
+
+
+class GuiviewStateHelper(GuiviewState):
+
+    '''     NOT IMPLEMENTED 
+    
+        Inherits GuiviewState, which should be data-populated.
+        Adds multiple helpers methods to use this data in Jupyter.
+    '''
+    
+    def __new__(cls, inputGuiviewState):
+        inputGuiviewState.__class__ = GuiviewStateHelper
+        print '__new'
+        return inputGuiviewState
+    
+    def __init__(self, inputGuiviewState):
+        # GuiviewState.__init__(self)
+        # inputGuiviewState.__init__()
+        print '__init'
+        pass
+
+    
+    def getOrigFrame(self):
+        ''' returns origFrame as numpy obj, instead of a 
+            serialized string '''
+        return np.loads(self.serial_origFrame)
+
+    
+    def getZoomWindow(self):
+        ''' returns a zoom window from origFrame + zoomRect'''
+        
+        if (self.zoomRect is None) or (self.serial_origFrame is None):
+            return None
+
+        frame = self.getOrigFrame()
+
+    
 
 
 DATA_DIR = "../data/usr/demo.db"
@@ -110,13 +174,18 @@ class DBInterface:
         return False
 
     def createTable(self):
-        s = """CREATE TABLE state_tbl (id text, state text)"""
+        s = """CREATE TABLE state_tbl (id integer primary key, state text)"""
+        self.c.execute(s)
+        self.conn.commit()
+
+    def deleteTable(self):
+        s = "drop table state_tbl"
         self.c.execute(s)
         self.conn.commit()
 
     def insertState(self, state):
-        s = """INSERT INTO state_tbl(id, state) VALUES(?,?)"""
-        self.c.execute(s, ('1', state))
+        s = """INSERT INTO state_tbl(state) VALUES(?)"""
+        self.c.execute(s, (state,))
         self.conn.commit()
 
     def deleteAll(self):
@@ -128,20 +197,22 @@ class DBInterface:
         rows = self.c.fetchall()
         return rows
 
+    def selectLatest(self):
+        s = """select * from state_tbl 
+                where id = (select max(id) from state_tbl) """
+        self.c.execute(s)
+        row = self.c.fetchall()
+        try:
+            assert len(row) == 1
+        except:
+            print 'there is more than 1 record in this result!'
+        return row
 
 
-# test ipy reload --------------
-def hello():
-    return 2
+    def viewAll(self):
+        self.c.execute("select id from state_tbl")
+        rows = self.c.fetchall()
+        return rows
 
-class MyClass:
 
-    def __init__(self):
-        pass
 
-    def myMethod(self):
-        return 2
-
-# build flask app -------------------
-
-# app = Flask(__name__)

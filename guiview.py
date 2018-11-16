@@ -362,10 +362,14 @@ while(True):
             frameFactory.setWriteAndAdvance(outputFactory.getAdvanceFrame())
 
         if outputFactory.checkOutputState():
+            
             outputFactory.outputState( display = display 
                                       ,frameFactory = frameFactory
-                                      ,trackFactory = trackFactory )
+                                      ,trackFactory = trackFactory 
+                                      ,timeFactory = timeFactory
+                                      ,notesFactory = notesFactory)
         
+        # new frame section
         if frameFactory.queryNewFrame():
             
             ret, frame = frameFactory.getFrame()

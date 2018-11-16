@@ -664,7 +664,8 @@ class OutputFactory:
             return True
         return False
 
-    def outputState(self, display, frameFactory, trackFactory):
+    def outputState(self, display, frameFactory, trackFactory,
+                    timeFactory, notesFactory):
 
         if self.db is None:
             self.db = DBInterface("data/usr/demo.db")
@@ -672,12 +673,12 @@ class OutputFactory:
         if self.bDeleteState:
             self.db.deleteAll()
             print 'deleting all states...'
-            return
 
         if self.bOutputState:
             
             state = GuiviewState()
-            state.saveState(display, frameFactory, trackFactory)
+            state.setState(display, frameFactory, trackFactory,
+                            timeFactory, notesFactory)
             s_state = state.save()
             self.db.insertState(s_state)
             print 'outputting state...'
@@ -911,6 +912,17 @@ class NotesFactory:
         
         except:
             self.dataVid = {}
+
+    def getBaseMetaLog(self):
+
+        fullLog = copy.deepcopy(self.dataVid)
+
+        try:
+            del fullLog["frames"]
+        except:
+            pass
+
+        return fullLog
 
     def loadFrameNotes(self):
         ''' if video is processed it already has frame notes, load those '''

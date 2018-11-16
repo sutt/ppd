@@ -1,6 +1,64 @@
 #Tasks
 
+11/16
+
+    [x] first commit: better interproc data
+        [x] zoom-window, score-window coords
+        [x] add reload advice: altered method vs new method
+        [~] helper class; demo in ipy
+        [x] incrementing primary key for state_tbl
+        [x] function to get latest state from state_tbl
+
+    [ ] second commit: demo of tracking iteration
+        [ ] pathToData
+        [ ] change db name from 'demo' to interproc
+        [ ] helper functions
+            [ ] multi image subplt
+            [ ] crop for zoom window
+            [ ] orientation for view
+        
+
+    [ ] third commit: unit tests for this? it's gonna be hard
+        [ ] help figure out instance inheritance:
+            best insight: __new__(cls,)
+            https://stackoverflow.com/questions/1382871/dynamically-attaching-a-method-to-an-existing-python-object-generated-with-swig/1383646#1383646
+            https://docs.python.org/2.7/reference/datamodel.html
+            https://stackoverflow.com/questions/14177788/init-child-with-parent-instance
+            https://pypi.org/project/Acquisition/
+            https://stackoverflow.com/questions/1081253/inheriting-from-instance-in-python
+            https://stackoverflow.com/questions/1911281/how-do-i-get-list-of-methods-in-a-python-class
+            https://thepythonguru.com/python-inheritance-and-polymorphism/
+
+
+    Misc
+        [ ] tkinter in a better place - mid screend
+            root.geometry("+800+800")
+            https://yagisanatode.com/2018/02/23/how-do-i-change-the-size-and-position-of-the-main-window-in-tkinter-and-python-3/
+            do this with other misc stuff
 11/15
+
+    Checkpoint todos:
+    [ ] clean bugs
+    [ ] add documentation
+    [ ] add supporting notes
+    [ ] add tests
+    [ ] workthru the workflow; surfacing bugs
+    [ ] refactor file hierarchy
+    [ ] add some more data sets
+        [ ] bounces
+        [ ] process some datasets
+    [ ] ipy-interproc
+        [x] add sqlite
+        [x] add to guiC
+        [ ] do an ipy example with missing track in output4
+            [ ] expand color thresh and succesfully track it
+    [ ] evaluation
+
+    List of bugs:
+        [ ] make it noisy when an empty timelog is output from guirecord of guiview
+            [ ] can you replicate it happening?
+        [ ] vscode - prevent file explorer from expanding subdirs of open files
+        
 
     [x] timelog - interval
 
@@ -59,8 +117,8 @@
 
 11/13
 
-    [ ] organize demo speed data 
-        [ ] add excel to binary .gitattributes
+    [x] organize demo speed data 
+        [x] add excel to binary .gitattributes
 
     [x] build a book showing fps diff in low light conditions
 
