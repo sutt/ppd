@@ -8,6 +8,8 @@ from miscutils import uniqueFn
 from modules.Utils import TimeLog
 from modules.Utils import MetaDataLog
 from modules.DataSchemas import ScoreSchema
+from modules.Interproc import DBInterface
+from modules.Interproc import GuiviewState
 from modules import GlobalsC as g
 
 class FrameFactory:
@@ -534,11 +536,14 @@ class OutputFactory:
         self.bWriteScoreSnap = False
         self.bAllowDuplicates = False
         self.bInitWriteVid = False
+        self.bOutputState = False
+        self.bDeleteState = False
         self.advanceFrame = False
         self.compressionEnum = 0
         self.framesData = []
         self.framesInd = []
         self.frameCounter = None
+        self.db = None
 
 
     def setOutputDir(self, outputDir):
@@ -559,6 +564,8 @@ class OutputFactory:
                 ,switchWriteFrame=None
                 ,switchWriteScoring=None
                 ,switchOverideNote=None
+                ,switchOutputState=None
+                ,switchDeleteState=None
                 ):
         
         if duplicatesEnum is not None:
@@ -596,6 +603,16 @@ class OutputFactory:
             if switchOverideNote:
                 g.switchOverideNote = False
                 self.advanceFrame = True
+
+        if switchOutputState is not None:
+            self.bOutputState = switchOutputState
+            if switchOutputState:
+                g.switchOutputState = False
+
+        if switchDeleteState is not None:
+            self.bDeleteState = switchDeleteState
+            if switchDeleteState:
+                g.switchDeleteState = False
 
 
     def getAdvanceFrame(self):
@@ -640,6 +657,31 @@ class OutputFactory:
     def needScore(self):
         ''' return true if this frames notes should include scoring '''
         return self.bWriteScoreSnap
+
+    def checkOutputState(self):
+        if self.bOutputState or self.bDeleteState:
+            print 'here'
+            return True
+        return False
+
+    def outputState(self, display, frameFactory, trackFactory):
+
+        if self.db is None:
+            self.db = DBInterface("data/usr/demo.db")
+
+        if self.bDeleteState:
+            self.db.deleteAll()
+            print 'deleting all states...'
+            return
+
+        if self.bOutputState:
+            
+            state = GuiviewState()
+            state.saveState(display, frameFactory, trackFactory)
+            s_state = state.save()
+            self.db.insertState(s_state)
+            print 'outputting state...'
+
 
     @staticmethod
     def stripExt(fn):

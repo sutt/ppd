@@ -49,6 +49,12 @@ class ConstructGui:
     def cmd_alterParams(self):
         g.switchAlterParams = True
 
+    def cmd_outputState(self):
+        g.switchOutputState = True
+
+    def cmd_deleteState(self):
+        g.switchDeleteState = True
+
     def cmd_resetParams(self):
         g.switchResetParams = True
 
@@ -651,6 +657,22 @@ class ConstructGui:
             ,command = self.cmd_resetParams
             ).pack(side=tk.LEFT)
 
+        fstate1 = tk.Frame(root)
+        fstate1.pack(side = tk.TOP)
+
+        tk.Label(fstate1, text="output state:").pack(side=tk.LEFT)
+
+        tk.Button(
+             fstate1
+            ,text = 'output'
+            ,command = self.cmd_outputState
+            ).pack(side=tk.LEFT)
+
+        tk.Button(
+             fstate1
+            ,text = 'delete'
+            ,command = self.cmd_deleteState
+            ).pack(side=tk.LEFT)
 
 
         f0_1 = tk.Frame(root)

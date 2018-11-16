@@ -73,6 +73,8 @@ g.trackObjEnum = 0
 g.trackTypeEnum = 0
 g.annotateObjEnum = False
 g.switchSelectReset = False
+g.switchOutputState = False
+g.switchDeleteState = False
 
 
 #High Level Options --------------------------
@@ -330,6 +332,8 @@ while(True):
                             ,switchWriteFrame=g.switchWriteVid
                             ,switchWriteScoring=g.switchWriteScoring
                             ,switchOverideNote=g.switchOverideNote
+                            ,switchOutputState=g.switchOutputState
+                            ,switchDeleteState=g.switchDeleteState
                             )
 
         # output, handle before next frame
@@ -356,6 +360,11 @@ while(True):
                                     ,notesFactory.getFrameData() )
 
             frameFactory.setWriteAndAdvance(outputFactory.getAdvanceFrame())
+
+        if outputFactory.checkOutputState():
+            outputFactory.outputState( display = display 
+                                      ,frameFactory = frameFactory
+                                      ,trackFactory = trackFactory )
         
         if frameFactory.queryNewFrame():
             
