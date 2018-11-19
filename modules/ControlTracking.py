@@ -71,6 +71,9 @@ class TrackFactory:
         # rgb: (orange ball) [  0  96 192] [ 88 232 255]
         # green sharpie:  [ 15 106  86] [ 81 171 148]
 
+    def setAlgoEnum(self, algoEnum):
+        self.tp_trackAlgoEnum = algoEnum
+
     def setCmd( self 
                ,trackingOn 
                ,outputParams=None
@@ -273,7 +276,18 @@ class TrackFactory:
 
     
     def trackFrame(self, b_log=False):
+        '''
+            Wrapper function for a particular trackAlgo:
+                - unpack parameters
+                - select the particular track algo to run
+                - [possibly] time the function (if self.bTrackTimer)
+                - [possibly] return log of img transform steps (if b_log)
 
+            questions/todos:
+                [ ] pass in objEnum to trackAlgo for multi-obj tracking
+
+        '''
+        
         if not(self.on): return
 
         tracking_blur = self.tp_tracking_blur
@@ -285,6 +299,8 @@ class TrackFactory:
         if self.bTrackTimer:
             t0 = time.time()
 
+        ret = None
+
         if self.tp_trackAlgoEnum == 0:
             
             ret = self.trackDefault(
@@ -293,11 +309,19 @@ class TrackFactory:
                         ,thresh_lo = thresh_lo
                         ,thresh_hi = thresh_hi
                         ,b_log = b_log
+                        ,objEnum = 0  #TODO-SS
             )
 
         elif self.tp_trackAlgoEnum == 1:
             
-            pass
+            ret = self.trackDemoNew(
+                         tracking_blur = tracking_blur
+                        ,repair_iterations = repair_iterations
+                        ,thresh_lo = thresh_lo
+                        ,thresh_hi = thresh_hi
+                        ,b_log = b_log
+                        # ,objEnum = 0
+            )
 
         else:
             print 'trackAlgoEnum not recognized'
@@ -319,6 +343,7 @@ class TrackFactory:
                     ,thresh_lo
                     ,thresh_hi
                     ,b_log = False
+                    ,objEnum = 0
                     ):
         '''
             trackDefault:
@@ -331,6 +356,7 @@ class TrackFactory:
                  - organize all parameters used in func args; these are
                    retreived from the instance in parent function, trackFrame,
                    and thus read-only.
+                    - add b_log and objEnum defaults to args
 
                  - write trackAlgo output data to instance properties:
                     self.currentTrackSuccess
@@ -369,8 +395,81 @@ class TrackFactory:
 
             self.currentTrackScore.addCircle(
                                      self.circleToRect((x,y,radius))
-                                    ,objEnum=0   #TODO-SS
+                                    ,objEnum=objEnum
                                     )
+
+        if b_log:
+            
+            keys = ['img_t','img_mask','img_mask_2','xy', 'radius', 'scoreCircle']
+            data = {}
+            for k in keys:
+                data[k] = None
+
+            data['img_t'] = img_t
+            data['img_mask'] = img_mask
+            
+            if img_mask is not None:
+                data['img_mask_2'] = img_mask_2
+                data['xy'] = (x,y)
+                data['radius'] = radius
+                data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
+            
+            return data
+
+    def trackDemoNew(self
+                    ,tracking_blur
+                    ,repair_iterations
+                    ,thresh_lo
+                    ,thresh_hi
+                    ,b_log = False
+                    ):
+        '''
+            trackDemoNew:
+
+                Example for adding a non-default trackAlgo.
+
+                Only a few small changes to this function:
+
+                    - allow us to bypass repairA step by setting 
+                      repair_iterations to 0
+
+                    - early return when img_mask is blank
+                
+            questions / todos:
+
+                [ ] verify early return skips a section and verify the notebook
+                    workflow process handles the missing data gracefully 
+                    in mutliPlot()
+                [ ] is a tracking_blur = 1 do any changes?
+                [ ] does repair_iteration = 0 work in trackDefault()?
+
+        '''
+
+        img_t = transformA(self.currentFrame.copy(), tracking_blur)
+        
+        img_mask = threshA(  img_t 
+                            ,threshLo = thresh_lo   
+                            ,threshHi = thresh_hi ) 
+
+        if img_mask.sum() != 0:
+
+            if repair_iterations > 0:
+                img_repair = repairA(img_mask, iterations = repair_iterations)
+                img_terminal = img_repair
+            else:
+                img_terminal = img_mask
+
+            x,y = find_xy(img_terminal)
+            radius = find_radius(img_terminal)
+                    
+            if radius > 0:
+                
+                self.currentTrackSuccess = True
+
+                self.currentTrackScore.addCircle(
+                                            self.circleToRect((x,y,radius))
+                                            ,objEnum=0   
+                                        )
 
         if b_log:
             

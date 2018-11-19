@@ -93,6 +93,7 @@ i_scoringenum = 0
 f_scoredelay = 1.0
 b_scoreoff = False
 b_output_tracktimer = False
+i_algo_enum = 0
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -114,6 +115,7 @@ ap.add_argument("--track", action="store_true", default=False)
 ap.add_argument("--startplay", action="store_true", default=False)
 ap.add_argument("--tracktimer", action="store_true", default=False)
 ap.add_argument("--allowduplicates", action="store_true", default=False)
+ap.add_argument("--algoenum", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -202,6 +204,9 @@ if args["tracktimer"]:
 if args["allowduplicates"]:
     g.duplicatesEnum = 1
 
+if args["algoenum"] != "":
+    i_algo_enum = int(args["algoenum"])
+
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
     sys.exit()
@@ -267,6 +272,8 @@ while(True):
     trackFactory = TrackFactory(on=g.trackingOn)
     
     trackFactory.setInit(ballColor = notesFactory.getBallColor())
+
+    trackFactory.setAlgoEnum(i_algo_enum)
 
     trackFactory.setTrackTimer(b_output_tracktimer)
 

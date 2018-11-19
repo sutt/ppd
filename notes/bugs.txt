@@ -32,8 +32,8 @@
 
     [ ] first commit:
         [ ] draw tracking score on multiplot; show which contour is being used
-        [ ] subplot titles
-        [ ] add a third image scenario...a difficult but sucessful track
+        [x] subplot titles
+        [x] add a third image scenario...a difficult but sucessful track
         [ ] need to analyze not only zoom window but 
 
     [ ] 2:00 - 3:00
@@ -49,12 +49,16 @@
             [ ] add sum(sum( as condition for advancing in trackFrame
         [ ] turn off repairIterations
         [ ] add evaluation of whole image / is tracked obj center in zoom window
-        [ ] rename buildData()
+        [ ] generalize buildData for different crop selections
+            [ ] rename buildData()
             [ ] add this to a module
 
     [ ] 4:30 - 5:30
         [x] call multiple tracking algos
-        [ ] pass in trackAlgoEnum to guiview
+        [x] pass in trackAlgoEnum to guiview
+        [x] add second trackAlgo
+        [x] pass-in objEnum to trackAlgo
+            [x] add this concept to template documentation
 
 
 11/16
