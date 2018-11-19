@@ -50,6 +50,7 @@ class TrackFactory:
         self.savedParams = None
 
         # tp_: tracking parameters
+        self.tp_trackAlgoEnum = 0
         self.tp_tracking_blur = 1
         self.tp_repair_iterations = 1
         self.tp_b_hsv = False
@@ -65,7 +66,7 @@ class TrackFactory:
 
         if self.declaredBallColor == "orange":
             self.threshInitial = [ (0, 96, 192), (88, 232, 255) ]
-            
+
         # From old notes:
         # rgb: (orange ball) [  0  96 192] [ 88 232 255]
         # green sharpie:  [ 15 106  86] [ 81 171 148]
@@ -271,7 +272,7 @@ class TrackFactory:
         return params
 
     
-    def trackFrame(self):
+    def trackFrame(self, b_log=False):
 
         if not(self.on): return
 
@@ -284,6 +285,72 @@ class TrackFactory:
         if self.bTrackTimer:
             t0 = time.time()
 
+        if self.tp_trackAlgoEnum == 0:
+            
+            ret = self.trackDefault(
+                         tracking_blur = tracking_blur
+                        ,repair_iterations = repair_iterations
+                        ,thresh_lo = thresh_lo
+                        ,thresh_hi = thresh_hi
+                        ,b_log = b_log
+            )
+
+        elif self.tp_trackAlgoEnum == 1:
+            
+            pass
+
+        else:
+            print 'trackAlgoEnum not recognized'
+
+        if self.bTrackTimer:
+            if self.currentFrameInd not in self.trackTimerData.keys():
+                t_proc = time.time() - t0
+                self.trackTimerData[self.currentFrameInd] = t_proc
+
+        if ret is not None:
+            return ret
+
+        
+    # tracker algos --------
+
+    def trackDefault(self
+                    ,tracking_blur
+                    ,repair_iterations
+                    ,thresh_lo
+                    ,thresh_hi
+                    ,b_log = False
+                    ):
+        '''
+            trackDefault:
+
+                Template for writing a track algo.
+
+                - add documentation notes, describing how this algo is different;
+                  in this case we're describing the templating.
+
+                 - organize all parameters used in func args; these are
+                   retreived from the instance in parent function, trackFrame,
+                   and thus read-only.
+
+                 - write trackAlgo output data to instance properties:
+                    self.currentTrackSuccess
+                    self.currentTrackScore  (as a DataSchema.ScoreSchema)
+
+                 - return None, unless b_log
+
+                    - in which case, include a b_log section:
+                        - add all possible transforms to 'keys' list.
+                        - set 'data' for each possible key, mimicing control flow
+                          for early return in the function
+                        (this will be used to debug in notebooks, but is
+                         not necessary for most purposes.)
+
+            questions / todos:
+
+                [ ] will we overwrite data before it hits b_log return data?
+
+        '''
+
         img_t = transformA(self.currentFrame.copy(), tracking_blur)
         
         img_mask = threshA(  img_t 
@@ -292,10 +359,10 @@ class TrackFactory:
 
         if not(img_mask is None):
 
-            img_mask = repairA(img_mask, iterations = repair_iterations)
+            img_mask_2 = repairA(img_mask, iterations = repair_iterations)
 
-            x,y = find_xy(img_mask)
-            radius = find_radius(img_mask)
+            x,y = find_xy(img_mask_2)
+            radius = find_radius(img_mask_2)
                     
             if radius > 0:
                 self.currentTrackSuccess = True
@@ -305,13 +372,23 @@ class TrackFactory:
                                     ,objEnum=0   #TODO-SS
                                     )
 
-        if self.bTrackTimer:
-            if self.currentFrameInd not in self.trackTimerData.keys():
-                t_proc = time.time() - t0
-                self.trackTimerData[self.currentFrameInd] = t_proc
+        if b_log:
+            
+            keys = ['img_t','img_mask','img_mask_2','xy', 'radius', 'scoreCircle']
+            data = {}
+            for k in keys:
+                data[k] = None
 
-
-
+            data['img_t'] = img_t
+            data['img_mask'] = img_mask
+            
+            if img_mask is not None:
+                data['img_mask_2'] = img_mask_2
+                data['xy'] = (x,y)
+                data['radius'] = radius
+                data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
+            
+            return data
 
 
     # helper functions ------

@@ -1,8 +1,11 @@
 import os, sys, copy, time
 import numpy as np
+import cv2
 import pickle
 import sqlite3
 from modules.DataSchemas import ScoreSchema
+from modules.ImgUtils import crop_img
+from modules.ControlDisplay import Display
 
 
 '''
@@ -100,19 +103,63 @@ class GuiviewState:
 
     # helpers ---------
 
-    def getOrigFrame(self):
+    def getOrigFrame(self, b_cvt_color = False):
         ''' returns origFrame as numpy obj, instead of a 
             serialized string '''
-        return np.loads(self.serial_origFrame)
+        img = np.loads(self.serial_origFrame)
+        if b_cvt_color:
+            return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img
+
+    @staticmethod
+    def cvtColor(img):
+        ''' convert cv2 BGR array to matplotlib RGB array '''
+        try:
+            _shape = img.shape
+            if len(_shape) == 3:
+                if _shape[2] == 3:
+                    return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        except:
+            pass
+        
+        return img
+
+        
+
 
     
-    def getZoomWindow(self):
+    def initDisplay(self):
+        self.display = Display()
+        self.display.setInit(showOn=False
+                            ,scoreOff=False
+                            ,frameResize=True
+                            ,frameAnnotateFn=False)
+        self.display.setFrame(self.getOrigFrame())
+    
+    def getZoomWindow(self, inputRect=None):
         ''' returns a zoom window from origFrame + zoomRect'''
         
-        if (self.zoomRect is None) or (self.serial_origFrame is None):
-            return None
+        # if (self.zoomRect is None) or (self.serial_origFrame is None):
+        #     return None
 
         frame = self.getOrigFrame()
+
+        if inputRect is None:
+            _rect = self.zoomRect
+        else:
+            _rect = inputRect
+        
+        #TODO - only need to scale if it's a self.zoomRect, otherwise you're doing
+        #       scaleToMain() when your input is in terms of orig
+        
+        zoom_img = crop_img( frame
+                            ,self.display.absRect(
+                                tuple( 
+                                    self.display.scaleMainToOrig(p) for p in _rect
+                                    )
+                                )
+                            )
+        return zoom_img
 
 
 
