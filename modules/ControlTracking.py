@@ -1,5 +1,7 @@
 import os, sys, time, copy, json, re, argparse
 
+from collections import OrderedDict
+
 import numpy as np
 import cv2
 
@@ -287,7 +289,7 @@ class TrackFactory:
                 [ ] pass in objEnum to trackAlgo for multi-obj tracking
 
         '''
-        
+
         if not(self.on): return
 
         tracking_blur = self.tp_tracking_blur
@@ -437,7 +439,7 @@ class TrackFactory:
                 
             questions / todos:
 
-                [ ] verify early return skips a section and verify the notebook
+                [x] verify early return skips a section and verify the notebook
                     workflow process handles the missing data gracefully 
                     in mutliPlot()
                 [ ] is a tracking_blur = 1 do any changes?
@@ -473,19 +475,23 @@ class TrackFactory:
 
         if b_log:
             
-            keys = ['img_t','img_mask','img_mask_2','xy', 'radius', 'scoreCircle']
-            data = {}
+            keys = ['img_t','img_mask','img_repair', 'img_terminal',
+                    'xy', 'radius', 'scoreCircle']
+            data = OrderedDict()
             for k in keys:
                 data[k] = None
 
             data['img_t'] = img_t
             data['img_mask'] = img_mask
             
-            if img_mask is not None:
-                data['img_mask_2'] = img_mask_2
+            if img_mask.sum() != 0:
+                data['img_terminal'] = img_terminal
                 data['xy'] = (x,y)
                 data['radius'] = radius
-                data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
+                if repair_iterations > 0:
+                    data['img_repair'] = img_repair
+                if radius > 0:
+                    data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
             
             return data
 

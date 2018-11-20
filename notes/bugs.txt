@@ -1,5 +1,20 @@
 #Tasks
 
+11/20
+
+    [ ] test applyTracker with window function
+    [x] save/load states to a db
+    [ ] use listScore to view a thresh hit
+    [ ] tests for AnalysisHelper functions
+    [ ] keypress 'O' for output-state
+    [ ] rename freaking db to interproc
+    [ ] inWindowCheck()
+    [ ] vscode: halve the screen for working with jupyter
+    [ ] jupyter: get code complete for own functions, imported libraries
+    [ ] jupyter: remove yellow syntax highlighting
+    [ ] remove print 'here' in output-state cmd
+    
+
 11/19
 
     [ ] Build example notebook
@@ -8,7 +23,7 @@
 
             [ ] track un-tracked ball with manual thresh change
 
-            [ ] show image pipeline of each step in track
+            [x] show image pipeline of each step in track
 
             [ ] for-loop checking different thresh's
 
@@ -23,7 +38,7 @@
                 [x] basic
                 [ ] input_rect
             [ ] display windows
-            [ ] tile function for multiple images
+            [x] tile function for multiple images
 
         [ ] build importable classes that use Display to produce output
 
@@ -34,7 +49,7 @@
         [ ] draw tracking score on multiplot; show which contour is being used
         [x] subplot titles
         [x] add a third image scenario...a difficult but sucessful track
-        [ ] need to analyze not only zoom window but 
+        [ ] need to analyze not only zoom window but whole frame
 
     [ ] 2:00 - 3:00
         [x] keys for unpacking data of images
@@ -44,10 +59,10 @@
         [ ] getLatest(last=3)
     
     [ ] 3:00 - 4:00
-        [ ] test with no img_mask_2 image
-            [ ] this exact case does not occur; need a better example
-            [ ] add sum(sum( as condition for advancing in trackFrame
-        [ ] turn off repairIterations
+        [x] test with no img_mask_2 image
+            [x] this exact case does not occur; need a better example
+            [x] add sum(sum( as condition for advancing in trackFrame
+        [x] turn off repairIterations
         [ ] add evaluation of whole image / is tracked obj center in zoom window
         [ ] generalize buildData for different crop selections
             [ ] rename buildData()
@@ -59,6 +74,15 @@
         [x] add second trackAlgo
         [x] pass-in objEnum to trackAlgo
             [x] add this concept to template documentation
+
+    [ ] 5:30 - 6:30
+        [x] turn off repairIters
+        [ ] answer questions in trackDemoNew()
+
+    [ ] 8:00 +
+        [ ] helper functions -> module
+        [ ] demo-interproc-analysis-2
+        
 
 
 11/16

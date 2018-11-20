@@ -161,6 +161,10 @@ class GuiviewState:
                             )
         return zoom_img
 
+    def drawTracker(self, trackRect):
+        pass
+
+        #TODO - implement; then pass into getZoomWindow()
 
 
 class GuiviewStateHelper(GuiviewState):
@@ -234,6 +238,17 @@ class DBInterface:
         s = """INSERT INTO state_tbl(state) VALUES(?)"""
         self.c.execute(s, (state,))
         self.conn.commit()
+
+    def insertStateGetId(self, state):
+        ids_0 = self.getIds() 
+        self.insertState(state)
+        ids_1 = self.getIds()
+        return filter(lambda _id: _id not in ids_0, ids_1)[0]
+
+    def getIds(self):
+        self.c.execute('select id from state_tbl')
+        rows = self.c.fetchall()
+        return [elem[0] for elem in rows]
 
     def deleteAll(self):
         self.c.execute('delete from state_tbl')
