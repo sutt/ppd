@@ -1,5 +1,42 @@
 #Tasks
 
+11/21
+
+    [x] build data for search-params-1.ipynb
+    [ ] how to get baselineScore? when it's a FP like frame189
+        [ ] easy way to get rect interactively from guiview:
+            a one-liner in jupyter; build this as importable function
+            [ ] close db connection after function use
+    [x] build searchParams module
+    [ ] do a function of searchParams
+        [ ] timeit - time per iter?
+        [x] use Evaltracker class
+    [ ] buildGradient for full combination on tuple
+    [ ] trackFrameDemo3 - separates mask and selection
+        [ ] b_log returns countours data
+    [ ] tests for SerachParams functions
+    [x] fix id'd 'Problems' from language server
+
+    3:00
+        [x] commit minor fixes
+        [x] commit new module, new data
+            [ ] first some unit tests
+        [ ] commit new notebook
+        [ ] plot of working params
+        
+
+    4:00
+        [ ] new book, use interproc and interThresh
+        [ ] we really need to get trainingFrames going
+
+    Also want:
+    [ ] function that finds the full circle from zoomWindow
+        [ ] isAPseudoCircle
+        [ ] find circles in un-transformed image; hough's circle finder?
+        [ ] fit a circle to object
+        [ ] extract the pixels from this shape, and re-calcs
+
+
 11/20
 
     [x] test applyTracker with window function
@@ -33,6 +70,8 @@
     [ ] histogram for num contours
     [ ] separate mask from object selection
     [ ] add buildGradient, combineGradient and combineDicts to Module
+    [ ] better checkTrackSuccess...verify the track is near where the ground-truth
+        score is
     
 
 11/19

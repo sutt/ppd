@@ -1,4 +1,15 @@
 
+11/21
+
+We don't want a "good" object tracker, we want a configureable/adjustable object tracker.
+
+think about when TV was first invented and there was no high-thruput
+digital data lines: sure a tv in perfect unobstructed line of sight to a broadcast tower would work, but what about at ground level of Times Square? And then everything in between: theres a huge space of possible
+interference that we can't build into the logic of the signal-receiver.
+instead we could alleviate individual situations with trial and error by adding more distortion in the proximity, using our body as antenna. But a better solution is the rabbit ears, a simple machine, but highly configurable for each situation to make it work, and allows each individual situation to work.
+
+So what we're looking for is computer vision "rabbit ears", a powerful yet simple configuration module. That's what will let this pretty straightforward technology work and be mass-useable outside the lab.
+
 11/7
 
 guiview is essentially the skeleton of a training-data management system. it references frame-data, time-data, note-data, interfaces with track-calcs, so this is how we'd build a total dataset evaluation. it's not just a custom photoshop-like program for hand edits, but a template for app development.
