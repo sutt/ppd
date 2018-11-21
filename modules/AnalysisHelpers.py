@@ -1,6 +1,8 @@
+import copy
 from matplotlib import pyplot as plt
 from modules.Interproc import GuiviewState
 from modules.ControlTracking import TrackFactory
+from modules.ControlDisplay import Display
 
 '''
     functions to use in jupyter notebooks to debug different
@@ -30,11 +32,7 @@ def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
          listTransformTitles - list of variable names corresponding to
                     img transforms within trackAlgo
          listFrameTitles - list of frame-indexes
-        
-        TODOs
-        [x] better name
-        [x] better description
-        [x] arg for window selection
+            
     '''
     
     listData = []
@@ -118,10 +116,71 @@ def roiSelectZoomWindow(inputGuiviewState):
 
 class EvalTracker:
 
-    def __init__(self):
-        self.baseline = None
+    '''
+        Different ways to evaluate if the ScoreSchema output from a trackFrame
+        matches expectations.
 
-    def checkTrackSuccess(self, trackScore):
+    '''
+    
+    def __init__(self):
+        self.baselineScore = None
+
+    def setBaselineScore(self, baselineScore):
+        self.baselineScore = copy.deepcopy(baselineScore)
+
+    def distanceFromBaseline(self, inputScore):
+        ''' cartesian distance from center of inputScore to baseline;
+            for score-type=circle only
+        '''
+        
+        if not(self.checkTrackSuccess(inputScore)):
+            return 9999.9
+
+        xA, yA, rA = Display.rectToCircle(inputScore['0']['data'])
+        xB, yB, rB = Display.rectToCircle(self.baselineScore['0']['data'])
+
+        cartDistance = ((xA - xB)**2 + (yA - yB)**2)**(0.5)
+
+        return cartDistance
+
+    @staticmethod
+    def checkTrackSuccess(trackScore):
+        ''' easiest way to check a ScoreSchema if track returned True '''
+        try:
+            if trackScore['0']['data'] == (0,0,0,0):
+                return False
+            return True
+        except:
+            return False
+
+    def checkTrackInsideBaseline(self, inputScore):
+        '''
+            check if the center on inputScore is inside the baslineScore
+                currently inside rect; todo - check for inside a circle
+        '''
+        
+        if not(self.checkTrackSuccess(inputScore)):
+            return False
+
+        _x, _y, _dx, _dy = inputScore['0']['data']
+        x, y, dx, dy = self.baselineScore['0']['data']
+
+        if not((_x > x) and (_x < x + dx)):
+            return False
+
+        if not((_y > y) and (_y < y + dy)):        
+            return False
+        
+        return True
+
+    #TODO - checkBaselineInsideTrack
+    #TODO - checkEitherContainsOther() union trackInside, baselineInside
+
+    def checkTrackInWindow(self, inputScore, zoomRect):
+        '''
+            check if inputScore is inside the zoomWindow
+            question: is zoomrect relative to Orig or to Main?
+        '''
         pass
 
 
