@@ -28,6 +28,8 @@
     4:00
         [ ] new book, use interproc and interThresh
         [ ] we really need to get trainingFrames going
+        [ ] label axises on paramSpace scatter
+        [ ] modularize paramSpace functions
 
     Also want:
     [ ] function that finds the full circle from zoomWindow
@@ -35,6 +37,8 @@
         [ ] find circles in un-transformed image; hough's circle finder?
         [ ] fit a circle to object
         [ ] extract the pixels from this shape, and re-calcs
+    [ ] second largest obj in mask
+        [ ] but not another portion of the ball
 
 
 11/20
