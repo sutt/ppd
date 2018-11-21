@@ -1168,7 +1168,7 @@ class Display:
 
         if y_return < 0:
             #this will insure no OOB error
-            return self.centerPointFromRect(input_rect)
+            return (x + int(dx / 2), y + int(dy / 2))
         else:
             return (x_return, y_return)
         

@@ -395,10 +395,14 @@ class TrackFactory:
             if radius > 0:
                 self.currentTrackSuccess = True
 
-            self.currentTrackScore.addCircle(
+                self.currentTrackScore.addCircle(
                                      self.circleToRect((x,y,radius))
                                     ,objEnum=objEnum
                                     )
+            else:
+                self.currentTrackSuccess = False
+                self.currentTrackScore.reset()
+                
 
         if b_log:
             
@@ -472,6 +476,9 @@ class TrackFactory:
                                             self.circleToRect((x,y,radius))
                                             ,objEnum=0   
                                         )
+            else:
+                self.currentTrackSuccess = False
+                self.currentTrackScore.reset()
 
         if b_log:
             

@@ -128,7 +128,7 @@ class ScoreSchema:
         self.bHasContents = True
 
 
-    def addRay(self, rayData):
+    def addRay(self, rayData, objEnum=0):
         ''' add a ray score. data format: ((x0,y0), (x1,y1))'''
         _score = {}
         _score['type'] = 'ray'
