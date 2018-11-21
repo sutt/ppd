@@ -199,8 +199,8 @@ class ConstructGui:
             self.cmd_sw_trackon()
         if e.char == "r":
             self.cmd_selectreset()
-        
-        
+        if e.char == "o":
+            self.cmd_outputState()
             
 
         
@@ -664,7 +664,7 @@ class ConstructGui:
 
         tk.Button(
              fstate1
-            ,text = 'output'
+            ,text = 'Output'
             ,command = self.cmd_outputState
             ).pack(side=tk.LEFT)
 

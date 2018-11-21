@@ -660,7 +660,6 @@ class OutputFactory:
 
     def checkOutputState(self):
         if self.bOutputState or self.bDeleteState:
-            print 'here'
             return True
         return False
 
@@ -668,7 +667,7 @@ class OutputFactory:
                     timeFactory, notesFactory):
 
         if self.db is None:
-            self.db = DBInterface("data/usr/demo.db")
+            self.db = DBInterface("data/usr/interproc.db")
 
         if self.bDeleteState:
             self.db.deleteAll()

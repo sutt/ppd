@@ -2,17 +2,29 @@
 
 11/20
 
-    [ ] test applyTracker with window function
+    [x] test applyTracker with window function
     [x] save/load states to a db
     [ ] use listScore to view a thresh hit
-    [ ] tests for AnalysisHelper functions
-    [ ] keypress 'O' for output-state
-    [ ] rename freaking db to interproc
+    [x] tests for AnalysisHelper functions
+    [x] keypress 'O' for output-state
+    [x] rename freaking db to interproc
     [ ] inWindowCheck()
     [ ] vscode: halve the screen for working with jupyter
     [ ] jupyter: get code complete for own functions, imported libraries
     [ ] jupyter: remove yellow syntax highlighting
-    [ ] remove print 'here' in output-state cmd
+    [x] remove print 'here' in output-state cmd
+
+    [ ] 7:00 +
+        we want to for-loop thru 
+        [ ] we need to eval tracker
+            this will help us say yes or no if a param point worked
+        [ ] we need to not output listPlts from applyTracker if told not to
+            this will save time/memory for vast param search space
+        [ ] then write one of these loops
+
+    Also want
+    [ ] histogram for num contours
+    [ ] separate mask from object selection
     
 
 11/19

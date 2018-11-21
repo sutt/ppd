@@ -12,13 +12,14 @@ from modules.ControlTracking import TrackFactory
         [ ] add unit tests
 '''
 
-def applyTracker(listGS, tracker, roiSelectFunc = None):
+def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
     ''' 
         pass in:
          listGS -  list of GuiviewState objs; "states"
          tracker - one trackFactory obj; applied to all states
          roiSelectFunc - a function that takes a guiviewstate obj
                     as an argument, and returns an image
+         bLogPlts - bool for outputting data['listPlts']
 
         returns dict:
          listScore - list of ScoreSchema obj's; one for each state
@@ -60,40 +61,42 @@ def applyTracker(listGS, tracker, roiSelectFunc = None):
 
         listFrameTitles.append( str(_gs.frameCounter) )
 
-    for _data in listData:
+    if bLogPlts:
 
-        for _key in _data.keys():
+        for _data in listData:
 
-            try:
-                assert _data[_key].shape[0] > 0
-                assert _data[_key].shape[1] > 0
-            except:
-                continue     # not an image; bypass
+            for _key in _data.keys():
 
-            # build list of all keys in all tracking scenarios;
-            # this way we'll include a record for that transform 
-            # for each Frame for an NxM-aligned subplots
-            
-            if _key not in listTransformTitles:
-                listTransformTitles.append(_key)
-        
-    for _data in listData:
-    
-        listTmp = []
-        
-        for _transformTitle in listTransformTitles:
-            
-            # inclue the image-data from this transform;
-            # if that transform doesn't exist, mark as None.
-            
-            try:
-                outputData = _data[_transformTitle]
-            except:
-                outputData = None
+                try:
+                    assert _data[_key].shape[0] > 0
+                    assert _data[_key].shape[1] > 0
+                except:
+                    continue     # not an image; bypass
+
+                # build list of all keys in all tracking scenarios;
+                # this way we'll include a record for that transform 
+                # for each Frame for an NxM-aligned subplots
                 
-            listTmp.append( outputData )
+                if _key not in listTransformTitles:
+                    listTransformTitles.append(_key)
+            
+        for _data in listData:
+        
+            listTmp = []
+            
+            for _transformTitle in listTransformTitles:
+                
+                # inclue the image-data from this transform;
+                # if that transform doesn't exist, mark as None.
+                
+                try:
+                    outputData = _data[_transformTitle]
+                except:
+                    outputData = None
+                    
+                listTmp.append( outputData )
 
-        listPlts.append( listTmp )
+            listPlts.append( listTmp )
     
     ret = {}
     ret['listPlts'] = listPlts
@@ -110,6 +113,26 @@ def roiSelectZoomWindow(inputGuiviewState):
     '''
     inputGuiviewState.initDisplay()
     return inputGuiviewState.getZoomWindow()
+
+
+
+class EvalTracker:
+
+    def __init__(self):
+        self.baseline = None
+
+    def checkTrackSuccess(self, trackScore):
+        pass
+
+
+    
+def checkTrackSuccess(trackScore):
+    try:
+        if trackScore['0']['data'] == (0,0,0,0):
+            return False
+        return True
+    except:
+        return False
 
 
 def multiPlot(list_list_imgs
