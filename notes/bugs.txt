@@ -16,15 +16,23 @@
 
     [ ] 7:00 +
         we want to for-loop thru 
-        [ ] we need to eval tracker
+        [x] we need to eval tracker
             this will help us say yes or no if a param point worked
-        [ ] we need to not output listPlts from applyTracker if told not to
+        [x] we need to not output listPlts from applyTracker if told not to
             this will save time/memory for vast param search space
-        [ ] then write one of these loops
+        [x] function for param gradient
+        [x] combine two param gradients
+        [x] then write one of these loops
+        [x] show how to display transforms of successfully tracked paramPoints
+        [ ] better checkTrackSuccess
+
+        [x] git push data
+        [x] git push notebooks
 
     Also want
     [ ] histogram for num contours
     [ ] separate mask from object selection
+    [ ] add buildGradient, combineGradient and combineDicts to Module
     
 
 11/19
@@ -37,7 +45,7 @@
 
             [x] show image pipeline of each step in track
 
-            [ ] for-loop checking different thresh's
+            [x] for-loop checking different thresh's
 
         [ ] bugs:
 
@@ -70,30 +78,30 @@
         [x] 3rd image
         [ ] getLatest(last=3)
     
-    [ ] 3:00 - 4:00
+    [x] 3:00 - 4:00
         [x] test with no img_mask_2 image
             [x] this exact case does not occur; need a better example
             [x] add sum(sum( as condition for advancing in trackFrame
         [x] turn off repairIterations
-        [ ] add evaluation of whole image / is tracked obj center in zoom window
-        [ ] generalize buildData for different crop selections
-            [ ] rename buildData()
-            [ ] add this to a module
+        [x] add evaluation of whole image / is tracked obj center in zoom window
+        [x] generalize buildData for different crop selections
+            [x] rename buildData()
+            [x] add this to a module
 
-    [ ] 4:30 - 5:30
+    [x] 4:30 - 5:30
         [x] call multiple tracking algos
         [x] pass in trackAlgoEnum to guiview
         [x] add second trackAlgo
         [x] pass-in objEnum to trackAlgo
             [x] add this concept to template documentation
 
-    [ ] 5:30 - 6:30
+    [x] 5:30 - 6:30
         [x] turn off repairIters
-        [ ] answer questions in trackDemoNew()
+        [x] answer questions in trackDemoNew()
 
-    [ ] 8:00 +
-        [ ] helper functions -> module
-        [ ] demo-interproc-analysis-2
+    [x] 8:00 +
+        [x] helper functions -> module
+        [x] demo-interproc-analysis-2
         
 
 
