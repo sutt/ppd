@@ -1,5 +1,28 @@
 #Tasks
 
+
+11/22
+
+    [ ] build some 3d plot utilities
+        [x] convert image to channels
+        [ ] interactive run from subprocess in jupyter
+        [ ] run highly limited one in notebook inline
+        [x] sampling function
+        [x] axises croppping vs full length
+        [x] axises labelling and shifting
+        [x] true colors for markers
+        [ ] two colors: obj vs background
+
+    [ ] demo 3d analysis:
+        [ ] subimages within an image
+        [ ] plot score-circle pixels vs. whole image
+            [ ] extract circle pixels
+        [ ] can you switch from %matplotlib inline <->
+            %matplotlib notebook
+
+    [ ] other color utils:
+        [ ] color hexagon w/ mouseover
+
 11/21
 
     [x] build data for search-params-1.ipynb
@@ -21,8 +44,8 @@
         [x] commit minor fixes
         [x] commit new module, new data
             [ ] first some unit tests
-        [ ] commit new notebook
-        [ ] plot of working params
+        [x] commit new notebook
+        [x] plot of working params
         
 
     4:00
@@ -49,7 +72,7 @@
     [x] tests for AnalysisHelper functions
     [x] keypress 'O' for output-state
     [x] rename freaking db to interproc
-    [ ] inWindowCheck()
+    [x] inWindowCheck()
     [ ] vscode: halve the screen for working with jupyter
     [ ] jupyter: get code complete for own functions, imported libraries
     [ ] jupyter: remove yellow syntax highlighting

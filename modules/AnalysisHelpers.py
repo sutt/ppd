@@ -1,5 +1,6 @@
-import copy
+import copy, random, subprocess
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from modules.Interproc import GuiviewState
 from modules.ControlTracking import TrackFactory
 from modules.ControlDisplay import Display
@@ -184,14 +185,99 @@ class EvalTracker:
         pass
 
 
+def imgToColors(img, sampleN = None):
+    '''
+        return list (len=3) of lists (len=num-pixels) of ints
+        corresponding to pixel values of B, G, R respectively.
+
+            sampleN: randomly sample and return N triplets
+
+        TODOs:
+            [ ] add random.seed stub for testing
+    '''
+    b, g, r = [list(img[:, :, clr].flatten()) for clr in  range(3)]
+
+    if sampleN is not None:
+
+        N = len(b)
+        
+        n = int(min(sampleN, N))
+
+        listSample = random.sample(xrange(N), n)
+        
+        b = [b[i]for i in listSample]
+        g = [g[i]for i in listSample]
+        r = [r[i]for i in listSample]
+
+    return b, g, r
+
+
+def channelsToColorStr(listB, listG, listR):
+    ''' input: BGR returns: '#'+RGB-hex-string
+        example: with channelsToColorStr(*imgToColors(img))
+    '''
+    return [
+        "#" + hex(x[0])[2:] + hex(x[1])[2:] + hex(x[2])[2:]
+        for x in zip(listR, listG, listB)
+    ]
+
+
+
+def colorPlot(listB, listG, listR
+               ,listColors = None
+               ,spaceTotal = True
+               ,spaceDefined = {}
+               ,regionMarkers = None
+              ):
+    '''
+        3d plot of pixels color values
+
+        listColors = [list] of '#00ff00'-style color strings
+                     of len equal to listB
+        spaceTotal - [bool] if True, whole support of each axis
+                    is displayed: 0 to 255
+        spaceDefined - [dict] with keys 'x', 'y', 'z' and a tuple 
+                     corresponding to (lo, hi) values on that axis
+        regionMarkers - TODO 
+
+        TODOS
+            [ ] do a second plot plt.scatter() ?
+            [ ] title uses spaceDefined / spaceTotal inputs
+    '''
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors)
     
-def checkTrackSuccess(trackScore):
-    try:
-        if trackScore['0']['data'] == (0,0,0,0):
-            return False
-        return True
-    except:
-        return False
+    if spaceTotal and len(spaceDefined.keys()) == 0:
+        ax.set_xlim3d(0, 255)
+        ax.set_ylim3d(0, 255)
+        ax.set_zlim3d(0, 255)
+        
+    if len(spaceDefined.keys()) > 0:
+        if spaceDefined.get('x', None) is not None:
+            ax.set_xlim3d(spaceDefined['x'])
+        if spaceDefined.get('y', None) is not None:
+            ax.set_ylim3d(spaceDefined['y'])
+        if spaceDefined.get('z', None) is not None:
+            ax.set_zlim3d(spaceDefined['z'])
+        
+    if regionMarkers is not None:
+        pass
+        #TODO
+
+    ax.set_xlabel('B')
+    ax.set_ylabel('G')
+    ax.set_zlabel('R')
+    
+    plt.show()
+
+
+def subprocColorPlot():
+    '''
+        3d color plot as subprocess; allows good interactivity when
+        called from jupyter but using a true TK window outside browser/
+    '''
+    pass
 
 
 def multiPlot(list_list_imgs
