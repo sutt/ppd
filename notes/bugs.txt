@@ -1,12 +1,38 @@
 #Tasks
 
 
+11/24
+
+    [x] verify neither %matplotlib notebook or separate tk.matplotlib is more
+        responsive: FALSE: matplotlib-notebook is semi-responsive at sampleN=200,
+        while matplotlib-subproc is responsive at sampleN=2000, and semi-responsive at 
+        sampleN=5000 so a 10x diff
+
+    [ ] investigate if you can:
+         get the current-view-params for an interactive figure
+         set the view-params for a static figure
+            - we can view params in figure subtitle bar; are they sufficient?
+                azimuth, elevation
+
+    [ ] why don't "buttons" / controllers on tk-matpltolib work? e.g. zoom
+
+
+11/23
+
+    [x] build SubprocColorPlot
+        [x] db interface
+
+    The goal with SubprocColorPlot was to create a separate TK window outside 
+    jupyter to more easily rotate the figure for exploration. This has proven 
+    very difficult with jupyter: so far we need to go into cmd-line to get it 
+    to work. 
+
 11/22
 
     [ ] build some 3d plot utilities
         [x] convert image to channels
-        [ ] interactive run from subprocess in jupyter
-        [ ] run highly limited one in notebook inline
+        [x] interactive run from subprocess in jupyter
+        [x] run highly limited one in notebook inline
         [x] sampling function
         [x] axises croppping vs full length
         [x] axises labelling and shifting

@@ -1,3 +1,13 @@
+11/25
+
+    >python AnalysisHelpers.py --subprocColorPlot  [from modules/]
+
+        displays a ColorCube in a separate window based on last saved data
+        in interproc_colorplot.db
+
+    can just intermittently delete: data/usr/interproc_colorplot.db 
+        to keep data size in check
+
 10/9
 
     >python guiview.py --track --scoreoff

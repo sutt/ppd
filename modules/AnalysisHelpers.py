@@ -1,9 +1,13 @@
-import copy, random, subprocess
+import sys, copy, random, subprocess, time
+import pickle
+import cv2
+import numpy as np
+from Interproc import DBInterface
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from modules.Interproc import GuiviewState
-from modules.ControlTracking import TrackFactory
-from modules.ControlDisplay import Display
+from Interproc import GuiviewState
+from ControlTracking import TrackFactory
+from ControlDisplay import Display
 
 '''
     functions to use in jupyter notebooks to debug different
@@ -13,6 +17,7 @@ from modules.ControlDisplay import Display
         [ ] inWindowCheck() returns True if trackScuess and center is
             in window
         [ ] add unit tests
+        [ ] subprocColorPlot runs from jupyter instead of cmd-line
 '''
 
 def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
@@ -216,12 +221,21 @@ def channelsToColorStr(listB, listG, listR):
     ''' input: BGR returns: '#'+RGB-hex-string
         example: with channelsToColorStr(*imgToColors(img))
     '''
+    def twoDigit(strHex):
+        strHex = strHex[2:]
+        if len(strHex) == 1:
+            strHex = '0' + strHex
+        return strHex
+
     return [
-        "#" + hex(x[0])[2:] + hex(x[1])[2:] + hex(x[2])[2:]
+        "#" + twoDigit(hex(x[0])) + twoDigit(hex(x[1])) + twoDigit(hex(x[2]))
         for x in zip(listR, listG, listB)
     ]
 
-
+def cvtPlot(img):
+    ''' show the image after converting from bgr to rgb '''
+    _img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+    plt.imshow(_img)
 
 def colorPlot(listB, listG, listR
                ,listColors = None
@@ -272,12 +286,128 @@ def colorPlot(listB, listG, listR
     plt.show()
 
 
-def subprocColorPlot():
+class SubprocColorPlot:
+
+    ''' Class to save/load params for calling colorPlot() in a subprocess;
+        since it's a subproc, we need to transport the data with Interproc comm
+        using pickle dump/load.
+        Allows good "responsive" interactivity when called from jupyter but using a 
+        true TK window outside browser.
+
+        To Use:
+        in jupyter: use helper function subprocColorPlot() to build a class and output it
+        then in terminal: cd to modules/; python AnalysisHelpers.py --subprocColorPlot;
+                          this should produce the plot in separate window.
+
     '''
-        3d color plot as subprocess; allows good interactivity when
-        called from jupyter but using a true TK window outside browser/
-    '''
-    pass
+
+    def __init__(self
+                ,listB = None
+                ,listG = None
+                ,listR = None
+                ,listColors = None
+                ,spaceTotal = True
+                ,spaceDefined = {}
+                ,regionMarkers = None
+                ):
+        ''' set parameters to call colorPlot() now, or later with methods below'''
+
+        # colorPlot params
+        self.listB = listB
+        self.listG = listG
+        self.listR = listR
+        self.listColors = listColors
+        self.spaceTotal = spaceTotal
+        self.spaceDefined = spaceDefined
+        self.regionMarkers = regionMarkers
+
+        # interprocess comm helpers
+        self.dbPathFn = "../data/usr/interproc_colorplot.db"
+        self.db = None
+        self.loadedClass = None
+
+    #helper set-methods: for loading data piece-wise -----
+    
+    def setListX(self, listB, listG, listR):
+        self.listB = copy.copy(listB)
+        self.listG = copy.copy(listG)
+        self.listR = copy.copy(listR)
+
+    def setListColors(self, listColors):
+        self.listColors = copy.copy(listColors)
+
+    def setParams(self, spaceTotal = None, spaceDefined = None):
+        if spaceTotal is not None:
+            self.spaceTotal = spaceTotal
+        if spaceDefined is not None:
+            self.spaceDefined = copy.copy(spaceDefined)
+
+    # interproc methods ------
+
+    def save(self):
+        _db = DBInterface(self.dbPathFn)
+        _db.insertState(pickle.dumps(self))
+
+    def load(self):
+        ''' load the most recent entry from colorplot_tbl into 
+            self.loadedClass '''
+        
+        try:
+            _db = DBInterface(self.dbPathFn)
+            recentRecord = _db.selectLatest()
+        except:
+            print 'could not load colorplot_tbl record'
+
+        try:
+            self.loadedClass = pickle.loads(recentRecord[0][1])
+        except:
+            print 'could not load SubprocColorPlot class with pickle'
+
+    def callPlot(self):
+        ''' main method for running a subprocess colorPlot() '''
+        self.loadedClass.plot()
+    
+    def plot(self):
+        ''' invoke the colorPlot function '''
+        
+        colorPlot(listB = self.listB
+                 ,listG = self.listG
+                 ,listR = self.listR
+                 ,listColors = self.listColors
+                 ,spaceTotal = self.spaceTotal
+                 ,spaceDefined = self.spaceDefined
+                 ,regionMarkers = self.regionMarkers
+                 )
+
+
+def subprocColorPlot(
+                 listB
+                ,listG
+                ,listR
+                ,listColors = None
+                ,spaceTotal = True
+                ,spaceDefined = {}
+                ,regionMarkers = None
+                ):
+    
+    ''' helper function for calling subprocColorPlot '''
+    
+    subprocClass = SubprocColorPlot(
+                 listB = listB
+                ,listG = listG
+                ,listR = listR
+                ,listColors = listColors
+                ,spaceTotal = spaceTotal
+                ,spaceDefined = spaceDefined
+                ,regionMarkers = regionMarkers
+                )
+    
+    subprocClass.save()
+
+    # PROBLEM: matplotlib doesn't output when called from jupyter
+        # running subprocess calling colorPlot
+        # <Figure size 640x480 with 1 Axes>
+
 
 
 def multiPlot(list_list_imgs
@@ -339,3 +469,23 @@ def multiPlot(list_list_imgs
                     _ax.set_title(input_frame_titles[w_i])
     
     fig.show()
+
+
+if __name__ == "__main__":
+
+
+    # check for call to subprocColorPlot
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--subprocColorPlot":
+            
+            print 'running subprocess calling colorPlot'
+
+            p = SubprocColorPlot()
+            p.load()
+            p.callPlot()
+            plt.show()
+
+            print 'done and exiting'
+            
+
+

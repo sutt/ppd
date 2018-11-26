@@ -3,9 +3,9 @@ import numpy as np
 import cv2
 import pickle
 import sqlite3
-from modules.DataSchemas import ScoreSchema
-from modules.ImgUtils import crop_img
-from modules.ControlDisplay import Display
+from DataSchemas import ScoreSchema
+from ImgUtils import crop_img
+from ControlDisplay import Display
 
 
 '''
@@ -204,7 +204,7 @@ class GuiviewStateHelper(GuiviewState):
     
 
 
-DATA_DIR = "../data/usr/demo.db"
+DATA_DIR = "../data/usr/interproc.db"
 
 class DBInterface:
 
