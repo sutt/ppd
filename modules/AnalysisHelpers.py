@@ -189,6 +189,7 @@ class EvalTracker:
         '''
         pass
 
+# Data Prep Helper Func's for colorCube -------------------
 
 def imgToColors(img, sampleN = None):
     '''
@@ -237,11 +238,18 @@ def cvtPlot(img):
     _img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
     plt.imshow(_img)
 
+
+# colorCube -------------------------------------------------
+
 def colorPlot(listB, listG, listR
                ,listColors = None
                ,spaceTotal = True
                ,spaceDefined = {}
+               ,viewPoisitonDefined = {}
                ,regionMarkers = None
+               ,bInitPosition = False
+               ,keyPressFunc = None
+               ,axData = None
               ):
     '''
         3d plot of pixels color values
@@ -252,15 +260,41 @@ def colorPlot(listB, listG, listR
                     is displayed: 0 to 255
         spaceDefined - [dict] with keys 'x', 'y', 'z' and a tuple 
                      corresponding to (lo, hi) values on that axis
-        regionMarkers - TODO 
+        viewPositionDefined - [dict] with keys elevation and azimuth
+                        that dictate an initial view position
+        regionMarkers - TODOs-implement 
+        bInitPosition - [bool] set view-poisition when plt'd
+        keyPressEvent - if not None, a reference to a function that
+                        accepts a keyEvent arg and 
+        axData -        if not None, a reference to a class instance method 
+                        that attaches a reference to ax instance of a fig 
 
         TODOS
             [ ] do a second plot plt.scatter() ?
             [ ] title uses spaceDefined / spaceTotal inputs
     '''
+    
+    plt.close()     #reset from previous interactive
+    
     fig = plt.figure()
+    
     ax = fig.add_subplot(111, projection='3d')
+    
+    if ((len(viewPoisitonDefined.keys()) > 0) and
+        bInitPosition):
+    
+        ax.view_init(azim = viewPoisitonDefined.get('azimuth')
+                    ,elev = viewPoisitonDefined.get('elevation')
+        )
+        
     ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors)
+
+    if axData is not None:
+        axData(ax)
+
+    if keyPressFunc is not None:
+        fig.canvas.mpl_connect('key_press_event', keyPressFunc)
+
     
     if spaceTotal and len(spaceDefined.keys()) == 0:
         ax.set_xlim3d(0, 255)
@@ -276,15 +310,17 @@ def colorPlot(listB, listG, listR
             ax.set_zlim3d(spaceDefined['z'])
         
     if regionMarkers is not None:
-        pass
-        #TODO
+        pass        #TODO
 
     ax.set_xlabel('B')
     ax.set_ylabel('G')
     ax.set_zlabel('R')
-    
+
     plt.show()
 
+    
+
+    
 
 class SubprocColorPlot:
 
@@ -299,6 +335,11 @@ class SubprocColorPlot:
         then in terminal: cd to modules/; python AnalysisHelpers.py --subprocColorPlot;
                           this should produce the plot in separate window.
 
+        Watchout:
+            this class interfaces with pickle with self.loadedClass which itself is a 
+            SubprocColorPlot instance, and each dump/load seession goes off that, as
+            does loadedClass.plot()
+
     '''
 
     def __init__(self
@@ -309,8 +350,9 @@ class SubprocColorPlot:
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
+                ,bInitPosition = True
                 ):
-        ''' set parameters to call colorPlot() now, or later with methods below'''
+        ''' set parameters to call colorPlot() now, or later with set-methods below'''
 
         # colorPlot params
         self.listB = listB
@@ -320,6 +362,13 @@ class SubprocColorPlot:
         self.spaceTotal = spaceTotal
         self.spaceDefined = spaceDefined
         self.regionMarkers = regionMarkers
+
+        # plot params:
+        self.bInitPosition = bInitPosition
+        self.azimuth = None
+        self.elevation = None
+        self.distance = None
+        self.ax = None
 
         # interprocess comm helpers
         self.dbPathFn = "../data/usr/interproc_colorplot.db"
@@ -342,6 +391,7 @@ class SubprocColorPlot:
         if spaceDefined is not None:
             self.spaceDefined = copy.copy(spaceDefined)
 
+
     # interproc methods ------
 
     def save(self):
@@ -360,24 +410,78 @@ class SubprocColorPlot:
 
         try:
             self.loadedClass = pickle.loads(recentRecord[0][1])
-        except:
+            print 'loaded class type: ', str(self.loadedClass.__class__.__name__)
+        except Exception as e:
             print 'could not load SubprocColorPlot class with pickle'
+            print e
 
-    def callPlot(self):
-        ''' main method for running a subprocess colorPlot() '''
-        self.loadedClass.plot()
     
-    def plot(self):
+    # plotting methods; invoked on self.loadedClass -------
+    
+    def callPlot(self, bInitPosition=True, bInteractive=False):
+        ''' main method for running a subprocess colorPlot() '''
+        self.loadedClass.plot(bInitPosition=bInitPosition, bInteractive=bInteractive)
+    
+    
+    def plot(self, bInitPosition=True, bInteractive=False):
         ''' invoke the colorPlot function '''
         
-        colorPlot(listB = self.listB
+        viewPoisitonDefined = {}
+        keyPressSubproc = None
+        setAxData = None
+
+        if bInitPosition:
+            viewPoisitonDefined['azimuth'] = self.azimuth
+            viewPoisitonDefined['elevation'] = self.elevation
+            
+        if bInteractive:
+            keyPressSubproc =  self.keyPressSubproc
+            setAxData = self.setAxData
+        
+        colorPlot(
+                  listB = self.listB
                  ,listG = self.listG
                  ,listR = self.listR
                  ,listColors = self.listColors
                  ,spaceTotal = self.spaceTotal
                  ,spaceDefined = self.spaceDefined
+                 ,viewPoisitonDefined  = viewPoisitonDefined
+                 ,bInitPosition = bInitPosition
                  ,regionMarkers = self.regionMarkers
+                 ,keyPressFunc=keyPressSubproc
+                 ,axData = setAxData
                  )
+
+    # helper-pass-ins for interactive state ------
+    
+    def setAxData(self, axObj):
+        ''' stores a reference to ax object created from the fig in an interactive-
+            enabled colorCube; used in keyPressSubproc to get viewing-position data
+        '''
+        self.ax = axObj
+
+    def resetAxData(self):
+        ''' call this before save() to avoid pickling ax obj '''
+        self.ax = None
+    
+    def keyPressSubproc(self, event):  
+        ''' pass this in to colorPlot to handle keypress events here'''
+        
+        if event.key == 'o':
+            self.azimuth = self.ax.azim
+            self.elevation = self.ax.elev
+            print 'outputting  view pos params to interproc %s , %s' % (
+                                        str(self.azimuth)[:5], str(self.elevation)[:5]
+                                        )
+            
+            self.resetAxData()
+            self.save()     # this will save self.loadedClass to db
+        else:
+            print '%s :command not recognized.' % event.key
+
+        
+    
+        
 
 
 def subprocColorPlot(
@@ -468,7 +572,7 @@ def multiPlot(list_list_imgs
                 if (not(b_multiline) or h_i == 0) :
                     _ax.set_title(input_frame_titles[w_i])
     
-    fig.show()
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -481,9 +585,9 @@ if __name__ == "__main__":
             print 'running subprocess calling colorPlot'
 
             p = SubprocColorPlot()
+            p.bInitPosition = False
             p.load()
-            p.callPlot()
-            plt.show()
+            p.callPlot(bInitPosition=True, bInteractive=True)
 
             print 'done and exiting'
             

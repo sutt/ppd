@@ -5,7 +5,9 @@
         displays a ColorCube in a separate window based on last saved data
         in interproc_colorplot.db
 
-    can just intermittently delete: data/usr/interproc_colorplot.db 
+        press 'o': to output view-position to interproc_colorplot.db
+
+        can just intermittently delete: data/usr/interproc_colorplot.db 
         to keep data size in check
 
 10/9

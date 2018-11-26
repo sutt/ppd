@@ -1,5 +1,22 @@
 #Tasks
 
+11/25
+
+    [x] verify you can delete interproc_colorplot.db and recover
+    [ ] finish a demo-subproc book and commit it
+        [ ] show bunch of different colorCube slices / analysis-types on listGS
+    [x] keypress to output data in subprocess
+        [x] simple
+        [x] complex
+        [x] how to get fig.get_axis()
+    [ ] refactor colorPlt -> colorCube
+    [x] add animation? - no!
+    [ ] need to add boundary in colorCube
+    [ ] have guiview show the colorplt in realtime
+    
+    notes:        
+
+
 
 11/24
 
@@ -13,6 +30,13 @@
          set the view-params for a static figure
             - we can view params in figure subtitle bar; are they sufficient?
                 azimuth, elevation
+
+            - apropos: https://stackoverflow.com/questions/12904912/how-to-set-camera-position-for-3d-plots-using-python-matplotlib
+                ax.view_init(elev=10., azim=ii)
+                axx=ax1.get_axes()
+                azm=axx.azim
+                ele=axx.elev
+                dst=axx.dist      
 
     [ ] why don't "buttons" / controllers on tk-matpltolib work? e.g. zoom
 
