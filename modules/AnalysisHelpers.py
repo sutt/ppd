@@ -241,7 +241,7 @@ def cvtPlot(img):
 
 # colorCube -------------------------------------------------
 
-def colorPlot(listB, listG, listR
+def colorCube(listB, listG, listR
                ,listColors = None
                ,spaceTotal = True
                ,spaceDefined = {}
@@ -253,6 +253,8 @@ def colorPlot(listB, listG, listR
               ):
     '''
         3d plot of pixels color values
+
+        some arg's are for interactive-manipulation +interproc-comm
 
         listColors = [list] of '#00ff00'-style color strings
                      of len equal to listB
@@ -322,22 +324,22 @@ def colorPlot(listB, listG, listR
 
     
 
-class SubprocColorPlot:
+class SubprocColorCube:
 
-    ''' Class to save/load params for calling colorPlot() in a subprocess;
+    ''' Class to save/load params for calling colorCube() in a subprocess;
         since it's a subproc, we need to transport the data with Interproc comm
         using pickle dump/load.
         Allows good "responsive" interactivity when called from jupyter but using a 
         true TK window outside browser.
 
         To Use:
-        in jupyter: use helper function subprocColorPlot() to build a class and output it
+        in jupyter: use helper function subprocColorCube() to build a class and output it
         then in terminal: cd to modules/; python AnalysisHelpers.py --subprocColorPlot;
                           this should produce the plot in separate window.
 
         Watchout:
             this class interfaces with pickle with self.loadedClass which itself is a 
-            SubprocColorPlot instance, and each dump/load seession goes off that, as
+            SubprocColorCube instance, and each dump/load seession goes off that, as
             does loadedClass.plot()
 
     '''
@@ -347,14 +349,14 @@ class SubprocColorPlot:
                 ,listG = None
                 ,listR = None
                 ,listColors = None
-                ,spaceTotal = True
+                ,spaceTCube = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
                 ,bInitPosition = True
                 ):
-        ''' set parameters to call colorPlot() now, or later with set-methods below'''
+        ''' set parameters to call colorCube() now, or later with set-methods below'''
 
-        # colorPlot params
+        # colorCube params
         self.listB = listB
         self.listG = listG
         self.listR = listR
@@ -412,19 +414,19 @@ class SubprocColorPlot:
             self.loadedClass = pickle.loads(recentRecord[0][1])
             print 'loaded class type: ', str(self.loadedClass.__class__.__name__)
         except Exception as e:
-            print 'could not load SubprocColorPlot class with pickle'
+            print 'could not load SubprocColorCube class with pickle'
             print e
 
     
     # plotting methods; invoked on self.loadedClass -------
     
     def callPlot(self, bInitPosition=True, bInteractive=False):
-        ''' main method for running a subprocess colorPlot() '''
+        ''' main method for running a subprocess colorCube() '''
         self.loadedClass.plot(bInitPosition=bInitPosition, bInteractive=bInteractive)
     
     
-    def plot(self, bInitPosition=True, bInteractive=False):
-        ''' invoke the colorPlot function '''
+    def plot(self, bInitCubetion=True, bInteractive=False):
+        ''' invoke the colorCube function '''
         
         viewPoisitonDefined = {}
         keyPressSubproc = None
@@ -438,7 +440,7 @@ class SubprocColorPlot:
             keyPressSubproc =  self.keyPressSubproc
             setAxData = self.setAxData
         
-        colorPlot(
+        colorCube(
                   listB = self.listB
                  ,listG = self.listG
                  ,listR = self.listR
@@ -465,7 +467,7 @@ class SubprocColorPlot:
         self.ax = None
     
     def keyPressSubproc(self, event):  
-        ''' pass this in to colorPlot to handle keypress events here'''
+        ''' pass this in to colorCube to handle keypress events here'''
         
         if event.key == 'o':
             self.azimuth = self.ax.azim
@@ -484,7 +486,7 @@ class SubprocColorPlot:
         
 
 
-def subprocColorPlot(
+def subprocColorCube(
                  listB
                 ,listG
                 ,listR
@@ -494,9 +496,10 @@ def subprocColorPlot(
                 ,regionMarkers = None
                 ):
     
-    ''' helper function for calling subprocColorPlot '''
+    ''' helper function for outputting an instance SubprocColorCube from
+        jupyter into an interproc db '''
     
-    subprocClass = SubprocColorPlot(
+    subprocClass = SubprocColorCube(
                  listB = listB
                 ,listG = listG
                 ,listR = listR
@@ -508,8 +511,8 @@ def subprocColorPlot(
     
     subprocClass.save()
 
-    # PROBLEM: matplotlib doesn't output when called from jupyter
-        # running subprocess calling colorPlot
+    #PROBLEM: matplotlib doesn't output when called from jupyter
+        # running subprocess calling colorCube
         # <Figure size 640x480 with 1 Axes>
 
 
@@ -582,13 +585,12 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "--subprocColorPlot":
             
-            print 'running subprocess calling colorPlot'
+            print 'running subprocess calling colorCube'
 
-            p = SubprocColorPlot()
+            p = SubprocColorCube()
             p.bInitPosition = False
             p.load()
             p.callPlot(bInitPosition=True, bInteractive=True)
-
             print 'done and exiting'
             
 

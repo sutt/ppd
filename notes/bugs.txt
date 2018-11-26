@@ -3,13 +3,15 @@
 11/25
 
     [x] verify you can delete interproc_colorplot.db and recover
-    [ ] finish a demo-subproc book and commit it
+    [ ] finish a demo-subproc-colorcube book and commit it
+    [ ] finish a colorcube-gallery-1 and commit it
         [ ] show bunch of different colorCube slices / analysis-types on listGS
+        [ ] do ball inThresh vs outOfThresh
     [x] keypress to output data in subprocess
         [x] simple
         [x] complex
         [x] how to get fig.get_axis()
-    [ ] refactor colorPlt -> colorCube
+    [x] refactor colorPlt -> colorCube
     [x] add animation? - no!
     [ ] need to add boundary in colorCube
     [ ] have guiview show the colorplt in realtime
