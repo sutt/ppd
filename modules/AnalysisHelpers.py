@@ -349,10 +349,11 @@ class SubprocColorCube:
                 ,listG = None
                 ,listR = None
                 ,listColors = None
-                ,spaceTCube = True
+                ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
                 ,bInitPosition = True
+                ,dbPathFn = None
                 ):
         ''' set parameters to call colorCube() now, or later with set-methods below'''
 
@@ -373,7 +374,10 @@ class SubprocColorCube:
         self.ax = None
 
         # interprocess comm helpers
-        self.dbPathFn = "../data/usr/interproc_colorplot.db"
+        if dbPathFn is None:
+            self.dbPathFn = "../data/usr/interproc_colorcube.db"
+        else:
+            self.dbPathFn = dbPathFn
         self.db = None
         self.loadedClass = None
 
@@ -425,7 +429,7 @@ class SubprocColorCube:
         self.loadedClass.plot(bInitPosition=bInitPosition, bInteractive=bInteractive)
     
     
-    def plot(self, bInitCubetion=True, bInteractive=False):
+    def plot(self, bInitPosition=True, bInteractive=False):
         ''' invoke the colorCube function '''
         
         viewPoisitonDefined = {}
@@ -494,6 +498,7 @@ def subprocColorCube(
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
+                ,dbPathFn = None
                 ):
     
     ''' helper function for outputting an instance SubprocColorCube from
@@ -507,6 +512,7 @@ def subprocColorCube(
                 ,spaceTotal = spaceTotal
                 ,spaceDefined = spaceDefined
                 ,regionMarkers = regionMarkers
+                ,dbPathFn = dbPathFn
                 )
     
     subprocClass.save()
@@ -581,13 +587,17 @@ def multiPlot(list_list_imgs
 if __name__ == "__main__":
 
 
-    # check for call to subprocColorPlot
+    # check for call to subprocColorCube
     if len(sys.argv) > 1:
-        if sys.argv[1] == "--subprocColorPlot":
+        if sys.argv[1] == "--subprocColorCube":
             
+            dbPathFn = None
+            if sys.argv[2] == '--dbpathfn':
+                dbPathFn = str(sys.argv[3])
+
             print 'running subprocess calling colorCube'
 
-            p = SubprocColorCube()
+            p = SubprocColorCube(dbPathFn = dbPathFn)
             p.bInitPosition = False
             p.load()
             p.callPlot(bInitPosition=True, bInteractive=True)

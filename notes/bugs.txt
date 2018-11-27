@@ -3,7 +3,10 @@
 11/25
 
     [x] verify you can delete interproc_colorplot.db and recover
-    [ ] finish a demo-subproc-colorcube book and commit it
+    [x] finish a demo-subproc-colorcube book and commit it
+        [x] how to copy the interproc db into books-data
+        [x] explain the %notebook problem
+    [x] how to use interproc.db for testing
     [ ] finish a colorcube-gallery-1 and commit it
         [ ] show bunch of different colorCube slices / analysis-types on listGS
         [ ] do ball inThresh vs outOfThresh
@@ -27,7 +30,7 @@
         while matplotlib-subproc is responsive at sampleN=2000, and semi-responsive at 
         sampleN=5000 so a 10x diff
 
-    [ ] investigate if you can:
+    [x] investigate if you can:
          get the current-view-params for an interactive figure
          set the view-params for a static figure
             - we can view params in figure subtitle bar; are they sufficient?

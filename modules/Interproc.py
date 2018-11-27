@@ -129,6 +129,7 @@ class GuiviewState:
 
     
     def initDisplay(self):
+        ''' this is confusing and should be called automatically on init'''
         self.display = Display()
         self.display.setInit(showOn=False
                             ,scoreOff=False
