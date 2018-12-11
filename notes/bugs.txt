@@ -1,5 +1,102 @@
 #Tasks
 
+12/10
+
+    back at it...
+
+    misc notes
+
+        color cube colors: green for TP, red for FN, yellow for FP, blue for TN
+
+        add dude perfect video and cronin competition vids
+
+        color transforms for colorCube? e.g to accentuate yellow
+
+        rolling shutter creates positioning problems where the beginning of the roll
+        records the actual ball, and
+
+        which way does rolling shutter roll? how can that be exploited? how can
+        that be demonstated?
+
+        can i prove that positioning concept actually "works" - resolves a unique 
+        3D position from two 2D images. has to work with the proposed experimental
+        setup and in the full volume over the table
+
+    major goals:
+
+        review the current uncommited items, complete them, add them in.
+
+        review the notebook situation and do a new one with colorcube
+
+        review outstanding items, sort into two groups, todo and deferred        
+
+    Todo
+
+        [ ] move regionMarkers hfunctions into module
+        [ ] multiple balls (from multiple frames) 
+        [ ] plot with dif markers
+            [ ] 1: thresh-in / thresh-out
+            [ ] 2: in-score / out-score
+        [ ] add stateOutput to docs
+        [ ] pathToData
+        [ ] change db name from 'demo' to interproc
+        [ ] helper functions
+            [ ] multi image subplt
+            [ ] crop for zoom window
+            [ ] orientation for view
+        [ ] histogram for num contours
+        [ ] separate mask from object selection
+        [ ] add buildGradient, combineGradient and combineDicts to Module
+        [ ] better checkTrackSuccess...verify the track is near where the ground-truth
+            score is
+        [ ] new book, use interproc and interThresh
+        [ ] we really need to get trainingFrames going
+        [ ] function that finds the full circle from zoomWindow
+            [ ] isAPseudoCircle
+            [ ] find circles in un-transformed image; hough's circle finder?
+            [ ] fit a circle to object
+            [ ] extract the pixels from this shape, and re-calcs
+        [ ] second largest obj in mask
+            [ ] but not another portion of the ball
+        [ ] how to get baselineScore? when it's a FP like frame189
+            [ ] easy way to get rect interactively from guiview:
+                a one-liner in jupyter; build this as importable function
+                [ ] close db connection after function use
+
+    Deferred
+
+        [ ] regionMarkers helper - expandVolume(scalar, constant)
+        [ ] other color utils - color hexagon w/ mouseover
+        [ ] why don't "buttons" / controllers on tk-matpltolib work? e.g. zoom
+        [ ] modularize paramSpace functions
+        [ ] try volumes, work better than regionMarkers?
+            [ ] improved ImgUtils:filter_pixels_circle [with circle input]
+            [ ] need to add boundary in colorCube
+        [ ] have guiview show the colorplt in realtime
+                [ ] do a function of searchParams
+            [ ] timeit - time per iter?
+        [ ] buildGradient for full combination on tuple
+        [ ] trackFrameDemo3 - separates mask and selection
+            [ ] b_log returns countours data
+        [ ] tests for SerachParams functions
+
+
+11/26
+
+    [ ] plot with dif markers
+        [ ] 1: thresh-in / thresh-out
+        [ ] 2: in-score / out-score
+
+    [ ] set interproc_colorcube.db pathFn
+    
+    [ ] try volumes, work better than regionMarkers?
+
+    [ ] move regionMarkers hfunctions into module
+
+    [ ] multiple balls (from multiple frames) 
+
+    [ ] improved ImgUtils:filter_pixels_circle [with circle input]
+
 11/25
 
     [x] verify you can delete interproc_colorplot.db and recover
@@ -18,8 +115,41 @@
     [x] add animation? - no!
     [ ] need to add boundary in colorCube
     [ ] have guiview show the colorplt in realtime
+
+    [ ] this will be great for iterThresh display debugging
+    [ ] would be nice to have a way to show plt side-by-side or 
+        for any arbitrary display-setup
     
-    notes:        
+    9:30 +:
+        [ ] regionMarkers
+            [ ] 2nd scatter
+
+        [ ] regionMarkers helpers
+            [x] threshToVolume
+            [ ] expandVolume(scalar, constant)
+
+        10:00
+            [x] get some data
+            [x] work on adding regionMarkers
+            [ ] then if 2x scatter works, do a second scatter for in/out
+
+        11:00
+            [x] build edgesFromCorners
+
+
+        notes:
+
+            matplotlib gallery
+
+                3d volumes
+                https://matplotlib.org/2.1.1/gallery/mplot3d/voxels.html#sphx-glr-gallery-mplot3d-voxels-py
+
+                3d scatter
+                https://matplotlib.org/2.1.1/gallery/mplot3d/scatter3d.html#sphx-glr-gallery-mplot3d-scatter3d-py
+
+                shapes with opacity
+                https://stackoverflow.com/questions/48672663/matplotlib-render-all-internal-voxels-with-alpha
+
 
 
 
