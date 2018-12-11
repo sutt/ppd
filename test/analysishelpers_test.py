@@ -77,7 +77,8 @@ def test_applyTracker_1():
     assert data['listFrameTitles'] == ['0','189', '312']
     assert len(data['listScore']) == 3
     assert data['listScore'][0]['0']['data'] == (209, 168, 35, 35)
-    assert data['listScore'][1]['0']['data'] == (0,0,0,0)
+    assert data['listScore'][1] == None
+
 
 
 def test_applyTracker_2():
@@ -112,7 +113,7 @@ def test_applyTracker_2():
     assert data['listFrameTitles'] == ['0','189', '312']
     assert len(data['listScore']) == 3
     assert data['listScore'][0]['0']['data'] == (209, 168, 35, 35)
-    assert data['listScore'][1]['0']['data'] == (0,0,0,0)
+    assert data['listScore'][1] == None
 
 
 def test_applyTracker_2():
@@ -145,7 +146,7 @@ def test_applyTracker_2():
     
     assert len(data['listScore']) == 3
     assert data['listScore'][0]['0']['data'] == (17, 18, 35, 35)
-    assert data['listScore'][1]['0']['data'] == (0,0,0,0)
+    assert data['listScore'][1] == None
 
 
 

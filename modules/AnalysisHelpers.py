@@ -242,6 +242,7 @@ def cvtPlot(img):
 # colorCube -------------------------------------------------
 
 def colorCube(listB, listG, listR
+               ,dictData = {}
                ,listColors = None
                ,spaceTotal = True
                ,spaceDefined = {}
@@ -256,6 +257,7 @@ def colorCube(listB, listG, listR
 
         some arg's are for interactive-manipulation +interproc-comm
 
+        dictData - [dict] where each key has a value of a list of bgr lists.
         listColors = [list] of '#00ff00'-style color strings
                      of len equal to listB
         spaceTotal - [bool] if True, whole support of each axis
@@ -264,7 +266,7 @@ def colorCube(listB, listG, listR
                      corresponding to (lo, hi) values on that axis
         viewPositionDefined - [dict] with keys elevation and azimuth
                         that dictate an initial view position
-        regionMarkers - TODOs-implement 
+        regionMarkers - if not None, list of list 
         bInitPosition - [bool] set view-poisition when plt'd
         keyPressEvent - if not None, a reference to a function that
                         accepts a keyEvent arg and 
@@ -289,7 +291,15 @@ def colorCube(listB, listG, listR
                     ,elev = viewPoisitonDefined.get('elevation')
         )
         
-    ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors)
+    ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors, marker='o')
+
+    if len(dictData.keys()) > 0:
+        for _k in dictData.keys():
+            ax.scatter(*dictData[_k], c = 'red' ,marker = _k)
+
+    if regionMarkers is not None:
+        ax.scatter(xs=regionMarkers[0], ys=regionMarkers[1], zs=regionMarkers[2], 
+                    c='black', marker='^')
 
     if axData is not None:
         axData(ax)
@@ -349,6 +359,7 @@ class SubprocColorCube:
                 ,listG = None
                 ,listR = None
                 ,listColors = None
+                ,dictData = {}
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
@@ -362,6 +373,7 @@ class SubprocColorCube:
         self.listG = listG
         self.listR = listR
         self.listColors = listColors
+        self.dictData = dictData
         self.spaceTotal = spaceTotal
         self.spaceDefined = spaceDefined
         self.regionMarkers = regionMarkers
@@ -449,6 +461,7 @@ class SubprocColorCube:
                  ,listG = self.listG
                  ,listR = self.listR
                  ,listColors = self.listColors
+                 ,dictData = self.dictData
                  ,spaceTotal = self.spaceTotal
                  ,spaceDefined = self.spaceDefined
                  ,viewPoisitonDefined  = viewPoisitonDefined
@@ -495,6 +508,7 @@ def subprocColorCube(
                 ,listG
                 ,listR
                 ,listColors = None
+                ,dictData = {}
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
@@ -509,6 +523,7 @@ def subprocColorCube(
                 ,listG = listG
                 ,listR = listR
                 ,listColors = listColors
+                ,dictData = dictData
                 ,spaceTotal = spaceTotal
                 ,spaceDefined = spaceDefined
                 ,regionMarkers = regionMarkers
@@ -592,8 +607,9 @@ if __name__ == "__main__":
         if sys.argv[1] == "--subprocColorCube":
             
             dbPathFn = None
-            if sys.argv[2] == '--dbpathfn':
-                dbPathFn = str(sys.argv[3])
+            if len(sys.argv) > 2:
+                if sys.argv[2] == '--dbpathfn':
+                    dbPathFn = str(sys.argv[3])
 
             print 'running subprocess calling colorCube'
 
