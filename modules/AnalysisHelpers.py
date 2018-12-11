@@ -346,6 +346,7 @@ class SubprocColorCube:
         in jupyter: use helper function subprocColorCube() to build a class and output it
         then in terminal: cd to modules/; python AnalysisHelpers.py --subprocColorPlot;
                           this should produce the plot in separate window.
+            use --dbpathfn [path/to/data.db] for specific book analysis
 
         Watchout:
             this class interfaces with pickle with self.loadedClass which itself is a 

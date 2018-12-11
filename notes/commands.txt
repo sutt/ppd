@@ -10,6 +10,9 @@
         can just intermittently delete: data/usr/interproc_colorplot.db 
         to keep data size in check
 
+        --dbpathfn [PATH-TO-DB] allows us isolate the graph in question to
+        a specific book analysis
+
 10/9
 
     >python guiview.py --track --scoreoff

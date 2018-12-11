@@ -1,5 +1,20 @@
 #Tasks
 
+12/11
+
+    [x] --dbpathfn used, how does it work with colorcub-gallery.ipynb?
+    [ ] document the flag in commands.txt
+    [ ] document the flag in class definition
+    [ ] commit the gallery-1 and associated data
+    [ ] bug: SubprocColorCube can not load old interproc_colorcube.db data when class
+        elements have been changed like addition on dictData as an arg
+    [ ] modularize the regionmarkers
+    [ ] make colorcube-gallery-2
+    [ ] colorcube gallery, get a few figures in there:
+        [ ] add FP/FN color markers
+
+    
+
 12/10
 
     back at it...
