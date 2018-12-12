@@ -1,6 +1,6 @@
 #Tasks
 
-12/11
+12/11 - 12/12
 
     [x] --dbpathfn used, how does it work with colorcub-gallery.ipynb?
     [x] document the flag in commands.txt
@@ -16,16 +16,17 @@
         [x] modularize function
         [ ] multiple balls (from multiple frames) 
             [ ] far away and close
-    [ ] modularize plotting a confusion matrix
+    [x] modularize plotting a confusion matrix
     [ ] allow multiplot grids; use tk.save()? pass in a global plt to separate functions?
     [ ] definedVolume near where the 3 key metrics are:
         [ ] CI for each of the three masses
-    [ ] multi-thresh: bitwise_or
     [x] make in-notebook plot larger
     [ ] decrease whitespace
     [x] add color legend
     [ ] build preplanned azimuth/elevation tuples 
-    [ ] add title
+        [ ] function that does of each, horizontally
+    [x] add title
+    [x] do 10,000 point plot
     
     [x] build basic numpy operators
         [x] use cv2.bitwise_and(mask1, mask2)
@@ -42,7 +43,10 @@
             [ ] how to make expanding threshold 1-dimensional?
 
     [ ] add a second or-thresh
-        [ ] view in colorcube
+        [x] view in colorcube
+        [x] apply to confusion matrix module
+        [ ] apply to tracker
+        [x] multi-thresh: bitwise_or
 
     [ ] slice the colorCube diagonally
         [ ] can do a cubic fill
@@ -99,9 +103,9 @@
 
         [x] move regionMarkers hfunctions into module
         [ ] multiple balls (from multiple frames) 
-        [ ] plot with dif markers
-            [ ] 1: thresh-in / thresh-out
-            [ ] 2: in-score / out-score
+        [x] plot with dif markers
+            [x] 1: thresh-in / thresh-out
+            [x] 2: in-score / out-score
         [ ] add stateOutput to docs
         [ ] pathToData
         [ ] change db name from 'demo' to interproc
@@ -148,19 +152,19 @@
 
 11/26
 
-    [ ] plot with dif markers
-        [ ] 1: thresh-in / thresh-out
-        [ ] 2: in-score / out-score
+    [x] plot with dif markers
+        [x] 1: thresh-in / thresh-out
+        [x] 2: in-score / out-score
 
-    [ ] set interproc_colorcube.db pathFn
+    [x] set interproc_colorcube.db pathFn
     
     [ ] try volumes, work better than regionMarkers?
 
-    [ ] move regionMarkers hfunctions into module
+    [x] move regionMarkers hfunctions into module
 
     [ ] multiple balls (from multiple frames) 
 
-    [ ] improved ImgUtils:filter_pixels_circle [with circle input]
+    [x] improved ImgUtils:filter_pixels_circle [with circle input]
 
 11/25
 

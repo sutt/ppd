@@ -203,6 +203,7 @@ class PixelConfusionMatrix:
         
         self.img = kwargs.get('img', None)
         self.thresh = kwargs.get('thresh', None)
+        self.threshes = kwargs.get('threshes', None)
         self.circle = kwargs.get('circle', None)
 
         self.circleMask = None
@@ -241,6 +242,9 @@ class PixelConfusionMatrix:
     def setThresh(self, thresh):
         self.thresh = thresh
 
+    def setThreshes(self, threshes):
+        self.threshes = copy.copy(threshes)
+
     def setCircle(self, scoreRect):
         self.circle = scoreRect
 
@@ -257,8 +261,8 @@ class PixelConfusionMatrix:
     def calc(self):
 
         assert ((self.img is not None) and
-                (self.thresh is not None) and
-                (self.circle is not None)
+                (self.circle is not None) and
+                ((self.thresh is not None) or (self.threshes is not None))
                )
 
         self.buildMasks()
@@ -324,11 +328,29 @@ class PixelConfusionMatrix:
 
 
     def buildThreshMask(self):
-        #TODO - replace cv2.inRange with numpy function
-        return np.array(
-                        cv2.inRange(self.img, self.thresh[0], self.thresh[1])
-                        ,dtype='bool'
-                        )
+        
+        if self.threshes is None:
+
+            return np.array(
+                            cv2.inRange(self.img, self.thresh[0], self.thresh[1])
+                            ,dtype='bool'
+                            )
+            
+            #TODO - replace cv2.inRange with numpy function
+
+        else:
+
+            #multi-thresh
+            fullMask = np.array(np.zeros(shape = self.img.shape[:2]), dtype='bool')
+
+            for _thresh in self.threshes:
+                
+                _mask = np.array(cv2.inRange(self.img, _thresh[0], _thresh[1])
+                                            ,dtype='bool')
+                
+                fullMask = np.bitwise_or(fullMask, _mask)
+            
+            return fullMask
 
     @staticmethod
     def circleCenter(rect):
@@ -411,6 +433,7 @@ def colorCube(  listB = None
                ,bInitPosition = False
                ,figsize = (10,10)
                ,bLegend = False
+               ,title = None
                ,keyPressFunc = None
                ,axData = None
               ):
@@ -525,6 +548,9 @@ def colorCube(  listB = None
     ax.set_xlabel('B')
     ax.set_ylabel('G')
     ax.set_zlabel('R')
+
+    if title is not None:
+        ax.set_title(title)
 
     plt.show()
 
