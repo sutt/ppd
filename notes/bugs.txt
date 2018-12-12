@@ -17,12 +17,15 @@
         [ ] multiple balls (from multiple frames) 
             [ ] far away and close
     [ ] modularize plotting a confusion matrix
-    [ ] allow multiplot grids; use tk.save()?
+    [ ] allow multiplot grids; use tk.save()? pass in a global plt to separate functions?
     [ ] definedVolume near where the 3 key metrics are:
         [ ] CI for each of the three masses
-    [ ] colorCube can set
-    [ ] make in-notebook plot larger
-    [ ] add color legend
+    [ ] multi-thresh: bitwise_or
+    [x] make in-notebook plot larger
+    [ ] decrease whitespace
+    [x] add color legend
+    [ ] build preplanned azimuth/elevation tuples 
+    [ ] add title
     
     [x] build basic numpy operators
         [x] use cv2.bitwise_and(mask1, mask2)
@@ -37,6 +40,9 @@
         [ ] output in human readable form
         [ ] roc over threshold
             [ ] how to make expanding threshold 1-dimensional?
+
+    [ ] add a second or-thresh
+        [ ] view in colorcube
 
     [ ] slice the colorCube diagonally
         [ ] can do a cubic fill

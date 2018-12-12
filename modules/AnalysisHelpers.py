@@ -2,6 +2,7 @@ import sys, copy, random, subprocess, time
 import pickle
 import cv2
 import numpy as np
+from collections import OrderedDict
 from itertools import combinations
 from Interproc import DBInterface
 from matplotlib import pyplot as plt
@@ -217,7 +218,7 @@ class PixelConfusionMatrix:
         self.tnPix = None
         self.fnPix = None
         
-        self.n = None
+        self.N = None
 
         self.t = None
         self.f = None
@@ -272,7 +273,7 @@ class PixelConfusionMatrix:
         self.tnPix = self.img[self.tnMask]
         self.fnPix = self.img[self.fnMask]
 
-        self.n = self.img.shape[0] * self.img.shape[1]
+        self.N = self.img.shape[0] * self.img.shape[1]
 
         self.t = sum(sum(self.circleMask))
         self.f = (self.circleMask.shape[0] * self.circleMask.shape[1]) - self.t
@@ -301,17 +302,17 @@ class PixelConfusionMatrix:
         ''' val: int; of the number of pixels in each category '''
         ret = {}
         
-        ret['tp'] = self.tp if bN else float(self.tp) / float(self.n)
-        ret['fp'] = self.fp if bN else float(self.fp) / float(self.n)
-        ret['tn'] = self.tn if bN else float(self.tn) / float(self.n)
-        ret['fn'] = self.fn if bN else float(self.fn) / float(self.n)
+        ret['tp'] = self.tp if bN else float(self.tp) / float(self.N)
+        ret['fp'] = self.fp if bN else float(self.fp) / float(self.N)
+        ret['tn'] = self.tn if bN else float(self.tn) / float(self.N)
+        ret['fn'] = self.fn if bN else float(self.fn) / float(self.N)
 
-        ret['n'] = self.n if bN else 1.0
+        ret['N'] = self.n if bN else 1.0
 
-        ret['t'] = self.t if bN else float(self.t) / float(self.n)
-        ret['f'] = self.f if bN else float(self.f) / float(self.n)
-        ret['p'] = self.p if bN else float(self.p) / float(self.n)
-        ret['n'] = self.n if bN else float(self.n) / float(self.n)
+        ret['t'] = self.t if bN else float(self.t) / float(self.N)
+        ret['f'] = self.f if bN else float(self.f) / float(self.N)
+        ret['p'] = self.p if bN else float(self.p) / float(self.N)
+        ret['n'] = self.n if bN else float(self.n) / float(self.N)
 
         return ret
 
@@ -398,78 +399,107 @@ def cvtPlot(img):
 
 # colorCube -------------------------------------------------
 
-def colorCube(listB, listG, listR
-               ,dictData = {}
+def colorCube(  listB = None
+               ,listG = None
+               ,listR = None
+               ,confData = {}
+               ,regionMarkers = None
                ,listColors = None
                ,spaceTotal = True
                ,spaceDefined = {}
-               ,viewPoisitonDefined = {}
-               ,regionMarkers = None
+               ,viewPositionDefined = {}
                ,bInitPosition = False
+               ,figsize = (10,10)
+               ,bLegend = False
                ,keyPressFunc = None
                ,axData = None
               ):
     '''
         3d plot of pixels color values
 
-        some arg's are for interactive-manipulation +interproc-comm
+        (some arg's are for interactive-manipulation + interproc-comm)
 
-        dictData - [dict] where each key has a value of a list of bgr lists.
+        listB, listG, listR - [list] if not None, a single scatter plot with color
+                              corresponding to listColors
+
+        confData - [dict] where each key representing one element of confusion
+                    matrix has a value of a list of bgr lists.
+        
+        regionMarkers - [list] representing thresh volume, if not none, 
+                        a list of bgr lists
+
         listColors = [list] of '#00ff00'-style color strings
                      of len equal to listB
+        
         spaceTotal - [bool] if True, whole support of each axis
                     is displayed: 0 to 255
+        
         spaceDefined - [dict] with keys 'x', 'y', 'z' and a tuple 
                      corresponding to (lo, hi) values on that axis
+        
         viewPositionDefined - [dict] with keys elevation and azimuth
                         that dictate an initial view position
-        regionMarkers - if not None, list of list 
+        
         bInitPosition - [bool] set view-poisition when plt'd
+
+        fisize - [tuple] of ints for size of figure
+
+        bLegend - [bool] display a legend
+        
         keyPressEvent - if not None, a reference to a function that
                         accepts a keyEvent arg and 
+        
         axData -        if not None, a reference to a class instance method 
                         that attaches a reference to ax instance of a fig 
-
-        TODOS
-            [ ] do a second plot plt.scatter() ?
-            [ ] title uses spaceDefined / spaceTotal inputs
+            
     '''
     
     plt.close()     #reset from previous interactive
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     
     ax = fig.add_subplot(111, projection='3d')
     
-    if ((len(viewPoisitonDefined.keys()) > 0) and
+    #set view position
+    if ((len(viewPositionDefined.keys()) > 0) and
         bInitPosition):
     
-        ax.view_init(azim = viewPoisitonDefined.get('azimuth')
-                    ,elev = viewPoisitonDefined.get('elevation')
+        ax.view_init(azim = viewPositionDefined.get('azimuth')
+                    ,elev = viewPositionDefined.get('elevation')
         )
         
-    ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors, marker='o')
+    #single scatter
+    if ((listB is not None) and (listG is not None) and (listR is not None)):
+        
+        ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors, marker='o')
 
-    clrKey = {'tp': 'green', 'fp': 'yellow', 'fn': 'red'}
     
-    if len(dictData.keys()) > 0:
-        for _k in dictData.keys():
-            ax.scatter( *dictData[_k] 
+    #multi-scatter: confusion matrix
+    if len(confData.keys()) > 0:
+
+        clrKey = OrderedDict({'tp': 'green', 'fp': 'yellow', 'fn': 'red', 'tn':'blue'})
+
+        for _k in clrKey.keys():
+        
+            ax.scatter( *confData[_k] 
                         ,marker = 'o'
                         ,c = clrKey.get(_k, 'red') 
                         )
+        
 
+    #thresh volume plotting
     if regionMarkers is not None:
         ax.scatter(xs=regionMarkers[0], ys=regionMarkers[1], zs=regionMarkers[2], 
                     c='black', marker='^')
 
+    #keypress utils
     if axData is not None:
         axData(ax)
 
     if keyPressFunc is not None:
         fig.canvas.mpl_connect('key_press_event', keyPressFunc)
 
-    
+    #set viewable space
     if spaceTotal and len(spaceDefined.keys()) == 0:
         ax.set_xlim3d(0, 255)
         ax.set_ylim3d(0, 255)
@@ -483,8 +513,14 @@ def colorCube(listB, listG, listR
         if spaceDefined.get('z', None) is not None:
             ax.set_zlim3d(spaceDefined['z'])
         
-    if regionMarkers is not None:
-        pass        #TODO
+    #formatting
+    if bLegend:
+        legendArgs = []
+        if (confData.keys() > 0):
+            legendArgs += [str.upper(k) for k in clrKey.keys()]
+        if (regionMarkers is not None):
+            legendArgs += ['thresh-volume']
+        plt.legend(legendArgs)
 
     ax.set_xlabel('B')
     ax.set_ylabel('G')
@@ -522,7 +558,7 @@ class SubprocColorCube:
                 ,listG = None
                 ,listR = None
                 ,listColors = None
-                ,dictData = {}
+                ,confData = {}
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
@@ -536,7 +572,7 @@ class SubprocColorCube:
         self.listG = listG
         self.listR = listR
         self.listColors = listColors
-        self.dictData = dictData
+        self.confData = confData
         self.spaceTotal = spaceTotal
         self.spaceDefined = spaceDefined
         self.regionMarkers = regionMarkers
@@ -607,13 +643,13 @@ class SubprocColorCube:
     def plot(self, bInitPosition=True, bInteractive=False):
         ''' invoke the colorCube function '''
         
-        viewPoisitonDefined = {}
+        viewPositionDefined = {}
         keyPressSubproc = None
         setAxData = None
 
         if bInitPosition:
-            viewPoisitonDefined['azimuth'] = self.azimuth
-            viewPoisitonDefined['elevation'] = self.elevation
+            viewPositionDefined['azimuth'] = self.azimuth
+            viewPositionDefined['elevation'] = self.elevation
             
         if bInteractive:
             keyPressSubproc =  self.keyPressSubproc
@@ -624,10 +660,10 @@ class SubprocColorCube:
                  ,listG = self.listG
                  ,listR = self.listR
                  ,listColors = self.listColors
-                 ,dictData = self.dictData
+                 ,confData = self.confData
                  ,spaceTotal = self.spaceTotal
                  ,spaceDefined = self.spaceDefined
-                 ,viewPoisitonDefined  = viewPoisitonDefined
+                 ,viewPositionDefined  = viewPositionDefined
                  ,bInitPosition = bInitPosition
                  ,regionMarkers = self.regionMarkers
                  ,keyPressFunc=keyPressSubproc
@@ -664,11 +700,11 @@ class SubprocColorCube:
 
 
 def subprocColorCube(
-                 listB
-                ,listG
-                ,listR
+                 listB = None
+                ,listG = None
+                ,listR = None
                 ,listColors = None
-                ,dictData = {}
+                ,confData = {}
                 ,spaceTotal = True
                 ,spaceDefined = {}
                 ,regionMarkers = None
@@ -683,7 +719,7 @@ def subprocColorCube(
                 ,listG = listG
                 ,listR = listR
                 ,listColors = listColors
-                ,dictData = dictData
+                ,confData = confData
                 ,spaceTotal = spaceTotal
                 ,spaceDefined = spaceDefined
                 ,regionMarkers = regionMarkers
