@@ -3,15 +3,59 @@
 12/11
 
     [x] --dbpathfn used, how does it work with colorcub-gallery.ipynb?
-    [ ] document the flag in commands.txt
-    [ ] document the flag in class definition
-    [ ] commit the gallery-1 and associated data
+    [x] document the flag in commands.txt
+    [x] document the flag in class definition
+    [x] commit the gallery-1 and associated data
     [ ] bug: SubprocColorCube can not load old interproc_colorcube.db data when class
         elements have been changed like addition on dictData as an arg
-    [ ] modularize the regionmarkers
-    [ ] make colorcube-gallery-2
+    [x] modularize the regionmarkers
+    [x] make colorcube-gallery-2
     [ ] colorcube gallery, get a few figures in there:
-        [ ] add FP/FN color markers
+        [x] replicate existing red/blue disnction
+        [x] add FP/FN color markers
+        [x] modularize function
+        [ ] multiple balls (from multiple frames) 
+            [ ] far away and close
+    [ ] modularize plotting a confusion matrix
+    [ ] allow multiplot grids; use tk.save()?
+    [ ] definedVolume near where the 3 key metrics are:
+        [ ] CI for each of the three masses
+    [ ] colorCube can set
+    [ ] make in-notebook plot larger
+    [ ] add color legend
+    
+    [x] build basic numpy operators
+        [x] use cv2.bitwise_and(mask1, mask2)
+        [x] build modularized functions for tp/tn/fp/fn
+
+        https://stackoverflow.com/questions/44865023/circular-masking-an-image-in-python-using-numpy-arrays
+
+    [ ] build PixelConfusionMatrix class
+        [x] does calculation of threshold
+        [x] accepts new threshes, new images, new masks
+        [x] outputs in machine readable form
+        [ ] output in human readable form
+        [ ] roc over threshold
+            [ ] how to make expanding threshold 1-dimensional?
+
+    [ ] slice the colorCube diagonally
+        [ ] can do a cubic fill
+        [ ] timeit function
+        [ ] how can we do it elegantly?
+        [ ] use solids on 3d plot, to easily filter
+        [ ] can use sklearn type segmentation algo's
+
+    [ ] use iterThresh with the colorCube
+
+    [ ] contours historgram
+
+    [ ] repairA appears wrong: erode and dilate should run in a loop, not
+        one before the other.
+
+    [ ] explore hsv
+
+    [ ] add all this stuff to a PolicyManagement module with training+iterThresh
+
 
     
 
@@ -47,7 +91,7 @@
 
     Todo
 
-        [ ] move regionMarkers hfunctions into module
+        [x] move regionMarkers hfunctions into module
         [ ] multiple balls (from multiple frames) 
         [ ] plot with dif markers
             [ ] 1: thresh-in / thresh-out

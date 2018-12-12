@@ -2,6 +2,7 @@ import sys, copy, random, subprocess, time
 import pickle
 import cv2
 import numpy as np
+from itertools import combinations
 from Interproc import DBInterface
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -189,6 +190,162 @@ class EvalTracker:
         '''
         pass
 
+class PixelConfusionMatrix:
+
+    ''' build a confusion matrix for individual pixesl using:
+            within pixel threshold value (positive's) 
+            known circle location (true's) 
+            their negation (~ operator) are negative's and false's respectively
+    '''
+    
+    def __init__(self, **kwargs):
+        
+        self.img = kwargs.get('img', None)
+        self.thresh = kwargs.get('thresh', None)
+        self.circle = kwargs.get('circle', None)
+
+        self.circleMask = None
+        self.threshMask = None
+        
+        self.tpMask = None
+        self.fpMask = None
+        self.tnMask = None
+        self.fnMask = None
+
+        self.tpPix = None
+        self.fpPix = None
+        self.tnPix = None
+        self.fnPix = None
+        
+        self.n = None
+
+        self.t = None
+        self.f = None
+        self.p = None
+        self.n = None
+
+        self.tp = None
+        self.fp = None
+        self.tn = None
+        self.fn = None
+
+        # for near the circle
+        self.psuedoCircleMask = None
+        self.pseudoFp = None
+        self.pseudoFn = None
+
+    def setImg(self, img):
+        self.img = img.copy()
+
+    def setThresh(self, thresh):
+        self.thresh = thresh
+
+    def setCircle(self, scoreRect):
+        self.circle = scoreRect
+
+    def buildMasks(self):
+        
+        self.circleMask = self.buildCircularMask(
+                                 self.img.shape[1]
+                                ,self.img.shape[0]
+                                ,*self.circleCenter(self.circle)
+                                )
+
+        self.threshMask = self.buildThreshMask()
+
+    def calc(self):
+
+        assert ((self.img is not None) and
+                (self.thresh is not None) and
+                (self.circle is not None)
+               )
+
+        self.buildMasks()
+        
+        self.tpMask = np.bitwise_and(self.threshMask, self.circleMask)
+        self.fpMask = np.bitwise_and(self.threshMask, ~self.circleMask)
+        self.tnMask = np.bitwise_and(~self.threshMask, ~self.circleMask)
+        self.fnMask = np.bitwise_and(~self.threshMask, self.circleMask)
+
+        self.tpPix = self.img[self.tpMask]
+        self.fpPix = self.img[self.fpMask]
+        self.tnPix = self.img[self.tnMask]
+        self.fnPix = self.img[self.fnMask]
+
+        self.n = self.img.shape[0] * self.img.shape[1]
+
+        self.t = sum(sum(self.circleMask))
+        self.f = (self.circleMask.shape[0] * self.circleMask.shape[1]) - self.t
+
+        self.p = sum(sum(self.threshMask))
+        self.n = (self.threshMask.shape[0] * self.threshMask.shape[1]) - self.p
+
+        self.tp = self.tpPix.shape[0]
+        self.fp = self.fpPix.shape[0]
+        self.tn = self.tnPix.shape[0]
+        self.fn = self.fnPix.shape[0]
+
+
+    def getData(self):
+        ''' data: list of the 3-ples; pixel data in each category '''
+        ret = {}
+
+        ret['tp'] = self.tpPix.copy()
+        ret['fp'] = self.fpPix.copy()
+        ret['tn'] = self.tnPix.copy()
+        ret['fn'] = self.fnPix.copy()
+
+        return ret
+
+    def getVals(self, bN = True):
+        ''' val: int; of the number of pixels in each category '''
+        ret = {}
+        
+        ret['tp'] = self.tp if bN else float(self.tp) / float(self.n)
+        ret['fp'] = self.fp if bN else float(self.fp) / float(self.n)
+        ret['tn'] = self.tn if bN else float(self.tn) / float(self.n)
+        ret['fn'] = self.fn if bN else float(self.fn) / float(self.n)
+
+        ret['n'] = self.n if bN else 1.0
+
+        ret['t'] = self.t if bN else float(self.t) / float(self.n)
+        ret['f'] = self.f if bN else float(self.f) / float(self.n)
+        ret['p'] = self.p if bN else float(self.p) / float(self.n)
+        ret['n'] = self.n if bN else float(self.n) / float(self.n)
+
+        return ret
+
+    def displayVals(self, bN = True, places = 6):
+        ''' printout a human readable display with formatting '''
+        vals = self.getVals(bN = bN)
+
+        #some formatting thing....        
+
+
+    def buildThreshMask(self):
+        #TODO - replace cv2.inRange with numpy function
+        return np.array(
+                        cv2.inRange(self.img, self.thresh[0], self.thresh[1])
+                        ,dtype='bool'
+                        )
+
+    @staticmethod
+    def circleCenter(rect):
+        _x,_y,_dx,_dy = rect
+        x = _x + int(_dx/2)
+        y = _y + int(_dy/2)
+        r = min(int(_dx/2),int(_dy/2))
+        return x,y,r
+
+    @staticmethod
+    def buildCircularMask(w, h, x, y, r):
+        Y, X = np.ogrid[:h, :w]
+        distFromCenter = np.sqrt((X - x)**2 + (Y - y)**2)
+        mask = distFromCenter <= r
+        return mask
+
+
+
 # Data Prep Helper Func's for colorCube -------------------
 
 def imgToColors(img, sampleN = None):
@@ -293,9 +450,14 @@ def colorCube(listB, listG, listR
         
     ax.scatter(xs=listB, ys=listG, zs=listR, c=listColors, marker='o')
 
+    clrKey = {'tp': 'green', 'fp': 'yellow', 'fn': 'red'}
+    
     if len(dictData.keys()) > 0:
         for _k in dictData.keys():
-            ax.scatter(*dictData[_k], c = 'red' ,marker = _k)
+            ax.scatter( *dictData[_k] 
+                        ,marker = 'o'
+                        ,c = clrKey.get(_k, 'red') 
+                        )
 
     if regionMarkers is not None:
         ax.scatter(xs=regionMarkers[0], ys=regionMarkers[1], zs=regionMarkers[2], 
@@ -499,9 +661,6 @@ class SubprocColorCube:
         else:
             print '%s :command not recognized.' % event.key
 
-        
-    
-        
 
 
 def subprocColorCube(
@@ -536,6 +695,93 @@ def subprocColorCube(
     #PROBLEM: matplotlib doesn't output when called from jupyter
         # running subprocess calling colorCube
         # <Figure size 640x480 with 1 Axes>
+
+# colorcube helpers like regionMarkers --------------
+
+def threshToCorners(threshLo, threshHi):
+    ''' output 8 3-ples from input 2 3-ples'''
+    
+    ret = []
+    threshes = [list(threshLo)]
+    threshes.append(list(threshHi))
+    
+    for _x in range(2):
+        for _y in range(2):
+            for _z in range(2):
+                
+                    x = threshes[_x][0]
+                    y = threshes[_y][1]
+                    z = threshes[_z][2]
+                    
+                    ret.append((x,y,z))
+                    
+    return ret
+
+def pointsToList(points):
+    ''' slices list of points into respective x,y,z value lists for input to plot()
+        input: list of 3-ples, corresponding to points in color-space
+        output: list (of length-3) of lists (of length=input-list-length),
+                corresponding to 
+        [(10,10,20), (20,20,0)] -> [[10,20],[10,20], [20,0]]
+    '''
+    return [[point[clr] for point in points] for clr in range(3)]
+
+def cornersToCornerSets(corners):
+    ''' input: list 
+    
+    '''
+    cornerSets = (
+        filter(lambda cornerSet: 2 == sum( [ 
+                                    int((cornerSet[0][elem] - cornerSet[1][elem]) == 0)
+                                    for elem in range(3)
+                                    ])
+            , [x for x in combinations(corners, 2)]
+        )
+    )
+    return cornerSets
+
+def cornerSetsToEdges(cornerSets, stepAmt = 5):
+    ''' build a marker for each point along region edge at stepAmt intervals 
+        input: list of 2-ples of 3-ples (corresponding 3D points)
+        ouput: list of 3-ples (corresponding to all points on the edges)
+    '''
+
+    regionEdges = []
+
+    for cornerSet in cornerSets:
+        
+        ind_step = [0 == (cornerSet[0][clr] - cornerSet[1][clr]) for clr in range(3)].index(False)
+        
+        step_lo = min(cornerSet[0][ind_step], cornerSet[1][ind_step])
+        step_hi = max(cornerSet[0][ind_step], cornerSet[1][ind_step])
+        
+        inds_hold = [clr for clr in range(3) if clr != ind_step]
+        
+        for _step in range(step_lo, step_hi, stepAmt):
+            
+            _point = [0,0,0]
+            
+            for _hold in inds_hold:
+                _point[_hold] = cornerSet[0][_hold]
+                
+            _point[ind_step] = _step
+            
+            regionEdges.append(_point)            
+
+    return regionEdges
+
+def threshToEdges(threshLo, threshHi, stepAmt = 5):
+    ''' return edges of region from a threshold value; still need to convert
+        3-ples with pointsToList() 
+    '''
+    return  cornerSetsToEdges(
+                cornersToCornerSets(
+                    threshToCorners(threshLo, threshHi)
+                )
+                ,stepAmt = stepAmt
+            )
+
+     
 
 
 
