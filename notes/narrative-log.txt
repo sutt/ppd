@@ -1,3 +1,12 @@
+11/25
+
+random thought:
+i'm interested in Diagnostic Information Engineering - not data engineering where overall volume is the goal - but figuring out what to look at and how to organize your workflow around key metrics and views
+
+11/22
+
+random thought on NN's:
+NN's perfrom well in domains - like NLP, sound processing, img processing - where the concept of a probability distribution function is not realistic (too much dimensionality, no good prior, etc...). Chomsky has written on this in terms of language with "orange dreams furiously" as a point on a pdf or the "what is happening outside the physics dept's window" thought experiment. I beleive there is no first priciples way to build a confidence interval from scoring on an NN model, only to build a true holdout dataset and evaluate the trained model against it. In contrast classic stats has CI fromulas galroe, e.g Bufferoni CI for regression parameters. Since classical statistics is obsessed with pdf's, it's not surprising that domains that "lacked" this feature (or where it was inappropriately shoe-horned) and much more perfrormant when discarding it.
 
 11/21
 
