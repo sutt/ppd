@@ -14,7 +14,7 @@ from modules.Utils import MetaDataLog
 
 from modules.ImgUtils import (crop_img, filter_pixels_circle
                              ,pixlist_to_pseduoimg)
-from modules.ImgProcs import (threshA, transformA, repairA)
+from modules.ImgProcs import (threshA, transformA, repairA, threshMultiOr)
 from modules.TrackA import (find_xy, find_radius)
 
 from modules.IterThresh import iterThreshA
@@ -39,6 +39,8 @@ class TrackFactory:
         self.currentTrackScore = ScoreSchema()
 
         self.threshInitial = [ (0,0,0), (255,255,255) ]
+
+        self.threshes = []
 
         self.declaredBallColor = ""
 
@@ -65,6 +67,9 @@ class TrackFactory:
         
         if self.declaredBallColor == "green":
             self.threshInitial = [ (29, 86, 6), (64, 255, 255) ]
+
+            self.threshes.append(tuple(self.threshInitial))
+            self.threshes.append(((20, 60, 6),(40, 255, 255)))
 
         if self.declaredBallColor == "orange":
             self.threshInitial = [ (0, 96, 192), (88, 232, 255) ]
@@ -232,6 +237,8 @@ class TrackFactory:
         self.combine_threshes(self.trainingThreshes)
         
         self.threshInitial = (tuple(map(int, _lo)), tuple(map(int,_hi)))
+
+        #TODO - update self.threshes, if necessary
         
 
     def setTrackTimer(self, bTrackTimer):
@@ -250,6 +257,7 @@ class TrackFactory:
                         ,repair_iterations=None
                         ,thresh_lo=None
                         ,thresh_hi=None
+                        ,threshes=None
                         ):
         
         if tracking_blur is not None:
@@ -264,6 +272,9 @@ class TrackFactory:
         if thresh_hi is not None:
             self.threshInitial[1] = tuple(thresh_hi)
 
+        if threshes is not None:
+            self.threshes = copy.copy(threshes)
+
     
     def getTrackParams(self):
         
@@ -273,6 +284,7 @@ class TrackFactory:
         params['repair_iterations'] = self.tp_repair_iterations
         params['thresh_lo'] = self.threshInitial[0]
         params['thresh_hi'] = self.threshInitial[1]
+        params['threshes'] = copy.copy(self.threshes)
 
         return params
 
@@ -297,6 +309,8 @@ class TrackFactory:
 
         thresh_lo = self.threshInitial[0]
         thresh_hi = self.threshInitial[1]
+
+        threshes = copy.copy(self.threshes)
 
         if self.bTrackTimer:
             t0 = time.time()
@@ -325,6 +339,15 @@ class TrackFactory:
                         # ,objEnum = 0
             )
 
+        elif self.tp_trackAlgoEnum == 2:
+            
+            ret = self.trackMultiThresh1(
+                         tracking_blur = tracking_blur
+                        ,repair_iterations = repair_iterations
+                        ,threshes = threshes
+                        ,b_log = b_log
+                        # ,objEnum = 0
+            )
         else:
             print 'trackAlgoEnum not recognized'
 
@@ -456,6 +479,74 @@ class TrackFactory:
         img_mask = threshA(  img_t 
                             ,threshLo = thresh_lo   
                             ,threshHi = thresh_hi ) 
+
+        if img_mask.sum() != 0:
+
+            if repair_iterations > 0:
+                img_repair = repairA(img_mask, iterations = repair_iterations)
+                img_terminal = img_repair
+            else:
+                img_terminal = img_mask
+
+            x,y = find_xy(img_terminal)
+            radius = find_radius(img_terminal)
+                    
+            if radius > 0:
+                
+                self.currentTrackSuccess = True
+
+                self.currentTrackScore.addCircle(
+                                            self.circleToRect((x,y,radius))
+                                            ,objEnum=0   
+                                        )
+            else:
+                self.currentTrackSuccess = False
+                self.currentTrackScore.reset()
+
+        if b_log:
+            
+            keys = ['img_t','img_mask','img_repair', 'img_terminal',
+                    'xy', 'radius', 'scoreCircle']
+            data = OrderedDict()
+            for k in keys:
+                data[k] = None
+
+            data['img_t'] = img_t
+            data['img_mask'] = img_mask
+            
+            if img_mask.sum() != 0:
+                data['img_terminal'] = img_terminal
+                data['xy'] = (x,y)
+                data['radius'] = radius
+                if repair_iterations > 0:
+                    data['img_repair'] = img_repair
+                if radius > 0:
+                    data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
+            
+            return data
+
+    def trackMultiThresh1(self
+                    ,tracking_blur
+                    ,repair_iterations
+                    ,threshes
+                    ,b_log = False
+                    ):
+        '''
+            trackMultiThresh1:
+
+                Evolved from trackDemoNew; uses multiple thresh intervals
+                
+            questions / todos:
+
+                [ ] multiple threshes
+
+        '''
+
+        img_t = transformA(self.currentFrame.copy(), tracking_blur)
+        
+        img_mask = threshMultiOr(  img_t 
+                                  ,threshes = threshes
+                                ) 
 
         if img_mask.sum() != 0:
 

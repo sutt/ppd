@@ -1,5 +1,10 @@
 #Tasks
 
+12/13
+
+    [x] multi-OR-thresh in tracker
+    [ ] human readable confusion output
+
 12/11 - 12/12
 
     [x] --dbpathfn used, how does it work with colorcub-gallery.ipynb?
@@ -14,14 +19,14 @@
         [x] replicate existing red/blue disnction
         [x] add FP/FN color markers
         [x] modularize function
-        [ ] multiple balls (from multiple frames) 
-            [ ] far away and close
+        [x] multiple balls (from multiple frames) 
+            [x] far away and close
     [x] modularize plotting a confusion matrix
     [ ] allow multiplot grids; use tk.save()? pass in a global plt to separate functions?
-    [ ] definedVolume near where the 3 key metrics are:
-        [ ] CI for each of the three masses
+    [~] definedVolume near where the 3 key metrics are:
+        [~] CI for each of the three masses
     [x] make in-notebook plot larger
-    [ ] decrease whitespace
+    [~] decrease whitespace
     [x] add color legend
     [ ] build preplanned azimuth/elevation tuples 
         [ ] function that does of each, horizontally

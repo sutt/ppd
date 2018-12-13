@@ -17,6 +17,18 @@ def transformA(img, blur = 11, b_hsv = False):
 
 def threshA(img, threshLo = (0,0,0), threshHi = (255,255,255)):
     return cv2.inRange(img, threshLo, threshHi)
+
+def threshMultiOr(img, threshes = []):
+    
+    fullMask = np.array(np.zeros(shape = img.shape[:2]), dtype='bool')
+
+    for _thresh in threshes:
+
+        _mask = np.array(cv2.inRange(img, _thresh[0], _thresh[1]), dtype='bool')
+                
+        fullMask = np.bitwise_or(fullMask, _mask)
+    
+    return np.array(fullMask, dtype='uint8')
     
 def repairA(img, iterations = 2):
     img = cv2.erode(img, None, iterations=iterations)
