@@ -2,6 +2,8 @@ import sys, copy, random, subprocess, time
 import pickle
 import cv2
 import numpy as np
+import io
+from PIL import Image
 from collections import OrderedDict
 from itertools import combinations
 from Interproc import DBInterface
@@ -311,7 +313,7 @@ class PixelConfusionMatrix:
         ret['tn'] = self.tn if bN else float(self.tn) / float(self.N)
         ret['fn'] = self.fn if bN else float(self.fn) / float(self.N)
 
-        ret['N'] = self.n if bN else 1.0
+        ret['N'] = self.N if bN else 1.0
 
         ret['t'] = self.t if bN else float(self.t) / float(self.N)
         ret['f'] = self.f if bN else float(self.f) / float(self.N)
@@ -322,9 +324,33 @@ class PixelConfusionMatrix:
 
     def displayVals(self, bN = True, places = 6):
         ''' printout a human readable display with formatting '''
+        
         vals = self.getVals(bN = bN)
 
-        #some formatting thing....        
+        #build output matrix
+        data = [
+                 [vals['N'], vals['t'],  vals['f']]
+                ,[vals['p'], vals['tp'], vals['fp']]
+                ,[vals['n'], vals['tn'], vals['fn']]
+               ]
+
+        #rounding
+        if not(bN):
+            data = map(lambda x: 
+                        map(lambda y: 
+                            y if isinstance(y, str) else round(y, places)
+                        ,x)
+                    ,data)
+
+        colsList = [" ", "True", "False"]
+        rowsList = [" ", "Positive", "Negative"]
+
+        #printout
+        rowFormat ="{:>15}" * (len(colsList) + 1)
+        print rowFormat.format("", *colsList)
+        
+        for header, row in zip(rowsList, data):
+            print rowFormat.format(header, *row)
 
 
     def buildThreshMask(self):
@@ -368,8 +394,50 @@ class PixelConfusionMatrix:
         return mask
 
 
-
 # Data Prep Helper Func's for colorCube -------------------
+
+def buildConfusionData(gs, inputThreshes, N = 1000):
+    ''' input:  gs             [guiview-state object]
+                inputThreshes  [list of (2ple of 3ples)]
+        
+        returns: pixelconfusionmatrix obj
+    '''
+
+    _img = gs.getOrigFrame()
+    _circle = gs.displayOutputScore['0']['data']
+    _threshes = inputThreshes
+
+    pcm = PixelConfusionMatrix( img = _img
+                               ,threshes = _threshes
+                               ,circle = _circle
+                              )
+
+    pcm.calc()
+
+    return pcm
+
+
+def buildConfusionPlotData(pcm, N = 1000):
+    ''' input:  pcm           [PixelConsusionMatrix object]
+                N             [int] - max sample amount
+        
+        returns: plotData [dict] with 4 entries from confusion mat
+                                  with 3 channel int lists
+    '''
+
+    cm = pcm.getData()
+
+    metrics = ['tp', 'fp', 'fn', 'tn']
+    plotData = {}
+
+    for metric in metrics:
+        _data = cm[metric]
+        plotData[metric] = pointsToList(
+                        random.sample(_data, min(len(_data), N))
+                         )
+    return plotData
+
+
 
 def imgToColors(img, sampleN = None):
     '''
@@ -434,6 +502,8 @@ def colorCube(  listB = None
                ,figsize = (10,10)
                ,bLegend = False
                ,title = None
+               ,b_single = True
+               ,b_save = False
                ,keyPressFunc = None
                ,axData = None
               ):
@@ -476,13 +546,14 @@ def colorCube(  listB = None
                         that attaches a reference to ax instance of a fig 
             
     '''
-    
+        
     plt.close()     #reset from previous interactive
-    
+
     fig = plt.figure(figsize=figsize)
-    
+
     ax = fig.add_subplot(111, projection='3d')
-    
+
+
     #set view position
     if ((len(viewPositionDefined.keys()) > 0) and
         bInitPosition):
@@ -530,11 +601,11 @@ def colorCube(  listB = None
         
     if len(spaceDefined.keys()) > 0:
         if spaceDefined.get('x', None) is not None:
-            ax.set_xlim3d(spaceDefined['x'])
+            ax.set_xlim3d(*spaceDefined['x'])
         if spaceDefined.get('y', None) is not None:
-            ax.set_ylim3d(spaceDefined['y'])
+            ax.set_ylim3d(*spaceDefined['y'])
         if spaceDefined.get('z', None) is not None:
-            ax.set_zlim3d(spaceDefined['z'])
+            ax.set_zlim3d(*spaceDefined['z'])
         
     #formatting
     if bLegend:
@@ -552,9 +623,37 @@ def colorCube(  listB = None
     if title is not None:
         ax.set_title(title)
 
-    plt.show()
+    if b_save:
 
-    
+        # output a saved png image
+        
+        # f = fig.gcf()
+        # DefaultSize = f.get_size_inches()
+        # print DefaultSize
+        # fig.set_fig_size()
+        # f.set_figsize_inches( (DefaultSize[0]*2, DefaultSize[1]*2) )
+        
+        # plt.axis('off')
+        # plt.axes.get_xaxis().set_visible(False)
+        # plt.axes.get_yaxis().set_visible(False)
+
+        # fig.savefig(buf, format = 'png', bbox_inces='tight', pad_inches=0)
+        
+        buf = io.BytesIO()
+        # fig.savefig(buf, format = 'png', dpi = 200)
+        fig.savefig(buf, format = 'png', dpi = 'figure')
+        buf.seek(0)
+        ret = buf.read()
+        buf.close()
+        
+        plt.close(fig)
+
+        return ret
+
+    else:
+
+        plt.show()
+
 
     
 
@@ -843,8 +942,97 @@ def threshToEdges(threshLo, threshHi, stepAmt = 5):
                 ,stepAmt = stepAmt
             )
 
+def buildRegionMarkers(threshes, stepAmt = 10):
+    ''' return the volume edges for [multiple] thresh volumes
+        as a 3-channel list of int's. '''
+
+    regionMarkers = [[],[],[]]
+
+    for _thresh in threshes:
+    
+        volume_i = pointsToList(
+                        threshToEdges(
+                                _thresh[0]
+                                ,_thresh[1]
+                                ,stepAmt = stepAmt
+                        )
+        )
+
+        if len(volume_i[0]) > 0:
+            
+            for clr in range(len(regionMarkers)):
+                regionMarkers[clr].extend(volume_i[clr])
+    
+    return regionMarkers
+
+
+# multi-plotting helper functions -------
+
+def confusionPlotByImage( listGS
+                         ,inputThresh
+                         ,N = 1000
+                         ,viewPositionDefined = {}
+                         ,regionStepAmt = 10
+                         ,figsize = (10,10)
+                        ):
+    ''' across each guiview-state, plot a color cube
+    
+        thresh held constant
+
+        input a list og GS's, and a constant threshold
+
+        TODO - make inputThresh multi-thresh
+    '''
+    
+    for _gs in listGS:
+        
+        _plotData = buildConfusionData(_gs, inputThresh)
+        
+        _regionMarkers = buildRegionMarkers([inputThresh])
+        
+        _title = 'frame ' + str(_gs.frameCounter)
+        
+        colorCube( confData = _plotData
+                  ,regionMarkers = _regionMarkers
+                  ,title = _title
+                  ,viewPositionDefined = viewPositionDefined
+                  ,bInitPosition = True
+                  ,figsize = figsize
+                 )
      
 
+def confusionPlotByViews(    
+                    confusionData
+                    ,threshes
+                    ,title=""
+                    ,regionStepAmt = 10
+                    ,figsize = (10,10)
+                    ):
+    ''' plot 3 different views of the same color cube '''
+    
+    views = [
+         ('green+blue' , {'azimuth': -81, 'elevation': 95})
+        ,('green+red'  , {'azimuth': -166,'elevation': -3.57})
+        ,('red+blue'   , {'azimuth': 81,  'elevation': 145})
+    ]
+
+    # other views to use
+    # ('red+green' , {'elevation':12, 'azimuth': -178})
+    # ('blue_green',  {'azimuth':89,'elevation': -115})
+    
+    _regionEdges = buildRegionMarkers(threshes, stepAmt = regionStepAmt) 
+    
+    for _view in views:
+    
+        _title = _view[0] + str(title)
+    
+        colorCube( confData = confusionData 
+                  ,viewPositionDefined = _view[1]
+                  ,title = _title
+                  ,regionMarkers = _regionEdges
+                  ,bInitPosition = True
+                  ,figsize = figsize
+                 )
 
 
 def multiPlot(list_list_imgs
@@ -852,7 +1040,10 @@ def multiPlot(list_list_imgs
               ,input_transform_titles = None
               ,input_frame_titles = None
               ,input_figure_title = None
-              ,figsize = (10,10)            
+              ,figsize = (10,10)  
+              ,hspace = 0.3
+              ,wspace = 0.3
+              ,bGrid = True          
              ):
     '''
         output an N x M array of images
@@ -868,7 +1059,7 @@ def multiPlot(list_list_imgs
     '''
     
     w = len(list_list_imgs)
-    h = len(list_list_imgs[0])     
+    h = len(list_list_imgs[0])  
     
     b_multiline = False
     if (h > 1) and (w > 1):
@@ -876,7 +1067,8 @@ def multiPlot(list_list_imgs
     
     fig, ax = plt.subplots(h,w, figsize=figsize)
     
-    fig.subplots_adjust(hspace=0.3)
+    fig.subplots_adjust(hspace=hspace)
+    fig.subplots_adjust(wspace=wspace)
     
     if input_figure_title is not None:
         fig.suptitle(input_figure_title)
@@ -884,6 +1076,8 @@ def multiPlot(list_list_imgs
     for h_i in range(h):
         for w_i in range(w):
             
+            plt.box(False)
+
             if list_list_imgs[w_i][h_i] is None:
                 continue
                 
@@ -904,7 +1098,12 @@ def multiPlot(list_list_imgs
             if input_frame_titles is not None:
                 if (not(b_multiline) or h_i == 0) :
                     _ax.set_title(input_frame_titles[w_i])
-    
+
+            if not(bGrid):
+                _ax.tick_params(axis='x', colors=(0,0,0,0))
+                _ax.tick_params(axis='y', colors=(0,0,0,0))
+                _ax.axis('off')
+
     plt.show()
 
 

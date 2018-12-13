@@ -3,7 +3,15 @@
 12/13
 
     [x] multi-OR-thresh in tracker
-    [ ] human readable confusion output
+    [x] human readable confusion output
+    [x] preplanned azim/elev slices + function
+        [x] gonna involve multi-img plotting
+        [x] modularize regionMarkers function
+    
+    5:00
+        [ ] cleanup and commit work
+        [ ] iterThresh debug gallery
+        [ ] output all states with a certain condition
 
 12/11 - 12/12
 
@@ -43,14 +51,14 @@
         [x] does calculation of threshold
         [x] accepts new threshes, new images, new masks
         [x] outputs in machine readable form
-        [ ] output in human readable form
+        [x] output in human readable form
         [ ] roc over threshold
             [ ] how to make expanding threshold 1-dimensional?
 
-    [ ] add a second or-thresh
+    [x] add a second or-thresh
         [x] view in colorcube
         [x] apply to confusion matrix module
-        [ ] apply to tracker
+        [x] apply to tracker
         [x] multi-thresh: bitwise_or
 
     [ ] slice the colorCube diagonally
