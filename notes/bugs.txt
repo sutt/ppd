@@ -1,5 +1,49 @@
 #Tasks
 
+
+
+12/14
+
+    [x] verify interactive graph still works
+    
+    [ ] iterThresh debug gallery
+
+        [x] build dataset
+            [x] build some output states similiar to trainingSteps
+            [x] get the close out of range too
+            [x] get an orange ball too
+            [x] build output state db; should have displayInputScore
+                [x] how to get pseudo-zoomWindow based on scoreDisplay?
+            [x] repeat score->output with orange ball for interproc4.db
+
+        [x] commit these bug fix: multiPlot, interProc, tracker, buildConfusionData
+        
+        [ ] iterThresh stepwise + update regionMarkers
+
+    [ ] output all states with a certain condition
+        guiview --filter-condition=
+        this could be like test_enum 7 where all class go into an interface
+        then check for conditions on those elems
+
+    Mop-ups:
+
+        [ ] use mutliplot with mutli colorplots using 
+            biggerPic() is cc-gallery-3.ipynb
+        [ ] need pseudo-FP, pseudo-FN where the "True Circle"
+            is 2 smaller / larger respectively
+        [~] bug guiview: scoreDisplay is not n/a when trackSucess=False
+            - best way to view on the fly tracking misses is with 
+              'annotate obj' turned on, so you see the number dissapear
+        [x] bug guiview-state: zoomWindow doesn't work on 1280p
+        [x] bug applyTracker(): need to reset tracker each iteration;
+            this could be related to the bug above; NOT COMPLETELY
+            is this why oct20/output4 is now "solved" for all frames? YES - actually it's "unsolved"
+        [ ] bug guiview: the score rect's are "off", how did that occur?
+             - maybe via going back frames while recording them?
+             - maybe because we're skipping first ~18 frames from beginning
+                and thus they're lagged behind?
+             - as seen on dec14/output6.proc1.avi frame 78 and further
+             - can this be corrected in reprocessing for now?
 12/13
 
     [x] multi-OR-thresh in tracker
@@ -9,9 +53,8 @@
         [x] modularize regionMarkers function
     
     5:00
-        [ ] cleanup and commit work
-        [ ] iterThresh debug gallery
-        [ ] output all states with a certain condition
+        [x] cleanup and commit work
+
 
 12/11 - 12/12
 

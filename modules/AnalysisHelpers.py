@@ -396,7 +396,7 @@ class PixelConfusionMatrix:
 
 # Data Prep Helper Func's for colorCube -------------------
 
-def buildConfusionData(gs, inputThreshes, N = 1000):
+def buildConfusionData(gs, inputThreshes, N = 1000, bOutputScore = True):
     ''' input:  gs             [guiview-state object]
                 inputThreshes  [list of (2ple of 3ples)]
         
@@ -404,8 +404,12 @@ def buildConfusionData(gs, inputThreshes, N = 1000):
     '''
 
     _img = gs.getOrigFrame()
-    _circle = gs.displayOutputScore['0']['data']
     _threshes = inputThreshes
+
+    if bOutputScore:
+        _circle = gs.displayOutputScore['0']['data']
+    else:
+        _circle = gs.displayInputScore['0']['data']
 
     pcm = PixelConfusionMatrix( img = _img
                                ,threshes = _threshes
@@ -974,6 +978,7 @@ def confusionPlotByImage( listGS
                          ,viewPositionDefined = {}
                          ,regionStepAmt = 10
                          ,figsize = (10,10)
+                         ,bOutputScore = True
                         ):
     ''' across each guiview-state, plot a color cube
     
@@ -986,7 +991,10 @@ def confusionPlotByImage( listGS
     
     for _gs in listGS:
         
-        _plotData = buildConfusionData(_gs, inputThresh)
+        _pcm = buildConfusionData( _gs, [inputThresh]
+                                        ,bOutputScore = bOutputScore)
+
+        _plotData = buildConfusionPlotData(_pcm)
         
         _regionMarkers = buildRegionMarkers([inputThresh])
         
@@ -999,7 +1007,17 @@ def confusionPlotByImage( listGS
                   ,bInitPosition = True
                   ,figsize = figsize
                  )
-     
+
+def presetCubeViews():
+    views = [
+         ('green+blue' , {'azimuth': -81, 'elevation': 95})
+        ,('green+red'  , {'azimuth': -166,'elevation': -4})
+        ,('red+blue'   , {'azimuth': 81,  'elevation': 145})
+    ]
+        # other views to use
+        # ('red+green' , {'elevation':12, 'azimuth': -178})
+        # ('blue_green',  {'azimuth':89,'elevation': -115})
+    return views
 
 def confusionPlotByViews(    
                     confusionData
@@ -1010,15 +1028,7 @@ def confusionPlotByViews(
                     ):
     ''' plot 3 different views of the same color cube '''
     
-    views = [
-         ('green+blue' , {'azimuth': -81, 'elevation': 95})
-        ,('green+red'  , {'azimuth': -166,'elevation': -3.57})
-        ,('red+blue'   , {'azimuth': 81,  'elevation': 145})
-    ]
-
-    # other views to use
-    # ('red+green' , {'elevation':12, 'azimuth': -178})
-    # ('blue_green',  {'azimuth':89,'elevation': -115})
+    views = presetCubeViews()
     
     _regionEdges = buildRegionMarkers(threshes, stepAmt = regionStepAmt) 
     
@@ -1044,6 +1054,7 @@ def multiPlot(list_list_imgs
               ,hspace = 0.3
               ,wspace = 0.3
               ,bGrid = True          
+              ,bForceTitles = False
              ):
     '''
         output an N x M array of images
@@ -1092,11 +1103,11 @@ def multiPlot(list_list_imgs
             _ax.imshow(_img)
             
             if input_transform_titles is not None:
-                if (not(b_multiline) or w_i == 0) :
+                if ((not(b_multiline) or w_i == 0) or bForceTitles):
                     _ax.set_ylabel(input_transform_titles[h_i])
                     
             if input_frame_titles is not None:
-                if (not(b_multiline) or h_i == 0) :
+                if ((not(b_multiline) or h_i == 0) or bForceTitles):
                     _ax.set_title(input_frame_titles[w_i])
 
             if not(bGrid):

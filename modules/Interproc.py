@@ -136,6 +136,13 @@ class GuiviewState:
                             ,frameResize=True
                             ,frameAnnotateFn=False)
         self.display.setFrame(self.getOrigFrame())
+        
+        #added for more capabilities
+        self.display.scoreOn = True
+        self.display.bShowScoring = True
+        self.display.scoreRect = self.scoreRect
+        self.display.inputScore.load(copy.deepcopy(self.displayInputScore))
+        self.display.alterFrame()
     
     def getZoomWindow(self, inputRect=None):
         ''' returns a zoom window from origFrame + zoomRect'''
@@ -276,6 +283,4 @@ class DBInterface:
         self.c.execute("select id from state_tbl")
         rows = self.c.fetchall()
         return rows
-
-
 

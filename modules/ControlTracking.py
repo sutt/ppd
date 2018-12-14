@@ -73,6 +73,7 @@ class TrackFactory:
 
         if self.declaredBallColor == "orange":
             self.threshInitial = [ (0, 96, 192), (88, 232, 255) ]
+            # self.threshInitial = [ (29, 86, 6), (64, 255, 255) ]
 
         # From old notes:
         # rgb: (orange ball) [  0  96 192] [ 88 232 255]
@@ -503,6 +504,10 @@ class TrackFactory:
                 self.currentTrackSuccess = False
                 self.currentTrackScore.reset()
 
+        else:
+                self.currentTrackSuccess = False
+                self.currentTrackScore.reset()
+
         if b_log:
             
             keys = ['img_t','img_mask','img_repair', 'img_terminal',
@@ -570,6 +575,10 @@ class TrackFactory:
             else:
                 self.currentTrackSuccess = False
                 self.currentTrackScore.reset()
+        
+        else:
+            self.currentTrackSuccess = False
+            self.currentTrackScore.reset()
 
         if b_log:
             
