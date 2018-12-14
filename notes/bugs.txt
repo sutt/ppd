@@ -18,7 +18,7 @@
 
         [x] commit these bug fix: multiPlot, interProc, tracker, buildConfusionData
         
-        [ ] iterThresh stepwise + update regionMarkers
+        [x] iterThresh stepwise + update regionMarkers
 
     [ ] output all states with a certain condition
         guiview --filter-condition=
@@ -27,6 +27,8 @@
 
     Mop-ups:
 
+        [ ] ImgUtils.pixlist_to_pseduoimg (typo)
+        
         [ ] use mutliplot with mutli colorplots using 
             biggerPic() is cc-gallery-3.ipynb
         [ ] need pseudo-FP, pseudo-FN where the "True Circle"
