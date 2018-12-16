@@ -1,12 +1,20 @@
 #Tasks
 
+12/15
+
+    [ ] build boosted iterThresh
+
+    [ ] bug? IterThresh.py:208:
+            ''' for clr_i in CLRS:
+                     if clr_i in clrs:  '''
+    
 
 
 12/14
 
     [x] verify interactive graph still works
     
-    [ ] iterThresh debug gallery
+    [x] iterThresh debug gallery
 
         [x] build dataset
             [x] build some output states similiar to trainingSteps
@@ -20,6 +28,21 @@
         
         [x] iterThresh stepwise + update regionMarkers
 
+    [ ] build better region classifiers
+
+        [ ] hand-drawn distance from the origin separators
+
+        [x] use sklearn to segment
+            [x] first on 2D data
+            [x] then on 3D data
+            [~] how to force data points in nether regions thereby forcing "full green"?
+                [~] maybe be sampling in and out data mean/sd and then randomly sampling
+                    from that space
+
+            [~] cubic fill for continuous model score
+
+    [ ] try HSV segmentation
+    
     [ ] output all states with a certain condition
         guiview --filter-condition=
         this could be like test_enum 7 where all class go into an interface

@@ -505,6 +505,7 @@ def colorCube(  listB = None
                ,bInitPosition = False
                ,figsize = (10,10)
                ,bLegend = False
+               ,bLegend2 = False
                ,title = None
                ,b_single = True
                ,b_save = False
@@ -619,6 +620,9 @@ def colorCube(  listB = None
         if (regionMarkers is not None):
             legendArgs += ['thresh-volume']
         plt.legend(legendArgs)
+
+    if bLegend2:
+        plt.legend()
 
     ax.set_xlabel('B')
     ax.set_ylabel('G')
@@ -1043,6 +1047,24 @@ def confusionPlotByViews(
                   ,bInitPosition = True
                   ,figsize = figsize
                  )
+
+# helpers to extract a png to a numpy array for display in multiPlot -------
+
+def bytesToPic(bPic):
+    arr = np.asarray(bytearray(bPic), dtype=np.uint8)
+    pic = cv2.imdecode(arr, 1)
+    return pic
+
+def croppedPic(pic):
+    deltaCrop = int( (float(1.9)/float(15.0)) * pic.shape[0]   )
+    h,w = pic.shape[:2]
+    pic_copy = pic.copy()
+    crop = pic_copy[deltaCrop:h - deltaCrop,deltaCrop:w - deltaCrop ,:]
+    return crop
+
+def bytesToPic2(bPic):
+    tmp = bytesToPic(bPic)
+    return croppedPic(tmp)
 
 
 def multiPlot(list_list_imgs
