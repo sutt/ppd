@@ -1,3 +1,36 @@
+12/20
+
+objTracker doesn't have to be perfect right now; in the next stages we'll add scope-limiting assumptions, knowledge priors, and agent policy restrictions. Here we just have to produce a decent baseline. Then we can see what we're still missing, even after the business logic fills-in some misses.
+
+Most of the requirements in path construction/projection is actually a motion ray obj-tracking, so that will be the area to concentrate in the future.
+
+But the config + positioning steps will use stationary tracking so this is helpful.
+
+12/19
+
+Now that orange ball is tracked pretty succesfully, this initial phase should be tied off. From here, we have a baseline algorithm and can find some challenge frames within our existing videos. Todos still include:
+ - challenge data
+ - guiview --filter
+ - eval module
+ - experiments with dif off-the-shelf obj trackers
+ - workspace tidying 
+
+note: the logitech camera's dynamic focusing is interfering with tracking (oct20/output8)
+
+12/17
+
+It's interesting to plot and segment individual raw pixels, but it's not productive to our ultimate task to segment multi-pixel objects. Instead we should be combining averages of proximate pixels and drawing segmentation rules there.
+
+But how does conflict with the far-away / low-pixel object objective? Because multi-pixels ("blurred"/aggregated) have the same plotting ability with higher signal to noise.
+
+This generation of track-algo's without pixel aggregating is the extreme form of long distance find where even 1 good pixel can get us a find and we're looking for regions of them, but actually the span of tracking-algo's can be thought of as a spectrum of increasingly high-aggregate, increasingly low variation, and increasingly low noise. From there it will be easier to generalize color-space segmentation based on pre-video and in-video calibration. And a long distance find is a low-aggregation amount thus noisier, which we ideally don't want to do, but can if we conceive of this portion of the track-algo (candidate object identification) less as a hard classifier and more as a scoring, with a ranking.
+
+
+12/16
+
+Software Engineering advice is like nutritional advice; there's more than enough out there, most of it will help you, but you'd be better served by simply being disciplined and applying some crude heuristic and following it than in accumulating extensive knowledge. Second, there are actively harmful pieces of advice. Although these exist for a reason (b/c this does help certain people), it's not right for you, and you need to be able to be sensitive to this possibility and willing to pivot. But third, at the highest level, you do need to accumulate cutting edge knowledged and be willing to expand past the crude-discipline-paradigm.
+
+
 11/25
 
 random thought:
