@@ -128,13 +128,15 @@ class GuiviewState:
 
 
     
-    def initDisplay(self):
+    def initDisplay(self, zoomFct=None):
         ''' this is confusing and should be called automatically on init'''
+
         self.display = Display()
         self.display.setInit(showOn=False
                             ,scoreOff=False
                             ,frameResize=True
-                            ,frameAnnotateFn=False)
+                            ,frameAnnotateFn=False
+                            ,zoomFct=zoomFct)
         self.display.setFrame(self.getOrigFrame())
         
         #added for more capabilities
@@ -142,15 +144,16 @@ class GuiviewState:
         self.display.bShowScoring = True
         self.display.scoreRect = self.scoreRect
         self.display.inputScore.load(copy.deepcopy(self.displayInputScore))
+        self.display.frameAnnotateFn = False
+        self.display.zoomAnnotateSize = False
         self.display.alterFrame()
     
     def getZoomWindow(self, inputRect=None):
         ''' returns a zoom window from origFrame + zoomRect'''
-        
-        # if (self.zoomRect is None) or (self.serial_origFrame is None):
-        #     return None
 
         frame = self.getOrigFrame()
+
+        #TODO - this will avoid all the annotations like drawTrackers()
 
         if inputRect is None:
             _rect = self.zoomRect
@@ -169,10 +172,48 @@ class GuiviewState:
                             )
         return zoom_img
 
+    
     def drawTracker(self, trackRect):
-        pass
+        ''' draw track onto self.display.frame using trackRect'''
 
-        #TODO - implement; then pass into getZoomWindow()
+        self.display.zoomOn = False
+        self.display.trackOn = True
+        self.display.trackScore.addCircle(trackRect, 0)
+        
+        self.display.drawTrackers()
+        
+
+    def drawOperator(self, scoreRect):
+        ''' draw score onto self.display.frame using trackRect'''
+
+        self.display.zoomOn = False
+        self.display.scoreOn = True
+        self.display.bShowScoring = True
+        self.display.inputScore.addCircle(scoreRect, 0)
+        
+        self.display.drawOperators()
+
+    def getScoreWindow(self, bScoreFrame = True):
+        ''' return window in self.display.scoreRect; use
+            drawTracker(), drawOperator() before this get annotations
+            bScoreFrame = True: use the scoreFrame in this class
+                (which is created in self.initDisplay() + display.alterFrame())
+            bScoreFrame = False: clip from display.frame
+        '''
+
+        if bScoreFrame:
+            
+            score_img = self.display.scoreFrame.copy()
+
+        else:
+
+            score_img = crop_img( self.display.frame.copy()
+                                    ,self.display.absRect(
+                                        tuple(self.display.scoreRect)
+                                    )
+                                )
+        return score_img
+
 
 
 class GuiviewStateHelper(GuiviewState):

@@ -120,6 +120,8 @@ class Display:
 
         #below this size, zoom_display resizes by a whoole number multiple
         self.modZeroSize = 40
+
+        self.zoomFct = None
         
 
     def setOrientation(self, iOrientation):
@@ -141,12 +143,14 @@ class Display:
                 ,scoreOff=False
                 ,frameResize=True
                 ,frameAnnotateFn=True
+                ,zoomFct=None
                 ):
 
         self.showOn = showOn
         self.scoreOff = scoreOff
         self.frameResize = frameResize
         self.frameAnnotateFn = frameAnnotateFn
+        self.zoomFct = zoomFct
 
     def setShowScoring(self, bShowScoring):
         self.bShowScoring = bShowScoring
@@ -254,6 +258,7 @@ class Display:
             
             protoZoomRect = None
             
+            
             if self.inputScore.getData(self.scoreDisplayObjEnum) is not None:               
                 protoZoomRect = self.inputScore.getObjRect(self.scoreDisplayObjEnum)
                 zoomFct = 0.1
@@ -262,6 +267,9 @@ class Display:
                 protoZoomRect = self.trackScore.getObjRect(self.scoreDisplayObjEnum)
                 zoomFct = 0.3   
 
+            if self.zoomFct is not None:
+                zoomFct = self.zoomFct
+            
             if protoZoomRect is None:
                 self.scoreRect = None
             

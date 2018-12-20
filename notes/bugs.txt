@@ -1,17 +1,48 @@
 #Tasks
 
 
+12/20
+
+    [ ] build new dataset w/ challenges
+
+    
+    [ ] improve EvalTracker class
+        [x] checkEitherContainsOther()
+        [x] updgrade insideRect to insideCircle()
+        [ ] add a fudge-value for inside() functions (1 or 2 pixels? prop to radi?)
+        [ ] put these criteria in notebook as a table
+            [ ] can you find an example where insideTrack=T;insideBase=F?
+
+    [x] 2:30 - 3:30
+        [x] side-by-side eval results
+        [x] need drawTracker(), drawOperator()
+        [x] verify origFrame is not altered by these methods
+        [~] need a load/re-save for new method in GuiviewState
+            this can actually just be handled by reload(GuiviewState), 
+            and re-instatiate as gs = listGS[0], then call gs.newMethod()
+
+    [x] 3:30 - 5:00
+        [x] demo getScoreWindow(bScoreFrame=True/False) in notebook
+        [x] expand score window
+        
+
 12/19
 
     [x] add colorInRange to AnalysisHelpers
     [x] make colorInRange() multi-thresh
     [x] modify existing orange thresh
     [x] add second thresh to orange hand-drawn
-    [ ] do a PCM on each orange frame
+    [x] do a PCM on each orange frame
     [x] add to threshes to TrackFactory; observe
         [x] diagnose new tracking perf in new notebook
     [ ] how to do one PCM on multiple frames?
     [ ] build new coordinates: distance from origin line
+
+    [ ] new book: analyze-orange-thresh-1
+        [x] PCM's for all frames
+        [x] tracksuccess table
+        [ ] build new dataset of guiviews of track misses
+        [ ] try changing threshes to more stringent red-min value
 
     bug: guiview shows scoreWindow (not-"n/a") with failed track
         on oct20/output5.avi frame_i=210

@@ -137,10 +137,20 @@ class EvalTracker:
         Different ways to evaluate if the ScoreSchema output from a trackFrame
         matches expectations.
 
+        inputs are full scoring-dict, within this class we index the scoring-dict
+        with 'objEnum' and 'data' keys
+
+            e.g. EvalTracker.setBaselineScore(gs.displayInputScore)
+                 (where gs.displayInputScore is a score-dict)
+
     '''
     
     def __init__(self):
         self.baselineScore = None
+        self.objEnum = '0'
+
+    def setObjEnum(self, sObjEnum):
+        self.objEnum = str(sObjEnum)
 
     def setBaselineScore(self, baselineScore):
         self.baselineScore = copy.deepcopy(baselineScore)
@@ -153,27 +163,26 @@ class EvalTracker:
         if not(self.checkTrackSuccess(inputScore)):
             return 9999.9
 
-        xA, yA, rA = Display.rectToCircle(inputScore['0']['data'])
-        xB, yB, rB = Display.rectToCircle(self.baselineScore['0']['data'])
+        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+        xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
         cartDistance = ((xA - xB)**2 + (yA - yB)**2)**(0.5)
 
         return cartDistance
 
-    @staticmethod
-    def checkTrackSuccess(trackScore):
+    def checkTrackSuccess(self, trackScore):
         ''' easiest way to check a ScoreSchema if track returned True '''
         try:
-            if trackScore['0']['data'] == (0,0,0,0):
+            if trackScore[self.objEnum]['data'] == (0,0,0,0):
                 return False
             return True
         except:
             return False
 
-    def checkTrackInsideBaseline(self, inputScore):
+    def checkTrackInsideBaselineRect(self, inputScore):
         '''
             check if the center on inputScore is inside the baslineScore
-                currently inside rect; todo - check for inside a circle
+            important: this uses rect, not circle    
         '''
         
         if not(self.checkTrackSuccess(inputScore)):
@@ -190,8 +199,76 @@ class EvalTracker:
         
         return True
 
-    #TODO - checkBaselineInsideTrack
-    #TODO - checkEitherContainsOther() union trackInside, baselineInside
+    def checkTrackInsideBaseline(self, inputScore):
+        '''
+            check if the center on inputScore is inside the baslineScore
+            considered as a circle
+                
+        '''
+        
+        if not(self.checkTrackSuccess(inputScore)):
+            return False
+
+        xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
+
+        dist = self.distanceFromBaseline(inputScore)
+
+        if dist < rB:
+            return True
+
+        return False
+
+
+    def checkBaselineInsideTrack(self, inputScore):
+        '''
+            check if the center on baselineScore is inside the trackScore
+                currently inside rect; todo - check for inside a circle
+        '''
+        
+        if not(self.checkTrackSuccess(inputScore)):
+            return False
+
+        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+
+        dist = self.distanceFromBaseline(inputScore)
+
+        if dist < rA:
+            return True
+
+        return False
+
+    def checkEitherContainsOther(self, inputScore):
+        ''' either track-center is inside baseline-score-circle or
+            baseline-score-center is inside track-center-circle. '''
+
+        return ( self.checkBaselineInsideTrack(inputScore) or
+                self.checkTrackInsideBaseline(inputScore))
+
+    def checkBothContainsOther(self, inputScore):
+        ''' both track-center is inside baseline-score-circle and
+            baseline-score-center is inside track-center-circle. '''
+
+        return ( self.checkBaselineInsideTrack(inputScore) and
+                self.checkTrackInsideBaseline(inputScore))
+
+
+    def compareRadii(self, inputScore):
+        '''
+            compare size of the radius;
+            positive: track is larger; nnegative: baseline is larger
+        '''
+        
+        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+        xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
+
+        if ((rA > 0.0) and (rB > 0.0)):
+            return (rA - rB)
+        else:
+            return 0.0
+
+        
+
+
 
     def checkTrackInWindow(self, inputScore, zoomRect):
         '''
@@ -406,7 +483,10 @@ class PixelConfusionMatrix:
 def buildConfusionData(gs, inputThreshes, N = 1000, bOutputScore = True):
     ''' input:  gs             [guiview-state object]
                 inputThreshes  [list of (2ple of 3ples)]
-        
+
+                bOutputScore - depends on the guiview-state, if the score
+                    is in displayInput / displayOutput
+
         returns: pixelconfusionmatrix obj
     '''
 
