@@ -1,5 +1,32 @@
 #Tasks
 
+
+12/19
+
+    [x] add colorInRange to AnalysisHelpers
+    [x] make colorInRange() multi-thresh
+    [x] modify existing orange thresh
+    [x] add second thresh to orange hand-drawn
+    [ ] do a PCM on each orange frame
+    [x] add to threshes to TrackFactory; observe
+        [x] diagnose new tracking perf in new notebook
+    [ ] how to do one PCM on multiple frames?
+    [ ] build new coordinates: distance from origin line
+
+    bug: guiview shows scoreWindow (not-"n/a") with failed track
+        on oct20/output5.avi frame_i=210
+
+    
+
+12/17
+
+    Crash course for images
+    https://www.scipy-lectures.org/packages/scikit-image/index.html
+
+    https://docs.scipy.org/doc/numpy/reference/routines.array-manipulation.html
+
+
+
 12/15
 
     [ ] build boosted iterThresh

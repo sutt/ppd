@@ -122,6 +122,13 @@ def roiSelectZoomWindow(inputGuiviewState):
     inputGuiviewState.initDisplay()
     return inputGuiviewState.getZoomWindow()
 
+def roiSelectScoreWindow(inputGuiviewState):
+    ''' a roiSelectFunc for use with applyTracker(); pass a *reference*
+        to this function into that function 
+    '''
+    inputGuiviewState.initDisplay()
+    return inputGuiviewState.display.scoreFrame.copy()
+
 
 
 class EvalTracker:
@@ -484,6 +491,26 @@ def channelsToColorStr(listB, listG, listR):
         "#" + twoDigit(hex(x[0])) + twoDigit(hex(x[1])) + twoDigit(hex(x[2]))
         for x in zip(listR, listG, listB)
     ]
+
+
+def colorInRange(data, threshes):
+    ''' input: data as np.array shape (N, 3)
+        output: list of int's (1 or 0) of len N
+    '''
+    _img = np.array(data, ndmin=3)
+    
+    or_inRangeX = np.array(np.zeros(shape = data.shape).T, dtype='bool')
+    
+    for _thresh in threshes:
+        
+        inRangeX = cv2.inRange(_img, _thresh[0], _thresh[1])
+        
+        inRangeX = np.array(inRangeX, dtype='bool')
+    
+        or_inRangeX = np.bitwise_or(inRangeX, or_inRangeX)
+
+    return [int(v) for v in or_inRangeX[0]]    
+
 
 def cvtPlot(img):
     ''' show the image after converting from bgr to rgb '''

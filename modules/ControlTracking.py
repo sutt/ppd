@@ -72,12 +72,16 @@ class TrackFactory:
             self.threshes.append(((20, 60, 6),(40, 255, 255)))
 
         if self.declaredBallColor == "orange":
-            self.threshInitial = [ (0, 96, 192), (88, 232, 255) ]
-            # self.threshInitial = [ (29, 86, 6), (64, 255, 255) ]
 
-        # From old notes:
-        # rgb: (orange ball) [  0  96 192] [ 88 232 255]
-        # green sharpie:  [ 15 106  86] [ 81 171 148]
+            thresh1 = (6, 30, 120), (64, 255, 255)
+            # thresh2 = ((6,30,90),(64,255,255))
+            thresh3 = ((64,100,110),(90,255,255))
+            thresh4 = ((90,120,130),(120,255,255))
+            
+            self.threshInitial = thresh1
+
+            self.threshes = [thresh1, thresh3, thresh4]
+
 
     def setAlgoEnum(self, algoEnum):
         self.tp_trackAlgoEnum = algoEnum
