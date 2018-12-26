@@ -11,7 +11,7 @@
         [ ] pandas
         [ ] fudge value on pcm
 
-    [ ] add buildEvalData functions to modules
+    [x] add buildEvalData functions to modules
         
         [x] new module
 
@@ -19,11 +19,11 @@
             how to repair all instances of from AnalysisHelpers import EvalTracker?
             -> ctrl+f; wasn't many
         
-        [ ] add a single function that does em all
+        [x] add a single function that does em all
         
-        [ ] a class for the dataframe:
-            [ ] rename(columns = )
-            [ ] df.format.style()
+    [ ] a class for the dataframe:
+        [ ] rename(columns = )
+        [ ] df.format.style()
                 https://stackoverflow.com/questions/48243818/display-column-name-different-from-dictionary-key-name-in-pandas
     
     Connery the Cop - C + JS
