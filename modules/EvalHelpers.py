@@ -160,6 +160,8 @@ class EvalTracker:
         pass
 
 
+
+
 class EvalDataset:
 
     ''' put eval results into a dataframe '''
@@ -167,6 +169,7 @@ class EvalDataset:
     def __init__(self):
         
         self.df = None
+
         self.eval_method_names = [
             'checkBaselineInsideTrack',
             'checkBothContainsOther',
@@ -177,6 +180,25 @@ class EvalDataset:
             'checkTrackSuccess',
             'compareRadii',
             'distanceFromBaseline'
+            ]
+
+        self.formatting_cols = {
+            # 'checkBaselineInsideTrack':     '{:6.2f}',
+            # 'checkBothContainsOther':       '{:6.2f}',
+            # 'checkEitherContainsOther':     '{:6.2f}',
+            # 'checkTrackInWindow':           '{:6.2f}',
+            # 'checkTrackInsideBaseline':     '{:6.2f}',
+            # 'checkTrackInsideBaselineRect': '{:6.2f}',
+            # 'checkTrackSuccess':            '{:6.2f}',
+            'compareRadii':                 '{:6.2f}',
+            'distanceFromBaseline':         '{:6.2f}'
+            }
+        
+        self.col_order_default = [
+            'listIndex'
+            ,'frameCounter'
+            ,'checkBothContainsOther'
+            ,'distanceFromBaseline'
             ]
 
 
@@ -202,6 +224,26 @@ class EvalDataset:
         
         return df
 
+    
+    def getDataset(self):
+        return self.df
+
+    
+    def getDatasetDisplay(self, sort_args=None):
+        ''' return.print  a dataframe with various formatting niceties'''
+
+        # column order
+        _df = self.df.copy()
+        _df =  self.columnOrder(_df, first_cols = self.col_order_default)
+        
+        # column heading spacing
+        _new_cols =  self.displayEvalMethodNames(_df.columns)
+        _df.rename(columns = _new_cols, inplace=True)
+
+        # rounding / clipping, need to return on this line for
+        # formatting to flow thru to jupyter
+        return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
+        
 
     @staticmethod
     def evalRecord(gs, tracker, method_names):
@@ -295,14 +337,33 @@ class EvalDataset:
         col_list = first_cols + [col for col in df.columns 
                              if col not in first_cols]
     
-        _tmp_df = df[col_list]
+        tmp_df = df[col_list]
     
-        return _tmp_df
+        return tmp_df
+
+    
+    @staticmethod
+    def new_col_formatting(dict_new_cols, dict_formatting):
+        
+        ret = {}
+
+        for _k in dict_formatting.keys():
+            ret[dict_new_cols[_k]] = dict_formatting[_k]
+
+        return ret
 
     
     @staticmethod
     def displayEvalMethodNames(list_str_names):
-        ''' add a line carriage after each word'''
+        ''' add a line carriage after each word, corresponding to 
+            first letter capitalization
+            
+            input: list_str_names - original column names (list of str)
+
+            return: dict: 
+                key - original col name (str)
+                val - new col name (str)
+            '''
     
         list_ret = []
         
@@ -327,5 +388,10 @@ class EvalDataset:
                 _ret += "\n"
                 
             list_ret.append(_ret)
-            
-        return list_ret
+
+        # pandas requires cols in dict format
+        dict_ret = {}
+        for _k, _v in zip(list_str_names, list_ret):
+            dict_ret[str(_k)] = _v
+
+        return dict_ret

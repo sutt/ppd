@@ -8,7 +8,7 @@
         [ ] add these new scores to analysis book
             [ ] how to keep 'em separate? 
                 [ ] frameCounter index "not in"
-        [ ] pandas
+        [x] pandas
         [ ] fudge value on pcm
 
     [x] add buildEvalData functions to modules
@@ -21,10 +21,39 @@
         
         [x] add a single function that does em all
         
-    [ ] a class for the dataframe:
-        [ ] rename(columns = )
-        [ ] df.format.style()
+    [x] a class for the dataframe:
+        [x] rename(columns = )
+        [x] df.format.style()
                 https://stackoverflow.com/questions/48243818/display-column-name-different-from-dictionary-key-name-in-pandas
+
+
+    [ ] FrameTrackObject class
+
+        we don't need full guiviewState object, just orginal-frame + notes + misc(?)
+        -> this should be default object to iterate over instead of listGS
+
+            [ ] refactor listGS to list_fto
+    
+    [ ] build EvalData for whole video
+        [ ] how do we get gs's for each frame?
+            a utility in guiview? 
+            or FTO conversion? 
+            we want to emulate the 1-line r/w to disk functionality of GS though
+        [ ] how to handle score vs unscored frames?
+        [ ] show how to sort for this
+        [ ] show how to aggregate in the face of this
+
+    [ ] There is a hierarchy to batch eval
+
+        for each {tracker, githash, init_policy}:
+
+        directory / vidlist
+            video
+                (init stage)
+                frame
+                    (scored vs unscored)
+                    trackPerfMetric
+                        (various methods)
     
     Connery the Cop - C + JS
 
