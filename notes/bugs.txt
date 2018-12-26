@@ -12,6 +12,13 @@
         [ ] fudge value on pcm
 
     [ ] add buildEvalData functions to modules
+        
+        [x] new module
+
+        [x] copy over EvalTracker class
+            how to repair all instances of from AnalysisHelpers import EvalTracker?
+            -> ctrl+f; wasn't many
+        
         [ ] add a single function that does em all
         
         [ ] a class for the dataframe:
