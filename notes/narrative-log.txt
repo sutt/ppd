@@ -6,6 +6,8 @@ Most of the requirements in path construction/projection is actually a motion ra
 
 But the config + positioning steps will use stationary tracking so this is helpful.
 
+Comprehensive Evaluation - "eval module" - is next step.
+
 12/19
 
 Now that orange ball is tracked pretty succesfully, this initial phase should be tied off. From here, we have a baseline algorithm and can find some challenge frames within our existing videos. Todos still include:

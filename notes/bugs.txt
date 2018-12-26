@@ -1,5 +1,25 @@
 #Tasks
 
+12/26
+
+    [ ] finish previous tasks
+        [ ] build new dataset
+            [ ] 10 challenge frames
+        [ ] add these new scores to analysis book
+            [ ] how to keep 'em separate? 
+                [ ] frameCounter index "not in"
+        [ ] pandas
+        [ ] fudge value on pcm
+
+    [ ] add buildEvalData functions to modules
+        [ ] add a single function that does em all
+        
+        [ ] a class for the dataframe:
+            [ ] rename(columns = )
+            [ ] df.format.style()
+                https://stackoverflow.com/questions/48243818/display-column-name-different-from-dictionary-key-name-in-pandas
+    
+    Connery the Cop - C + JS
 
 12/20
 
@@ -10,8 +30,8 @@
         [x] checkEitherContainsOther()
         [x] updgrade insideRect to insideCircle()
         [ ] add a fudge-value for inside() functions (1 or 2 pixels? prop to radi?)
-        [ ] put these criteria in notebook as a table
-            [ ] can you find an example where insideTrack=T;insideBase=F?
+        [x] put these criteria in notebook as a table
+            [~] can you find an example where insideTrack=T;insideBase=F?
 
     [x] 2:30 - 3:30
         [x] side-by-side eval results
@@ -24,6 +44,16 @@
     [x] 3:30 - 5:00
         [x] demo getScoreWindow(bScoreFrame=True/False) in notebook
         [x] expand score window
+
+    [ ] 7:00 + 
+        [x] copy over evalTracker stuff to analyze-orange-2
+        [x] delete the trailing cells in analyze-orange-1
+        [x] implement eval tracker for good_gs, bad_gs
+        [x] put them in pandas
+        [x] then do the eval suite on all tracked frames
+        [ ] new dataset,
+        [ ] import new dataset
+        [ ] eval suite on new dataset
         
 
 12/19
