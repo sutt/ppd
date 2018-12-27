@@ -17,6 +17,7 @@ from modules.ControlFlow import NotesFactory
 from modules.ControlDisplay import Display
 from modules.ControlTracking import TrackFactory
 from modules.GraphicsCV import (draw_annotations, resize_img, draw_text)
+from modules.Utils import parseCliList
 
 if False: from cv2 import *  # for vscode intellisense
 
@@ -94,6 +95,9 @@ f_scoredelay = 1.0
 b_scoreoff = False
 b_output_tracktimer = False
 i_algo_enum = 0
+b_batch_output = False
+i_batch_output_enum = 0
+l_batch_output_list = None
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -116,6 +120,8 @@ ap.add_argument("--startplay", action="store_true", default=False)
 ap.add_argument("--tracktimer", action="store_true", default=False)
 ap.add_argument("--allowduplicates", action="store_true", default=False)
 ap.add_argument("--algoenum", type=str, default="")
+ap.add_argument("--batchoutputenum", type=str, default="")
+ap.add_argument("--batchoutputlist", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -207,6 +213,24 @@ if args["allowduplicates"]:
 if args["algoenum"] != "":
     i_algo_enum = int(args["algoenum"])
 
+if args["batchoutputenum"] != "":
+    
+    b_batch_output = True
+    i_batch_output_enum = int(args["batchoutputenum"])
+    
+    # adjust hi-level params for a no-show run
+    b_gui = False
+    b_show = False
+    b_preload = False
+    f_scoredelay = 0.0
+    g.frameDelay = False
+    g.playOn = True
+    
+if args["batchoutputlist"] != "":
+    b_batch_output = True
+    i_batch_output_enum = 1
+    l_batch_output_list = parseCliList( args["batchoutputlist"] )
+
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
     sys.exit()
@@ -224,6 +248,10 @@ directoryFactory.setData( initDir= init_dir
 outputFactory = OutputFactory()
 
 outputFactory.setOutputDir(directoryFactory.initDir)
+
+outputFactory.setBatchState( b_batch_output
+                            ,i_batch_output_enum
+                            ,l_batch_output_list)
 
 if b_gui:
 
@@ -414,6 +442,9 @@ while(True):
             if trackFactory.getTrackOnChange():
                 display.resetOperators()
 
+        #TODO - add EvalFactory
+        # if ret and evalFactory.on():
+        #     evalFactory.setScore(notes)
         
         if ret and not(trackFactory.getTrackOnChange()):
 
@@ -447,6 +478,9 @@ while(True):
     outputFactory.resetFramesInd()
     
     directoryFactory.incrementPlayCounter()
+
+    if outputFactory.checkBatchExit():
+        break
 
     if directoryFactory.checkExit(frameFactory.getFailedLoad()):
         break

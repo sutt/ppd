@@ -1,5 +1,23 @@
 #Tasks
 
+12/27
+
+    [x] finish batch-output
+        [x] test list cli option
+        [x] add this to commands.txt; anywhere else? say docs?
+        [x] verify program flow w/ debugger
+            [x] can we grab first frame with our conditionals in criteria?
+        [x] commit to git
+
+
+    [ ] build the new dataset
+        [ ] use the criteria to output all scoring states
+        [ ] verify this in a jupyter listGS
+
+    [ ] subprocess wrapper for --batchoutputlist calls
+
+    [ ] build some tests for these functions
+
 12/26
 
     [ ] finish previous tasks
@@ -25,25 +43,83 @@
         [x] rename(columns = )
         [x] df.format.style()
                 https://stackoverflow.com/questions/48243818/display-column-name-different-from-dictionary-key-name-in-pandas
+        further styling for pandas:
+            https://community.modeanalytics.com/gallery/python_dataframe_styling/
 
 
-    [ ] FrameTrackObject class
+    [~] FrameTrackObject class
 
         we don't need full guiviewState object, just orginal-frame + notes + misc(?)
         -> this should be default object to iterate over instead of listGS
 
-            [ ] refactor listGS to list_fto
+            [~] refactor listGS to list_fto
     
-    [ ] build EvalData for whole video
-        [ ] how do we get gs's for each frame?
+    [~] build EvalData for whole video
+        
+        [x] how do we get gs's for each frame?
+            
             a utility in guiview? 
             or FTO conversion? 
             we want to emulate the 1-line r/w to disk functionality of GS though
-        [ ] how to handle score vs unscored frames?
-        [ ] show how to sort for this
-        [ ] show how to aggregate in the face of this
+            each gs for a whole video is too large, we're not getting 20x vid compression rate
+            so any gs or even fto is too cumbersome to pickle into a db for the whole vid, especially high framesize ones
+            
+            instead we need a guiview like program to run frames > 20 batches:
+                with evalTracker / evalDataset in the inner loop
+            why can't we just bring EvalClassX's into guiview?
+            
+            what batch_output_state would be good for is detailed viewing/plotting for misses:
+                a second procedure that runs on a filtered dataframe for certain characteristics
+                e.g. checkTrackInsideBaseline = False for output5.avi
+                this can be called semi-automatically from evalDataset
+                so many criteria will just be lists of frameCounters, 
+                    need to be passed in cli? call guiview as a subprocess with show=off?
+                    use a json file to r/w the frameCounter list?
+            
+        
+        [ ] finish batchenum feature
+            [x] list of frameCounter inputs
+            [x] delete all interproc states before start
+                [~] or separate --dbpathfn with custom name
+            [x] add pre- and post- print message
+            [x] suppress "outputting state..."
+            [x] exit after run thru
+            [~] subprocess that calls guiview with --batchoutputenum <arg> --nogui --showoff
+                and returns listGS
 
-    [ ] There is a hierarchy to batch eval
+        [ ] build vid_eval
+            [ ] what form: as guiview submodule EvalFactory with --eval ?
+            [ ]  where does the data go after process is terminated? as a pickle/db write?
+                [ ] a subproc wrapper for this
+                [ ] a vid_eval.py alias for this that calls subprocess on guiview.py --eval
+                [ ] --dbpathfn to eval_output5_2018.12.29.11.13.11.sqlite
+                [ ] how to avoid adding this table to master_table in the db before it's verified?
+            [ ] add calculated fields, e.g. = compareRadii / baselineRadius
+            [ ] baseline vid_eval will not look at track_log, that's only as indv frame
+                level / n < 20 leveli
+            [ ] feed in multiple sources of data to dataframe from non-frame sources 
+                e.g. time, notes, trackertime, etc.
+
+        next steps
+
+            [ ] aggregation of table data
+            [ ] basic db-interface
+            [ ] validation -> insertion to master table
+            [ ] how to update/add to master_table schema?
+            [ ] batch algo / batch vid runs
+            [ ] multi-algo / multi-vid comparisons
+
+        misc
+            [ ] progress bar
+            [ ] call with --startplay or whatever
+            [ ] how to handle score vs unscored frames?
+            [ ] show how to sort for this
+            [ ] show how to aggregate in the face of this
+            [ ] need a --stopcriteria similiar to --batchoutput but for stopping in guiview
+
+
+    
+    There is a hierarchy to batch eval
 
         for each {tracker, githash, init_policy}:
 

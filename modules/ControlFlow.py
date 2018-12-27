@@ -538,6 +538,10 @@ class OutputFactory:
         self.bInitWriteVid = False
         self.bOutputState = False
         self.bDeleteState = False
+        self.bBatchState = False
+        self.enumBatchCriteria = 0
+        self.batchIndexList = None
+        self.batchOutputCounter = 0
         self.advanceFrame = False
         self.compressionEnum = 0
         self.framesData = []
@@ -555,6 +559,35 @@ class OutputFactory:
     def resetFramesInd(self):
         self.framesInd = []
         self.frameCounter = None
+
+    def setBatchState(self, bBatchState, iEnumBatchCriteria, lBatchIndexList=None):
+    
+        self.bBatchState = bBatchState
+        self.enumBatchCriteria = iEnumBatchCriteria
+        if lBatchIndexList is not None:
+            self.batchIndexList = copy.copy(lBatchIndexList)
+    
+        if bBatchState:
+            print '\nSTART - running batch output ...'
+            try:
+                if self.db is None:
+                    self.db = DBInterface("data/usr/interproc.db")
+                self.db.deleteAll()
+                print '...deleting all exisiting interproc.db records...'
+            except:
+                print 'failed to delete exisitng records'
+                
+    
+    def checkBatchExit(self):
+        ''' return True to exit guiview inner loop; for once-thru 
+            batch-output / batch-eval runs '''
+        
+        if self.bBatchState:
+        
+            print 'FINISH - batch output with %s outputs.' % str(self.batchOutputCounter)
+            return True
+        
+        return False
 
     def setCmd( self
                 ,duplicatesEnum=None
@@ -659,10 +692,52 @@ class OutputFactory:
         return self.bWriteScoreSnap
 
     def checkOutputState(self):
-        if self.bOutputState or self.bDeleteState:
+        if self.bOutputState or self.bDeleteState or self.bBatchState:
             return True
         return False
 
+    def checkCriteriaOutput(self,
+                            display, 
+                            frameFactory, 
+                            trackFactory, 
+                            timeFactory, 
+                            notesFactory
+                            ):
+        ''' evaluate if criteria is met and return if so'''
+        
+        if self.enumBatchCriteria == 0:
+            return False
+        
+        elif self.enumBatchCriteria == 1:
+        
+            # check the list
+            if ((display.origFrame is not None) and
+                (self.batchIndexList is not None) and
+                (len(self.batchIndexList) > 0)  and
+                (frameFactory.frameCounter in self.batchIndexList)):
+            
+                return True
+        
+        elif self.enumBatchCriteria == 2:
+        
+            # example criteria using objects
+            if ((display.origFrame is not None) and 
+                (frameFactory.frameCounter > -1) and
+                (frameFactory.frameCounter < 20)):
+                
+                return True
+
+        elif self.enumBatchCriteria == 3:
+        
+            # all frames that contain a scoring
+            if ((display.origFrame is not None) and 
+                (frameFactory.frameCounter > -1) and
+                (display.inputScore.bHasContents())):
+                
+                return True
+        
+        return False
+    
     def outputState(self, display, frameFactory, trackFactory,
                     timeFactory, notesFactory):
 
@@ -673,14 +748,29 @@ class OutputFactory:
             self.db.deleteAll()
             print 'deleting all states...'
 
-        if self.bOutputState:
+        if self.bBatchState:
+
+            bProceed = self.checkCriteriaOutput( 
+                                    display, 
+                                    frameFactory, 
+                                    trackFactory, 
+                                    timeFactory, 
+                                    notesFactory
+                                    )
+
+            if bProceed: self.batchOutputCounter += 1
+
+        if self.bOutputState or bProceed:
             
             state = GuiviewState()
             state.setState(display, frameFactory, trackFactory,
                             timeFactory, notesFactory)
             s_state = state.save()
             self.db.insertState(s_state)
-            print 'outputting state...'
+            
+            if not(bProceed):
+                print 'outputting state...'
+
 
 
     @staticmethod
