@@ -739,7 +739,7 @@ class OutputFactory:
             # all frames that contain a scoring
             if ((display.origFrame is not None) and 
                 (frameFactory.frameCounter > -1) and
-                (display.inputScore.bHasContents())):
+                (display.inputScore.checkHasContents())):
                 
                 return True
         

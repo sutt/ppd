@@ -9,9 +9,9 @@
             [x] can we grab first frame with our conditionals in criteria?
         [x] commit to git
 
-    [ ] build the new dataset
-        [ ] use the criteria to output all scoring states
-        [ ] verify this in a jupyter listGS
+    [x] build the new dataset
+        [x] use the criteria to output all scoring states
+        [x] verify this in a jupyter listGS
 
     [x] subprocess wrapper for --batchoutputlist calls
         [x] wrapper
@@ -19,17 +19,26 @@
 
     [ ] build some tests for these functions
         [x] need --dbpathfn for mock testing of db writes
+        [ ] test the guiview itself
+        [ ] test the subproc
+
+    [ ] new book: eval-data-2:
+        [ ] restrict imports to essential + condense
+        [ ] add db to ppd_data repo
+        [ ] recipe for filter-table -> get-particular gs's -> analyze in detail
+            [ ] also with comparison to "good" gs
+            [ ] mask progression & pcm plots
 
 12/26
 
-    [ ] finish previous tasks
-        [ ] build new dataset
-            [ ] 10 challenge frames
-        [ ] add these new scores to analysis book
-            [ ] how to keep 'em separate? 
-                [ ] frameCounter index "not in"
+    [x] finish previous tasks
+        [x] build new dataset
+            [x] 10 challenge frames
+        [x] add these new scores to analysis book
+            [x] how to keep 'em separate? 
+                [x] frameCounter index "not in"
         [x] pandas
-        [ ] fudge value on pcm
+        [~] fudge value on pcm
 
     [x] add buildEvalData functions to modules
         
@@ -79,14 +88,14 @@
                     use a json file to r/w the frameCounter list?
             
         
-        [ ] finish batchenum feature
+        [x] finish batchenum feature
             [x] list of frameCounter inputs
             [x] delete all interproc states before start
                 [~] or separate --dbpathfn with custom name
             [x] add pre- and post- print message
             [x] suppress "outputting state..."
             [x] exit after run thru
-            [~] subprocess that calls guiview with --batchoutputenum <arg> --nogui --showoff
+            [x] subprocess that calls guiview with --batchoutputenum <arg> --nogui --showoff
                 and returns listGS
 
         [ ] build vid_eval
@@ -137,7 +146,7 @@
 
 12/20
 
-    [ ] build new dataset w/ challenges
+    [x] build new dataset w/ challenges
 
     
     [ ] improve EvalTracker class
@@ -165,9 +174,9 @@
         [x] implement eval tracker for good_gs, bad_gs
         [x] put them in pandas
         [x] then do the eval suite on all tracked frames
-        [ ] new dataset,
-        [ ] import new dataset
-        [ ] eval suite on new dataset
+        [x] new dataset,
+        [x] import new dataset
+        [x] eval suite on new dataset
         
 
 12/19

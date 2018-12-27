@@ -479,6 +479,8 @@ def subprocBatchOutput(  f_pathfn
                 batch_enum  - (int) enum for batch-criteria
                 batch_list  - (list of ints) frame-counters to output
                 db_pathfn   - (str) path and fn for db for interproc-comm
+                                    path is relative ppd/ root not calling 
+                                    function
     '''
 
     # validate
@@ -496,14 +498,13 @@ def subprocBatchOutput(  f_pathfn
         criteria_val = listToCommas(batch_list)
 
     # build cmd
-    cmd = '''python guiview.py --file data/proc/raw/oct20/output4.avi
-                    %s %s %s %s''' % (
-                                        criteria_key
+    cmd = '''python guiview.py --file %s %s %s %s %s''' % (
+                                         f_pathfn
+                                        ,criteria_key
                                         ,criteria_val
                                         ,'--batchdbpathfn'
                                         ,db_pathfn
                                         )
-    
     args = argsFromCmd(cmd)
     
     # call subproc
