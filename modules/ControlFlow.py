@@ -548,6 +548,7 @@ class OutputFactory:
         self.framesInd = []
         self.frameCounter = None
         self.db = None
+        self.dbPathFn = "data/usr/interproc.db"
 
 
     def setOutputDir(self, outputDir):
@@ -560,20 +561,26 @@ class OutputFactory:
         self.framesInd = []
         self.frameCounter = None
 
-    def setBatchState(self, bBatchState, iEnumBatchCriteria, lBatchIndexList=None):
+    def setBatchState(self, bBatchState, iEnumBatchCriteria, 
+                            lBatchIndexList=None, sBatchDbPathFn = ""):
     
         self.bBatchState = bBatchState
         self.enumBatchCriteria = iEnumBatchCriteria
+        
         if lBatchIndexList is not None:
             self.batchIndexList = copy.copy(lBatchIndexList)
+
+        if sBatchDbPathFn != "":
+            self.dbPathFn = sBatchDbPathFn
     
         if bBatchState:
             print '\nSTART - running batch output ...'
             try:
                 if self.db is None:
-                    self.db = DBInterface("data/usr/interproc.db")
+                    self.db = DBInterface(self.dbPathFn)
                 self.db.deleteAll()
-                print '...deleting all exisiting interproc.db records...'
+                self.db = None
+                print '...deleting all exisiting %s records...' % str(self.dbPathFn)
             except:
                 print 'failed to delete exisitng records'
                 
@@ -742,7 +749,7 @@ class OutputFactory:
                     timeFactory, notesFactory):
 
         if self.db is None:
-            self.db = DBInterface("data/usr/interproc.db")
+            self.db = DBInterface(self.dbPathFn)
 
         if self.bDeleteState:
             self.db.deleteAll()

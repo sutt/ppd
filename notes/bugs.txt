@@ -9,14 +9,16 @@
             [x] can we grab first frame with our conditionals in criteria?
         [x] commit to git
 
-
     [ ] build the new dataset
         [ ] use the criteria to output all scoring states
         [ ] verify this in a jupyter listGS
 
-    [ ] subprocess wrapper for --batchoutputlist calls
+    [x] subprocess wrapper for --batchoutputlist calls
+        [x] wrapper
+        [x] dbpathfn for output
 
     [ ] build some tests for these functions
+        [x] need --dbpathfn for mock testing of db writes
 
 12/26
 

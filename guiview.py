@@ -98,6 +98,7 @@ i_algo_enum = 0
 b_batch_output = False
 i_batch_output_enum = 0
 l_batch_output_list = None
+s_batch_db_pathfn = ""
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -122,6 +123,7 @@ ap.add_argument("--allowduplicates", action="store_true", default=False)
 ap.add_argument("--algoenum", type=str, default="")
 ap.add_argument("--batchoutputenum", type=str, default="")
 ap.add_argument("--batchoutputlist", type=str, default="")
+ap.add_argument("--batchdbpathfn", type=str, default="")
 args = vars(ap.parse_args())
 
 
@@ -214,22 +216,25 @@ if args["algoenum"] != "":
     i_algo_enum = int(args["algoenum"])
 
 if args["batchoutputenum"] != "":
-    
     b_batch_output = True
     i_batch_output_enum = int(args["batchoutputenum"])
     
-    # adjust hi-level params for a no-show run
+if args["batchoutputlist"] != "":
+    b_batch_output = True
+    i_batch_output_enum = 1
+    l_batch_output_list = parseCliList( args["batchoutputlist"] )
+
+if args["batchoutputlist"] != "" or args["batchoutputenum"] != "":
+    # adjust hi-level params for a no-show "batch output" run
     b_gui = False
     b_show = False
     b_preload = False
     f_scoredelay = 0.0
     g.frameDelay = False
     g.playOn = True
-    
-if args["batchoutputlist"] != "":
-    b_batch_output = True
-    i_batch_output_enum = 1
-    l_batch_output_list = parseCliList( args["batchoutputlist"] )
+
+if args["batchdbpathfn"] != "":
+    s_batch_db_pathfn = args["batchdbpathfn"]
 
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
@@ -251,7 +256,8 @@ outputFactory.setOutputDir(directoryFactory.initDir)
 
 outputFactory.setBatchState( b_batch_output
                             ,i_batch_output_enum
-                            ,l_batch_output_list)
+                            ,l_batch_output_list
+                            ,s_batch_db_pathfn)
 
 if b_gui:
 

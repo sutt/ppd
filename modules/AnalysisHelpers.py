@@ -453,6 +453,74 @@ def cvtPlot(img):
     plt.imshow(_img)
 
 
+# subprocess batch output ----------------------------------
+
+def argsFromCmd(strCmd):
+        strCmd = strCmd.replace("\t", "")
+        strCmd = strCmd.replace("\n", " ")
+        args = strCmd.split(" ")
+        args = filter(lambda s: s != "", args)
+        return args
+
+def listToCommas(list_input):
+    return ",".join(map(str, list_input))
+
+def subprocBatchOutput(  f_pathfn
+                        ,batch_enum = None
+                        ,batch_list = None
+                        ,db_pathfn = "data/usr/batch_tmp.db"
+                        ):
+    '''
+        get a batch of guiview-state outputs based on defined criteria.
+
+        return: listGS - list of GS objects
+
+        input:  f_pathfn    - (str) pathfn to video file
+                batch_enum  - (int) enum for batch-criteria
+                batch_list  - (list of ints) frame-counters to output
+                db_pathfn   - (str) path and fn for db for interproc-comm
+    '''
+
+    # validate
+    if (int(batch_enum is not None) + int(batch_list is not None)) != 1:
+        print 'must call with only one batch_xxx arg'
+        return None
+
+    # build args
+    if batch_enum is not None:
+        criteria_key = "--batchoutputenum"
+        criteria_val = str(batch_enum)
+
+    if batch_list is not None:
+        criteria_key = "--batchoutputlist"
+        criteria_val = listToCommas(batch_list)
+
+    # build cmd
+    cmd = '''python guiview.py --file data/proc/raw/oct20/output4.avi
+                    %s %s %s %s''' % (
+                                        criteria_key
+                                        ,criteria_val
+                                        ,'--batchdbpathfn'
+                                        ,db_pathfn
+                                        )
+    
+    args = argsFromCmd(cmd)
+    
+    # call subproc
+    proc =  subprocess.Popen(    args
+                                ,stderr = subprocess.PIPE
+                                ,stdout = subprocess.PIPE
+                                ,cwd = "../"
+                                )
+    ret = proc.wait()
+
+    # load from db - assume we're calling from ppd/books/
+    db = DBInterface("../" + db_pathfn)     
+    listGS = [pickle.loads(record[1]) for record in db.selectAll()]
+
+    return listGS
+
+
 # colorCube -------------------------------------------------
 
 def colorCube(  listB = None

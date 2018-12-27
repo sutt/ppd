@@ -11,6 +11,10 @@
 
         output guiview-state for frameCounters in the comma-seperated-list
 
+        --batchdbpathfn path/to/tmp.db
+
+            use this instead of using default gs-db in data/usr/interproc.db
+        
         (can't use both --batchoutputlist and --batchoutputlist at once)
 
 11/25
