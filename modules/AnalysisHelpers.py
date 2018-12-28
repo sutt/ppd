@@ -130,6 +130,46 @@ def roiSelectScoreWindow(inputGuiviewState):
     return inputGuiviewState.display.scoreFrame.copy()
 
 
+def buildImgComparisonData(listGS, tracker):
+    ''' show intermediate mask data '''
+    
+    img_data = []
+    
+    for _gs in listGS:
+        
+        _tmp = []
+        
+        # scoreframe with track/score annotations
+        
+        tracker.setFrame(_gs.getOrigFrame())
+        track_log = tracker.trackFrame(b_log=True)
+        track_score = tracker.getTrackScore()
+        
+        _gs.initDisplay(zoomFct=0.5)
+        _gs.drawTracker(track_score['0']['data'])
+        _gs.drawOperator(_gs.displayInputScore['0']['data'])
+        
+        img = _gs.getScoreWindow()
+        
+        _tmp.append(img)
+        
+        # scoreframe tracker modified mask(s)
+        
+        _gs.initDisplay(zoomFct=0.5)
+        cropped_img = _gs.getScoreWindow(bScoreFrame=False)
+        
+        tracker.setFrame(cropped_img)
+        track_log = tracker.trackFrame(b_log=True)
+        
+        logs_of_interest = ['img_mask', 'img_terminal']
+        
+        for _log_key in logs_of_interest:
+            
+            _tmp.append(track_log[_log_key])
+
+        img_data.append(_tmp)
+        
+    return img_data
 
 
 class PixelConfusionMatrix:
@@ -1169,6 +1209,26 @@ def multiPlot(list_list_imgs
                 _ax.axis('off')
 
     plt.show()
+
+
+def exploreImgs(listGS, figw = 20):
+    ''' for introductory dataset exploration; '''
+
+    chart_data = []
+
+    for _gs in listGS:
+        _gs.initDisplay()
+        tmp = []
+        tmp.append(_gs.getOrigFrame())
+        tmp.append(_gs.display.scoreFrame.copy())
+        chart_data.append(tmp)
+
+    titles = [_gs.frameCounter for _gs in listGS]
+
+    multiPlot( chart_data, hspace = 0, wspace = 0, figsize = (figw, 2)
+              ,input_frame_titles =   titles
+              ,bForceTitles = False
+              ,bGrid=False)
 
 
 if __name__ == "__main__":
