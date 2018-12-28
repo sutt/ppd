@@ -159,6 +159,21 @@ class EvalTracker:
         '''
         pass
 
+    # build properities ----------
+
+    def propBaselineRadius(self):
+        x, y, r = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
+        return r
+
+    # build calcs -----------------
+
+    @staticmethod
+    def calc_BallUnitsAway(df_main, df_props):
+        return ( float(df_main['distanceFromBaseline']) / 
+                 (float(df_props['propBaselineRadius']) * 2.0)  
+                )
+
+
 
 
 
@@ -169,6 +184,10 @@ class EvalDataset:
     def __init__(self):
         
         self.df = None
+
+        self.df_props = None
+        
+        self.df_calcs = None
 
         self.eval_method_names = [
             'checkBaselineInsideTrack',
@@ -182,6 +201,26 @@ class EvalDataset:
             'distanceFromBaseline'
             ]
 
+        self.eval_method_names_2 = [
+            'checkBaselineInsideTrack',
+            'checkBothContainsOther',
+            'checkEitherContainsOther',
+            # 'checkTrackInWindow',
+            'checkTrackInsideBaseline',
+            'checkTrackInsideBaselineRect',
+            'checkTrackSuccess',
+            'compareRadii',
+            'distanceFromBaseline'
+            ]
+
+        self.prop_method_names = [
+            'propBaselineRadius',
+            ]
+
+        self.calc_method_names = [
+            'calc_BallUnitsAway',
+            ]
+
         self.formatting_cols = {
             # 'checkBaselineInsideTrack':     '{:6.2f}',
             # 'checkBothContainsOther':       '{:6.2f}',
@@ -190,20 +229,45 @@ class EvalDataset:
             # 'checkTrackInsideBaseline':     '{:6.2f}',
             # 'checkTrackInsideBaselineRect': '{:6.2f}',
             # 'checkTrackSuccess':            '{:6.2f}',
-            'compareRadii':                 '{:6.2f}',
-            'distanceFromBaseline':         '{:6.2f}'
+            'compareRadii':                 '{:4.0f}',
+            'distanceFromBaseline':         '{:4.0f}',
+            'calc_BallUnitsAway':           '{:6.2f}'
             }
         
         self.col_order_default = [
-            'listIndex'
+             'listIndex'
             ,'frameCounter'
             ,'checkBothContainsOther'
             ,'distanceFromBaseline'
+            ,'checkTrackSuccess'
             ]
+
+        self.col_order_requested = None
+
+        self.rows_requested = None
+
+    def setFirstCols(self, list_first_cols):
+        ''' for use before getDatasetDisplay; set to None to go back to default'''
+        self.color_order_requested = copy.copy(list_first_cols)
+
+    def getFirstCols(self):
+        if self.col_order_requested is not None:
+            return self.col_order_requested
+        return self.col_order_default
+
+    def setRowsRequested(self, psRows):
+        ''' input: pandas series of booleans '''
+        self.rows_requested = psRows
+
+    def getFilteredIndex(self, filter_rows, return_index = "listIndex"):
+        ''' returns field return_index for rows matching filter_rows '''
+        _df = self.getDataset()
+        _filtered = _df[filter_rows][return_index]
+        return [int(x) for x in list(_filtered)]
 
 
     def buildDataset(self, listGS, tracker):
-        ''' return: pd.DataFrame
+        ''' 
             input:  listGS - list of GuiveiwState objects
                     tracker - TrackFactory object, initialized
             
@@ -214,19 +278,37 @@ class EvalDataset:
                 cols corresponding to EvalTracker properties
         '''
 
-        eval_data = self.buildEvalData(listGS, tracker, self.eval_method_names)
+        eval_data = self.buildEvalData(listGS, tracker, self.eval_method_names_2)
         index_data = self.buildIndexData(listGS)
         full_data = self.mergeDataDicts(*[index_data, eval_data])
         
         df = pd.DataFrame(full_data)
 
         self.df = df
-        
-        return df
+
+    def buildProps(self, listGS):
+        ''' build properties dataframe '''
+
+        #can we get framesize here?
+            
+        full_data = self.buildPropData(listGS, self.prop_method_names)
+
+        self.df_props = pd.DataFrame(full_data)
+
+    def buildCalcs(self):
+        ''' build properties dataframe '''
+            
+        full_data = self.buildCalcData(self.calc_method_names)
+
+        self.df_calcs = pd.DataFrame(full_data)
 
     
     def getDataset(self):
         return self.df
+
+    def getFullDataset(self):
+        all_dfs = [self.df, self.df_props, self.df_calcs]
+        return pd.concat(all_dfs, axis = 1)
 
     
     def getDatasetDisplay(self, sort_args=None):
@@ -240,10 +322,62 @@ class EvalDataset:
         _new_cols =  self.displayEvalMethodNames(_df.columns)
         _df.rename(columns = _new_cols, inplace=True)
 
+        # filter rows
+        if self.rows_requested is not None:
+            _df = _df[self.rows_requested]
+
         # rounding / clipping, need to return on this line for
         # formatting to flow thru to jupyter
         return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
+    
+    
+    def calcRecord(self, record_index, method_names):
+
+        list_data = []
+
+        for meth_name in method_names:
+
+            try:
+                _ev = EvalTracker()
+                _evMeth = getattr(_ev, meth_name)
+                _val = _evMeth(  self.df[record_index: record_index+1]
+                                ,self.df_props[record_index: record_index+1]
+                                )
+            except:
+                _val = None
+            
+            list_data.append(_val)
+
+        return list_data
+
+
+    @staticmethod
+    def propRecord(gs, method_names):
+        ''' return a list of values (double, int, str, bool, obj) corresponding
+            to the result an EvalTracker method for that gs. Order of list
+            corresponds to order of method_names'''
         
+        list_data = []
+
+        try:
+            _ev = EvalTracker()
+            _ev.setBaselineScore(gs.displayInputScore)
+            
+        except:        
+            return None
+        
+        for meth_name in method_names:
+
+            try:
+                _evMeth = getattr(_ev, meth_name)
+                _val = _evMeth()
+            except:
+                _val = None
+            
+            list_data.append(_val)
+
+        return list_data
+
 
     @staticmethod
     def evalRecord(gs, tracker, method_names):
@@ -276,6 +410,56 @@ class EvalDataset:
             list_data.append(_val)
 
         return list_data
+
+    @classmethod
+    def buildPropData(cls, listGS, prop_method_names):
+        
+        data = []
+        
+        for _gs in listGS:
+            
+            _record = cls.propRecord(_gs, copy.copy(prop_method_names))
+            
+            data.append(_record)
+            
+        dict_data = {}
+        
+        for j_col in range(len(prop_method_names)):
+            
+            _tmp = []
+            
+            for i_row in range(len(data)):
+            
+                _tmp.append(data[i_row][j_col])
+            
+            dict_data[prop_method_names[j_col]] = _tmp
+            
+        return dict_data
+
+    
+    def buildCalcData(self, calc_method_names):
+        
+        data = []
+        
+        for _recordIndex in self.df.index:
+            
+            _record = self.calcRecord(_recordIndex, copy.copy(calc_method_names))
+            
+            data.append(_record)
+            
+        dict_data = {}
+        
+        for j_col in range(len(calc_method_names)):
+            
+            _tmp = []
+            
+            for i_row in range(len(data)):
+            
+                _tmp.append(data[i_row][j_col])
+            
+            dict_data[calc_method_names[j_col]] = _tmp
+            
+        return dict_data
 
 
     @classmethod

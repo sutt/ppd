@@ -1,5 +1,20 @@
 #Tasks
 
+12/28
+
+    [ ] Pandas work: filtering + calcd fields + aggregated fields
+        
+        https://pandas.pydata.org/pandas-docs/stable/10min.html
+        [x] filter
+        [x] calc'd field: distanceFromBaseline / baselineRadius
+        [ ] aggregated: % True?
+
+    [x] eval-data-2 demo of how to visually explore specific frames
+
+    [ ] compare tracker algoenum=1 vs algoenum=2
+
+    [ ] build eval module
+
 12/27
 
     [x] finish batch-output
@@ -23,8 +38,9 @@
         [ ] test the subproc
 
     [ ] new book: eval-data-2:
-        [ ] restrict imports to essential + condense
-        [ ] add db to ppd_data repo
+        [x] restrict imports to essential + condense
+        [x] add db to ppd_data repo
+        [ ] eliminate some eval fields
         [ ] recipe for filter-table -> get-particular gs's -> analyze in detail
             [ ] also with comparison to "good" gs
             [ ] mask progression & pcm plots
@@ -122,7 +138,7 @@
 
         misc
             [ ] progress bar
-            [ ] call with --startplay or whatever
+            [x] call with --startplay or whatever
             [ ] how to handle score vs unscored frames?
             [ ] show how to sort for this
             [ ] show how to aggregate in the face of this
