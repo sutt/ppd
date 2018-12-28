@@ -9,11 +9,18 @@
         [x] calc'd field: distanceFromBaseline / baselineRadius
         [ ] aggregated: % True?
 
+        [ ] refactor these separate methods into one
+
     [x] eval-data-2 demo of how to visually explore specific frames
 
     [ ] compare tracker algoenum=1 vs algoenum=2
+        [ ] need to add this to subprocBatchOutput
 
     [ ] build eval module
+
+        [ ] basic skeleton and results
+
+    
 
 12/27
 

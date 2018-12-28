@@ -16,6 +16,7 @@ from modules.ControlFlow import OutputFactory
 from modules.ControlFlow import NotesFactory
 from modules.ControlDisplay import Display
 from modules.ControlTracking import TrackFactory
+from modules.ControlEval import EvalFactory
 from modules.GraphicsCV import (draw_annotations, resize_img, draw_text)
 from modules.Utils import parseCliList
 
@@ -99,6 +100,7 @@ b_batch_output = False
 i_batch_output_enum = 0
 l_batch_output_list = None
 s_batch_db_pathfn = ""
+b_eval = False
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -124,6 +126,7 @@ ap.add_argument("--algoenum", type=str, default="")
 ap.add_argument("--batchoutputenum", type=str, default="")
 ap.add_argument("--batchoutputlist", type=str, default="")
 ap.add_argument("--batchdbpathfn", type=str, default="")
+ap.add_argument("--eval", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -224,7 +227,7 @@ if args["batchoutputlist"] != "":
     i_batch_output_enum = 1
     l_batch_output_list = parseCliList( args["batchoutputlist"] )
 
-if args["batchoutputlist"] != "" or args["batchoutputenum"] != "":
+if args["batchoutputlist"] != "" or args["batchoutputenum"] != "" or args["eval"]:
     # adjust hi-level params for a no-show "batch output" run
     b_gui = False
     b_show = False
@@ -235,6 +238,9 @@ if args["batchoutputlist"] != "" or args["batchoutputenum"] != "":
 
 if args["batchdbpathfn"] != "":
     s_batch_db_pathfn = args["batchdbpathfn"]
+
+if args["eval"]:
+    b_eval = True
 
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
@@ -275,6 +281,9 @@ display.setInit(showOn=b_show
                 ,scoreOff=b_scoreoff
                 ,frameResize=b_resize
                 ,frameAnnotateFn=b_annotate_fn)
+
+evalFactory = EvalFactory(on=b_eval)
+
 
 #Video Loop: init a new video-file at top --------------
 
@@ -448,9 +457,16 @@ while(True):
             if trackFactory.getTrackOnChange():
                 display.resetOperators()
 
-        #TODO - add EvalFactory
-        # if ret and evalFactory.on():
-        #     evalFactory.setScore(notes)
+
+        if ret and evalFactory.isOn():
+            
+            evalFactory.setInputs( 
+                             inputScore=notesFactory.getFrameScoreCurrent()
+                            ,trackScore=trackFactory.getTrackScore()
+                            )
+            
+            evalFactory.evalFrame()
+            
         
         if ret and not(trackFactory.getTrackOnChange()):
 
@@ -485,7 +501,7 @@ while(True):
     
     directoryFactory.incrementPlayCounter()
 
-    if outputFactory.checkBatchExit():
+    if outputFactory.checkBatchExit() or evalFactory.checkExit():
         break
 
     if directoryFactory.checkExit(frameFactory.getFailedLoad()):
