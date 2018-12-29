@@ -15,6 +15,8 @@ from ControlTracking import TrackFactory
 from ControlDisplay import Display
 from DataSchemas import  ScoreSchema
 from EvalHelpers import EvalTracker, EvalDataset
+import sqlalchemy
+
 
 class EvalFactory:
 
@@ -26,8 +28,10 @@ class EvalFactory:
         self.on = on
 
         self.data = None
-
         self.data_pd = None
+
+        self.db = None
+        self.dbPathFn = None
         
         self.evData = None
         self.ev = None
@@ -46,8 +50,13 @@ class EvalFactory:
         if not(self.on):
             return
         
+        print '\nSTART - running eval module...'
+        
         self.data = []
         
+        self.dbPathFn = "data/usr/eval_tmp.db"
+        self.db = DBInterface(self.dbPathFn)
+
         self.evData = EvalDataset()
         self.ev = EvalTracker()
 
@@ -106,7 +115,7 @@ class EvalFactory:
                 _evMeth = getattr(self.ev, meth_name)
                 _val = _evMeth(_trackScore)
             except:
-                _val = None     #TODO pandas.nan ?
+                _val = None
             
             list_data.append(_val)
 
@@ -116,6 +125,7 @@ class EvalFactory:
 
         data = copy.deepcopy(self.data)
 
+        # data to form readable by pandas
         dict_data = {}
         
         for j_col in range(len(self.eval_method_names)):
@@ -128,7 +138,19 @@ class EvalFactory:
             
             dict_data[self.eval_method_names[j_col]] = _tmp
             
+        # data to pandas
         self.data_pd = pd.DataFrame(dict_data)
 
-        print self.data_pd[:10]
+        # output to db 
+        engine = sqlalchemy.create_engine('sqlite:///' + self.dbPathFn
+                                            ,echo=False)
+        
+        self.data_pd.to_sql('current_dataframe'
+                            ,con = engine
+                            ,if_exists='replace')
+
+        print 'output db: %s' % str(self.dbPathFn)
+        
+        rows, cols = self.data_pd.shape
+        print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
 

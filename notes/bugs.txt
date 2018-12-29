@@ -13,13 +13,45 @@
 
     [x] eval-data-2 demo of how to visually explore specific frames
 
-    [ ] compare tracker algoenum=1 vs algoenum=2
-        [ ] need to add this to subprocBatchOutput
+    [x] compare tracker algoenum=1 vs algoenum=2
+        [x] need to add this to subprocBatchOutput
 
     [ ] build eval module
 
-        [ ] basic skeleton and results
+        [x] basic skeleton and results
+        [x] how to pickle it into sqlite?
 
+        TODO
+        [ ] need to add tracker score properties
+        [ ] need to add inputscore properties
+        [ ] why do we even do eval inside guiview? all we need is those properties
+        [ ] difference of each frame for different algos
+            [ ] for boolean: improvement or regression?
+            [ ] for number data: improvement or regression?
+
+        Milestones
+         - an aggregated table for each video and each algo, showing perf diffs
+
+        Things to Think about
+
+            We'll want to add challenge frames as we iterate. The easiest way
+            to do this is create a new video copied from previous with extra 
+            inputScores. But this would create tons of processing for multiple
+            of the same video (or more vexxing, slightly different amount of frames
+            due to user error in video creation). But this creates a problem
+            where we don't have the evaluation for the new scores on the old algos.
+
+            -> this could be avoided by doing having evalFactory only output
+               trackScore and inputScore properties, then doing eval as a 
+               post-processing / calculated field type thing. "we want eval but
+               we don't have to calc it right there"
+               
+            -> new recipe: cp the file then write (/ override ?) scoring / notes 
+                which preserves the videos frame amount.
+
+        Misc fun stuff
+        [ ] progress bar
+        [ ] keypress cv2->tkinter
     
 
 12/27
@@ -44,13 +76,13 @@
         [ ] test the guiview itself
         [ ] test the subproc
 
-    [ ] new book: eval-data-2:
+    [x] new book: eval-data-2:
         [x] restrict imports to essential + condense
         [x] add db to ppd_data repo
-        [ ] eliminate some eval fields
-        [ ] recipe for filter-table -> get-particular gs's -> analyze in detail
-            [ ] also with comparison to "good" gs
-            [ ] mask progression & pcm plots
+        [x] eliminate some eval fields
+        [x] recipe for filter-table -> get-particular gs's -> analyze in detail
+            [x] also with comparison to "good" gs
+            [x] mask progression & pcm plots
 
 12/26
 

@@ -246,6 +246,9 @@ class EvalDataset:
 
         self.rows_requested = None
 
+    def setDf(self, df):
+        self.df = df
+    
     def setFirstCols(self, list_first_cols):
         ''' for use before getDatasetDisplay; set to None to go back to default'''
         self.color_order_requested = copy.copy(list_first_cols)

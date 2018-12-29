@@ -2,7 +2,9 @@ import sys, copy, random, subprocess, time
 import pickle
 import cv2
 import numpy as np
+import pandas as pd
 import io
+import sqlalchemy
 from PIL import Image
 from collections import OrderedDict
 from itertools import combinations
@@ -493,7 +495,7 @@ def cvtPlot(img):
     plt.imshow(_img)
 
 
-# subprocess batch output ----------------------------------
+# subprocess BatchOutput / Eval ------------------------------
 
 def argsFromCmd(strCmd):
         strCmd = strCmd.replace("\t", "")
@@ -560,6 +562,48 @@ def subprocBatchOutput(  f_pathfn
     listGS = [pickle.loads(record[1]) for record in db.selectAll()]
 
     return listGS
+
+
+def subprocEval( f_pathfn
+                ,algo_enum = 0
+                ,db_pathfn = "data/usr/eval_tmp.db"
+                ):
+    '''
+        get a eval-dataframe by running guiview with eval module turned on
+
+        return: df          - pandas dataframe
+
+        input:  f_pathfn    - (str) pathfn to video file
+                algo_enum   - (int) sent to ControlTracker via guiview cli
+                db_pathfn   - (str) NOT IMPLEMENTED here
+                                    path and fn for db for interproc-comm
+                                    path is relative ppd/ root not calling 
+                                    function
+    '''
+
+    # build cmd
+    cmd = '''python guiview.py --file %s 
+                                --eval --track 
+                                --algoenum %s''' % (
+                                                f_pathfn
+                                                ,algo_enum
+                                                )
+    args = argsFromCmd(cmd)
+    
+    # call subproc
+    proc =  subprocess.Popen(    args
+                                ,stderr = subprocess.PIPE
+                                ,stdout = subprocess.PIPE
+                                ,cwd = "../"
+                                )
+    ret = proc.wait()
+
+    # load from db - assume we're calling from ppd/books/
+    db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + db_pathfn, echo=False)
+
+    df = pd.read_sql_table('current_dataframe', con=db_engine)
+
+    return df
 
 
 # colorCube -------------------------------------------------
