@@ -173,33 +173,47 @@ class ConstructGui:
         self.sv_lag1.set(str(lag1))
 
     def cmd_keypress(self, e):
-        if e.char == "p" or e.char == "q":
+        ''' for keypress in tkinter window '''
+        self.do_keypress(e.char)
+
+    def cmd_cv_keypress(self, input_int):
+        ''' for keypress on opencv window(s) '''
+        try:
+            input_str = chr(input_int)
+            self.do_keypress(input_str)
+        except:
+            pass
+    
+    def do_keypress(self, input_str):
+        ''' universal keypress function '''
+
+        if input_str == "p" or input_str == "q":
             self.cmd_play_sw()
-        if e.char == "s":
+        if input_str == "s":
             self.cmd_retreat()
-        if e.char == "a":
+        if input_str == "a":
             self.cmd_advance()
-        if e.char == "f":
+        if input_str == "f":
             self.cmd_snapWriteVid_sw()
-        if e.char == "g":
+        if input_str == "g":
             self.cmd_snapWriteScoring_sw()
-        if e.char == "h":
+        if input_str == "h":
             self.cmd_snapWriteOveride_sw()
-        if e.char == "z":
+        if input_str == "z":
             self.cmd_selectzoom()
-        if e.char == "c":
+        if input_str == "c":
             self.cmd_selectroimain()
-        if e.char == "x":
+        if input_str == "x":
             self.cmd_selectroizoom()
-        if e.char == "w":
+        if input_str == "w":
             self.cmd_writevid_sw()
-        if e.char == "i":
+        if input_str == "i":
             self.cmd_initWritevid_sw()
-        if e.char == "t":
+        if input_str == "t":
             self.cmd_sw_trackon()
-        if e.char == "r":
+        if input_str == "r":
             self.cmd_selectreset()
-        if e.char == "o":
+        if input_str == "o":
             self.cmd_outputState()
             
 
@@ -928,6 +942,9 @@ class GuiInterface:
 
         if kwargs.get('writevidFn', None) is not None:
             self.gui.guiHeader.set_sv_writevidFn(str(kwargs.get('writevidFn', "n/a")))
+
+        if kwargs.get('cvKeypress', None) is not None:
+            self.gui.guiHeader.cmd_cv_keypress( kwargs.get('cvKeypress', None))
         
 
     def initGui(self, playOnVal, frameDelayVal):

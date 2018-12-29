@@ -122,6 +122,8 @@ class Display:
         self.modZeroSize = 40
 
         self.zoomFct = None
+
+        self.keypress = None
         
 
     def setOrientation(self, iOrientation):
@@ -157,6 +159,12 @@ class Display:
 
     def getShowScoring(self):
         return self.bShowScoring
+
+    def getKeypress(self):
+        return self.keypress
+
+    def setKeypress(self, val):
+        self.keypress = val
 
     def setCmd( self
                 ,cmdSelectZoom=False
@@ -701,6 +709,8 @@ class Display:
         if not(self.showOn):
             return
 
+        key, key2, key3 = 255, 255, 255
+        
         self.orientCheck()
 
         windowName = 'img_display'
@@ -842,26 +852,14 @@ class Display:
             cv2.imshow(windowName, self.scoreFrame)
             key3 = cv2.waitKey(1) & 0xFF
 
-        #new func -----------
-        if key == ord("s"):
-            initBB = cv2.selectROI("img_display", self.frame, True, False )
+        # keypress, pass to gui -----------
+        cvKeypress = None
+        if (key3 != 255): cvKeypress = key3
+        if (key2 != 255): cvKeypress = key2
+        if (key != 255): cvKeypress = key
+        self.setKeypress(cvKeypress)
+        
 
-        if self.zoomOn and self.zoomFrame is not None and self.windowTwo:
-            pass
-            #TODO - key2 only if windowTwo is shown
-            #TODO - add key3
-            # if key2 == ord('z'):
-
-            #     self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect))
-                
-            #     self.resetOperators()
-                
-
-            # if key2 == ord('x'):
-
-            #     self.zoomRect = self.zoomInRect(copy.copy(self.zoomRect)
-            #                                     ,b_zoomout=True)
-            #     self.resetOperators()
                 
     # test helpers --------------------
     # use these only for test stubs

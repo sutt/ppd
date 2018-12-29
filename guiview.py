@@ -421,6 +421,10 @@ while(True):
                                       ,timeFactory = timeFactory
                                       ,notesFactory = notesFactory)
         
+        if b_gui:
+            guiInterface.update(cvKeypress=display.getKeypress())
+
+
         # new frame section
         if frameFactory.queryNewFrame():
             
