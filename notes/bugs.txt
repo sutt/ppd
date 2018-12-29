@@ -51,8 +51,8 @@
 
         Misc fun stuff
         [x] progress bar
-        [ ] keypress cv2 -> tkinter
-        [ ] turn off semiloaded/preloaded for eval runs?
+        [x] keypress cv2 -> tkinter
+        [~] turn off semiloaded/preloaded for eval runs?
     
 
 12/27

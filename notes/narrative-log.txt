@@ -1,3 +1,11 @@
+12/28
+
+"virutal frames" 1MHz Framerate from iPhoneX but only for pure black&white scenes
+https://www.technologyreview.com/s/612410/how-to-mod-a-smartphone-camera-so-it-shoots-a-million-frames-per-second/
+
+for pt2. - config + positioning
+https://stackoverflow.com/questions/33025904/ar-with-external-tracking-alignment-is-wrong-values-are-right
+
 12/20
 
 objTracker doesn't have to be perfect right now; in the next stages we'll add scope-limiting assumptions, knowledge priors, and agent policy restrictions. Here we just have to produce a decent baseline. Then we can see what we're still missing, even after the business logic fills-in some misses.
