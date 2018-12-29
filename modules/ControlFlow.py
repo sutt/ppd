@@ -291,6 +291,11 @@ class TimeFactory:
             self.avgFps = None
             self.avgFrametime = None
 
+    def getFrameTotal(self):
+        if self.cumtime is not None:
+            if len(self.cumtime) > 0:
+                return len(self.cumtime)
+        return -1
 
     def setDelay(self, b_delay):
         self.b_delay = b_delay

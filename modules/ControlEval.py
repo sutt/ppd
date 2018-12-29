@@ -24,7 +24,7 @@ class EvalFactory:
         logic of guiview 
     '''
     
-    def __init__(self, on=False):
+    def __init__(self, on=False, bProgressBar=True):
         self.on = on
 
         self.data = None
@@ -39,6 +39,12 @@ class EvalFactory:
         self.currentInputScore = None
         self.currentTrackScore = None
 
+        self.bProgressBar = bProgressBar
+        self.progressBarCounter = None
+        self.progressBarMod = None
+        self.progressBarWidth = None
+        self.frameTotal = None
+
         self._init()
 
     def isOn(self):
@@ -51,6 +57,17 @@ class EvalFactory:
             return
         
         print '\nSTART - running eval module...'
+
+        if self.bProgressBar:
+            
+            self.progressBarCounter = 0
+            self.progressBarMod = 30
+            self.progressBarWidth = 30
+            self.frameTotal = 0
+
+            sys.stdout.write("[%s]" % (" " * self.progressBarWidth))
+            sys.stdout.flush()
+            sys.stdout.write("\b" * (self.progressBarWidth + 1))
         
         self.data = []
         
@@ -81,6 +98,23 @@ class EvalFactory:
             return True
         return False
 
+    def updateByVid(self, frameTotal=None):
+        
+        if not(self.on):
+            return
+        
+        if frameTotal is not None:
+            if frameTotal > 0:
+                
+                self.frameTotal = frameTotal
+        
+                self.progressBarMod = int(self.frameTotal / self.progressBarWidth) + 1
+
+        # TODO - add numbers to progress bar
+        # https://stackoverflow.com/questions/3160699/python-progress-bar
+                
+        
+
     def setInputs(self
                  ,inputScore
                  ,trackScore
@@ -101,6 +135,21 @@ class EvalFactory:
         ''' not implemented; jsut an idea'''
         pass
 
+    def progressBar(self):
+        ''' update progress bar '''
+        
+        if not(self.bProgressBar):
+            return
+        
+        if self.progressBarCounter % self.progressBarMod == 0:
+            
+            sys.stdout.write("-")
+            sys.stdout.flush()
+
+        self.progressBarCounter += 1
+
+
+
     def evalFrame(self, *args):
 
         list_data = []
@@ -120,6 +169,8 @@ class EvalFactory:
             list_data.append(_val)
 
         self.data.append(list_data)
+
+        self.progressBar()
 
     def outputData(self):
 
@@ -149,6 +200,7 @@ class EvalFactory:
                             ,con = engine
                             ,if_exists='replace')
 
+        sys.stdout.write("\n")
         print 'output db: %s' % str(self.dbPathFn)
         
         rows, cols = self.data_pd.shape

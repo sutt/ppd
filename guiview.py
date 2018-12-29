@@ -329,6 +329,8 @@ while(True):
     
     timeFactory.setT0()
 
+    evalFactory.updateByVid(frameTotal=timeFactory.getFrameTotal())
+
     if b_gui:
         
         guiInterface.updateByVid(vidFn=directoryFactory.vidFn()

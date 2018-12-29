@@ -50,8 +50,9 @@
                 which preserves the videos frame amount.
 
         Misc fun stuff
-        [ ] progress bar
-        [ ] keypress cv2->tkinter
+        [x] progress bar
+        [ ] keypress cv2 -> tkinter
+        [ ] turn off semiloaded/preloaded for eval runs?
     
 
 12/27
