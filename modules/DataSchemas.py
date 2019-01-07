@@ -246,6 +246,69 @@ class ScoreSchema:
 
         return None
 
+    @staticmethod
+    def getScalarFields(num_objs=4, num_data_cols=4):
+        ''' return list of str, representing col names for this score_schema
+
+            num_objs (int) total number of objects to repeat this for
+            num_data_cols (int)
+
+                obj_exists_<objI>, 
+                obj_type_<objI>, 
+                data<0>_<objI>, data<1>_<objI>, ...data<num_data_cols>_<objI>
+        '''
+        fields = []
+
+        scalar_fields = ['obj_exists','obj_type']
+        data_fields = ['data' + str(i) for i in range(num_data_cols)]
+        scalar_fields.extend(data_fields)
+        
+        for _objI in range(num_objs):
+            
+            _fields = copy.copy(scalar_fields)
+            _fields = [str(elem) + '_' + str(_objI) for elem in _fields]
+            fields.extend(_fields)
+
+        return copy.copy(fields)
+
+
+    def toScalars(self, num_data_cols=4):
+        '''
+            return dict with keys and values corresponding to all objEnums
+            that exists. keys:  (I=objEnum)
+                obj_exists_I
+                obj_type_I
+                data0_I
+                ...
+                data<num_cols>_I
+        '''
+
+        if not(self.checkHasContents):
+            return None
+
+        outputDict = {}
+        for _objEnum in self.data.keys():
+            
+            outputDict['obj_exists_' + str(_objEnum)] = True
+
+            outputDict['obj_type_' + str(_objEnum)] = self.data[_objEnum].get('type', None)
+
+            _dataStruct = self.data[_objEnum].get('data', None)
+
+            if _dataStruct is None:
+                continue
+            
+            for iCol in range(num_data_cols):
+                
+                _val = None
+                if iCol < len(_dataStruct):
+                    _val = _dataStruct[iCol]
+
+                outputDict['data' + str(iCol) + '_' + str(_objEnum)] = _val
+        
+        return outputDict
+
+
 
 def test_getObjRect_1():
     

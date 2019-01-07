@@ -1,5 +1,82 @@
 #Tasks
 
+1/7
+
+    Basic outputOutcomeData
+    [x] data_fields in getScalarFields() needs underscore in naming
+
+    Advanced method:
+    [ ] add tuple objects to pandas/sql
+    [ ] don't need dump/load ScoreSchema into EvalFactory
+
+
+
+1/4 - 1/6
+
+    [x] see if pandas dataframe can work to merge dicts of full_cols with
+        particular frame's cols e.g. pd_base.addRecord({'scoreObj':0, ...})
+
+    [x] add toScalars() and getScalarFields()
+    
+    [x] add pandas logic to outputOutcomeData
+
+    [x] new idea: all just dictionary until final step
+
+    Misc Extras:
+        
+        [ ] Extra Eval Methods:
+            [ ] checkLocalMovement - is the ball in roughly the same region as previous?
+            [ ] checkRadiusChange - is the ball's radius roughly the same as last time?
+                [ ] add a plot across all frames
+
+1/1 - 1/4
+
+    [x] rip out current EvalModule; replace with trackScore and inputScore properties
+        only
+        [x] how do we handle 4 objEnum's?
+            for each objEnum: we have a 'type' and the 'data'
+            how do we handle tuples/list in 'data'?
+        
+        [x] write tbl col names within scoreSchema ?
+        
+        [ ] also we need notes on that frame
+
+        [x] how do add a scoreSchema object to a list with deep copying?
+            [ ] write unit-test / pandas
+
+        [ ] how to store tuples in pandas?
+
+    [ ] Test / Note any features needed for "adding challenge frames iteratively"
+        via guiview workflow
+
+    tuples -> sql
+
+        [x] ScoreSchema.toScalars() / .fromScalars()
+            for each obj-type (ray vs circle) we decompose into scalars
+            but what 
+             - the main issue here is we may have unexpectedly add columns
+               for a new type of object
+             - if some records have int's but other have nones does that make
+               the sql data tables incompatible?
+        
+        [x] object in pandas then df.to_sql(), then we can get tuples out?
+            [ ] can we get a tuple out of an entry
+            [ ] how are tuples saved in sqlite?
+
+        [ ] another way to do it to create a record for each scalar in a separate
+            table with a join to the frame_eval_table
+
+        [ ] another way is with ORM e.g. sqlalchemy
+
+        [ ] can use a combination of these styles: e.g. DF = 
+            data_type   data_object     data0   data1   ...
+            ray         ((1,2),(3,4))   1       2       ...
+            circle      ((5,6),(7,8))   5       6       ...
+            where we have object/tuple AND scalars
+
+    within EvalFactory we can have the loadEvalData() function as well as methods to 
+    apply the evalMethods.
+
 12/28
 
     [ ] Pandas work: filtering + calcd fields + aggregated fields

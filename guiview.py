@@ -241,6 +241,7 @@ if args["batchdbpathfn"] != "":
 
 if args["eval"]:
     b_eval = True
+    b_preload = False
 
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
@@ -472,6 +473,7 @@ while(True):
                             )
             
             evalFactory.evalFrame()
+            evalFactory.outcomeFrame()
             
         
         if ret and not(trackFactory.getTrackOnChange()):

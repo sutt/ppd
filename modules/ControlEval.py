@@ -1,5 +1,6 @@
 import sys, copy, random, subprocess, time
 import pickle
+import sqlalchemy
 import cv2
 import numpy as np
 import io
@@ -8,20 +9,18 @@ from PIL import Image
 from collections import OrderedDict
 from itertools import combinations
 from Interproc import DBInterface
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
 from DataSchemas import  ScoreSchema
 from EvalHelpers import EvalTracker, EvalDataset
-import sqlalchemy
+
 
 
 class EvalFactory:
 
-    ''' interfaces Eval Classes and calcs to work with the control-flow 
-        logic of guiview 
+    ''' outputs inputScore and trackScore into sql for communication
+        with next process
     '''
     
     def __init__(self, on=False, bProgressBar=True):
@@ -29,6 +28,9 @@ class EvalFactory:
 
         self.data = None
         self.data_pd = None
+
+        self.outcome_data = None
+        self.outcome_data_pd = None
 
         self.db = None
         self.dbPathFn = None
@@ -79,6 +81,8 @@ class EvalFactory:
 
         self.currentInputScore = ScoreSchema()
         self.currentTrackScore = ScoreSchema()
+
+        self.outcome_data = []
         
         self.eval_method_names = [
             'checkBaselineInsideTrack',
@@ -95,6 +99,7 @@ class EvalFactory:
         ''' allows us to exit from guiview loop'''
         if self.on:
             self.outputData()
+            self.outputOutcomeData()
             return True
         return False
 
@@ -109,10 +114,6 @@ class EvalFactory:
                 self.frameTotal = frameTotal
         
                 self.progressBarMod = int(self.frameTotal / self.progressBarWidth) + 1
-
-        # TODO - add numbers to progress bar
-        # https://stackoverflow.com/questions/3160699/python-progress-bar
-                
         
 
     def setInputs(self
@@ -129,6 +130,8 @@ class EvalFactory:
             self.currentTrackScore.reset()
         else:
             self.currentTrackScore.load(trackScore)
+
+        # self.data_input.append(self.currentTrackScore)
         
 
     def _setInputScore(self, inputScore):
@@ -148,7 +151,12 @@ class EvalFactory:
 
         self.progressBarCounter += 1
 
-
+    def outcomeFrame(self, *args):
+        ''' add outcome data to preserved data '''
+        dict_data = {}
+        dict_data['inputScore'] = copy.deepcopy(self.currentInputScore)
+        dict_data['trackScore'] = copy.deepcopy(self.currentTrackScore)
+        self.outcome_data.append(dict_data)
 
     def evalFrame(self, *args):
 
@@ -171,6 +179,84 @@ class EvalFactory:
         self.data.append(list_data)
 
         self.progressBar()
+
+    def outputOutcomeData(self):
+        ''' take ScoreSchema obj's in outcome_data and output to a sql table
+            
+            steps:
+                - outcome_data transformed to a dict of columns
+                - inserted into pandas dataframe, outcome_data_pd
+                - dataframe to sql via sqlalchemy
+
+                field naming template:
+                <type>_<field_name><field_num(opt)>_<objenum>
+
+                    type: 'input' vs. 'track'
+                    field_name: some string denoting what it means
+                    field_num: (optional) to distinguish data
+                    objenum: num corresponding to ob
+
+
+        '''
+        
+        base_fields = ScoreSchema.getScalarFields(num_objs=4)
+        
+        all_fields = (str(_type) + '_' + str(_field)
+                        for _field in base_fields 
+                        for _type in ('input', 'track')
+                        )
+        full_data = {}
+        for _field in all_fields:
+            full_data[_field] = []
+        
+        for _record in copy.deepcopy(self.outcome_data):
+            
+            _typeDicts = []
+            for _type in ('input', 'track'):
+
+                try:
+                
+                    _typeKey = _type + 'Score'
+                    _scoreObj = _record[_typeKey]
+
+                    assert _scoreObj is not None
+                    assert _scoreObj.__class__.__name__ == 'ScoreSchema'
+
+                    _scalarsDictTmp = _scoreObj.toScalars()
+
+                    _scalarsDict = {}
+                    for _k in _scalarsDictTmp.keys():
+                        _scalarsDict[str(_type) + '_' + str(_k)] = _scalarsDictTmp[_k]
+
+                except:
+                    _scalarsDict = {}
+
+                _typeDicts.append(_scalarsDict)
+
+            _recordDict = {}
+            for _typeDict in _typeDicts:
+                for _field in _typeDict:
+                    _recordDict[_field] = _typeDict[_field]
+
+            for _field in full_data:
+                full_data[_field].append(
+                    _recordDict.get(_field, None)
+                )
+            
+        # data to pandas
+        self.outcome_data_pd = pd.DataFrame(full_data)
+
+        # output to db 
+        engine = sqlalchemy.create_engine('sqlite:///' + self.dbPathFn
+                                            ,echo=False)
+        
+        self.outcome_data_pd.to_sql('output_dataframe'
+                            ,con = engine
+                            ,if_exists='replace')
+
+        sys.stdout.write("\n")
+        print 'output db: %s' % str(self.dbPathFn)
+
 
     def outputData(self):
 
