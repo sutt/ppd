@@ -5,9 +5,38 @@
     Basic outputOutcomeData
     [x] data_fields in getScalarFields() needs underscore in naming
 
-    Advanced method:
-    [ ] add tuple objects to pandas/sql
-    [ ] don't need dump/load ScoreSchema into EvalFactory
+    [ ] Advanced outcomeData methods
+        [ ] add tuple objects to pandas/sql
+        [ ] don't need dump/load ScoreSchema into EvalFactory
+        [ ] add notes to the table
+            [ ] as a json object
+            [ ] as scalars
+
+    [ ] understand the properties of fields in pandas / sql
+        [ ] what happens with None vs. np.NaN ?
+        [ ] how does this affect aggregation ?
+
+    [x] Refactor EvalFactory
+        [x] eliminate eval_methods as output
+
+    [ ] Methods for the table; add these to a class
+        [ ] filter cols for one objEnum
+        [ ] filter rows for criteria
+            [ ] only rows with input-scores
+            [ ] only rows where track fails
+        [ ] apply eval dataset to 
+
+    [ ] subprocEval enhancements:
+        [ ] does progress bar print within subprocEval inside jupyter?
+            it shouldn't because subproc is running in a shell
+        [ ] make progress bar work in subprocEval
+
+    Bugs:
+        [ ] track_obj_exists_I is always true when tracking is turned on
+            but it doesn't capture TrackFactory.currentTrackSuccess
+        [ ] how to copy/paste pythonically in vscode?
+        [ ] how to one button split window vscode?
+    
 
 
 

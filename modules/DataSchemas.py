@@ -1,22 +1,7 @@
 import copy
 
 '''
-    [x] How to modify an existing score
-    [ ] Object Types: an enum
-        BALL_A - a stationary ball
-        BALL_B - a ball in motion
-        BALL_C - something in between?
-    [x] Object Enums, e.g. 1=ball, 2= ball reflection, 3=drone, 4=drone reflection
-    [x] Circle vs Ray Score types
     [ ] score_types as training vs challenge
-
-    [x] Annotate objects with objEnum on frame
-
-    Notes:
-        tagging #TODO-SS for relvant areas 
-
-        Display: .scoreRect .roiRectScoring | .circleTrack
-        NotesFactory:  .frameScoring  
 
 '''
 
@@ -301,93 +286,24 @@ class ScoreSchema:
             for iCol in range(num_data_cols):
                 
                 _val = None
-                if iCol < len(_dataStruct):
-                    _val = _dataStruct[iCol]
+                
+                if self.data[_objEnum].get('type', None) == 'circle':
+                    
+                    if iCol < len(_dataStruct):
+                        _val = _dataStruct[iCol]
+
+                elif self.data[_objEnum].get('type', None) == 'ray':
+
+                    if iCol < 4:
+                        _val = _dataStruct[iCol / 2][iCol % 2]
+
+                else:
+                    
+                    #TODO - add warning
+                    if iCol < len(_dataStruct):
+                        _val = _dataStruct[iCol]
 
                 outputDict['data' + str(iCol) + '_' + str(_objEnum)] = _val
         
         return outputDict
 
-
-
-def test_getObjRect_1():
-    
-    score = {
-                "0":{
-                    "type":"ray",
-                    "data": [[100,50], [200, 75]]
-                },
-                "1":{
-                    "type":"ray",
-                    "data": [[200, 75], [100,50]]
-                }
-			}
-
-    ss = ScoreSchema()
-    ss.load(score)
-
-    assert ss.getObjRect(0) == ss.getObjRect(1)
-
-    assert ss.getObjRect(0) == (100, 50, 100, 25)
-
-    score = {
-                "0":{
-                    "type":"ray",
-                    "data": [[100,50], [200, 25]]
-                }
-			}
-
-    ss.load(score)
-
-    ss.getObjRect(0) == (100, 25, 100, 25)
-
-def test_getObjRect_2():
-    
-    score = {
-                "1":{
-                    "type":"circle",
-                    "data": [100,50, 99, 99]
-                }
-			}
-
-    ss = ScoreSchema()
-    ss.load(score)
-
-    assert ss.getObjRect(1) == (100, 50, 99, 99)
-
-def test_checkHasValid_1():
-
-    score = {
-                "0":{
-                    "type":"circle",
-                    "data": [20, 40, 50, 60]
-                },
-                "1":{
-                    "type":"circle",
-                    "data": [-10, -20, 40, 40]
-                }
-			}
-
-    ss = ScoreSchema()
-    ss.load(score)
-
-    assert ss.checkHasValid()
-
-    score = {
-                "0":{
-                    "type":"circle",
-                    "data": [-10, 20, 40, 40]
-                },
-                "1":{
-                    "type":"circle",
-                    "data": [10, 20, -40, 40]
-                }
-			}
-
-    ss = ScoreSchema()
-    ss.load(score)
-
-    assert ss.checkHasValid() == False
-
-if __name__ == "__main__":
-    test_checkHasValid_1()

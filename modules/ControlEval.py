@@ -26,9 +26,6 @@ class EvalFactory:
     def __init__(self, on=False, bProgressBar=True):
         self.on = on
 
-        self.data = None
-        self.data_pd = None
-
         self.outcome_data = None
         self.outcome_data_pd = None
 
@@ -71,7 +68,7 @@ class EvalFactory:
             sys.stdout.flush()
             sys.stdout.write("\b" * (self.progressBarWidth + 1))
         
-        self.data = []
+        self.outcome_data = []
         
         self.dbPathFn = "data/usr/eval_tmp.db"
         self.db = DBInterface(self.dbPathFn)
@@ -81,24 +78,11 @@ class EvalFactory:
 
         self.currentInputScore = ScoreSchema()
         self.currentTrackScore = ScoreSchema()
-
-        self.outcome_data = []
         
-        self.eval_method_names = [
-            'checkBaselineInsideTrack',
-            'checkBothContainsOther',
-            'checkEitherContainsOther',
-            'checkTrackInsideBaseline',
-            'checkTrackInsideBaselineRect',
-            'checkTrackSuccess',
-            'compareRadii',
-            'distanceFromBaseline'
-            ]
 
     def checkExit(self):
         ''' allows us to exit from guiview loop'''
         if self.on:
-            self.outputData()
             self.outputOutcomeData()
             return True
         return False
@@ -130,26 +114,7 @@ class EvalFactory:
             self.currentTrackScore.reset()
         else:
             self.currentTrackScore.load(trackScore)
-
-        # self.data_input.append(self.currentTrackScore)
         
-
-    def _setInputScore(self, inputScore):
-        ''' not implemented; jsut an idea'''
-        pass
-
-    def progressBar(self):
-        ''' update progress bar '''
-        
-        if not(self.bProgressBar):
-            return
-        
-        if self.progressBarCounter % self.progressBarMod == 0:
-            
-            sys.stdout.write("-")
-            sys.stdout.flush()
-
-        self.progressBarCounter += 1
 
     def outcomeFrame(self, *args):
         ''' add outcome data to preserved data '''
@@ -157,46 +122,19 @@ class EvalFactory:
         dict_data['inputScore'] = copy.deepcopy(self.currentInputScore)
         dict_data['trackScore'] = copy.deepcopy(self.currentTrackScore)
         self.outcome_data.append(dict_data)
-
-    def evalFrame(self, *args):
-
-        list_data = []
-
-        self.ev.setBaselineScore(self.currentInputScore.getAll())
-    
-        _trackScore = self.currentTrackScore.getAll()
-        
-        for meth_name in self.eval_method_names:
-
-            try:
-                _evMeth = getattr(self.ev, meth_name)
-                _val = _evMeth(_trackScore)
-            except:
-                _val = None
-            
-            list_data.append(_val)
-
-        self.data.append(list_data)
-
         self.progressBar()
+
 
     def outputOutcomeData(self):
         ''' take ScoreSchema obj's in outcome_data and output to a sql table
-            
-            steps:
-                - outcome_data transformed to a dict of columns
-                - inserted into pandas dataframe, outcome_data_pd
-                - dataframe to sql via sqlalchemy
 
-                field naming template:
+            field naming template:
                 <type>_<field_name><field_num(opt)>_<objenum>
 
                     type: 'input' vs. 'track'
                     field_name: some string denoting what it means
                     field_num: (optional) to distinguish data
                     objenum: num corresponding to ob
-
-
         '''
         
         base_fields = ScoreSchema.getScalarFields(num_objs=4)
@@ -254,41 +192,23 @@ class EvalFactory:
                             ,con = engine
                             ,if_exists='replace')
 
+        # cli logging
         sys.stdout.write("\n")
         print 'output db: %s' % str(self.dbPathFn)
 
-
-    def outputData(self):
-
-        data = copy.deepcopy(self.data)
-
-        # data to form readable by pandas
-        dict_data = {}
-        
-        for j_col in range(len(self.eval_method_names)):
-            
-            _tmp = []
-            
-            for i_row in range(len(data)):
-            
-                _tmp.append(data[i_row][j_col])
-            
-            dict_data[self.eval_method_names[j_col]] = _tmp
-            
-        # data to pandas
-        self.data_pd = pd.DataFrame(dict_data)
-
-        # output to db 
-        engine = sqlalchemy.create_engine('sqlite:///' + self.dbPathFn
-                                            ,echo=False)
-        
-        self.data_pd.to_sql('current_dataframe'
-                            ,con = engine
-                            ,if_exists='replace')
-
-        sys.stdout.write("\n")
-        print 'output db: %s' % str(self.dbPathFn)
-        
-        rows, cols = self.data_pd.shape
+        rows, cols = self.outcome_data_pd.shape
         print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
 
+
+    def progressBar(self):
+        ''' update progress bar '''
+        
+        if not(self.bProgressBar):
+            return
+        
+        if self.progressBarCounter % self.progressBarMod == 0:
+            
+            sys.stdout.write("-")
+            sys.stdout.flush()
+
+        self.progressBarCounter += 1

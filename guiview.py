@@ -472,7 +472,6 @@ while(True):
                             ,trackScore=trackFactory.getTrackScore()
                             )
             
-            evalFactory.evalFrame()
             evalFactory.outcomeFrame()
             
         
