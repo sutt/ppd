@@ -1,6 +1,53 @@
 #Tasks
 
-1/7
+1/8
+
+    10:00 - 11:00
+        [x] load() method in evalFactory / analysisHelpers
+        [x] displayRelevant / filter methods in the class
+        [ ] pandas -> ScoreSchema
+        [ ] unittests
+        [ ] add frame-notes
+        [ ] add track-notes e.g. currentTrackSuccess
+
+    11:00 - 12:00
+        [ ] outputOutcomeData unittests
+        [ ] aggregate eval dataset
+        [ ] add tuples to sql
+        
+    12:00 - 1:00
+        [ ] subproc wrapper
+        [ ] applyEval
+        [ ] unit tests for --eval run
+
+    other
+        [ ] add trackTimer data
+            [ ] this need to be logged multiple times for 
+        [ ] other diagnostic plots e.g. x+y distance
+        [ ] catch plt.show() and plt.plot() and override into subplot
+            to form horizontal displayed subplots
+    
+    misc
+        [ ] remove 'from itertools import combinations' from multiple modules
+        [ ] progress bar for batchOutput()
+
+    ideas
+        [ ] 10 commands to ppd-objTracking
+            e.g. 
+                1 >python guiview.py --file --tracker --showscoring
+                2 >python guiview.py --eval
+                3 >load that table in jupyter
+                4 >get listGS of failures
+                5 >run analysis on fail-frames
+                7 >guirecord.py 
+                8 >timelog.py
+                9
+                10 >add the video to the data directory
+                11 >run eval with new vid
+
+                12 >write a new tracker
+                13 >eval it
+        [ ] document: 'track'= y_hat, 'input' / 'scored' = y
 
     Basic outputOutcomeData
     [x] data_fields in getScalarFields() needs underscore in naming
@@ -19,23 +66,26 @@
     [x] Refactor EvalFactory
         [x] eliminate eval_methods as output
 
-    [ ] Methods for the table; add these to a class
-        [ ] filter cols for one objEnum
-        [ ] filter rows for criteria
-            [ ] only rows with input-scores
-            [ ] only rows where track fails
-        [ ] apply eval dataset to 
+    [x] Methods for the table; add these to a class
+        [x] filter cols for one objEnum
+        [x] filter rows for criteria
+            [x] only rows with input-scores
+            [x] only rows where track fails
+        [~] apply eval dataset to 
 
     [ ] subprocEval enhancements:
         [ ] does progress bar print within subprocEval inside jupyter?
             it shouldn't because subproc is running in a shell
         [ ] make progress bar work in subprocEval
+            using a pipe from the shell?
+        [ ] how to make this work for multi-vid or multi-algo runs?
 
     Bugs:
         [ ] track_obj_exists_I is always true when tracking is turned on
             but it doesn't capture TrackFactory.currentTrackSuccess
         [ ] how to copy/paste pythonically in vscode?
         [ ] how to one button split window vscode?
+        [ ] add a next video shortcut key for --dir runs
     
 
 
@@ -128,9 +178,9 @@
         [x] how to pickle it into sqlite?
 
         TODO
-        [ ] need to add tracker score properties
-        [ ] need to add inputscore properties
-        [ ] why do we even do eval inside guiview? all we need is those properties
+        [x] need to add tracker score properties
+        [x] need to add inputscore properties
+        [x] why do we even do eval inside guiview? all we need is those properties
         [ ] difference of each frame for different algos
             [ ] for boolean: improvement or regression?
             [ ] for number data: improvement or regression?
@@ -158,7 +208,7 @@
         Misc fun stuff
         [x] progress bar
         [x] keypress cv2 -> tkinter
-        [~] turn off semiloaded/preloaded for eval runs?
+        [x] turn off semiloaded/preloaded for eval runs?
     
 
 12/27

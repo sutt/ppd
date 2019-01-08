@@ -13,6 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
+import sqlalchemy
 
 
 
@@ -172,8 +173,6 @@ class EvalTracker:
         return ( float(df_main['distanceFromBaseline']) / 
                  (float(df_props['propBaselineRadius']) * 2.0)  
                 )
-
-
 
 
 
@@ -582,3 +581,210 @@ class EvalDataset:
             dict_ret[str(_k)] = _v
 
         return dict_ret
+
+
+
+class OutcomeData:
+
+    ''' for loading and manipulating the output of guiview --eval '''
+    
+    def __init__(self, 
+                 dbPathFn='data/usr/eval_tmp.db',
+                 tblName='outcome_dataframe',
+                 bLoad=True
+                 ):
+
+        self.outcomeData = None
+        self.dbPathFn = dbPathFn
+        self.tblName = tblName
+        self.loaded=False
+        
+        if bLoad:
+            self.load()
+
+        #TODO - add eval methods
+        # if bEval:
+        #     self.eval()
+
+    def get(self):
+        return self.outcomeData
+    
+    def load(self):
+
+        db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + self.dbPathFn)
+        self.outcomeData = pd.read_sql_table(self.tblName, con=db_engine)
+        self.loaded=True
+
+    def displayCondensedTable(self, objEnum=0):
+        ''' display only cols for requested obj-enum
+            display only rows for frame with an input-score
+        '''
+        rows = self.filterInputScoreRows(self.outcomeData, objEnum)
+        cols = self.filterObjCols(self.outcomeData, objEnum)
+        return self.outcomeData[rows][cols]
+
+    def displaySummaryStats(self):
+
+        NUM_OBJS = 6
+
+        # build stats
+        n = self.outcomeData.shape[0]
+        
+        objsScored = [i for i in range(NUM_OBJS) 
+                        if any([elem == True for elem in 
+                                self.outcomeData.get('input_obj_exists_' + str(i), [])]
+                        )]
+        
+        objsTracked = [i for i in range(NUM_OBJS) 
+                        if any([elem == True for elem in 
+                                self.outcomeData.get('track_obj_exists_' + str(i), [])]
+                        )]
+
+        inputIndices = [[i for i,v in enumerate(
+                                    self.outcomeData['input_obj_exists_' + str(obj_enum)] 
+                                    ) if v == True]
+                        for obj_enum in objsScored]
+        
+        inputIndices = list(reduce(lambda a,b: set.union(set(a), set(b)), inputIndices))
+
+        numInputs = len(inputIndices)
+
+        
+        # format stats
+        _n = str(n)
+        _objsScored = ",".join([str(elem) for elem in objsScored])
+        _objsTracked = ",".join([str(elem) for elem in objsTracked])
+
+        inputIndices.sort()
+        _inputIndices = [str(elem) for elem in inputIndices]
+        _max_lo, _max_hi = min(len(inputIndices), 3), max(min(len(inputIndices) - 3, 3), 0)
+        _inputIndices = (','.join(_inputIndices[:_max_lo]) + 
+                         ('' if _max_hi == 0 else 
+                          '...' + ','.join(_inputIndices[-_max_hi:])
+                         ))
+        _numInputs = str(numInputs)
+        
+        
+        print 'num frames:                  %s'          %  _n
+        print 'obj enums scored/tracked:    %s / %s'     % (_objsScored, _objsTracked)
+        print 'num scored frames:           %s | %s'     % (_numInputs, _inputIndices)
+        
+        print '-------'
+        
+        # other stats? - this won't include eval data yet
+
+
+    def displaySeriesPlot(self, col_names=None, calc_fields=None, obj_legend=None
+                                ,chart_title=None):
+        ''' plot of the specified series; either col_names or calc_fields is not None
+
+            col_names   - None, str, list-of-str
+                            plot the column names specified; auto created legend
+            calc_fields - None, list-of-list-of-value_data(int/float)
+                            plot the fields data passed-in; req's obj_legend for legend
+            obj_legend  - None, list-of-str
+                            list of series titles
+
+            examples:
+
+                displaySeriesPlot(col_names=['obj_exists_0'])
+                
+                displaySeriesPlot(calc_fields=[[1,2,3], [1,0,1]], obj_legend=['a','b'])
+        '''
+        if col_names is not None:
+            
+            for _col in col_names:
+                plt.plot(self.outcomeData[_col])
+            
+            if obj_legend is None:
+                #col_names.reverse()?   #TODO
+                plt.legend(col_names)
+
+        if calc_fields is not None:
+            
+            for _field in calc_fields:
+                
+                if type(_field) is list:
+                    plt.plot(_field)
+
+                elif type(_field) is dict:
+                    xkeys = [_k for _k in _field.keys()]
+                    xkeys.sort()
+                    yvals = [_field[_k] for _k in xkeys]
+                    plt.scatter(xkeys, yvals, c='orange')
+        
+            if obj_legend is not None:
+                plt.legend(obj_legend)
+
+        if chart_title is not None:
+            plt.title(chart_title)
+
+        plt.show()
+
+    def buildDiameterPlotData(self, objEnum=0, b_all_frames=True):
+        ''' runs a preconfigured comparison plot and returns the raw data
+            compares the diameter of track vs input
+                note: diameter is minimum of enclosing rect dimensions
+        '''
+        data = []
+        legend = []
+        
+        df = self.outcomeData
+        
+        if not(b_all_frames):
+            df = df[self.filterInputScoreRows(df, objEnum=objEnum)]
+        
+        # build data structure
+        for _type in ('input', 'track'):
+            
+            _fields =  [_type + '_' + elem + '_' + str(objEnum) 
+                        for elem in ('data2', 'data3')
+                       ]
+            
+            _series = [min(a,b) for a,b in zip( list(df[_fields[0]])
+                                               ,list(df[_fields[1]])
+                                )]
+            
+            if _type == 'track' or not(b_all_frames):
+                
+                data.append(_series)
+            
+            elif _type == 'input':
+                
+                filtered_kv = [(i,v) for i,v in enumerate(_series)
+                                if not(np.isnan(v))]
+                xy_dict = {}
+                for k,v in filtered_kv:
+                    xy_dict[k] = v
+
+                data.append(xy_dict)
+
+            legend.append(_type)
+        
+        # formatting
+        legend.reverse()
+        
+        chart_title = 'All Frames' if b_all_frames else 'Frames with Input Score'
+        
+        self.displaySeriesPlot(calc_fields=data, obj_legend=legend
+                                ,chart_title=chart_title)
+
+        return data
+
+
+    @staticmethod
+    def filterObjCols(df, objEnum=0):
+        obj_cols = filter(lambda sCol: sCol.find('_' + str(objEnum)) > -1, 
+                     list(df.columns))
+        return obj_cols
+
+    @staticmethod
+    def filterInputScoreRows(df, objEnum=0):
+        col_name = 'input_obj_exists_' + str(objEnum)
+        filtered_rows = df[col_name] == True
+        return filtered_rows
+
+    
+if __name__ == "__main__":
+    od = OutcomeData()
+    od.buildDiameterPlotData()

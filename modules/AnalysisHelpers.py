@@ -601,9 +601,21 @@ def subprocEval( f_pathfn
     # load from db - assume we're calling from ppd/books/
     db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + db_pathfn, echo=False)
 
-    df = pd.read_sql_table('current_dataframe', con=db_engine)
+    df = pd.read_sql_table('outcome_dataframe', con=db_engine)
 
     return df
+
+
+def loadOutcomeDataDf(db_pathfn="data/usr/eval_tmp.db"
+                      ,tbl_name='outcome_dataframe'):
+    ''' load from db and return pandas-df; assume we're calling from books/ dir '''
+    
+    db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + db_pathfn, echo=False)
+
+    return pd.read_sql_table(tbl_name, con=db_engine)
+
+
+    
 
 
 # colorCube -------------------------------------------------

@@ -20,10 +20,17 @@ from EvalHelpers import EvalTracker, EvalDataset
 class EvalFactory:
 
     ''' outputs inputScore and trackScore into sql for communication
-        with next process
+        with next process;
+        
+        (this will run "silent" [self.on=False] many times within
+         guiview so we construct it to do so lightly)
     '''
     
     def __init__(self, on=False, bProgressBar=True):
+        ''' everything init to None; real init data is in _init() 
+            where we can return before constructing heavy objects 
+        '''
+
         self.on = on
 
         self.outcome_data = None
@@ -31,6 +38,7 @@ class EvalFactory:
 
         self.db = None
         self.dbPathFn = None
+        self.dbTblName = None
         
         self.evData = None
         self.ev = None
@@ -70,6 +78,7 @@ class EvalFactory:
         
         self.outcome_data = []
         
+        self.dbTblName = 'outcome_dataframe'
         self.dbPathFn = "data/usr/eval_tmp.db"
         self.db = DBInterface(self.dbPathFn)
 
@@ -133,8 +142,8 @@ class EvalFactory:
 
                     type: 'input' vs. 'track'
                     field_name: some string denoting what it means
-                    field_num: (optional) to distinguish data
-                    objenum: num corresponding to ob
+                    field_num: (optional) to distinguish data scalars in a tuple
+                    objenum: num corresponding to obj
         '''
         
         base_fields = ScoreSchema.getScalarFields(num_objs=4)
@@ -188,7 +197,7 @@ class EvalFactory:
         engine = sqlalchemy.create_engine('sqlite:///' + self.dbPathFn
                                             ,echo=False)
         
-        self.outcome_data_pd.to_sql('output_dataframe'
+        self.outcome_data_pd.to_sql(self.dbTblName
                             ,con = engine
                             ,if_exists='replace')
 
@@ -197,6 +206,7 @@ class EvalFactory:
         print 'output db: %s' % str(self.dbPathFn)
 
         rows, cols = self.outcome_data_pd.shape
+        print 'output tbl: %s' % str(self.dbTblName)
         print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
 
 
