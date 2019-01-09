@@ -1,7 +1,22 @@
 #Tasks
 
-1/8
 
+1/9
+
+    tasks
+        [x] change name on graphic function
+        [x] add true x-values to b_all_frame=False
+        [x] test displaySeriesPlot
+        [x] refactor displayDiameterPlot() to simpler
+        [x] demo how to sort/rank return data for specific frames
+        
+        10:30 - 11:30 
+        [ ] apply eval to outcomeData
+
+        11:30 - 12:00
+        [ ] unit tests on today's  yesterday's work
+
+1/8
     10:00 - 11:00
         [x] load() method in evalFactory / analysisHelpers
         [x] displayRelevant / filter methods in the class
@@ -30,23 +45,10 @@
     misc
         [ ] remove 'from itertools import combinations' from multiple modules
         [ ] progress bar for batchOutput()
+        [ ] is long startup time in debug caused by ipython?
+            "pythonPath": (in launch.json)?
 
     ideas
-        [ ] 10 commands to ppd-objTracking
-            e.g. 
-                1 >python guiview.py --file --tracker --showscoring
-                2 >python guiview.py --eval
-                3 >load that table in jupyter
-                4 >get listGS of failures
-                5 >run analysis on fail-frames
-                7 >guirecord.py 
-                8 >timelog.py
-                9
-                10 >add the video to the data directory
-                11 >run eval with new vid
-
-                12 >write a new tracker
-                13 >eval it
         [ ] document: 'track'= y_hat, 'input' / 'scored' = y
 
     Basic outputOutcomeData

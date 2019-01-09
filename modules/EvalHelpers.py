@@ -697,7 +697,7 @@ class OutcomeData:
                 plt.plot(self.outcomeData[_col])
             
             if obj_legend is None:
-                #col_names.reverse()?   #TODO
+                
                 plt.legend(col_names)
 
         if calc_fields is not None:
@@ -721,55 +721,94 @@ class OutcomeData:
 
         plt.show()
 
-    def buildDiameterPlotData(self, objEnum=0, b_all_frames=True):
+    def displayDiameterPlot(self, objEnum=0, b_ret=False):
         ''' runs a preconfigured comparison plot and returns the raw data
             compares the diameter of track vs input
                 note: diameter is minimum of enclosing rect dimensions
+        
+        build allData as such:
+            {
+                plot1: (
+                             [series1_x1, series1_x2, ...]
+                            ,[series1_y1, series1_y2, ...]
+                        )
+                        (
+                             [series2_x1, series2_x2, ...]
+                            ,[series2_y1, series2_y2, ...]
+                        )        
+                plot2: ... 
+            }
         '''
-        data = []
-        legend = []
         
-        df = self.outcomeData
+        allData = {}
+        allLegend = {}
         
-        if not(b_all_frames):
-            df = df[self.filterInputScoreRows(df, objEnum=objEnum)]
-        
-        # build data structure
-        for _type in ('input', 'track'):
+        # build data
+        for _allFrames in (True, False):
             
-            _fields =  [_type + '_' + elem + '_' + str(objEnum) 
-                        for elem in ('data2', 'data3')
-                       ]
+            data, legend = {}, {}
             
-            _series = [min(a,b) for a,b in zip( list(df[_fields[0]])
-                                               ,list(df[_fields[1]])
-                                )]
-            
-            if _type == 'track' or not(b_all_frames):
+            if _allFrames:
+
+                df = self.outcomeData
+                x_index = list(df.index)
+
+            else:
+
+                ind = self.filterInputScoreRows(self.outcomeData, objEnum=objEnum)
+                df = self.outcomeData[ind]
+                x_index = [i for i,v in enumerate(ind) if v==True]
                 
-                data.append(_series)
-            
-            elif _type == 'input':
                 
-                filtered_kv = [(i,v) for i,v in enumerate(_series)
-                                if not(np.isnan(v))]
-                xy_dict = {}
-                for k,v in filtered_kv:
-                    xy_dict[k] = v
+            for _type in ('input', 'track'):
+                
+                _fields =  [_type + '_' + elem + '_' + str(objEnum) 
+                            for elem in ('data2', 'data3')
+                        ]
+                
+                _series = [min(a,b) for a,b in zip(  list(df[_fields[0]])
+                                                    ,list(df[_fields[1]])
+                                    )]
+                
+                data[_type] = (x_index, _series)
+                
+                legend[_type] = (_type)
 
-                data.append(xy_dict)
+            allData[_allFrames] = data
 
-            legend.append(_type)
-        
-        # formatting
-        legend.reverse()
-        
-        chart_title = 'All Frames' if b_all_frames else 'Frames with Input Score'
-        
-        self.displaySeriesPlot(calc_fields=data, obj_legend=legend
-                                ,chart_title=chart_title)
+        if b_ret:
+            return allData    
 
-        return data
+        # plotting
+        for _allFrames in allData.keys():
+            
+            _plotData = allData[_allFrames]
+            _plotLegend = []
+
+            for _series in _plotData.keys():
+            
+                x, y = _plotData[_series][0], _plotData[_series][1]
+                
+                _marker = None
+                if not(_allFrames): _marker = 'o'
+
+                _plotLegend.append(str(_series))
+
+                if (_allFrames == True) and (_series == 'input'):
+                    plt.scatter(x, y, c='orange')
+                else:
+                    plt.plot(x, y, marker=_marker)
+
+            # formatting
+            _plotLegend.reverse()
+            plt.legend(_plotLegend)
+            
+            _title = 'All Frames' if _allFrames else 'Frames with Input Score'
+            plt.title(_title)
+
+            plt.ylabel('ball diameter')
+
+            plt.show()
 
 
     @staticmethod

@@ -1,3 +1,58 @@
+1/8
+
+how to step into debugger of vscode from jupyter call?
+    attach external? to the ipy terminal or to chrome?
+        "name": "Attach (Remote Debug)",
+        "request": "attach",
+        "port": 3000,
+        "secret": "my_secret",
+        "host": "localhost"
+    ipy is on port localhost:8888 ; secret = "ipy token"
+    log:
+        [I 12:48:42.977 NotebookApp] Kernel started: 9bd7d855-a586-494f-aa2b-d8eb4fee0556
+    or: we could pickle out of jupyter into the module's __main__ section
+
+Here's how you could do it: 
+    (possibly using an extension in the notebook for interproc comm...)
+    create a tmp file in the same dir as the notebook, 
+        debug_notebookname_tmp1.py
+    collect all imports from the noteook, send those to temp file
+        you'll have to eliminate "cell magics" and include sys.path changes
+    encapsulate the cell to debug within a class/function? (this could be done
+    with an extension's custom cell type)
+    pickle that object to a tmp file debug_notebookname_obj1.pickle
+    note you'll have to pickle custom package cpython types with their
+        own command (or do you? will it just implement it automatically?)
+    have the debug_notebookname_tmp1.py load the debug_notebookname_obj1
+    execute the core within executable lines within via vscode-debug by launching
+    the debugger on the tmp.py
+    set a breakpoint before the program executes the first line
+    voila?
+            example: do it with tensorflow
+
+    10 commands to ppd-objTracking
+            e.g. 
+                1 >python guiview.py --file --tracker --showscoring
+                2 >python guiview.py --eval
+                3 >load that table in jupyter
+                4 >get listGS of failures
+                5 >run analysis on fail-frames
+                7 >guirecord.py 
+                8 >timelog.py
+                9
+                10 >add the video to the data directory
+                11 >run eval with new vid
+
+                12 >write a new tracker
+                13 >eval it
+
+1/2
+
+ai - cascading business-logic across a cognitive processing loop
+    e.g. this project, skydio/autonomy in general, nlp like sentiment analysis
+    define cognitive - arrange functions which process a datastream by use case on a spectrum of cognitive vs managerial; cognitive is input data (media) which contains deeper semantics, managerial data only has shallow meaning
+    define cascading - a clever tool for enumerating all possible states policies from a limited set of first pricicples and product requirements
+
 12/28
 
 "virutal frames" 1MHz Framerate from iPhoneX but only for pure black&white scenes
