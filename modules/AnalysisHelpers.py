@@ -569,11 +569,13 @@ def subprocEval( f_pathfn
                 ,db_pathfn = "data/usr/eval_tmp.db"
                 ):
     '''
-        get a eval-dataframe by running guiview with eval module turned on
+        get a outcome-dataframe by running guiview with eval module turned on.
+        data path is relative to parent directory of calling kernel.
 
         return: df          - pandas dataframe
 
-        input:  f_pathfn    - (str) pathfn to video file
+        input:  f_pathfn    - (str) pathfn to video file 
+                                    (!relative to parent dir of calling kernel!)
                 algo_enum   - (int) sent to ControlTracker via guiview cli
                 db_pathfn   - (str) NOT IMPLEMENTED here
                                     path and fn for db for interproc-comm

@@ -16,6 +16,11 @@
         11:30 - 12:00
         [ ] unit tests on today's  yesterday's work
 
+    bugs
+        [x] both plots: legend is reversed
+        [x] document f_pathfn better in subprocEval
+        [x] appears to sort diameterplot-data wrong in eval_module_2.ipynb
+
 1/8
     10:00 - 11:00
         [x] load() method in evalFactory / analysisHelpers

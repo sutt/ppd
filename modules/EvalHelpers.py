@@ -610,10 +610,15 @@ class OutcomeData:
         return self.outcomeData
     
     def load(self):
-
+        ''' load data from db '''
         db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + self.dbPathFn)
         self.outcomeData = pd.read_sql_table(self.tblName, con=db_engine)
         self.loaded=True
+
+    def loads(self, outcome_df):
+        ''' load data from data '''
+        self.outcomeData = outcome_df.copy()
+        self.loaded = True
 
     def displayCondensedTable(self, objEnum=0):
         ''' display only cols for requested obj-enum
@@ -728,15 +733,17 @@ class OutcomeData:
         
         build allData as such:
             {
-                plot1: (
-                             [series1_x1, series1_x2, ...]
-                            ,[series1_y1, series1_y2, ...]
-                        )
-                        (
-                             [series2_x1, series2_x2, ...]
-                            ,[series2_y1, series2_y2, ...]
-                        )        
-                plot2: ... 
+                True: {
+                         'input':  (  [series1_x1, series1_x2, ...]
+                                    ,[series1_y1, series1_y2, ...]
+                                )
+                        
+                         'track': (  [series2_x1, series2_x2, ...]
+                                    ,[series2_y1, series2_y2, ...]
+                                )
+                        }
+                False:   [same as above]
+                    ...
             }
         '''
         
@@ -800,13 +807,10 @@ class OutcomeData:
                     plt.plot(x, y, marker=_marker)
 
             # formatting
-            _plotLegend.reverse()
-            plt.legend(_plotLegend)
-            
             _title = 'All Frames' if _allFrames else 'Frames with Input Score'
             plt.title(_title)
-
             plt.ylabel('ball diameter')
+            plt.legend(_plotLegend)
 
             plt.show()
 
