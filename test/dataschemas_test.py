@@ -85,6 +85,70 @@ def test_toScalars():
     assert cmp(scalarsDict, ANSWER) == 0
 
 
+def test_fromScalarsAddObject():
+
+    ss = ScoreSchema()
+    assert ss.getAll() is None
+
+    fields = {'objtype':'circle', 'data0':100, 'data1':100, 'data2':40, 'data3':50, 'misc':'blah balh'}
+    ss.fromScalarsAddObject(objEnum=0, **fields)
+    assert ss.getAll() == {'0':{'type': 'circle', 'data': [100,100,40,50] }}
+
+    # test overwrite of objEnum=0
+    ss.fromScalarsAddObject(objEnum=0, **fields)
+    assert ss.getAll() == {'0':{'type': 'circle', 'data': [100,100,40,50] }}
+
+    # test multiple obj's
+    fields2 = {'objtype':'circle', 'data0':200, 'data1':100, 'data2':30, 'data3':20, 'misc':'blah balh'}
+    ss.fromScalarsAddObject(objEnum=3, **fields2)
+    assert ss.getAll() == {'0':{'type': 'circle', 'data': [100,100,40,50] },
+                           '3':{'type': 'circle', 'data': [200,100,30,20] }}
+
+
+def test_ScoreSchema_addObj_number_type():
+
+    # make sure all data gets converted to int-type
+    
+    # addCircle
+    inp_data = [11.0, 12, float(15), float(0)]
+    ss = ScoreSchema()
+    ss.addCircle(inp_data, objEnum=0)
+    ret_data = ss.getAll()['0']['data']
+    assert all(map(lambda elem: type(elem) is int, ret_data))
+    assert ret_data == [11,12,15,0]
+
+    # addRay
+    inp_data = [ [11.0, 12.9999], [float(15), float(0.1)]]
+    ss = ScoreSchema()
+    ss.addRay(inp_data, objEnum=0)
+    ret_data = ss.getAll()['0']['data']
+    assert all(map(lambda elem: type(elem) is int, ret_data[0]))
+    assert all(map(lambda elem: type(elem) is int, ret_data[1]))
+    assert ret_data == [[11,12],[15,0]]
+
+
+def test_ScoreSchema_load_number_type():
+    
+    # test that we coerce all data into int
+
+    # circle
+    inp_data = {'0':{'type':'circle', 'data':[1.1,2,float(15), 0.9999]}}
+    ss = ScoreSchema()
+    ss.load(inp_data)
+    ret_data = ss.getAll()['0']['data']
+    assert  ret_data == [1,2,15,0]
+    assert all(map(lambda elem: type(elem) is int, ret_data))
+
+    # ray
+    inp_data = {'0':{'type':'ray', 'data':[[1.1,2],[float(15), 0.9999]]}}
+    ss = ScoreSchema()
+    ss.load(inp_data)
+    ret_data = ss.getAll()['0']['data']
+    assert  ret_data == [[1,2],[15,0]]
+    assert all(map(lambda elem: type(elem) is int, ret_data[0]))
+    assert all(map(lambda elem: type(elem) is int, ret_data[1]))
+
+
 def test_getObjRect_1():
     
     score = {
@@ -163,3 +227,6 @@ def test_checkHasValid_1():
     ss.load(score)
 
     assert ss.checkHasValid() == False
+
+if __name__ == "__main__":
+    test_ScoreSchema_load_number_type()

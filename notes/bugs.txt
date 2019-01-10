@@ -1,5 +1,17 @@
 #Tasks
 
+1/10
+
+    [ ] outcome -> listScoreSchema
+        [ ] add unit tests
+    
+    [x] in ScoreSchema: coerce all data-values to int (currently they are float and L)
+        [x] addRay/ addCircle
+        [x] load()
+        [x] add unit tests
+
+    [x] edge cases for ScoreSchema getAll() returns {} or None?
+        -> returns None
 
 1/9
 
@@ -12,9 +24,18 @@
         
         10:30 - 11:30 
         [ ] apply eval to outcomeData
+            
+            notes:
 
-        11:30 - 12:00
-        [ ] unit tests on today's  yesterday's work
+                EvalDataset expects self.df to contain the eval methods already applied
+                that's the self.df element
+                EvalTracker works on ScoreSchema.getAll() output
+                but that includes all obj enums as dict which contain a type + data
+
+                eval: compare input vs track
+                properties: calc field on eval e.g. ballUnitsAway = centerDistance/ baselineRadius
+
+            [ ] probably need to return nan under certain track/input conditions
 
     bugs
         [x] both plots: legend is reversed
@@ -25,7 +46,7 @@
     10:00 - 11:00
         [x] load() method in evalFactory / analysisHelpers
         [x] displayRelevant / filter methods in the class
-        [ ] pandas -> ScoreSchema
+        [x] pandas -> ScoreSchema
         [ ] unittests
         [ ] add frame-notes
         [ ] add track-notes e.g. currentTrackSuccess

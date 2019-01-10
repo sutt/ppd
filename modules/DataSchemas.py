@@ -56,12 +56,26 @@ class ScoreSchema:
         except:
             return False
         
+    @staticmethod
+    def _coerceDataToInt(objData):
+        ''' handles objData as list/tuple or list/tuple-of-list/tuple '''
+        
+        if ((type(objData[0]) is list) or (type(objData[0]) is tuple)):
+            return map(lambda tup: map(int, tup), objData)    
+        else:
+            return map(int, objData)
+
     
     def load(self, objScoring):
         ''' load a dict object as data '''
         try:
             assert objScoring is not None
             assert isinstance(objScoring, dict)
+            
+            for _objEnum in objScoring.keys():
+                assert isinstance(objScoring[_objEnum]['data'], list)
+                objScoring[_objEnum]['data'] = self._coerceDataToInt(objScoring[_objEnum]['data'])
+            
             self.data = copy.deepcopy(objScoring)
             self.bLoaded = True
             self.bHasContents = True
@@ -108,7 +122,7 @@ class ScoreSchema:
         ''' add a circle score. data format: (x,y,w,h) '''
         _score = {}
         _score['type'] = 'circle'
-        _score['data'] = circleData         
+        _score['data'] = map(int, circleData)
         self.data[str(objEnum)] = _score
         self.bHasContents = True
 
@@ -117,7 +131,7 @@ class ScoreSchema:
         ''' add a ray score. data format: ((x0,y0), (x1,y1))'''
         _score = {}
         _score['type'] = 'ray'
-        _score['data'] = rayData
+        _score['data'] = map(lambda tup: map(int, tup), rayData)
         self.data[str(objEnum)] = _score
         self.bHasContents = True
 
@@ -306,4 +320,28 @@ class ScoreSchema:
                 outputDict['data' + str(iCol) + '_' + str(_objEnum)] = _val
         
         return outputDict
+
+    def fromScalarsAddObject(self,objEnum=0,**kwargs):
+        ''' pass in a dict for arguments:
+            make sure to change objEnum or you'll overwrite existing data
+        '''
+        _type = kwargs.get('objtype', 'circle')
+
+        _data0 = kwargs.get('data0', None)
+        _data1 = kwargs.get('data1', None)
+        _data2 = kwargs.get('data2', None)
+        _data3 = kwargs.get('data3', None)
+
+        if _type == 'circle':
+
+            self.addCircle([_data0, _data1, _data2, _data3], objEnum=objEnum)
+
+        elif _type == 'ray':
+
+            self.addRay([[_data0, _data1], [_data2, _data3]], objEnum=objEnum)
+
+        
+
+
+
 
