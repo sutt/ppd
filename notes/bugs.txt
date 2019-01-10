@@ -2,8 +2,8 @@
 
 1/10
 
-    [ ] outcome -> listScoreSchema
-        [ ] add unit tests
+    [x] outcome -> listScoreSchema
+        [x] add unit tests
     
     [x] in ScoreSchema: coerce all data-values to int (currently they are float and L)
         [x] addRay/ addCircle
@@ -12,6 +12,21 @@
 
     [x] edge cases for ScoreSchema getAll() returns {} or None?
         -> returns None
+
+    [ ] apply eval to listScoreSchema
+
+    [ ] more unittests in evalhelpers_test
+
+    tasks
+        [ ] have we posted the speed estimation data?
+        [ ] jupyter notebook showing the derivation
+
+    possible bugs
+
+        [ ] np.NaN (presumably pd.NaN) can't be converted with int(); problem?
+        
+        [ ] we really can't change outcome_dataframe field naming formula; how 
+            to solidify this thru unit tests? what are the edge cases?
 
 1/9
 

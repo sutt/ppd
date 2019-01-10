@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import io
 import pandas as pd
+import sqlalchemy
 from PIL import Image
 from collections import OrderedDict
 from itertools import combinations
@@ -13,7 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
-import sqlalchemy
+from DataSchemas import ScoreSchema
 
 
 
@@ -29,6 +30,9 @@ class EvalTracker:
             e.g. EvalTracker.setBaselineScore(gs.displayInputScore)
                  (where gs.displayInputScore is a score-dict)
 
+        Todo
+        [ ] this only evals for type='circle'; not for type='ray'
+
     '''
     
     def __init__(self):
@@ -39,6 +43,12 @@ class EvalTracker:
         self.objEnum = str(sObjEnum)
 
     def setBaselineScore(self, baselineScore):
+        ''' input the data from a ScoreSchema, a nested dict '''
+        try:
+            assert type(baselineScore) is dict
+        except:
+            print 'baselineScore must be a dict'
+            return
         self.baselineScore = copy.deepcopy(baselineScore)
 
     def distanceFromBaseline(self, inputScore):
@@ -212,10 +222,15 @@ class EvalDataset:
             'distanceFromBaseline'
             ]
 
+        # these are also calculated fields, but were designed
+        # to work back to outcome data fields, largely
+        # deprecated now.
         self.prop_method_names = [
             'propBaselineRadius',
             ]
 
+        # these are 'calculated fields' - they operate on 
+        # existing tbl fields
         self.calc_method_names = [
             'calc_BallUnitsAway',
             ]
@@ -591,20 +606,26 @@ class OutcomeData:
     def __init__(self, 
                  dbPathFn='data/usr/eval_tmp.db',
                  tblName='outcome_dataframe',
-                 bLoad=True
+                 bLoad=True,
+                 bEval=True
                  ):
 
         self.outcomeData = None
+        self.evalData = None
+
+        self.listScoreObjs = []
+
         self.dbPathFn = dbPathFn
         self.tblName = tblName
+        
         self.loaded=False
+        self.loaded_ss=False
         
         if bLoad:
             self.load()
 
-        #TODO - add eval methods
-        # if bEval:
-        #     self.eval()
+        if bEval:
+            self.eval()
 
     def get(self):
         return self.outcomeData
@@ -619,6 +640,11 @@ class OutcomeData:
         ''' load data from data '''
         self.outcomeData = outcome_df.copy()
         self.loaded = True
+
+    def eval(self):
+        ''' apply eval methods to outcome dataframe '''
+        data = None
+        self.evalData = pd.DataFrame(data)
 
     def displayCondensedTable(self, objEnum=0):
         ''' display only cols for requested obj-enum
@@ -828,6 +854,144 @@ class OutcomeData:
         return filtered_rows
 
     
+    def buildScoreSchemaList(self):
+        ''' populate a ScoreSchema object(s) for each record in outcome dataframe;
+            add to a dict (for input vs track), add that to a list. 
+            scoreObjList:
+                [   {'input':SS, 'track':SS }   <record0>
+                    {'input':SS, 'track':SS }   <record1>
+                     ...
+                ]
+        '''
+
+        def modKey(s):
+            # remove extraneous char's from keys
+            # 'input_data0_1' -> 'data0'
+            s = s.replace('track', '')
+            s = s.replace('input', '')
+            ind = s[::-1].index('_') + 1
+            if ind > 0:
+                s = s[:-ind]
+            s = s.replace('_', '')
+            return s    
+
+        def sepTypeData(fulldata):
+            # separate the fields into 'track' vs 'input'
+            # {name1: val1, ...}  (full record as a dict)   -> 
+            # {'track':{name1:val1,...}, 'input':{name2:val2,...}}
+            sep_scalars = {}
+            for _type in ('input', 'track'):
+                _tmp = {}
+                for _key in fulldata:
+                    if _type in _key:
+                        _tmp[_key] = fulldata[_key]
+                sep_scalars[_type] = copy.deepcopy(_tmp)
+            return sep_scalars
+        
+        def enumFromStr(s):
+            # parse the field name string, return int for obj enum
+            # return None for failed parse
+            try:
+                ind = s[::-1].index('_')
+                ret = int(s[-ind:])
+                return ret
+            except:
+                return None
+
+        def sepObjData(record_dict):
+            # separate data into indv obj's; eliminate un-used objects
+            # {name1_0:val, name1_1:val ...} ->
+            # {'0': {name1_0:val, ...}, '1': {name1_1:val, ...}, ...}
+            mod_dict = {}
+            for _typeKey in record_dict.keys():
+                obj_dict = {}
+                for _fieldKey in record_dict[_typeKey].keys():
+                    enum = enumFromStr(_fieldKey)
+                    if enum is not None:
+                        
+                        #TODO - check obj_exists_I value before proceeding?
+                        
+                        val = record_dict[_typeKey][_fieldKey]
+                        
+                        if str(enum) not in obj_dict.keys():
+                            obj_dict[str(enum)] = {_fieldKey: val}
+                        else:
+                            obj_dict[str(enum)][_fieldKey] = val
+                mod_dict[_typeKey] = obj_dict
+            return mod_dict
+
+        def modKeyData(record_dict):
+            # apply modKey to each key in the dict; replace old key; leave 
+            # values unchanged
+            for _typeKey in record_dict.keys():
+                for _objKey in record_dict[_typeKey].keys():
+                    for _fieldKey in record_dict[_typeKey][_objKey].keys():
+                        newKey = modKey(_fieldKey)
+                        record_dict[_typeKey][_objKey][newKey] = (
+                            record_dict[_typeKey][_objKey].pop(_fieldKey)
+                            )
+            return record_dict
+
+
+        # list of dicts; dict representing record
+        # 1: k/v
+        dRecords = self.outcomeData.to_dict(orient='record')
+        
+        # list of dict of dict. nest_level:
+        # 1: type
+        # 2: k/v
+        dRecords_nest_1 = map(lambda _dr: sepTypeData(_dr), dRecords)
+
+        # list of dict of dict of dict. nest level:
+        # 1: type
+        # 2: obj_enum
+        # 3: k/v
+        dRecords_nest_2 = map(lambda _dr: sepObjData(_dr), dRecords_nest_1)
+        
+        # list of dict of dict of dict. nest level:
+        # 1: type
+        # 2: obj_enum
+        # 3: k_mod/v
+        dRecords_nest_2_mod = map(lambda _dr: modKeyData(_dr), dRecords_nest_2)
+
+        # build listScoreObjs: list of dict of dict
+        # 1: list of records
+        # 2: dict of type
+        # 3: dict from scoreschema.data [ret from .getAll()]
+        for _record in dRecords_nest_2_mod:
+
+            _tmp = {}
+
+            for _type in _record.keys():    
+                
+                _ss = ScoreSchema()
+
+                for _objEnum in _record[_type].keys():     
+                    
+                    try:
+            
+                        kv = _record[_type][_objEnum]
+                        
+                        assert type(kv) is dict
+
+                        assert kv['objexists']
+                    
+                        _ss.fromScalarsAddObject(objEnum=_objEnum, **kv)
+                    
+                    except:
+                        pass
+
+                _tmp[_type] = _ss.getAll()
+
+            self.listScoreObjs.append(_tmp)
+
+        # validate
+        assert len(self.listScoreObjs) == len(self.outcomeData)
+        self.loaded_ss = True
+                
+
+    
 if __name__ == "__main__":
+    # pass
     od = OutcomeData()
-    od.buildDiameterPlotData()
+    od.buildScoreSchemaList()
