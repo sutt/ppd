@@ -32,6 +32,8 @@ class EvalTracker:
 
         Todo
         [ ] this only evals for type='circle'; not for type='ray'
+        [ ] handle None as baselineScore
+        [ ] refactor 'inputScore' to trackScore in some eval_meth's
 
     '''
     
@@ -39,6 +41,20 @@ class EvalTracker:
         self.baselineScore = None
         self.objEnum = '0'
 
+        self.eval_method_names = [
+            'checkBaselineInsideTrack',
+            'checkBothContainsOther',
+            'checkEitherContainsOther',
+            'checkTrackInsideBaseline',
+            'checkTrackInsideBaselineRect',
+            'checkTrackSuccess',
+            'compareRadii',
+            'distanceFromBaseline'
+            ]
+
+    def getMethodNames(self):
+        return copy.copy(self.eval_method_names)
+    
     def setObjEnum(self, sObjEnum):
         self.objEnum = str(sObjEnum)
 
@@ -47,7 +63,7 @@ class EvalTracker:
         try:
             assert type(baselineScore) is dict
         except:
-            print 'baselineScore must be a dict'
+            # print 'baselineScore must be a dict'
             return
         self.baselineScore = copy.deepcopy(baselineScore)
 
@@ -643,8 +659,51 @@ class OutcomeData:
 
     def eval(self):
         ''' apply eval methods to outcome dataframe '''
-        data = None
-        self.evalData = pd.DataFrame(data)
+        
+        data = []
+
+        ev = EvalTracker()
+        eval_meth_names = ev.getMethodNames()
+
+        self.buildScoreSchemaList()
+        
+        for _record in self.listScoreObjs:
+
+            inputScore = _record['input']
+            trackScore = _record['track']
+
+            ev.setBaselineScore(inputScore)
+            
+            ev.setObjEnum(0)    #TODO
+
+            list_data = []
+            for meth_name in eval_meth_names:
+
+                try:
+                    evMeth = getattr(ev, meth_name)
+                    val = evMeth(trackScore)
+                except:
+                    val = None
+            
+                list_data.append(val)
+
+            data.append(list_data)
+        
+        # data (list-of-list) -> dict_data (dict-of-list)
+        dict_data = {}
+        
+        for j_col in range(len(eval_meth_names)):
+            
+            _tmp = []
+            
+            for i_row in range(len(data)):
+            
+                _tmp.append(data[i_row][j_col])
+            
+            dict_data[eval_meth_names[j_col]] = _tmp
+
+        #dict_data to pandas
+        self.evalData = pd.DataFrame(dict_data)
 
     def displayCondensedTable(self, objEnum=0):
         ''' display only cols for requested obj-enum
@@ -863,6 +922,8 @@ class OutcomeData:
                      ...
                 ]
         '''
+        if self.loaded_ss:
+            self.listScoreObjs = []
 
         def modKey(s):
             # remove extraneous char's from keys

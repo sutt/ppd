@@ -13,13 +13,31 @@
     [x] edge cases for ScoreSchema getAll() returns {} or None?
         -> returns None
 
-    [ ] apply eval to listScoreSchema
+    [ ] apply eval to listScoreSchema simple
+
+        [ ] unittest
+
+        notes:
+            it's the try/catch in outcomeData.eval that's inserting nones
+            when baseline score is wrong
+
+    [ ] multi-ObjEnum eval
+    
+    [ ] helper methods on eval data
+
+    [ ] allow None as a baselineScore / handle it
 
     [ ] more unittests in evalhelpers_test
 
     tasks
         [ ] have we posted the speed estimation data?
-        [ ] jupyter notebook showing the derivation
+            [ ] jupyter notebook showing the derivation
+        [ ] add new test data to git
+        [x] correct failed tests
+        [ ] better docu for EvalDataset; it's really for applying eval to 
+            a {tracker, listGS} - "see how your new tracker performed on your
+            current frames-of-interest" without running full video eval and 
+            re-isolating your foi's.
 
     possible bugs
 
@@ -27,6 +45,13 @@
         
         [ ] we really can't change outcome_dataframe field naming formula; how 
             to solidify this thru unit tests? what are the edge cases?
+
+        [ ] is timefactory off for --eval?
+
+    other thoughts
+
+        we'll turn loggin off in trackfactory for time measurment but turn it on
+        when we want to debug
 
 1/9
 
