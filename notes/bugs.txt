@@ -1,5 +1,28 @@
 #Tasks
 
+1/11
+
+    10-11
+    [ ] helpers methods - copy from evalDataset
+        [x] displayEvalMethodsNames - works for snake_case
+        [x] deprecate old functions
+        [x] unittests for them
+        [ ] demo in jupyter
+        [x] make DFHelper.formatting_cols + DFHelper.col_order_default
+            work when cols aren't present
+        [ ] unittest for EvalDataset
+
+    [ ] multi-objEnum
+
+    [ ] aggregate eval table elements
+    [ ] test a vid w/o a input-score in the first frame: do col-types change?
+
+    misc:
+        [x] why is OD.evalData all zero's? ide-overwrite
+        [x] fix cmp in test_outcomeData_eval()
+
+    36d7ce4f4 b75e57345d
+
 1/10
 
     [x] outcome -> listScoreSchema
@@ -32,7 +55,7 @@
     tasks
         [ ] have we posted the speed estimation data?
             [ ] jupyter notebook showing the derivation
-        [ ] add new test data to git
+        [x] add new test data to git
         [x] correct failed tests
         [x] better docu for EvalDataset; it's really for applying eval to 
             a {tracker, listGS} - "see how your new tracker performed on your

@@ -250,7 +250,7 @@ class EvalTracker:
 class EvalDataset:
 
     ''' 
-        Apply {tracker, listGS} -> eval dataset
+        Apply {tracker, listGS} -> eval-dataframe
 
             e.g. .buildDataset(listGS, tracker) -> self.df
 
@@ -260,111 +260,26 @@ class EvalDataset:
         only on the listGS frames, and to insert a custom tracker, configured
         in jupyter.
 
-        This Class is somewhat deprecated.
+        Note: this never creates an outcome-dataframe or writes to temp db
+              as we are processing eval methods each frame/GS within the inner loop.
 
-        Contains helper methods for pretty-priniting / filtering dataset.
-        
-        Also shows pattern for building:
-
-            calc_'s - 'calculated fields' from existing df fields
-            prop_'s - like calculated field but for only track or input; not both
+        This Class is somewhat deprecated; has many methods removed.
         
     '''
 
     def __init__(self):
         
         self.df = None
-
-        self.df_props = None
         
-        self.df_calcs = None
-
-        self.eval_method_names = [
-            'checkBaselineInsideTrack',
-            'checkBothContainsOther',
-            'checkEitherContainsOther',
-            'checkTrackInsideBaseline',
-            'checkTrackInsideBaselineRect',
-            'checkTrackSuccess',
-            'compareRadii',
-            'distanceFromBaseline'
-            ]
-
-        self.eval_method_names_2 = [
-            'checkBaselineInsideTrack',
-            'checkBothContainsOther',
-            'checkEitherContainsOther',
-            # 'checkTrackInWindow',
-            'checkTrackInsideBaseline',
-            'checkTrackInsideBaselineRect',
-            'checkTrackSuccess',
-            'compareRadii',
-            'distanceFromBaseline'
-            ]
-
-        # these are also calculated fields, but were designed
-        # to work back to outcome data fields, largely
-        # deprecated now.
-        self.prop_method_names = [
-            'propBaselineRadius',
-            ]
-
-        # these are 'calculated fields' - they operate on 
-        # existing tbl fields
-        self.calc_method_names = [
-            'calc_BallUnitsAway',
-            ]
-
-        self.formatting_cols = {
-            # 'checkBaselineInsideTrack':     '{:6.2f}',
-            # 'checkBothContainsOther':       '{:6.2f}',
-            # 'checkEitherContainsOther':     '{:6.2f}',
-            # 'checkTrackInWindow':           '{:6.2f}',
-            # 'checkTrackInsideBaseline':     '{:6.2f}',
-            # 'checkTrackInsideBaselineRect': '{:6.2f}',
-            # 'checkTrackSuccess':            '{:6.2f}',
-            'compareRadii':                 '{:4.0f}',
-            'distanceFromBaseline':         '{:4.0f}',
-            'calc_BallUnitsAway':           '{:6.2f}'
-            }
+        _ev = EvalTracker()
         
-        self.col_order_default = [
-             'listIndex'
-            ,'frameCounter'
-            ,'checkBothContainsOther'
-            ,'distanceFromBaseline'
-            ,'checkTrackSuccess'
-            ]
-
-        self.col_order_requested = None
-
-        self.rows_requested = None
-
-    def setDf(self, df):
-        self.df = df
-    
-    def setFirstCols(self, list_first_cols):
-        ''' for use before getDatasetDisplay; set to None to go back to default'''
-        self.color_order_requested = copy.copy(list_first_cols)
-
-    def getFirstCols(self):
-        if self.col_order_requested is not None:
-            return self.col_order_requested
-        return self.col_order_default
-
-    def setRowsRequested(self, psRows):
-        ''' input: pandas series of booleans '''
-        self.rows_requested = psRows
-
-    def getFilteredIndex(self, filter_rows, return_index = "listIndex"):
-        ''' returns field return_index for rows matching filter_rows '''
-        _df = self.getDataset()
-        _filtered = _df[filter_rows][return_index]
-        return [int(x) for x in list(_filtered)]
+        self.eval_method_names = _ev.getMethodNames()
 
 
     def buildDataset(self, listGS, tracker):
         ''' 
+            This is the Main Method:
+
             input:  listGS - list of GuiveiwState objects
                     tracker - TrackFactory object, initialized
             
@@ -375,105 +290,13 @@ class EvalDataset:
                 cols corresponding to EvalTracker properties
         '''
 
-        eval_data = self.buildEvalData(listGS, tracker, self.eval_method_names_2)
+        eval_data = self.buildEvalData(listGS, tracker, self.eval_method_names)
         index_data = self.buildIndexData(listGS)
         full_data = self.mergeDataDicts(*[index_data, eval_data])
         
         df = pd.DataFrame(full_data)
 
         self.df = df
-
-    def buildProps(self, listGS):
-        ''' build properties dataframe '''
-
-        #can we get framesize here?
-            
-        full_data = self.buildPropData(listGS, self.prop_method_names)
-
-        self.df_props = pd.DataFrame(full_data)
-
-    def buildCalcs(self):
-        ''' build properties dataframe '''
-            
-        full_data = self.buildCalcData(self.calc_method_names)
-
-        self.df_calcs = pd.DataFrame(full_data)
-
-    
-    def getDataset(self):
-        return self.df
-
-    def getFullDataset(self):
-        all_dfs = [self.df, self.df_props, self.df_calcs]
-        return pd.concat(all_dfs, axis = 1)
-
-    
-    def getDatasetDisplay(self, sort_args=None):
-        ''' return.print  a dataframe with various formatting niceties'''
-
-        # column order
-        _df = self.df.copy()
-        _df =  self.columnOrder(_df, first_cols = self.col_order_default)
-        
-        # column heading spacing
-        _new_cols =  self.displayEvalMethodNames(_df.columns)
-        _df.rename(columns = _new_cols, inplace=True)
-
-        # filter rows
-        if self.rows_requested is not None:
-            _df = _df[self.rows_requested]
-
-        # rounding / clipping, need to return on this line for
-        # formatting to flow thru to jupyter
-        return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
-    
-    
-    def calcRecord(self, record_index, method_names):
-
-        list_data = []
-
-        for meth_name in method_names:
-
-            try:
-                _ev = EvalTracker()
-                _evMeth = getattr(_ev, meth_name)
-                _val = _evMeth(  self.df[record_index: record_index+1]
-                                ,self.df_props[record_index: record_index+1]
-                                )
-            except:
-                _val = None
-            
-            list_data.append(_val)
-
-        return list_data
-
-
-    @staticmethod
-    def propRecord(gs, method_names):
-        ''' return a list of values (double, int, str, bool, obj) corresponding
-            to the result an EvalTracker method for that gs. Order of list
-            corresponds to order of method_names'''
-        
-        list_data = []
-
-        try:
-            _ev = EvalTracker()
-            _ev.setBaselineScore(gs.displaytrackScore)
-            
-        except:        
-            return None
-        
-        for meth_name in method_names:
-
-            try:
-                _evMeth = getattr(_ev, meth_name)
-                _val = _evMeth()
-            except:
-                _val = None
-            
-            list_data.append(_val)
-
-        return list_data
 
 
     @staticmethod
@@ -507,56 +330,6 @@ class EvalDataset:
             list_data.append(_val)
 
         return list_data
-
-    @classmethod
-    def buildPropData(cls, listGS, prop_method_names):
-        
-        data = []
-        
-        for _gs in listGS:
-            
-            _record = cls.propRecord(_gs, copy.copy(prop_method_names))
-            
-            data.append(_record)
-            
-        dict_data = {}
-        
-        for j_col in range(len(prop_method_names)):
-            
-            _tmp = []
-            
-            for i_row in range(len(data)):
-            
-                _tmp.append(data[i_row][j_col])
-            
-            dict_data[prop_method_names[j_col]] = _tmp
-            
-        return dict_data
-
-    
-    def buildCalcData(self, calc_method_names):
-        
-        data = []
-        
-        for _recordIndex in self.df.index:
-            
-            _record = self.calcRecord(_recordIndex, copy.copy(calc_method_names))
-            
-            data.append(_record)
-            
-        dict_data = {}
-        
-        for j_col in range(len(calc_method_names)):
-            
-            _tmp = []
-            
-            for i_row in range(len(data)):
-            
-                _tmp.append(data[i_row][j_col])
-            
-            dict_data[calc_method_names[j_col]] = _tmp
-            
-        return dict_data
 
 
     @classmethod
@@ -611,35 +384,97 @@ class EvalDataset:
         return ret
 
     
-    @staticmethod
-    def columnOrder(df, first_cols):
-        ''' return dataframe with new column order '''
-    
-        col_list = first_cols + [col for col in df.columns 
-                             if col not in first_cols]
-    
-        tmp_df = df[col_list]
-    
-        return tmp_df
+
+class DFHelper:
+
+    '''
+        Methods for organizing and formatting the display of dataframes
+    '''
+
+    def __init__(self, df=None, df_type=None):
+
+        self.df = df
+
+        self.df_type = df_type
+
+        self.formatting_cols = {
+            'compareRadii':                 '{:4.0f}',
+            'distanceFromBaseline':         '{:4.0f}',
+            'calc_BallUnitsAway':           '{:6.2f}'
+            }
+
+        self.col_order_default = [
+            'listIndex'
+            ,'frameCounter'
+             'checkBothContainsOther'
+            ,'distanceFromBaseline'
+            ,'checkTrackSuccess'
+            ]
+        
+        self.col_order_requested = None
+
+        self.rows_requested = None
+
+    def setDf(self, df):
+        self.df = df
+
+    def getDatasetDisplay(self, sort_args=None):
+        ''' return.print  a dataframe with various formatting niceties'''
+
+        # column order
+        _df = self.df.copy()
+        _df =  self.columnOrder(_df, first_cols = self.col_order_default)
+        
+        # column heading spacing
+        _new_cols =  self.displayEvalMethodNames(_df.columns)
+        _df.rename(columns = _new_cols, inplace=True)
+
+        # filter rows
+        if self.rows_requested is not None:
+            _df = _df[self.rows_requested]
+
+        # rounding / clipping, need to return on this line for
+        # formatting to flow thru to jupyter
+        return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
 
     
     @staticmethod
     def new_col_formatting(dict_new_cols, dict_formatting):
+        ''' a utility function for to-jupyter formatting'''
         
-        ret = {}
+        col_format = {}
+        
+        keys_present = filter(lambda k: k in dict_new_cols.keys()
+                                ,dict_formatting.keys())
 
-        for _k in dict_formatting.keys():
-            ret[dict_new_cols[_k]] = dict_formatting[_k]
+        for _k in keys_present:
+            col_format[dict_new_cols[_k]] = dict_formatting[_k]
+        
+        return col_format
 
-        return ret
-
+    @staticmethod
+    def columnOrder(df, first_cols):
+        ''' return dataframe with new column order '''
+        first_cols_present = filter(lambda col: col in df.columns, first_cols)
+        col_list = first_cols_present + [col for col in df.columns 
+                             if col not in first_cols]
+        tmp_df = df[col_list]
+        return tmp_df
     
     @staticmethod
-    def displayEvalMethodNames(list_str_names):
+    def displayEvalMethodNames( list_str_names,
+                                b_upper=True,
+                                b_underscore=False
+                                ):
         ''' add a line carriage after each word, corresponding to 
-            first letter capitalization
+            first letter capitalization. e.g.:
+
+                'checkBaselineInside'   -> 'check\nBaseline\nInside\n'
+                'check_baseline_inside' -> 'check\n_baseline\n_inside\n'
             
-            input: list_str_names - original column names (list of str)
+            input:  list_str_names  - original column names (list of str)
+                    b_upper         - separate by Capitalized letters
+                    b_underscore    - separate by underscor characters
 
             return: dict: 
                 key - original col name (str)
@@ -648,23 +483,30 @@ class EvalDataset:
     
         list_ret = []
         
+        def idSeparator(c):
+            if b_upper:
+                if c.isupper(): return True
+            if b_underscore:
+                if c == '_': return True
+            return False
+
         for _name in list_str_names:
-            
-            ind_upper = map(lambda char: char.isupper(), _name)
-            
-            pos_upper = [x[0] for x in  
-                filter(lambda tup_iv: tup_iv[1], enumerate(ind_upper))
+
+            ind_sep = map(lambda char: idSeparator(char), _name)
+
+            pos_sep = [x[0] for x in  
+                filter(lambda tup_iv: tup_iv[1], enumerate(ind_sep))
                 ]
             
-            pos_upper.insert(0,0)
-            pos_upper.append(len(_name))
+            pos_sep.insert(0,0)
+            pos_sep.append(len(_name))
             
             _ret = ""
             
-            for i in range(len(pos_upper) - 1):
+            for i in range(len(pos_sep) - 1):
                 
-                _start = pos_upper[i]
-                _end = pos_upper[i + 1]
+                _start = pos_sep[i]
+                _end = pos_sep[i + 1]
                 _ret += _name[_start: _end]
                 _ret += "\n"
                 
@@ -678,10 +520,15 @@ class EvalDataset:
         return dict_ret
 
 
-
 class OutcomeData:
 
-    ''' for loading and manipulating the output of guiview --eval '''
+    ''' for loading and manipulating the output of guiview --eval.
+
+        we load outcome-dataframe from a DB, which is the 
+        trackScore + inputScore -> toScalar().
+
+        subsequently apply eval methods.
+    '''
     
     def __init__(self, 
                  dbPathFn='data/usr/eval_tmp.db',
@@ -698,8 +545,8 @@ class OutcomeData:
         self.dbPathFn = dbPathFn
         self.tblName = tblName
         
-        self.loaded=False
-        self.loaded_ss=False
+        self.loaded = False
+        self.loaded_ss = False
         
         if bLoad:
             self.load()
@@ -733,10 +580,10 @@ class OutcomeData:
         
         for _record in self.listScoreObjs:
 
-            trackScore = _record['input']
+            inputScore = _record['input']
             trackScore = _record['track']
 
-            ev.setBaselineScore(trackScore)
+            ev.setBaselineScore(inputScore)
             
             ev.setObjEnum(0)    #TODO
 
@@ -773,7 +620,8 @@ class OutcomeData:
         ''' display only cols for requested obj-enum
             display only rows for frame with an input-score
         '''
-        rows = self.filtertrackScoreRows(self.outcomeData, objEnum)
+        rows = self.filterInputScoreRows(self.outcomeData, objEnum)
+        
         cols = self.filterObjCols(self.outcomeData, objEnum)
         return self.outcomeData[rows][cols]
 
@@ -911,7 +759,7 @@ class OutcomeData:
 
             else:
 
-                ind = self.filtertrackScoreRows(self.outcomeData, objEnum=objEnum)
+                ind = self.filterInputScoreRows(self.outcomeData, objEnum=objEnum)
                 df = self.outcomeData[ind]
                 x_index = [i for i,v in enumerate(ind) if v==True]
                 
@@ -971,7 +819,7 @@ class OutcomeData:
         return obj_cols
 
     @staticmethod
-    def filtertrackScoreRows(df, objEnum=0):
+    def filterInputScoreRows(df, objEnum=0):
         col_name = 'input_obj_exists_' + str(objEnum)
         filtered_rows = df[col_name] == True
         return filtered_rows
@@ -1119,4 +967,5 @@ class OutcomeData:
 if __name__ == "__main__":
     # pass
     od = OutcomeData()
-    od.buildScoreSchemaList()
+    # od.buildScoreSchemaList()
+    od.evalData
