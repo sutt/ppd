@@ -13,9 +13,9 @@
     [x] edge cases for ScoreSchema getAll() returns {} or None?
         -> returns None
 
-    [ ] apply eval to listScoreSchema simple
+    [x] apply eval to listScoreSchema simple
 
-        [ ] unittest
+        [x] unittest
 
         notes:
             it's the try/catch in outcomeData.eval that's inserting nones
@@ -25,16 +25,16 @@
     
     [ ] helper methods on eval data
 
-    [ ] allow None as a baselineScore / handle it
+    [x] allow None as a baselineScore / handle it
 
-    [ ] more unittests in evalhelpers_test
+    [x] more unittests in evalhelpers_test
 
     tasks
         [ ] have we posted the speed estimation data?
             [ ] jupyter notebook showing the derivation
         [ ] add new test data to git
         [x] correct failed tests
-        [ ] better docu for EvalDataset; it's really for applying eval to 
+        [x] better docu for EvalDataset; it's really for applying eval to 
             a {tracker, listGS} - "see how your new tracker performed on your
             current frames-of-interest" without running full video eval and 
             re-isolating your foi's.
@@ -42,6 +42,8 @@
     possible bugs
 
         [ ] np.NaN (presumably pd.NaN) can't be converted with int(); problem?
+            yes - in cmp() for one
+            [ ] how to replace?
         
         [ ] we really can't change outcome_dataframe field naming formula; how 
             to solidify this thru unit tests? what are the edge cases?
@@ -53,6 +55,12 @@
         we'll turn loggin off in trackfactory for time measurment but turn it on
         when we want to debug
 
+        a NN would "predict the next frame" from a segmented/masked image
+        showing only the ball + its reflection & the config corners; you're
+        not predicting an x,y,z path, but just the motion blur of the next frame;
+        and from that you interpret is as position estimate
+
+
 1/9
 
     tasks
@@ -63,7 +71,7 @@
         [x] demo how to sort/rank return data for specific frames
         
         10:30 - 11:30 
-        [ ] apply eval to outcomeData
+        [x] apply eval to outcomeData
             
             notes:
 
@@ -75,7 +83,7 @@
                 eval: compare input vs track
                 properties: calc field on eval e.g. ballUnitsAway = centerDistance/ baselineRadius
 
-            [ ] probably need to return nan under certain track/input conditions
+            [x] probably need to return nan under certain track/input conditions
 
     bugs
         [x] both plots: legend is reversed
@@ -92,13 +100,13 @@
         [ ] add track-notes e.g. currentTrackSuccess
 
     11:00 - 12:00
-        [ ] outputOutcomeData unittests
+        [x] outputOutcomeData unittests
         [ ] aggregate eval dataset
         [ ] add tuples to sql
         
     12:00 - 1:00
         [ ] subproc wrapper
-        [ ] applyEval
+        [x] applyEval
         [ ] unit tests for --eval run
 
     other

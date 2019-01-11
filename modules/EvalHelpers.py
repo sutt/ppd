@@ -27,20 +27,24 @@ class EvalTracker:
         inputs are full scoring-dict, within this class we index the scoring-dict
         with 'objEnum' and 'data' keys
 
-            e.g. EvalTracker.setBaselineScore(gs.displayInputScore)
-                 (where gs.displayInputScore is a score-dict)
+            e.g. EvalTracker.setBaselineScore(gs.displaytrackScore)
+                 (where gs.displaytrackScore is a score-dict)
 
         Todo
         [ ] this only evals for type='circle'; not for type='ray'
-        [ ] handle None as baselineScore
-        [ ] refactor 'inputScore' to trackScore in some eval_meth's
+        [x] handle None as baselineScore
+        [x] refactor 'trackScore' to trackScore in some eval_meth's
 
     '''
     
     def __init__(self):
         self.baselineScore = None
         self.objEnum = '0'
+        
+        # return for method errors
+        self.naReturn = None    #np.NaN, etc...
 
+        # list all eval methods here to run as an iterable
         self.eval_method_names = [
             'checkBaselineInsideTrack',
             'checkBothContainsOther',
@@ -54,6 +58,9 @@ class EvalTracker:
 
     def getMethodNames(self):
         return copy.copy(self.eval_method_names)
+
+    def setNaReturn(self, naReturn):
+        self.naReturn = naReturn
     
     def setObjEnum(self, sObjEnum):
         self.objEnum = str(sObjEnum)
@@ -61,21 +68,41 @@ class EvalTracker:
     def setBaselineScore(self, baselineScore):
         ''' input the data from a ScoreSchema, a nested dict '''
         try:
-            assert type(baselineScore) is dict
+            assert type(baselineScore) is dict or baselineScore is None
+            for _objKey in baselineScore.keys():
+                assert baselineScore[_objKey].get('type', None) is not None
+                assert baselineScore[_objKey].get('data', None) is not None
+                assert type(baselineScore[_objKey].get('data', None)) is list
+            self.baselineScore = copy.deepcopy(baselineScore)
         except:
-            # print 'baselineScore must be a dict'
-            return
-        self.baselineScore = copy.deepcopy(baselineScore)
+            self.baselineScore = None
+        
+    def _validateParams(self, trackScore='dummy'):
+        ''' validate baseline to see if eval_method will fail 
+            if calling with a trackScore arg, that gets validated too;
+            otherwise, only validate baselineScore'''
+        try:
+            assert self.baselineScore is not None
+            assert type(self.baselineScore[self.objEnum]['data']) is list
+            if trackScore != 'dummy':
+                assert trackScore is not None
+                assert type(trackScore[self.objEnum]['data']) is list
+            return True
+        except:
+            return False
 
-    def distanceFromBaseline(self, inputScore):
-        ''' cartesian distance from center of inputScore to baseline;
+    def distanceFromBaseline(self, trackScore):
+        ''' cartesian distance from center of trackScore to baseline;
             for score-type=circle only
         '''
         
-        if not(self.checkTrackSuccess(inputScore)):
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+
+        if not(self.checkTrackSuccess(trackScore)):
             return 9999.9
 
-        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+        xA, yA, rA = Display.rectToCircle(trackScore[self.objEnum]['data'])
         xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
         cartDistance = ((xA - xB)**2 + (yA - yB)**2)**(0.5)
@@ -84,6 +111,10 @@ class EvalTracker:
 
     def checkTrackSuccess(self, trackScore):
         ''' easiest way to check a ScoreSchema if track returned True '''
+        
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+        
         try:
             if trackScore[self.objEnum]['data'] == (0,0,0,0):
                 return False
@@ -91,16 +122,19 @@ class EvalTracker:
         except:
             return False
 
-    def checkTrackInsideBaselineRect(self, inputScore):
+    def checkTrackInsideBaselineRect(self, trackScore):
         '''
-            check if the center on inputScore is inside the baslineScore
+            check if the center on trackScore is inside the baslineScore
             important: this uses rect, not circle    
         '''
         
-        if not(self.checkTrackSuccess(inputScore)):
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+        
+        if not(self.checkTrackSuccess(trackScore)):
             return False
 
-        _x, _y, _dx, _dy = inputScore['0']['data']
+        _x, _y, _dx, _dy = trackScore['0']['data']
         x, y, dx, dy = self.baselineScore['0']['data']
 
         if not((_x > x) and (_x < x + dx)):
@@ -111,19 +145,22 @@ class EvalTracker:
         
         return True
 
-    def checkTrackInsideBaseline(self, inputScore):
+    def checkTrackInsideBaseline(self, trackScore):
         '''
-            check if the center on inputScore is inside the baslineScore
+            check if the center on trackScore is inside the baslineScore
             considered as a circle
                 
         '''
         
-        if not(self.checkTrackSuccess(inputScore)):
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+        
+        if not(self.checkTrackSuccess(trackScore)):
             return False
 
         xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
-        dist = self.distanceFromBaseline(inputScore)
+        dist = self.distanceFromBaseline(trackScore)
 
         if dist < rB:
             return True
@@ -131,46 +168,58 @@ class EvalTracker:
         return False
 
 
-    def checkBaselineInsideTrack(self, inputScore):
+    def checkBaselineInsideTrack(self, trackScore):
         '''
             check if the center on baselineScore is inside the trackScore
                 currently inside rect; todo - check for inside a circle
         '''
         
-        if not(self.checkTrackSuccess(inputScore)):
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+        
+        if not(self.checkTrackSuccess(trackScore)):
             return False
 
-        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+        xA, yA, rA = Display.rectToCircle(trackScore[self.objEnum]['data'])
 
-        dist = self.distanceFromBaseline(inputScore)
+        dist = self.distanceFromBaseline(trackScore)
 
         if dist < rA:
             return True
 
         return False
 
-    def checkEitherContainsOther(self, inputScore):
+    def checkEitherContainsOther(self, trackScore):
         ''' either track-center is inside baseline-score-circle or
             baseline-score-center is inside track-center-circle. '''
 
-        return ( self.checkBaselineInsideTrack(inputScore) or
-                self.checkTrackInsideBaseline(inputScore))
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
 
-    def checkBothContainsOther(self, inputScore):
+        return ( self.checkBaselineInsideTrack(trackScore) or
+                self.checkTrackInsideBaseline(trackScore))
+
+    def checkBothContainsOther(self, trackScore):
         ''' both track-center is inside baseline-score-circle and
             baseline-score-center is inside track-center-circle. '''
 
-        return ( self.checkBaselineInsideTrack(inputScore) and
-                self.checkTrackInsideBaseline(inputScore))
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
+
+        return ( self.checkBaselineInsideTrack(trackScore) and
+                self.checkTrackInsideBaseline(trackScore))
 
 
-    def compareRadii(self, inputScore):
+    def compareRadii(self, trackScore):
         '''
             compare size of the radius;
             positive: track is larger; nnegative: baseline is larger
         '''
+
+        if not(self._validateParams(trackScore)):
+            return self.naReturn
         
-        xA, yA, rA = Display.rectToCircle(inputScore[self.objEnum]['data'])
+        xA, yA, rA = Display.rectToCircle(trackScore[self.objEnum]['data'])
         xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
         if ((rA > 0.0) and (rB > 0.0)):
@@ -178,17 +227,13 @@ class EvalTracker:
         else:
             return 0.0
 
-
-    def checkTrackInWindow(self, inputScore, zoomRect):
-        '''
-            check if inputScore is inside the zoomWindow
-            question: is zoomrect relative to Orig or to Main?
-        '''
-        pass
-
     # build properities ----------
 
     def propBaselineRadius(self):
+
+        if not(self._validateParams()):
+            return self.naReturn
+
         x, y, r = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
         return r
 
@@ -204,7 +249,27 @@ class EvalTracker:
 
 class EvalDataset:
 
-    ''' put eval results into a dataframe '''
+    ''' 
+        Apply {tracker, listGS} -> eval dataset
+
+            e.g. .buildDataset(listGS, tracker) -> self.df
+
+                where df is eval-table + index-table
+        
+        Use this instead of a full --eval / subprocEval run to concentrate
+        only on the listGS frames, and to insert a custom tracker, configured
+        in jupyter.
+
+        This Class is somewhat deprecated.
+
+        Contains helper methods for pretty-priniting / filtering dataset.
+        
+        Also shows pattern for building:
+
+            calc_'s - 'calculated fields' from existing df fields
+            prop_'s - like calculated field but for only track or input; not both
+        
+    '''
 
     def __init__(self):
         
@@ -218,7 +283,6 @@ class EvalDataset:
             'checkBaselineInsideTrack',
             'checkBothContainsOther',
             'checkEitherContainsOther',
-            'checkTrackInWindow',
             'checkTrackInsideBaseline',
             'checkTrackInsideBaselineRect',
             'checkTrackSuccess',
@@ -394,7 +458,7 @@ class EvalDataset:
 
         try:
             _ev = EvalTracker()
-            _ev.setBaselineScore(gs.displayInputScore)
+            _ev.setBaselineScore(gs.displaytrackScore)
             
         except:        
             return None
@@ -422,7 +486,7 @@ class EvalDataset:
 
         try:
             _ev = EvalTracker()
-            _ev.setBaselineScore(gs.displayInputScore)
+            _ev.setBaselineScore(gs.displaytrackScore)
 
             tracker.setFrame(gs.getOrigFrame())
             tracker.trackFrame()
@@ -669,10 +733,10 @@ class OutcomeData:
         
         for _record in self.listScoreObjs:
 
-            inputScore = _record['input']
+            trackScore = _record['input']
             trackScore = _record['track']
 
-            ev.setBaselineScore(inputScore)
+            ev.setBaselineScore(trackScore)
             
             ev.setObjEnum(0)    #TODO
 
@@ -709,7 +773,7 @@ class OutcomeData:
         ''' display only cols for requested obj-enum
             display only rows for frame with an input-score
         '''
-        rows = self.filterInputScoreRows(self.outcomeData, objEnum)
+        rows = self.filtertrackScoreRows(self.outcomeData, objEnum)
         cols = self.filterObjCols(self.outcomeData, objEnum)
         return self.outcomeData[rows][cols]
 
@@ -847,7 +911,7 @@ class OutcomeData:
 
             else:
 
-                ind = self.filterInputScoreRows(self.outcomeData, objEnum=objEnum)
+                ind = self.filtertrackScoreRows(self.outcomeData, objEnum=objEnum)
                 df = self.outcomeData[ind]
                 x_index = [i for i,v in enumerate(ind) if v==True]
                 
@@ -907,7 +971,7 @@ class OutcomeData:
         return obj_cols
 
     @staticmethod
-    def filterInputScoreRows(df, objEnum=0):
+    def filtertrackScoreRows(df, objEnum=0):
         col_name = 'input_obj_exists_' + str(objEnum)
         filtered_rows = df[col_name] == True
         return filtered_rows
