@@ -1,5 +1,28 @@
 #Tasks
 
+1/12
+
+    tasks
+    [x] unittest: evaldataset
+        x add answer_outcome.db
+        x add interproc.db
+        x subprocEval collides with current output_dataframe db
+        x can we change guiview --eval to have custom db path?
+        x how to compare with nan's? nantonum via pd?
+    [x] condensedTable inOutcomeData for evalData-df
+    [x] demo these in eval-module-3
+        [x] evaldataset
+        [x] condensedTable
+            [x] evalMethodNames for type='output'
+    [x] add test data to git
+
+    [ ] unittest: pickle.load from interproc
+    [ ] unittest: subprocEval
+    [ ] unittest: DFHelper methods
+
+    misc
+        [ ] find num of frames from timelog or notesfactory (for progress bar)
+
 1/11
 
     10-11

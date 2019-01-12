@@ -1,4 +1,4 @@
-import sys, copy, random, subprocess, time
+import os, sys, copy, random, subprocess, time, math
 import pickle
 import cv2
 import numpy as np
@@ -309,7 +309,7 @@ class EvalDataset:
 
         try:
             _ev = EvalTracker()
-            _ev.setBaselineScore(gs.displaytrackScore)
+            _ev.setBaselineScore(gs.displayInputScore)
 
             tracker.setFrame(gs.getOrigFrame())
             tracker.trackFrame()
@@ -389,13 +389,20 @@ class DFHelper:
 
     '''
         Methods for organizing and formatting the display of dataframes
+
+        Types:  'outcome'   - track+input scoreschema to scalars
+                'eval'      - calculated field on outcome, comparison b/w them
     '''
 
     def __init__(self, df=None, df_type=None):
 
         self.df = df
 
-        self.df_type = df_type
+        if df is not None:
+            self.inferDfType(self.df)
+
+        if df_type is not None:
+            self.df_type = df_type
 
         self.formatting_cols = {
             'compareRadii':                 '{:4.0f}',
@@ -406,7 +413,7 @@ class DFHelper:
         self.col_order_default = [
             'listIndex'
             ,'frameCounter'
-             'checkBothContainsOther'
+            ,'checkBothContainsOther'
             ,'distanceFromBaseline'
             ,'checkTrackSuccess'
             ]
@@ -418,6 +425,36 @@ class DFHelper:
     def setDf(self, df):
         self.df = df
 
+    def inferDfType(self, df):
+        ''' use the col fields to try to infer the type of the df; this will
+            impact the methods used to manipulate the dataframe
+        '''    
+        if 'input_obj_exists_0' in df.columns:
+            self.df_type = 'outcome'
+        elif 'checkTrackSuccess' in df.columns:
+            self.df_type = 'eval'
+
+    
+    def setRowsRequested(self, series_data=None, range_data=None, s_cmd=None):
+
+        if series_data is not None:
+            self.rows_requested = series_data
+
+        if range_data is not None:
+            self.rows_requested = [ind in range_data for ind in self.df.index]
+
+        if s_cmd is not None:
+
+            if s_cmd == 'inputframes':
+                
+                if self.df_type == 'outcome':
+                    self.rows_requested = (self.df['input_obj_exists_0'] == True)
+                
+                elif self.df_type == 'eval':
+                    self.rows_requested = [not(math.isnan(elem)) for elem 
+                                            in self.df['compareRadii']]
+
+
     def getDatasetDisplay(self, sort_args=None):
         ''' return.print  a dataframe with various formatting niceties'''
 
@@ -426,7 +463,7 @@ class DFHelper:
         _df =  self.columnOrder(_df, first_cols = self.col_order_default)
         
         # column heading spacing
-        _new_cols =  self.displayEvalMethodNames(_df.columns)
+        _new_cols =  self.displayEvalMethodNames(_df.columns, b_underscore=True)
         _df.rename(columns = _new_cols, inplace=True)
 
         # filter rows
@@ -467,7 +504,7 @@ class DFHelper:
                                 b_underscore=False
                                 ):
         ''' add a line carriage after each word, corresponding to 
-            first letter capitalization. e.g.:
+            first letter capitalization or an underscore. e.g.:
 
                 'checkBaselineInside'   -> 'check\nBaseline\nInside\n'
                 'check_baseline_inside' -> 'check\n_baseline\n_inside\n'
@@ -965,7 +1002,9 @@ class OutcomeData:
 
     
 if __name__ == "__main__":
-    # pass
-    od = OutcomeData()
+    
+    pass
+
+    # od = OutcomeData()
     # od.buildScoreSchemaList()
-    od.evalData
+    # od.evalData

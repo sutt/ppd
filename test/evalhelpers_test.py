@@ -238,14 +238,34 @@ def test_OutcomeData_displayDiameterPlot():
 
 
 def test_EvalDataset_buildDataset():
-    pass
-    # path_test = '''data/test/evalhelpers/EvalDataset/'''
-    # path_db = os.path.join('..', path_test, 'test.db')
+    
+    path_test = '''data/test/evalhelpers/EvalDataset/'''
+    path_gs = os.path.join('..', path_test, 'input_gs.db')
+    path_answer = os.path.join('..', path_test, 'answer_outcome.pickle')
 
     #load listGS
-    # db = DBInterface(path_db)
-    # listGS = [ pickle.loads(d[1]) for d in db.selectAll()]
-    
+    db = DBInterface(path_gs)
+    listGS = [pickle.loads(d[1]) for d in db.selectAll()]
+    print [_gs.frameCounter for _gs in listGS]
+
+    # init tracker
+    my_tracker = TrackFactory(on=True)
+    my_tracker.setInit(ballColor = "orange")
+    my_tracker.setAlgoEnum(0)
+
+    # apply method
+    evd = EvalDataset()
+    evd.buildDataset(listGS, my_tracker)
+    output = evd.df.copy()
+
+    # validate
+    answer = pd.read_pickle(path_answer)
+    d_output, d_answer = output.to_dict(), answer.to_dict()
+
+    assert cmp(d_output, d_answer) == 0
+
+    # note: these GS's in input_gs all have inputframes so there are no nan's
+    #       and thus we can compare them
 
 
 if __name__ == "__main__":

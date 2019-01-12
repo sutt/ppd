@@ -1,3 +1,12 @@
+
+1/12
+
+    This is the Design-Build-Test suite for object tracking
+        Build: create a function in ControlTracker
+        Design: get into jupyter and look at indv. steps within the process. also, look at problem frames and try to adjust algo to make them work too.
+        Test: deploy the built-tracker across a corpus of test cases
+        overall: iterate on this process untill product req's are satisfied
+
 1/8
 
 how to step into debugger of vscode from jupyter call?
