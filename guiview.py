@@ -100,6 +100,7 @@ b_batch_output = False
 i_batch_output_enum = 0
 l_batch_output_list = None
 s_batch_db_pathfn = ""
+s_eval_db_pathfn = ""
 b_eval = False
 
 #CLI Flags ----------------------------------
@@ -126,6 +127,7 @@ ap.add_argument("--algoenum", type=str, default="")
 ap.add_argument("--batchoutputenum", type=str, default="")
 ap.add_argument("--batchoutputlist", type=str, default="")
 ap.add_argument("--batchdbpathfn", type=str, default="")
+ap.add_argument("--evaldbpathfn", type=str, default="")
 ap.add_argument("--eval", action="store_true", default=False)
 args = vars(ap.parse_args())
 
@@ -239,6 +241,9 @@ if args["batchoutputlist"] != "" or args["batchoutputenum"] != "" or args["eval"
 if args["batchdbpathfn"] != "":
     s_batch_db_pathfn = args["batchdbpathfn"]
 
+if args["evaldbpathfn"] != "":
+    s_eval_db_pathfn = args["evaldbpathfn"]
+
 if args["eval"]:
     b_eval = True
     b_preload = False
@@ -283,7 +288,7 @@ display.setInit(showOn=b_show
                 ,frameResize=b_resize
                 ,frameAnnotateFn=b_annotate_fn)
 
-evalFactory = EvalFactory(on=b_eval)
+evalFactory = EvalFactory(on=b_eval, dbPathFn=s_eval_db_pathfn)
 
 
 #Video Loop: init a new video-file at top --------------

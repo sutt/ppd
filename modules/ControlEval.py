@@ -26,7 +26,7 @@ class EvalFactory:
          guiview so we construct it to do so lightly)
     '''
     
-    def __init__(self, on=False, bProgressBar=True):
+    def __init__(self, on=False, dbPathFn='', bProgressBar=True):
         ''' everything init to None; real init data is in _init() 
             where we can return before constructing heavy objects 
         '''
@@ -37,8 +37,11 @@ class EvalFactory:
         self.outcome_data_pd = None
 
         self.db = None
-        self.dbPathFn = None
         self.dbTblName = None
+        self.dbPathFn = None
+        
+        if dbPathFn != "":
+            self.dbPathFn = dbPathFn
         
         self.evData = None
         self.ev = None
@@ -79,7 +82,8 @@ class EvalFactory:
         self.outcome_data = []
         
         self.dbTblName = 'outcome_dataframe'
-        self.dbPathFn = "data/usr/eval_tmp.db"
+        if self.dbPathFn is None:
+            self.dbPathFn = "data/usr/eval_tmp.db"
         self.db = DBInterface(self.dbPathFn)
 
         self.evData = EvalDataset()

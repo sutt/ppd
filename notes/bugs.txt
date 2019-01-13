@@ -1,5 +1,14 @@
 #Tasks
 
+1/13
+
+    [ ] add pandas-compare function to test
+    [ ] add warning if --eval run w/o --track
+
+    ideas
+        running --eval w/o inputframes is only recording track results
+        but it could be logging frame notes
+
 1/12
 
     tasks
@@ -17,8 +26,9 @@
     [x] add test data to git
 
     [ ] unittest: pickle.load from interproc
-    [ ] unittest: subprocEval
+    [x] unittest: subprocEval
     [ ] unittest: DFHelper methods
+    
 
     misc
         [ ] find num of frames from timelog or notesfactory (for progress bar)
@@ -26,14 +36,14 @@
 1/11
 
     10-11
-    [ ] helpers methods - copy from evalDataset
+    [x] helpers methods - copy from evalDataset
         [x] displayEvalMethodsNames - works for snake_case
         [x] deprecate old functions
         [x] unittests for them
-        [ ] demo in jupyter
+        [x] demo in jupyter
         [x] make DFHelper.formatting_cols + DFHelper.col_order_default
             work when cols aren't present
-        [ ] unittest for EvalDataset
+        [x] unittest for EvalDataset
 
     [ ] multi-objEnum
 

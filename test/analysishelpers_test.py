@@ -3,12 +3,14 @@ import subprocess
 import time
 import cv2
 import pickle
+import pandas as pd
 if False: from cv2 import *
 
 sys.path.append("../")
 from modules.AnalysisHelpers import ( multiPlot
                                      ,applyTracker
                                      ,roiSelectZoomWindow
+                                     ,subprocEval
                                      )
 from modules.ControlTracking import TrackFactory
 from modules.Interproc import DBInterface, GuiviewState
@@ -148,6 +150,20 @@ def test_applyTracker_2():
     assert data['listScore'][0]['0']['data'] == [17, 18, 35, 35]
     assert data['listScore'][1] == None
 
+def test_subprocEval_1():
+    
+    path_test = 'data/test/analysishelpers/subprocEval/'
+
+    vid_path = os.path.join(path_test, 'ss1.avi')
+    db_path = os.path.join(path_test, 'test_eval_db.db')
+    
+    answer_path = os.path.join('..', path_test, 'answer.pickle')
+
+    output = subprocEval(f_pathfn=vid_path, db_pathfn=db_path)
+
+    answer = pd.read_pickle(answer_path)
+
+    assert output.equals(answer)
 
 
 if __name__ == "__main__":
