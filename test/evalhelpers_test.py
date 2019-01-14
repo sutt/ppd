@@ -1,6 +1,7 @@
 import os, sys, json, copy, math, pickle
 import pandas as pd
 import numpy as np
+from utils import listContainSameElems, diff_pd
 sys.path.append("../")
 from modules.DataSchemas import ScoreSchema
 from modules.ControlTracking import TrackFactory
@@ -264,8 +265,76 @@ def test_EvalDataset_buildDataset():
 
     assert cmp(d_output, d_answer) == 0
 
-    # note: these GS's in input_gs all have inputframes so there are no nan's
-    #       and thus we can compare them
+def test_EvalDataset_buildDataset_2():
+    
+    # unlike previous test, this listGS has some non-inputframes gs's.
+
+    path_test = '''data/test/evalhelpers/EvalDataset_2/'''
+    path_gs = os.path.join('..', path_test, 'input_gs.db')
+    path_answer = os.path.join('..', path_test, 'answer_outcome.pickle')
+
+    #load listGS
+    db = DBInterface(path_gs)
+    listGS = [pickle.loads(d[1]) for d in db.selectAll()]
+    print [_gs.frameCounter for _gs in listGS]
+
+    # init tracker
+    my_tracker = TrackFactory(on=True)
+    my_tracker.setInit(ballColor = "orange")
+    my_tracker.setAlgoEnum(0)
+
+    # apply method
+    evd = EvalDataset()
+    evd.buildDataset(listGS, my_tracker)
+    output = evd.df.copy()
+
+    answer = pd.read_pickle(path_answer)
+    
+    # validate
+    try:
+        assert output.equals(answer)
+    except:
+        print diff_pd(output, answer)
+        raise Exception
+
+    
+def test_DFHelper_1():
+
+    path_test = 'data/test/evalhelpers/DFHelper1/'
+    path_db = os.path.join(path_test, 'eval_tmp.db')
+    # path_answer = os.path.join('..', path_test, 'answer.pickle')
+
+    #first load an outcomeData from sql
+    od = OutcomeData(dbPathFn = path_db, bLoad=True, bEval=True)
+
+    # build DFHelper objs
+    df_outcome = DFHelper(od.outcomeData)
+    df_eval = DFHelper(od.evalData)
+
+    # validate inferred types
+    assert df_outcome.df_type == 'outcome'
+    assert df_eval.df_type == 'eval'
+
+    # validate rowsRequested 
+    df_outcome.setRowsRequested(s_cmd='inputframes')
+    df_eval.setRowsRequested(s_cmd='inputframes')
+    ANSWER = [0, 9, 78, 116, 136, 176, 187, 194, 195, 201, 215, 246, 270, 292, 295, 307, 308, 324, 340]
+    assert [i for i,v in enumerate(df_outcome.rows_requested) if v] == ANSWER
+    assert [i for i,v in enumerate(df_eval.rows_requested) if v] == ANSWER
+
+    # validate col naming conversion
+    outcome_cols = df_outcome.displayEvalMethodNames(df_outcome.df.columns).values()
+    eval_cols =  df_outcome.displayEvalMethodNames(df_eval.df.columns).values()
+    outcome_ANSWER = ['track\n_data0\n_0\n', 'index\n', 'track\n_data0\n_2\n', 'track\n_data0\n_3\n', 'input\n_data2\n_3\n', 'track\n_data1\n_1\n', 'track\n_data1\n_0\n', 'track\n_data1\n_3\n', 'track\n_data1\n_2\n', 'track\n_data2\n_2\n', 'track\n_data2\n_3\n', 'track\n_data2\n_0\n', 'track\n_data2\n_1\n', 'input\n_data3\n_2\n', 'track\n_data3\n_3\n', 'track\n_data3\n_2\n', 'track\n_data3\n_1\n', 'input\n_obj\n_type\n_1\n', 'track\n_obj\n_exists\n_1\n', 'track\n_obj\n_exists\n_0\n', 'track\n_obj\n_exists\n_3\n', 'track\n_obj\n_exists\n_2\n', 'input\n_obj\n_type\n_2\n', 'input\n_data2\n_1\n', 'track\n_data0\n_1\n', 'track\n_obj\n_type\n_3\n', 'track\n_obj\n_type\n_0\n', 'track\n_obj\n_type\n_1\n', 'input\n_obj\n_type\n_3\n', 'track\n_data3\n_0\n', 'input\n_data1\n_0\n', 'input\n_data1\n_1\n', 'input\n_data1\n_2\n', 'input\n_data1\n_3\n', 'track\n_obj\n_type\n_2\n', 'input\n_data0\n_1\n', 'input\n_data0\n_0\n', 'input\n_data0\n_3\n', 'input\n_data0\n_2\n', 'input\n_data2\n_2\n', 'input\n_obj\n_type\n_0\n', 'input\n_data3\n_3\n', 'input\n_data3\n_0\n', 'input\n_data3\n_1\n', 'input\n_data2\n_0\n', 'input\n_obj\n_exists\n_2\n', 'input\n_obj\n_exists\n_3\n', 'input\n_obj\n_exists\n_0\n', 'input\n_obj\n_exists\n_1\n']
+    eval_ANSWER = ['check\nBaseline\nInside\nTrack\n', 'check\nTrack\nSuccess\n', 'check\nTrack\nInside\nBaseline\n', 'check\nEither\nContains\nOther\n', 'distance\nFrom\nBaseline\n', 'check\nBoth\nContains\nOther\n', 'compare\nRadii\n', 'check\nTrack\nInside\nBaseline\nRect\n']
+    assert listContainSameElems(outcome_cols, outcome_ANSWER)
+    assert listContainSameElems(eval_cols, eval_ANSWER)
+
+    # can't do that right now b/c it returns a view/not the df itself
+    # properties to test: .shape / .columns / against a loaded answer
+    # assert df_outcome.getDatasetDisplay() 
+    # assert df_outcome.getDatasetDisplay()
+
 
 
 if __name__ == "__main__":

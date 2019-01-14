@@ -5,7 +5,7 @@ import cv2
 import pickle
 import pandas as pd
 if False: from cv2 import *
-
+from utils import diff_pd
 sys.path.append("../")
 from modules.AnalysisHelpers import ( multiPlot
                                      ,applyTracker
@@ -15,6 +15,7 @@ from modules.AnalysisHelpers import ( multiPlot
 from modules.ControlTracking import TrackFactory
 from modules.Interproc import DBInterface, GuiviewState
 from modules.DataSchemas import ScoreSchema
+
 
 '''
 TESTS:
@@ -163,7 +164,11 @@ def test_subprocEval_1():
 
     answer = pd.read_pickle(answer_path)
 
-    assert output.equals(answer)
+    try:
+        assert output.equals(answer)
+    except:
+        diff_pd(answer, output)
+        raise Exception
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import os, sys, time, datetime
 import numpy as np
 import cv2
+import pandas as pd
 
 sys.path.append("../")
 from modules.ImgUtils import binary_diff
@@ -155,10 +156,55 @@ class ImgDiff:
         return output
         
 
+def diff_pd(df1, df2):
+    '''
+    Identify differences between two pandas DataFrames
+    https://stackoverflow.com/questions/17095101/outputting-difference-in-two-pandas-dataframes-side-by-side-highlighting-the-d
+    '''
+    assert (df1.columns == df2.columns).all(), \
+        "DataFrame column names are different"
+    if any(df1.dtypes != df2.dtypes):
+        "Data Types are different, trying to convert"
+        df2 = df2.astype(df1.dtypes)
+    if df1.equals(df2):
+        print 'they are the same according to diff_pd'
+        return None
+    else:
+        # need to account for np.nan != np.nan returning True
+        diff_mask = (df1 != df2) & ~(df1.isnull() & df2.isnull())
+        ne_stacked = diff_mask.stack()
+        changed = ne_stacked[ne_stacked]
+        changed.index.names = ['id', 'col']
+        difference_locations = np.where(diff_mask)
+        changed_from = df1.values[difference_locations]
+        changed_to = df2.values[difference_locations]
+        return pd.DataFrame({'from': changed_from, 'to': changed_to},
+                            index=changed.index)
+
+def listContainSameElems(list1, list2):
+    ''' return True if elements contain same elements, False otherwise'''
+    b1 = all(map(lambda x: x in list2, list1))
+    b2 = all(map(lambda x: x in list1, list2))
+    return (b1 and b2)
+
+
 # if __name__ == "__main__":
 
 TEST_DATA_DIR = "../data/test/helpers/utils_tests/"
 
+def test_listContainsSameElems():
+
+    a1, a2 = [1,2], [2,1]
+    assert listContainSameElems(a1, a2) == True
+
+    a1, a2 = [1,2], [2,0]
+    assert listContainSameElems(a1, a2) == False
+
+    a1, a2 = [1,2,3], [2,1,0]
+    assert listContainSameElems(a1, a2) == False
+
+    a1, a2 = [1,2], [1,2.0]
+    assert listContainSameElems(a1, a2) == True
 
 def test_diff_imgs_1():
     ''' test img_diff works for TruePositives and TrueNegatives '''
