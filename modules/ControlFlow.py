@@ -760,6 +760,8 @@ class OutputFactory:
             self.db.deleteAll()
             print 'deleting all states...'
 
+        bProceed = False
+        
         if self.bBatchState:
 
             bProceed = self.checkCriteriaOutput( 

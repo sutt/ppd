@@ -1,9 +1,49 @@
 #Tasks
 
+1/14
+
+[x] add pandas-compare function to test
+[x] add warning if --eval run w/o --track
+[x] check the eval / delayFrame issue
+[x] test a vid w/o a input-score in the first frame: do col-types change?
+[x] unittest: DFHelper methods
+[x] unittest: add EvalDataset_buildDataset_2() with .equlas() and non input frames
+[x] unittest: pickle.load from interproc
+[x] test data uploaded to git
+
+[ ] pathToData
+
+[ ] rename test folder / allow import from it? rename to "tests"
+    [ ] understand why guiview(line168) does work to import test
+    [ ] am i using ImgDiff anywhere?
+    [ ] refactor imports
+    [ ] refactor paths; so many; here's where you'd want pathToDatav / pathToTest
+
+[ ] Progress Bar
+    [ ] find num of frames from timelog or notesfactory (for progress bar)
+    [ ] build progressbar for subprocEval; stdout.PIPE?
+
+[ ] aggregate eval table elements
+[ ] multi-objEnum
+
+[ ] investigate the difference in tracking when a new video is created
+    (as first ob served in eval-module-3.ipynb:ATTENTION)
+    [ ] verify that lossless encoding has equal tracks
+    [ ] verify imgDiffs (e.g. using test/utils.py:ImgDiff) in ss1 vs ss2
+
+deferred
+    [ ] dfhelper datasetDisplay()
+        [ ] return the df itself
+        [ ] add asserts to evalhelpers_test:test_DFHelper_1()
+
+misc/ideas
+    [ ] "live" record/view script with tracking module deployed; "see the tracking" in
+        realtime
+
 1/13
 
-    [ ] add pandas-compare function to test
-    [ ] add warning if --eval run w/o --track
+    [x] add pandas-compare function to test
+    [x] add warning if --eval run w/o --track
 
     ideas
         running --eval w/o inputframes is only recording track results
@@ -25,9 +65,9 @@
             [x] evalMethodNames for type='output'
     [x] add test data to git
 
-    [ ] unittest: pickle.load from interproc
+    [x] unittest: pickle.load from interproc
     [x] unittest: subprocEval
-    [ ] unittest: DFHelper methods
+    [x] unittest: DFHelper methods
     
 
     misc
@@ -79,7 +119,7 @@
 
     [ ] multi-ObjEnum eval
     
-    [ ] helper methods on eval data
+    [x] helper methods on eval data
 
     [x] allow None as a baselineScore / handle it
 
@@ -97,14 +137,14 @@
 
     possible bugs
 
-        [ ] np.NaN (presumably pd.NaN) can't be converted with int(); problem?
+        [x] np.NaN (presumably pd.NaN) can't be converted with int(); problem?
             yes - in cmp() for one
-            [ ] how to replace?
+            [~] how to replace?
         
-        [ ] we really can't change outcome_dataframe field naming formula; how 
+        [x] we really can't change outcome_dataframe field naming formula; how 
             to solidify this thru unit tests? what are the edge cases?
 
-        [ ] is timefactory off for --eval?
+        [x] is timefactory off for --eval? yes
 
     other thoughts
 

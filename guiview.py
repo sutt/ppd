@@ -247,6 +247,7 @@ if args["evaldbpathfn"] != "":
 if args["eval"]:
     b_eval = True
     b_preload = False
+    g.trackingOn = True
 
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'

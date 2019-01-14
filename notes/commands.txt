@@ -3,10 +3,10 @@
 
     comprehensive video evaluation:
 
-    >python guiview.py --file x/x/vid.avi --eval --track
+    >python guiview.py --file x/x/vid.avi --eval
 
         runs the noshow/nogui eval utility on each frame, outputs to tmp_eval.db 
-        in data/usr/. must call with --track or there is no evaluation to de done.
+        in data/usr/. (--track is applied automatically)
 
 12/27
 

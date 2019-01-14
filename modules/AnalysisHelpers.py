@@ -584,7 +584,7 @@ def subprocEval( f_pathfn
 
     # build cmd
     cmd = '''python guiview.py --file %s 
-                                --eval --track 
+                                --eval
                                 --algoenum %s
                                 --evaldbpathfn %s ''' % (
                                                 f_pathfn

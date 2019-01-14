@@ -501,7 +501,7 @@ class DFHelper:
     @staticmethod
     def displayEvalMethodNames( list_str_names,
                                 b_upper=True,
-                                b_underscore=False
+                                b_underscore=True
                                 ):
         ''' add a line carriage after each word, corresponding to 
             first letter capitalization or an underscore. e.g.:
