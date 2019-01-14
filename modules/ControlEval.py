@@ -75,9 +75,17 @@ class EvalFactory:
             self.progressBarWidth = 30
             self.frameTotal = 0
 
-            sys.stdout.write("[%s]" % (" " * self.progressBarWidth))
+            # this is looks better but doesn't work for subproc piping 
+            # stdout with a variable seek
+            # sys.stdout.write("[%s]" % (" " * self.progressBarWidth))
+            # sys.stdout.flush()
+            # sys.stdout.write("\b" * (self.progressBarWidth + 1))
+            # sys.stdout.flush()
+            sProgressBarTemplate = "["
+            sProgressBarTemplate += " " * (self.progressBarWidth - 2)
+            sProgressBarTemplate += "]\n"
+            sys.stdout.write(sProgressBarTemplate)
             sys.stdout.flush()
-            sys.stdout.write("\b" * (self.progressBarWidth + 1))
         
         self.outcome_data = []
         
@@ -207,6 +215,7 @@ class EvalFactory:
 
         # cli logging
         sys.stdout.write("\n")
+        sys.stdout.flush()
         print 'output db: %s' % str(self.dbPathFn)
 
         rows, cols = self.outcome_data_pd.shape

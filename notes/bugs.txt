@@ -5,7 +5,7 @@
 [x] add pandas-compare function to test
 [x] add warning if --eval run w/o --track
 [x] check the eval / delayFrame issue
-[x] test a vid w/o a input-score in the first frame: do col-types change?
+[x] test a vid w/o a input-score in the first frame: do col-types change? no
 [x] unittest: DFHelper methods
 [x] unittest: add EvalDataset_buildDataset_2() with .equlas() and non input frames
 [x] unittest: pickle.load from interproc
@@ -15,13 +15,23 @@
 
 [ ] rename test folder / allow import from it? rename to "tests"
     [ ] understand why guiview(line168) does work to import test
-    [ ] am i using ImgDiff anywhere?
+        it seems it works from a parent/sibling within the file 
+        hierarchy; but not from a cousin file
+        weird: couldn't get listConatinsSameElems() from test/utils into test/interproc_test.py
+                but could get it into other moduleX_test.py
+    [x] am i using ImgDiff anywhere? yes, controldisplay_test
     [ ] refactor imports
     [ ] refactor paths; so many; here's where you'd want pathToDatav / pathToTest
 
-[ ] Progress Bar
-    [ ] find num of frames from timelog or notesfactory (for progress bar)
-    [ ] build progressbar for subprocEval; stdout.PIPE?
+[x] Progress Bar
+    [x] find num of frames from timelog or notesfactory (for progress bar) [already exists]
+    [x] build progressbar for subprocEval; stdout.PIPE?
+    [x] add timing to subproc
+        notes:
+            scratch/demo_subproc.py works
+                need to flush() stdout after write()
+                use tempfile module to avoid PIPE
+                only need stdout, not stderr
 
 [ ] aggregate eval table elements
 [ ] multi-objEnum

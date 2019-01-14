@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import io
 import sqlalchemy
+import tempfile
 from PIL import Image
 from collections import OrderedDict
 from itertools import combinations
@@ -563,10 +564,34 @@ def subprocBatchOutput(  f_pathfn
 
     return listGS
 
+def pollAndRead(proc, outLog, timeout=30):
+
+    out_counter = 0
+    sleep_interval = 0.001
+
+    for _ in range(int( float(timeout) / float(sleep_interval) ) ):
+
+        if proc.poll() is None:
+
+            outLog.seek(out_counter)
+            
+            ret = outLog.read()
+
+            if ret != '':
+                out_counter += len(str(ret))
+                sys.stdout.write(str(ret))
+            
+            time.sleep(sleep_interval)
+            
+        else:
+            return
+    
+    print 'subproc timed out after %s seconds' % str(timeout)
 
 def subprocEval( f_pathfn
                 ,algo_enum = 0
                 ,db_pathfn = "data/usr/eval_tmp.db"
+                ,b_log = False
                 ):
     '''
         get a outcome-dataframe by running guiview on a whole video.
@@ -593,18 +618,31 @@ def subprocEval( f_pathfn
                                                 )
     args = argsFromCmd(cmd)
     
+    outLog = tempfile.SpooledTemporaryFile() if b_log else subprocess.PIPE
+
+    t0 = time.time()
+
     # call subproc
     proc =  subprocess.Popen(    args
                                 ,stderr = subprocess.PIPE
-                                ,stdout = subprocess.PIPE
+                                ,stdout = outLog
                                 ,cwd = "../"
                                 )
-    ret = proc.wait()
+    
+    # for progressbar
+    if b_log:
+        pollAndRead(proc, outLog)
+    else:
+        ret = proc.wait()
 
     # load from db - assume we're calling from ppd/books/
     db_engine = sqlalchemy.create_engine('sqlite:///' + '../' + db_pathfn, echo=False)
 
     df = pd.read_sql_table('outcome_dataframe', con=db_engine)
+
+    if b_log:
+        total_time = str(time.time() - t0)
+        print 'time elapsed: %s' % total_time[:min(5, len(total_time))]
 
     return df
 
