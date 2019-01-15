@@ -1,5 +1,17 @@
 #Tasks
 
+1/15
+
+    investigate the diff-frame, diff-encoding situation
+        [x] new notebook: encoding-issue-1.ipynb
+        [x] mimic process of creating short/ss1 /ss2
+        [x] add book data to git
+
+
+    misc
+    [ ] why is test data changing each time for: test/analysishelpers/subprocEval/test_eval_db.db
+
+
 1/14
 
 [x] add pandas-compare function to test
