@@ -74,6 +74,7 @@ class EvalFactory:
             self.progressBarMod = 30
             self.progressBarWidth = 30
             self.frameTotal = 0
+            self.progressBarT0 = time.time()
 
             # this is looks better but doesn't work for subproc piping 
             # stdout with a variable seek
@@ -219,7 +220,9 @@ class EvalFactory:
         print 'output db: %s' % str(self.dbPathFn)
 
         rows, cols = self.outcome_data_pd.shape
+        total_time = str(time.time() - self.progressBarT0)
         print 'output tbl: %s' % str(self.dbTblName)
+        print 'total time: %s' % total_time[:min(5, len(total_time) )]
         print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
 
 

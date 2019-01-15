@@ -613,7 +613,7 @@ def subprocEval( f_pathfn
                                 --algoenum %s
                                 --evaldbpathfn %s ''' % (
                                                 f_pathfn
-                                                ,algo_enum
+                                                ,str(algo_enum)
                                                 ,db_pathfn
                                                 )
     args = argsFromCmd(cmd)
@@ -642,7 +642,7 @@ def subprocEval( f_pathfn
 
     if b_log:
         total_time = str(time.time() - t0)
-        print 'time elapsed: %s' % total_time[:min(5, len(total_time))]
+        print 'subproc time: %s' % total_time[:min(5, len(total_time))]
 
     return df
 
