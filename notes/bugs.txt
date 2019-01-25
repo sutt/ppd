@@ -1,5 +1,52 @@
 #Tasks
 
+1/25
+
+    [x] How do a eval outcome_data? - with OutcomeData.eval()
+    [ ] what happens when you aggregate on nan's?
+        [x] does it break, does it count nan as zeros thus e.g. lowering avg?
+            it doesn't break; it also takes into account nan as ignored
+        [x] sum, max, min, mean, median
+        [x] do we need to control rows_requested for basic aggregatin? - Kinda, see above
+        [ ] note: we will want to filter rows for advanced summaries: 
+            e.g. accuracy for balls < 20 pixels 
+
+    Tasks
+        [x] do some aggregating in notebook - df.mean() , df.min(), etc..
+        [x] figure out an atomic template for each aggregation in notebook
+        [x] start writing AggregatorClass
+            [x] need to do absolute value for compareRadii
+        [ ] show aggregation after eval run on cli/subprocEval
+
+1/24 - 1/25
+    
+    Previous
+    [ ] aggregate eval table elements
+    [ ] multi-objEnum
+    [ ] time perf for each frame from an eval run
+
+    Also
+    [ ] run a --dir for eval
+    [ ] add a video properties table for each video:
+        - e.g. dec14/output5.proc1.avi - ball-color:"green", frame-nums:345, ...
+        - how do we uniquely identify a video (that may be moved?) with non-unique
+        names within a file hierarchy? a hash of some property?
+
+    Culminating In
+    [ ] add a db
+
+    Misc
+    [ ] how to auto-complete/auto-correct video paths?
+    [ ] there are three point rays: when the ball bounces it looks like a 'V'
+    [ ] why is checkTrackInsideBaselineRect < checkTrackInsideBaseline ? (should be opposite)
+
+
+1/16
+
+    [ ] build speed-estimate-book using output-state
+        [ ] zoom windows for end points
+        [ ] use timelog from state to calc time interval
+
 1/15
 
     investigate the diff-frame, diff-encoding situation
@@ -7,10 +54,8 @@
         [x] mimic process of creating short/ss1 /ss2
         [x] add book data to git
 
-
     misc
     [ ] why is test data changing each time for: test/analysishelpers/subprocEval/test_eval_db.db
-
 
 1/14
 
@@ -48,10 +93,10 @@
 [ ] aggregate eval table elements
 [ ] multi-objEnum
 
-[ ] investigate the difference in tracking when a new video is created
+[x] investigate the difference in tracking when a new video is created
     (as first ob served in eval-module-3.ipynb:ATTENTION)
-    [ ] verify that lossless encoding has equal tracks
-    [ ] verify imgDiffs (e.g. using test/utils.py:ImgDiff) in ss1 vs ss2
+    [x] verify that lossless encoding has equal tracks
+    [x] verify imgDiffs (e.g. using test/utils.py:ImgDiff) in ss1 vs ss2
 
 deferred
     [ ] dfhelper datasetDisplay()
@@ -93,7 +138,7 @@ misc/ideas
     
 
     misc
-        [ ] find num of frames from timelog or notesfactory (for progress bar)
+        [x] find num of frames from timelog or notesfactory (for progress bar)
 
 1/11
 

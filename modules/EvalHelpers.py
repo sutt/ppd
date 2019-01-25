@@ -383,7 +383,138 @@ class EvalDataset:
                 ret[_k] = _dict[_k]
         return ret
 
+
+
+class AggEval:
+
+    '''
+        apply aggregating functions to eval_df: 
+        
+            accounts for the field's type (num vs bool) and whether it should
+            be interpreted as an absolute-val for agg purposes.
+
+        TODO:
+            [ ] agg only on some rows, e.g. ball size < some size
+                maybe that's done outside this class by passing in limited eval_df?
+            [ ] Add calculated fields here, e.g. ballUnitsAway ?
+            [ ] do things like 'check locality' and 'check stable radius' here?
+
+    '''
+    def __init__(self, eval_df=None):
+
+        self.bool_agg_meths = ['mean']
+        self.num_agg_meths = ['mean', 'median', 'min', 'max', 'std', 'sum']
+
+        self.d_agg = None
+        self.eval_df = None
+
+        if eval_df is not None:
+            self.eval_df = eval_df
+            self.calc()
+
+    def setEvalDf(self, eval_df):
+        self.eval_df = eval_df.copy()
+
+    def getAggDict(self):
+        return self.d_agg
+
+    def getAggDf(self):
+        df = pd.DataFrame(self.d_agg)
+        return df.T
+
+    def calc(self):
+        ''' heart of the function: build a dict (with key for each field)
+            of dicts (with a key for each agg method that applies for that field)
+        '''
+
+        d_agg = {}
     
+        eval_field_names = self.eval_df.columns
+
+        for field in eval_field_names:
+
+            data = self.eval_df[field]
+
+            if field == 'dummy':
+                
+                # this select statement for custom agg type not handled
+                # by unviersal_agg()
+                
+                field_agg = self.agg_dummy(data)
+                
+                d_agg[field] = field_agg
+
+            elif field == 'dummy2':
+                pass
+
+            else:
+                
+                # handle common eval fields here:
+
+                s_field_type = self.inferFieldType(field)
+
+                b_field_abs = self.inferFieldAbs(field)
+
+                field_agg = self.agg_universal( field, 
+                                                data, 
+                                                s_field_type, 
+                                                b_field_abs
+                                                )
+
+                d_agg[field] = field_agg
+                
+        self.d_agg = d_agg
+
+    def agg_universal(self, field_name, field_data, field_type, field_abs):
+        ''' aggregate a field based on properties you know about how
+            it should operate.
+        '''
+        
+        output_dict = {}
+        
+        if field_abs:
+            field_data = field_data.apply(np.abs)
+            
+        if field_type == 'bool':
+            agg_names = self.bool_agg_meths
+        elif field_type == 'num':
+            agg_names = self.num_agg_meths
+            
+        for agg_name in agg_names:
+            
+            try:
+                
+                aggMeth = getattr(field_data, agg_name)
+                
+                agg_val = aggMeth()
+                
+                output_dict[agg_name] = agg_val
+            
+            except:
+                pass
+        
+        return output_dict    
+
+    
+    def agg_dummy(data):
+        ''' template for custom agg function '''
+        pass
+
+    @staticmethod
+    def inferFieldType(s_field_name):
+        if 'check' in s_field_name:
+            return 'bool'
+        else:
+            return 'num'
+        
+    @staticmethod
+    def inferFieldAbs(s_field_name):
+        if s_field_name == 'compareRadii':
+            return True
+        else:
+            return False
+
+
 
 class DFHelper:
 
