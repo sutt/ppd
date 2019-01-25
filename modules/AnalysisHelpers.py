@@ -592,6 +592,7 @@ def subprocEval( f_pathfn
                 ,algo_enum = 0
                 ,db_pathfn = "data/usr/eval_tmp.db"
                 ,b_log = False
+                ,b_eval_log = False
                 ):
     '''
         get a outcome-dataframe by running guiview on a whole video.
@@ -605,6 +606,9 @@ def subprocEval( f_pathfn
                 db_pathfn   - (str) path and fn for db for interproc-comm
                                     path is relative ppd/ root not calling 
                                     function
+                b_log       - (bool) write to stdout in jupyter notebook a 
+                                    progress bar + process details
+                b_eval_log  - (bool) output an high-level summaries of the results
     '''
 
     # build cmd
@@ -616,6 +620,9 @@ def subprocEval( f_pathfn
                                                 ,str(algo_enum)
                                                 ,db_pathfn
                                                 )
+    if b_eval_log:
+        cmd += ' --evallog'
+
     args = argsFromCmd(cmd)
     
     outLog = tempfile.SpooledTemporaryFile() if b_log else subprocess.PIPE
@@ -1317,7 +1324,7 @@ def exploreImgs(listGS, figw = 20):
         _gs.initDisplay()
         tmp = []
         tmp.append(_gs.getOrigFrame())
-        tmp.append(_gs.display.scoreFrame.copy())
+        tmp.append(_gs.display.zoomFrame.copy())
         chart_data.append(tmp)
 
     titles = [_gs.frameCounter for _gs in listGS]

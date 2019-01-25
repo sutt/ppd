@@ -102,6 +102,7 @@ l_batch_output_list = None
 s_batch_db_pathfn = ""
 s_eval_db_pathfn = ""
 b_eval = False
+b_eval_log = False
 
 #CLI Flags ----------------------------------
 ap = argparse.ArgumentParser()
@@ -129,6 +130,7 @@ ap.add_argument("--batchoutputlist", type=str, default="")
 ap.add_argument("--batchdbpathfn", type=str, default="")
 ap.add_argument("--evaldbpathfn", type=str, default="")
 ap.add_argument("--eval", action="store_true", default=False)
+ap.add_argument("--evallog", action="store_true", default=False)
 args = vars(ap.parse_args())
 
 
@@ -249,6 +251,9 @@ if args["eval"]:
     b_preload = False
     g.trackingOn = True
 
+if args["evallog"]:
+    b_eval_log = True
+
 if args["dir"] == "" and args["file"] == "":
     print 'must run with --dir x/x/ or --file x/x/out.avi'
     sys.exit()
@@ -289,7 +294,9 @@ display.setInit(showOn=b_show
                 ,frameResize=b_resize
                 ,frameAnnotateFn=b_annotate_fn)
 
-evalFactory = EvalFactory(on=b_eval, dbPathFn=s_eval_db_pathfn)
+evalFactory = EvalFactory(on=b_eval
+                         ,dbPathFn=s_eval_db_pathfn
+                         ,bLog=b_eval_log)
 
 
 #Video Loop: init a new video-file at top --------------

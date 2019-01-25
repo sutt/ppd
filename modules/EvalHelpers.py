@@ -461,7 +461,7 @@ class AggEval:
                                                 b_field_abs
                                                 )
 
-                d_agg[field] = field_agg
+                d_agg['agg_' + field] = field_agg
                 
         self.d_agg = d_agg
 
@@ -564,6 +564,8 @@ class DFHelper:
             self.df_type = 'outcome'
         elif 'checkTrackSuccess' in df.columns:
             self.df_type = 'eval'
+        elif 'agg_checkTrackSuccess' in df.columns:
+            self.df_type = 'agg_eval'
 
     
     def setRowsRequested(self, series_data=None, range_data=None, s_cmd=None):
@@ -603,9 +605,19 @@ class DFHelper:
 
         # rounding / clipping, need to return on this line for
         # formatting to flow thru to jupyter
+        
         return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
 
-    
+
+    def getAggEvalDisplay(self, single_metric='mean'):
+        ''' return a string for the pandas table of the <single_metric> for each 
+            eval method
+        '''
+        _df = self.df.copy()
+        _series = _df[single_metric]
+        return _series.to_string(float_format= '{:,.2f}'.format)
+
+
     @staticmethod
     def new_col_formatting(dict_new_cols, dict_formatting):
         ''' a utility function for to-jupyter formatting'''

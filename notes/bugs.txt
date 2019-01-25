@@ -3,12 +3,12 @@
 1/25
 
     [x] How do a eval outcome_data? - with OutcomeData.eval()
-    [ ] what happens when you aggregate on nan's?
+    [x] what happens when you aggregate on nan's?
         [x] does it break, does it count nan as zeros thus e.g. lowering avg?
             it doesn't break; it also takes into account nan as ignored
         [x] sum, max, min, mean, median
         [x] do we need to control rows_requested for basic aggregatin? - Kinda, see above
-        [ ] note: we will want to filter rows for advanced summaries: 
+        [x] note: we will want to filter rows for advanced summaries: 
             e.g. accuracy for balls < 20 pixels 
 
     Tasks
@@ -16,7 +16,13 @@
         [x] figure out an atomic template for each aggregation in notebook
         [x] start writing AggregatorClass
             [x] need to do absolute value for compareRadii
-        [ ] show aggregation after eval run on cli/subprocEval
+        [x] show aggregation after eval run on cli/subprocEval
+            [x] allow DFHleper to handle AggEval df's, so we can pretty print to cli
+        [x] start a new notebook
+            [x] show subprocEval printing the agg_eval df
+        [ ] DFHelper returns a better way to format, copy EvalDisplay()
+
+        [ ] build a benchmark db and start interfacing with it from a DiffClass
 
 1/24 - 1/25
     
@@ -33,7 +39,8 @@
         names within a file hierarchy? a hash of some property?
 
     Culminating In
-    [ ] add a db
+    [ ] add this data for one video to a master-db
+    [ ] compare the eval results from current run to baseline in master-db
 
     Misc
     [ ] how to auto-complete/auto-correct video paths?

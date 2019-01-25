@@ -14,6 +14,7 @@ from ControlTracking import TrackFactory
 from ControlDisplay import Display
 from DataSchemas import  ScoreSchema
 from EvalHelpers import EvalTracker, EvalDataset
+from EvalHelpers import OutcomeData, AggEval, DFHelper
 
 
 
@@ -26,7 +27,7 @@ class EvalFactory:
          guiview so we construct it to do so lightly)
     '''
     
-    def __init__(self, on=False, dbPathFn='', bProgressBar=True):
+    def __init__(self, on=False, dbPathFn='', bProgressBar=True, bLog=False):
         ''' everything init to None; real init data is in _init() 
             where we can return before constructing heavy objects 
         '''
@@ -49,6 +50,7 @@ class EvalFactory:
         self.currentInputScore = None
         self.currentTrackScore = None
 
+        self.bLog = bLog
         self.bProgressBar = bProgressBar
         self.progressBarCounter = None
         self.progressBarMod = None
@@ -105,7 +107,7 @@ class EvalFactory:
     def checkExit(self):
         ''' allows us to exit from guiview loop'''
         if self.on:
-            self.outputOutcomeData()
+            self.outputOutcomeData(bLog = self.bLog)
             return True
         return False
 
@@ -147,7 +149,7 @@ class EvalFactory:
         self.progressBar()
 
 
-    def outputOutcomeData(self):
+    def outputOutcomeData(self, bLog=False):
         ''' take ScoreSchema obj's in outcome_data and output to a sql table
 
             field naming template:
@@ -222,8 +224,22 @@ class EvalFactory:
         rows, cols = self.outcome_data_pd.shape
         total_time = str(time.time() - self.progressBarT0)
         print 'output tbl: %s' % str(self.dbTblName)
-        print 'total time: %s' % total_time[:min(5, len(total_time) )]
+        print 'eval time: %s' % total_time[:min(5, len(total_time) )]
         print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
+
+        if bLog:
+
+            outcomeData = OutcomeData(bLoad=False, bEval=False)
+            outcomeData.loads(self.outcome_data_pd)
+            outcomeData.eval()
+            evalDf = outcomeData.evalData.copy()
+            aggEval = AggEval(evalDf)
+            aggDf = DFHelper(aggEval.getAggDf())
+
+            print ''
+            outcomeData.displaySummaryStats()
+            print aggDf.getAggEvalDisplay()
+
 
 
     def progressBar(self):
