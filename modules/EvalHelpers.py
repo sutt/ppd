@@ -603,10 +603,12 @@ class DFHelper:
         if self.rows_requested is not None:
             _df = _df[self.rows_requested]
 
-        # rounding / clipping, need to return on this line for
-        # formatting to flow thru to jupyter
+        # rounding / clipping
+        dict_formatting = self.new_col_formatting(_new_cols, self.formatting_cols)
+        for k in dict_formatting.keys():    
+            _df[k] = _df[k] = _df[k].map(dict_formatting[k].format)
         
-        return _df.style.format(self.new_col_formatting(_new_cols, self.formatting_cols))
+        return _df
 
 
     def getAggEvalDisplay(self, single_metric='mean'):

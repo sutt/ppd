@@ -1,5 +1,12 @@
 #Tasks
 
+1/26
+
+    Notes
+        EvalTracker -(reference to)-> OutcomeData [to do the Eval]
+        OutcomeData.outcomeData (df) -(values)-> DFHelper
+        OutcomeData.evalData    (df) -(values)-> DFHelper
+
 1/25
 
     [x] How do a eval outcome_data? - with OutcomeData.eval()
@@ -20,9 +27,45 @@
             [x] allow DFHleper to handle AggEval df's, so we can pretty print to cli
         [x] start a new notebook
             [x] show subprocEval printing the agg_eval df
-        [ ] DFHelper returns a better way to format, copy EvalDisplay()
+        [x] DFHelper returns a better way to format, copy EvalDisplay()
+        [~] Limit Obj amounts on outcome_data; does this happen already?
+            - already happens: EvalHelpers:768 - ev.setObjEnum(0) is harcoded
+            - outcomedata-df still shows all obj's
+        [ ] calc'd fields
+        [ ] EvalSuite.fullReport()
+            [ ] multiple
+            [ ] custom agg fields, e.g. balls < 20 pixels
 
-        [ ] build a benchmark db and start interfacing with it from a DiffClass
+        [ ] build a benchmark db and start interfacing with it from a
+            
+            EvalSuite class:
+                
+                .cliDisplay() - copy code from ControlEval:230
+                .jupyterFullDisplay() - a full page display of everything
+
+                - here's where you do diffs by frame and diffs by agg
+                  vs the benchmark
+
+                - this should support config for different 'reports' that
+                we develop as we go forward
+
+                - this can also include graphs e.g. compareRadii
+
+                - this has different ways to compare: e.g. same video, diff algos
+                vs. same algo, diff vids
+
+            MasterDBInterface class:
+
+                major issue: using sqlalchemy is difficult here for inserts
+                    db -> db via sql might be easier?
+                    how is the data actually stored in sqlite?
+
+                relational: tbl for videos tbl for algos, tbl for basic runs
+
+                insert instead of replace/update
+
+                query returns data to EvalSuite as df
+
 
 1/24 - 1/25
     

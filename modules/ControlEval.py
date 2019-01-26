@@ -14,7 +14,7 @@ from ControlTracking import TrackFactory
 from ControlDisplay import Display
 from DataSchemas import  ScoreSchema
 from EvalHelpers import EvalTracker, EvalDataset
-from EvalHelpers import OutcomeData, AggEval, DFHelper
+from EvalSuite import EvalSuite
 
 
 
@@ -216,30 +216,24 @@ class EvalFactory:
                             ,con = engine
                             ,if_exists='replace')
 
-        # cli logging
+        # cli logging destination
         sys.stdout.write("\n")
         sys.stdout.flush()
-        print 'output db: %s' % str(self.dbPathFn)
-
+        
         rows, cols = self.outcome_data_pd.shape
         total_time = str(time.time() - self.progressBarT0)
+        
+        print 'output db: %s' % str(self.dbPathFn)
         print 'output tbl: %s' % str(self.dbTblName)
         print 'eval time: %s' % total_time[:min(5, len(total_time) )]
-        print 'FINISH - rows: %s cols: % s ' % (str(rows), str(cols))
+        print 'outcome rows: %s cols: % s ' % (str(rows), str(cols))
 
+        # cli logging vid prop's + results
         if bLog:
-
-            outcomeData = OutcomeData(bLoad=False, bEval=False)
-            outcomeData.loads(self.outcome_data_pd)
-            outcomeData.eval()
-            evalDf = outcomeData.evalData.copy()
-            aggEval = AggEval(evalDf)
-            aggDf = DFHelper(aggEval.getAggDf())
-
-            print ''
-            outcomeData.displaySummaryStats()
-            print aggDf.getAggEvalDisplay()
-
+            
+            suite = EvalSuite()
+            suite.buildFromOutcome(self.outcome_data_pd)
+            suite.displayCli()
 
 
     def progressBar(self):
