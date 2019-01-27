@@ -1,48 +1,23 @@
-import sys, copy, random, subprocess, time
-import pickle
-import sqlalchemy
-import cv2
-import numpy as np
-import io
-import pandas as pd
-from PIL import Image
-from collections import OrderedDict
-from itertools import combinations
-from Interproc import DBInterface
-from Interproc import GuiviewState
-from ControlTracking import TrackFactory
-from ControlDisplay import Display
-from DataSchemas import  ScoreSchema
-from EvalHelpers import EvalTracker, EvalDataset
-from EvalHelpers import OutcomeData, AggEval, DFHelper
-
 import os, sys, copy, random, subprocess, time, math
-import pickle
 import cv2
 import numpy as np
-import io
 import pandas as pd
 import sqlalchemy
-from PIL import Image
-from collections import OrderedDict
-from itertools import combinations
-from Interproc import DBInterface
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from Interproc import GuiviewState
-from ControlTracking import TrackFactory
-from ControlDisplay import Display
 from DataSchemas import ScoreSchema
-
+from EvalHelpers import (EvalTracker, OutcomeData, AggEval, DFHelper)
 from IPython.display import display
-
 
 
 class EvalSuite:
 
-    ''' operate on and organize multiple DFClass types:
+    ''' Operate on and organize multiple DFClass types:
         
-            OutcomeData, AggEval, EvalData?
+            OutcomeData, EvalTracker, AggEval
+
+            - build all df types from a base dataset,
+            - do logging and multiple ways
+            - interface with master-db
 
     '''
 
@@ -77,26 +52,35 @@ class EvalSuite:
         ''' call from EvalFactory to print high-level stats on the run '''
         
         print ''
-        self.outcomeModel.displaySummaryStats()
+        self.outcomeModel.displaySummaryStats()   #TODO - print this when returns str
         print self.aggDfh.getAggEvalDisplay()
 
     def displayFullReport(self):
         ''' call this in jupyter for a large printout'''
         pass
+        #TODO - outcomeData.displaySeriesPlots() / .displayDiameterPlot()
 
-    def previewEachDf(self):
-        ''' output a couple rows from each of the three main df's
-            with formatting; helpful for first step when debugging
+    def previewEachDf(self, clip_rows=3):
+        ''' output each of the three main df's with formatting; 
+            (helpful for first step when debugging)
+            use clip_rows=0 for a full preview
         '''
         each_df_name = ('agg', 'eval', 'outcome')
         
         for df_name in each_df_name:
 
             if df_name == 'agg':
-                display(self.aggModel.getAggDf()[:3])
+                _df = self.aggDfh.getAggEvalDisplay()
+                print _df  # this is a string output
 
             if df_name == 'eval':
-                display(self.evalDfh.getDatasetDisplay()[:3])
+                _df = self.evalDfh.getDatasetDisplay()
+                if clip_rows > 0:
+                    _df = _df[:clip_rows]
+                display(_df)
                 
             if df_name == 'outcome':
-                display(self.outcomeDfh.getDatasetDisplay()[:3])
+                _df = self.outcomeDfh.getDatasetDisplay()
+                if clip_rows > 0:
+                    _df = _df[:clip_rows]
+                display(_df)

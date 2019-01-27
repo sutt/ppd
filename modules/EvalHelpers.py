@@ -10,7 +10,6 @@ from collections import OrderedDict
 from itertools import combinations
 from Interproc import DBInterface
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
@@ -32,8 +31,6 @@ class EvalTracker:
 
         Todo
         [ ] this only evals for type='circle'; not for type='ray'
-        [x] handle None as baselineScore
-        [x] refactor 'trackScore' to trackScore in some eval_meth's
 
     '''
     
@@ -56,8 +53,27 @@ class EvalTracker:
             'distanceFromBaseline'
             ]
 
+        # list all property methods here: properties don't compare baseline vs track,
+        # instead they operate on either baseline or track
+        self.eval_prop_names = [
+            'propBaselineRadius',
+            'propTrackRadius'
+        ]
+
+        # list all calc methods here: calcs need to be done after eval and props have 
+        # been processed as they use both
+        self.eval_calc_names = [
+            'calcBaselineBallUnitsAway'
+        ]
+
     def getMethodNames(self):
         return copy.copy(self.eval_method_names)
+
+    def getPropertyNames(self):
+        return copy.copy(self.eval_prop_names)
+
+    def getCalcNames(self):
+        return copy.copy(self.eval_calc_names)
 
     def setNaReturn(self, naReturn):
         self.naReturn = naReturn
@@ -229,7 +245,7 @@ class EvalTracker:
 
     # build properities ----------
 
-    def propBaselineRadius(self):
+    def propBaselineRadius(self, trackScore=None):
 
         if not(self._validateParams()):
             return self.naReturn
@@ -237,12 +253,21 @@ class EvalTracker:
         x, y, r = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
         return r
 
+    def propTrackRadius(self, trackScore):
+
+        #since there's no baselineScore we can't eval here
+        # if not(self._validateParams()):
+        #     return self.naReturn
+
+        x, y, r = Display.rectToCircle(trackScore[self.objEnum]['data'])
+        return r
+
     # build calcs -----------------
 
-    @staticmethod
-    def calc_BallUnitsAway(df_main, df_props):
-        return ( float(df_main['distanceFromBaseline']) / 
-                 (float(df_props['propBaselineRadius']) * 2.0)  
+    def calcBaselineBallUnitsAway(self, df_concat):
+        
+        return ( df_concat['distanceFromBaseline'] / 
+                 (df_concat['propBaselineRadius'] * 2.0)  
                 )
 
 
@@ -538,15 +563,17 @@ class DFHelper:
         self.formatting_cols = {
             'compareRadii':                 '{:4.0f}',
             'distanceFromBaseline':         '{:4.0f}',
-            'calc_BallUnitsAway':           '{:6.2f}'
+            'calcBaselineBallUnitsAway':    '{:4.2f}'
             }
 
         self.col_order_default = [
             'listIndex'
             ,'frameCounter'
+            ,'calcBaselineBallUnitsAway'
             ,'checkBothContainsOther'
             ,'distanceFromBaseline'
             ,'checkTrackSuccess'
+            ,'propTrackRadius'
             ]
         
         self.col_order_requested = None
@@ -720,7 +747,13 @@ class OutcomeData:
                  ):
 
         self.outcomeData = None
+        
         self.evalData = None
+        
+        #indv components of evalData
+        self.evalMethData = None
+        self.evalPropData = None
+        self.evalCalcData = None
 
         self.listScoreObjs = []
 
@@ -733,7 +766,7 @@ class OutcomeData:
         if bLoad:
             self.load()
 
-        if bEval:
+        if bEval and self.outcomeData is not None:
             self.eval()
 
     def get(self):
@@ -751,15 +784,19 @@ class OutcomeData:
         self.loaded = True
 
     def eval(self):
-        ''' apply eval methods to outcome dataframe '''
+        ''' build evalData from outcomeData 
+            for each meth, prop, and calc in EvalTracker, apply them to 
+            each frame records collected in eval process.
+        '''
         
-        data = []
-
         ev = EvalTracker()
-        eval_meth_names = ev.getMethodNames()
 
         self.buildScoreSchemaList()
-        
+
+        # build meth-df + prop-df
+        meth_data = []
+        prop_data = []
+
         for _record in self.listScoreObjs:
 
             inputScore = _record['input']
@@ -769,23 +806,78 @@ class OutcomeData:
             
             ev.setObjEnum(0)    #TODO
 
-            list_data = []
-            for meth_name in eval_meth_names:
+            meth_data.append( 
+                self.applyAllMethods(ev, ev.getMethodNames(), trackScore)
+            )
 
-                try:
-                    evMeth = getattr(ev, meth_name)
-                    val = evMeth(trackScore)
-                except:
-                    val = None
-            
-                list_data.append(val)
+            prop_data.append(
+                self.applyAllMethods(ev, ev.getPropertyNames(), trackScore)
+            )
 
-            data.append(list_data)
+        self.evalMethData = pd.DataFrame(
+                            self.convertToPandasPrecursor(meth_data, ev.getMethodNames())
+                        )
+
+        self.evalPropData = pd.DataFrame(
+                            self.convertToPandasPrecursor(prop_data, ev.getPropertyNames())
+                        )
+
+        # build calc-df
+        # note: these calc-functions take a df and operate on the full series
+        #       as opposed to meth-functions which operate on a single record
+        df_meth_and_prop = pd.concat((self.evalMethData.copy(), 
+                                      self.evalPropData.copy()
+                                      ), axis = 1)
         
-        # data (list-of-list) -> dict_data (dict-of-list)
+        calc_dict_data = {}
+        for calc_name in ev.getCalcNames():
+            try:
+                evMeth = getattr(ev, calc_name)
+                series = evMeth(df_meth_and_prop)
+                calc_dict_data[calc_name] = list(series)
+            except:
+                pass
+
+        self.evalCalcData = pd.DataFrame(calc_dict_data)
+        
+        # build full data
+        self.evalData = pd.concat( (self.evalMethData.copy(), 
+                                    self.evalPropData.copy(), 
+                                    self.evalCalcData.copy()
+                                    )
+                                    ,axis = 1
+                                    )
+        
+    @staticmethod
+    def applyAllMethods(evalObj, list_method_names, trackScore):
+        ''' given an EvalTracker object and a list of methods for it,
+            return a list of the value result for each method '''
+        
+        list_data = []
+        
+        for meth_name in list_method_names:
+
+            try:
+                evMeth = getattr(evalObj, meth_name)
+                val = evMeth(trackScore)
+            except:
+                val = None
+        
+            list_data.append(val)
+
+        return list_data
+
+    @staticmethod
+    def convertToPandasPrecursor(data, list_method_names):
+        ''' take the applyAllMethods() output and convert to datastructure 
+            that natually produces a pandas dataframe:
+
+            data (list-of-list) -> dict_data (dict-of-list)
+        '''
+
         dict_data = {}
-        
-        for j_col in range(len(eval_meth_names)):
+
+        for j_col in range(len(list_method_names)):
             
             _tmp = []
             
@@ -793,10 +885,9 @@ class OutcomeData:
             
                 _tmp.append(data[i_row][j_col])
             
-            dict_data[eval_meth_names[j_col]] = _tmp
+            dict_data[list_method_names[j_col]] = _tmp
 
-        #dict_data to pandas
-        self.evalData = pd.DataFrame(dict_data)
+        return dict_data
 
     def displayCondensedTable(self, objEnum=0):
         ''' display only cols for requested obj-enum
@@ -848,7 +939,7 @@ class OutcomeData:
                          ))
         _numInputs = str(numInputs)
         
-        
+        #TODO - s += 'blah blah\n'
         print 'num frames:                  %s'          %  _n
         print 'obj enums scored/tracked:    %s / %s'     % (_objsScored, _objsTracked)
         print 'num scored frames:           %s | %s'     % (_numInputs, _inputIndices)
@@ -1150,6 +1241,6 @@ if __name__ == "__main__":
     
     pass
 
-    # od = OutcomeData()
+    od = OutcomeData()
     # od.buildScoreSchemaList()
     # od.evalData

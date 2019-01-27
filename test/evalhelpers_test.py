@@ -326,17 +326,24 @@ def test_DFHelper_1():
     outcome_cols = df_outcome.displayEvalMethodNames(df_outcome.df.columns).values()
     eval_cols =  df_outcome.displayEvalMethodNames(df_eval.df.columns).values()
     outcome_ANSWER = ['track\n_data0\n_0\n', 'index\n', 'track\n_data0\n_2\n', 'track\n_data0\n_3\n', 'input\n_data2\n_3\n', 'track\n_data1\n_1\n', 'track\n_data1\n_0\n', 'track\n_data1\n_3\n', 'track\n_data1\n_2\n', 'track\n_data2\n_2\n', 'track\n_data2\n_3\n', 'track\n_data2\n_0\n', 'track\n_data2\n_1\n', 'input\n_data3\n_2\n', 'track\n_data3\n_3\n', 'track\n_data3\n_2\n', 'track\n_data3\n_1\n', 'input\n_obj\n_type\n_1\n', 'track\n_obj\n_exists\n_1\n', 'track\n_obj\n_exists\n_0\n', 'track\n_obj\n_exists\n_3\n', 'track\n_obj\n_exists\n_2\n', 'input\n_obj\n_type\n_2\n', 'input\n_data2\n_1\n', 'track\n_data0\n_1\n', 'track\n_obj\n_type\n_3\n', 'track\n_obj\n_type\n_0\n', 'track\n_obj\n_type\n_1\n', 'input\n_obj\n_type\n_3\n', 'track\n_data3\n_0\n', 'input\n_data1\n_0\n', 'input\n_data1\n_1\n', 'input\n_data1\n_2\n', 'input\n_data1\n_3\n', 'track\n_obj\n_type\n_2\n', 'input\n_data0\n_1\n', 'input\n_data0\n_0\n', 'input\n_data0\n_3\n', 'input\n_data0\n_2\n', 'input\n_data2\n_2\n', 'input\n_obj\n_type\n_0\n', 'input\n_data3\n_3\n', 'input\n_data3\n_0\n', 'input\n_data3\n_1\n', 'input\n_data2\n_0\n', 'input\n_obj\n_exists\n_2\n', 'input\n_obj\n_exists\n_3\n', 'input\n_obj\n_exists\n_0\n', 'input\n_obj\n_exists\n_1\n']
-    eval_ANSWER = ['check\nBaseline\nInside\nTrack\n', 'check\nTrack\nSuccess\n', 'check\nTrack\nInside\nBaseline\n', 'check\nEither\nContains\nOther\n', 'distance\nFrom\nBaseline\n', 'check\nBoth\nContains\nOther\n', 'compare\nRadii\n', 'check\nTrack\nInside\nBaseline\nRect\n']
+    eval_ANSWER = ['check\nBaseline\nInside\nTrack\n', 'prop\nBaseline\nRadius\n', 'check\nTrack\nSuccess\n', 'check\nTrack\nInside\nBaseline\n', 'check\nEither\nContains\nOther\n', 'distance\nFrom\nBaseline\n', 'check\nBoth\nContains\nOther\n', 'compare\nRadii\n', 'prop\nTrack\nRadius\n', 'check\nTrack\nInside\nBaseline\nRect\n', 'calc\nBaseline\nBall\nUnits\nAway\n']
     assert listContainSameElems(outcome_cols, outcome_ANSWER)
     assert listContainSameElems(eval_cols, eval_ANSWER)
 
     # can't do that right now b/c it returns a view/not the df itself
     # properties to test: .shape / .columns / against a loaded answer
-    # assert df_outcome.getDatasetDisplay() 
-    # assert df_outcome.getDatasetDisplay()
+    outcome_display_df = df_outcome.getDatasetDisplay()
+    eval_display_df = df_eval.getDatasetDisplay()
+    assert 'input\n_data0\n_0\n' in outcome_display_df.columns
+    assert outcome_display_df.shape == (19,49)
+    assert 'distance\nFrom\nBaseline\n' in eval_display_df.columns
+    assert eval_display_df.shape == (19,11)
+    assert str.strip(eval_display_df['distance\nFrom\nBaseline\n'][0]) == '2'
+    
 
 
 
 if __name__ == "__main__":
     # test_OutcomeData_buildScoreSchemaList()
+    test_DFHelper_1()
     pass

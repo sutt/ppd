@@ -1,15 +1,74 @@
 #Tasks
 
+1/27
+    
+    [x] Calc'd fields + Property fields
+        [x] can you build series calculations in jupyter?
+        [x] merge evalData + evalPropData in jupyter
+        [x] refactor repeated code blocks
+        [x] add float formatters for DFHelper
+        [x] change df names to full evalData df becomes default flow-thru
+
+
+    [ ] Specific Row Aggregatgors
+    [ ] Radius Delta Calc e.g. diff from 3-prev-frame-avg
+    
+    [ ] Multi-Obj-Tracking:
+        [ ] separate the baseline-obj-enum from track-obj-enum
+        [ ] do it for more than obj-enum=0
+        [ ] automatic inference for how many obj's to eval
+        [ ] allow ControlTracking to track different obj-enum's
+        [ ] flow-thru to all classes
+
+    [ ] Speed Estimate Book
+
+    Also
+    [ ] add framenotes to outcome_data
+    [ ] have framenotes flow into EvalTracker e.g. ball-obfusicated -> less stringent
+        eval metrics.
+
+    Misc
+    [ ] displaySummaryStats returns str instead of print
+        [ ] then you can unit test it
+    [ ] fix checkTrackSuccess metric
+    [x] fix propTrackRadius
+    [x] add new test data
+    [ ] add dependencies in github: PIL, mpltoolkit (Axes3d), IPython (display)
+
+    Ideas
+    [ ] for presentation:
+        show the challenge of tracking a distance object, a moving object, etc 
+        Design-Build-Test: hourglass shape...lots of design and lots of test, limited build
+
 1/26
 
     Notes
-        EvalTracker -(reference to)-> OutcomeData [to do the Eval]
-        OutcomeData.outcomeData (df) -(values)-> DFHelper
-        OutcomeData.evalData    (df) -(values)-> DFHelper
+        
+        DataModels references:
+            EvalTracker -(reference to)-> OutcomeData [to do the Eval]
+            OutcomeData.outcomeData (df) -(values)-> DFHelper
+            OutcomeData.evalData    (df) -(values)-> DFHelper
+            OutcomeData.evalData    (df) -(values)-> AggEval
+
+        Eval Metrics Scope - in what situations do they apply?
+
+            only for inputframes:
+                compareRadii
+                distanceFromBaseline
+                checkBothContainsOther
+                calc_ballUnitsAway
+                these metrics for custom consition e.g. ball less than 20 pixels
+
+            for all frames:
+                checkTrackSuccess
+                radiusVsRunningAverage
+                you can look at these for balls <20 pixels if you go based off track instead
+                    of score
+
 
 1/25
 
-    [x] How do a eval outcome_data? - with OutcomeData.eval()
+    [x] How do a eval outcome_data? - with OutcomeData.eval() via EvalTracker class
     [x] what happens when you aggregate on nan's?
         [x] does it break, does it count nan as zeros thus e.g. lowering avg?
             it doesn't break; it also takes into account nan as ignored
@@ -89,6 +148,7 @@
     [ ] how to auto-complete/auto-correct video paths?
     [ ] there are three point rays: when the ball bounces it looks like a 'V'
     [ ] why is checkTrackInsideBaselineRect < checkTrackInsideBaseline ? (should be opposite)
+    [ ] fix checkTrackSuccess metric
 
 
 1/16
@@ -149,9 +209,9 @@
     [x] verify imgDiffs (e.g. using test/utils.py:ImgDiff) in ss1 vs ss2
 
 deferred
-    [ ] dfhelper datasetDisplay()
-        [ ] return the df itself
-        [ ] add asserts to evalhelpers_test:test_DFHelper_1()
+    [x] dfhelper datasetDisplay()
+        [x] return the df itself
+        [x] add asserts to evalhelpers_test:test_DFHelper_1()
 
 misc/ideas
     [ ] "live" record/view script with tracking module deployed; "see the tracking" in
