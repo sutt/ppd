@@ -31,6 +31,15 @@ class EvalSuite:
         self.outcomeDfh = None
         self.evalDfh = None
         self.aggDfh = None
+        self.aggFilterDfh = None
+
+        self.default_agg_cols = [
+                                'agg_calcBaselineBallUnitsAway', 
+                                'agg_checkBothContainsOther',
+                                'agg_checkTrackSuccess',
+                                'fagg_less_than_20_pix_balls_away',
+                                'fagg_less_than_30_pix_success'
+                                ]
 
     def buildFromOutcome(self, outcome_data_pd):
         ''' use outcome_data_df to build eval and agg tables; also
@@ -40,20 +49,23 @@ class EvalSuite:
         self.outcomeModel.loads(outcome_data_pd)
         self.outcomeModel.eval()
 
-        self.evalTable = self.outcomeModel.evalData.copy()
+        self.evalTable = self.outcomeModel.getEval()
         
         self.aggModel = AggEval(self.evalTable)
         
-        self.outcomeDfh = DFHelper(self.outcomeModel.outcomeData)
+        self.outcomeDfh = DFHelper(self.outcomeModel.getOutcome())
         self.evalDfh = DFHelper(self.evalTable)
         self.aggDfh = DFHelper(self.aggModel.getAggDf())
+        self.aggFilterDfh = DFHelper(self.aggModel.getFilteredAggDf())
 
     def displayCli(self):
         ''' call from EvalFactory to print high-level stats on the run '''
         
         print ''
-        self.outcomeModel.displaySummaryStats()   #TODO - print this when returns str
-        print self.aggDfh.getAggEvalDisplay()
+        print self.outcomeModel.displaySummaryStats()
+        print self.aggDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
+        print self.aggFilterDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
+        print '-----'
 
     def displayFullReport(self):
         ''' call this in jupyter for a large printout'''
@@ -84,3 +96,10 @@ class EvalSuite:
                 if clip_rows > 0:
                     _df = _df[:clip_rows]
                 display(_df)
+
+
+if __name__ == "__main__":
+    od = OutcomeData()
+    suite = EvalSuite()
+    suite.buildFromOutcome(od.getOutcome())
+    suite.displayCli()

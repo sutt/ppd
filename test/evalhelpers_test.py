@@ -60,6 +60,9 @@ def test_outcomeData_eval():
 
     assert cmp(incoming_df[0:1].to_dict(), answer_df[0:1].to_dict()) == 0
 
+    ANSWER = '''num frames:                  383 \nobj enums scored/tracked:    0,1 / 0 \nnum scored frames:           10 | 0,22,40...125,188,380 \n-------'''
+    assert od.displaySummaryStats() == ANSWER
+
 
 def test_EvalTracker_eval_methods_good():
 

@@ -270,6 +270,30 @@ class EvalTracker:
                  (df_concat['propBaselineRadius'] * 2.0)  
                 )
 
+    # build filters ----------------
+
+    def filterDummy(self, eval_df, *args):
+        return pd.Series()
+
+    
+    def filterBaselineRadiusLessThan(self, eval_df, *args):
+        
+        try:
+            less_than_param = args[0]
+            series_data = eval_df['propBaselineRadius']
+            return (series_data < less_than_param)
+        except:
+            return pd.Series()
+
+    def filterTrackRadiusLessThan(self, eval_df, *args):
+        
+        try:
+            less_than_param = args[0]
+            series_data = eval_df['propTrackRadius']
+            return (series_data < less_than_param)
+        except:
+            return pd.Series()
+
 
 
 class EvalDataset:
@@ -415,13 +439,17 @@ class AggEval:
     '''
         apply aggregating functions to eval_df: 
         
-            accounts for the field's type (num vs bool) and whether it should
-            be interpreted as an absolute-val for agg purposes.
+            accounts for the field's type (num vs bool) and 
+            accounts for whether it should be interpreted as an absolute-val
+
+        also applies aggregating filtered functions, where only some frames
+        are used (the 'conditional_function' referring to a filterXXX func in 
+        EvalTracker) for aggregating.
 
         TODO:
-            [ ] agg only on some rows, e.g. ball size < some size
+            [x] agg only on some rows, e.g. ball size < some size
                 maybe that's done outside this class by passing in limited eval_df?
-            [ ] Add calculated fields here, e.g. ballUnitsAway ?
+            [x] Add calculated fields here, e.g. ballUnitsAway ?
             [ ] do things like 'check locality' and 'check stable radius' here?
 
     '''
@@ -430,7 +458,27 @@ class AggEval:
         self.bool_agg_meths = ['mean']
         self.num_agg_meths = ['mean', 'median', 'min', 'max', 'std', 'sum']
 
+        # special filter aggregates:
+        self.d_filters = {
+
+            'less_than_20_pix_balls_away': {
+                 'agg_method':              ('mean',)
+                ,'agg_metric':              'calcBaselineBallUnitsAway'
+                ,'conditional_function':    'filterBaselineRadiusLessThan'
+                ,'conditional_paramaters':  (20,)
+            },
+            'less_than_30_pix_success': {
+                 'agg_method':              ('mean',)
+                ,'agg_metric':              'checkTrackSuccess'
+                ,'conditional_function':    'filterTrackRadiusLessThan'
+                ,'conditional_paramaters':  (30,)
+            }
+        }
+
         self.d_agg = None
+
+        self.d_filter_agg = None
+
         self.eval_df = None
 
         if eval_df is not None:
@@ -447,16 +495,19 @@ class AggEval:
         df = pd.DataFrame(self.d_agg)
         return df.T
 
+    def getFilteredAggDf(self):
+        df = pd.DataFrame(self.d_filter_agg)
+        return df.T
+
     def calc(self):
         ''' heart of the function: build a dict (with key for each field)
             of dicts (with a key for each agg method that applies for that field)
         '''
 
         d_agg = {}
+        d_filter_agg = {}
     
-        eval_field_names = self.eval_df.columns
-
-        for field in eval_field_names:
+        for field in self.eval_df.columns:
 
             data = self.eval_df[field]
 
@@ -467,14 +518,14 @@ class AggEval:
                 
                 field_agg = self.agg_dummy(data)
                 
-                d_agg[field] = field_agg
+                d_agg['agg_' + field] = field_agg
 
             elif field == 'dummy2':
                 pass
 
             else:
                 
-                # handle common eval fields here:
+                # handle aggregation of common eval fields here:
 
                 s_field_type = self.inferFieldType(field)
 
@@ -487,10 +538,47 @@ class AggEval:
                                                 )
 
                 d_agg['agg_' + field] = field_agg
+
+                
+                # handle filtered aggregation fields here:
+
+                if self.checkFilterApplies(field):
+
+                    filters = self.getFilters(field)
+                    
+                    for filter_key in filters.keys():
+
+                        filter_obj = filters[filter_key]
+
+                        rows_conditional = self.applyFilter(filter_obj)
+
+                        filtered_data = data.copy()
+                        filtered_data = filtered_data[rows_conditional]
+
+                        if filter_obj.get('agg_method', None) is None:
+                            filtered_type = s_field_type
+                            custom_type = None
+                        else:
+                            filtered_type = 'custom'
+                            custom_type = filter_obj['agg_method']
+                        
+                        filtered_field_agg = self.agg_universal(field,
+                                                                filtered_data,
+                                                                filtered_type,
+                                                                b_field_abs,
+                                                                custom_type
+                                                                )
+                        
+                        filtered_field_agg['n'] = len(filtered_data)
+
+                        d_filter_agg['fagg_' + filter_key] = filtered_field_agg
                 
         self.d_agg = d_agg
+        self.d_filter_agg = d_filter_agg
 
-    def agg_universal(self, field_name, field_data, field_type, field_abs):
+
+    def agg_universal(self, field_name, field_data, field_type, field_abs, 
+                        custom_agg_names=None):
         ''' aggregate a field based on properties you know about how
             it should operate.
         '''
@@ -502,8 +590,12 @@ class AggEval:
             
         if field_type == 'bool':
             agg_names = self.bool_agg_meths
+        
         elif field_type == 'num':
             agg_names = self.num_agg_meths
+
+        elif field_type == 'custom':
+            agg_names = custom_agg_names
             
         for agg_name in agg_names:
             
@@ -539,6 +631,52 @@ class AggEval:
         else:
             return False
 
+    def checkFilterApplies(self, s_field_name):
+        ''' input:  s_field_name - (str) the column name
+            return: (bool)        
+        
+            return True is this field is contained in requested filter-agg-dict,
+            in self.d_filters, return False otherwise
+        '''
+
+        return any(
+                    [val['agg_metric'] == s_field_name 
+                     for val in self.d_filters.values()
+                    ]
+                )
+
+    def getFilters(self, s_field_name):
+        '''input: s_field_name - (str)
+            return (dict) with records from self.d_filters
+                return any filter records with s_field_name as agg_metric, 
+                empty dict if no matches.
+            '''
+        d_filters = {}
+        
+        for k in self.d_filters.keys():
+
+            if self.d_filters[k].get('agg_metric', '') == s_field_name:
+                
+                d_filters[k] = self.d_filters[k].copy()
+
+        return d_filters
+
+    def applyFilter(self, filterObj):
+        ''' input: filterObj - (dict)
+            return (pd.Series) representing the rows to include
+
+        '''
+        
+        try:
+            ev = EvalTracker()
+            meth = filterObj.get('conditional_function', 'filterDummy')
+            args = filterObj.get('conditional_paramaters', ())
+            f = getattr(ev, meth)
+            return f(self.eval_df, *args)
+        except:
+            return pd.Series()
+        
+    
 
 
 class DFHelper:
@@ -638,12 +776,19 @@ class DFHelper:
         return _df
 
 
-    def getAggEvalDisplay(self, single_metric='mean'):
+    def getAggEvalDisplay(self, single_metric='mean', metrics_requested=None):
         ''' return a string for the pandas table of the <single_metric> for each 
             eval method
         '''
         _df = self.df.copy()
         _series = _df[single_metric]
+
+        if metrics_requested is not None:
+            _series = _series.T
+            _valid_cols = [row for row in metrics_requested if row in list(_series.index)]
+            _series = _series[_valid_cols]
+            _series = _series.T
+
         return _series.to_string(float_format= '{:,.2f}'.format)
 
 
@@ -769,8 +914,11 @@ class OutcomeData:
         if bEval and self.outcomeData is not None:
             self.eval()
 
-    def get(self):
-        return self.outcomeData
+    def getOutcome(self):
+        return self.outcomeData.copy()
+
+    def getEval(self):
+        return self.evalData.copy()
     
     def load(self):
         ''' load data from db '''
@@ -939,14 +1087,14 @@ class OutcomeData:
                          ))
         _numInputs = str(numInputs)
         
-        #TODO - s += 'blah blah\n'
-        print 'num frames:                  %s'          %  _n
-        print 'obj enums scored/tracked:    %s / %s'     % (_objsScored, _objsTracked)
-        print 'num scored frames:           %s | %s'     % (_numInputs, _inputIndices)
+        s = ''
+        s += 'num frames:                  %s \n'          %  _n
+        s += 'obj enums scored/tracked:    %s / %s \n'     % (_objsScored, _objsTracked)
+        s += 'num scored frames:           %s | %s \n'     % (_numInputs, _inputIndices)
         
-        print '-------'
-        
-        # other stats? - this won't include eval data yet
+        s += '-------'
+
+        return s
 
 
     def displaySeriesPlot(self, col_names=None, calc_fields=None, obj_legend=None

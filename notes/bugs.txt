@@ -1,5 +1,38 @@
 #Tasks
 
+1/30
+
+    Commit-1
+        [x] displaySummaryStats returns str instead of print
+            [x] then you can unit test it
+
+        [x] Specific Row Aggregatgors
+        [~] Radius Delta Calc e.g. diff from 3-prev-frame-avg
+
+    
+    [ ] EvalSuite.fullReport()
+        [ ] multiple
+        [ ] custom agg fields, e.g. balls < 20 pixels
+
+    [ ] Need to flow-thru video-notes: 
+        e.g. framesize -> impacts "relative" ballsize
+
+    [ ] Need to flow-thru frame-notes: 
+        e.g. 'ball-obfusicated'=True -> checkTrackSuccess!=False
+
+    Misc/Thoughts
+    
+        Really need to fiugure out how to sql-i/o with the pandas into master
+        and whether we have enough fine-grained control to do this?
+        
+        EvalHelpers should be EvalComponents and several of the classes, e.g.
+        EvalDataset should be factored out to EvalHelpers
+
+        Ideas for metrics:
+            more like PixelConfusionMatrix where we compare each "true" ball pixel
+            against whether it was marked
+    
+
 1/27
     
     [x] Calc'd fields + Property fields
@@ -10,7 +43,7 @@
         [x] change df names to full evalData df becomes default flow-thru
 
 
-    [ ] Specific Row Aggregatgors
+    [x] Specific Row Aggregatgors
     [ ] Radius Delta Calc e.g. diff from 3-prev-frame-avg
     
     [ ] Multi-Obj-Tracking:
@@ -90,7 +123,7 @@
         [~] Limit Obj amounts on outcome_data; does this happen already?
             - already happens: EvalHelpers:768 - ev.setObjEnum(0) is harcoded
             - outcomedata-df still shows all obj's
-        [ ] calc'd fields
+        [x] calc'd fields
         [ ] EvalSuite.fullReport()
             [ ] multiple
             [ ] custom agg fields, e.g. balls < 20 pixels
