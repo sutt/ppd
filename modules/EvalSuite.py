@@ -63,14 +63,43 @@ class EvalSuite:
         
         print ''
         print self.outcomeModel.displaySummaryStats()
-        print self.aggDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
-        print self.aggFilterDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
+
+        print DFHelper.toStringFormatOutput(
+                self.aggDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
+                )
+        
+        print DFHelper.toStringFormatOutput(
+                self.aggFilterDfh.getAggEvalDisplay(metrics_requested=self.default_agg_cols)
+                )
+        
         print '-----'
 
     def displayFullReport(self):
         ''' call this in jupyter for a large printout'''
-        pass
-        #TODO - outcomeData.displaySeriesPlots() / .displayDiameterPlot()
+        
+        print 'video / metalog information \n'
+        #TODO - video name
+        print self.outcomeModel.displaySummaryStats()
+        
+        print '\nselect aggregates \n'
+        display(self.aggDfh.getAggEvalDisplay(
+                        metrics_requested=self.default_agg_cols)
+                )
+        display(self.aggFilterDfh.getAggFilterDisplay(
+                        metrics_requested=self.default_agg_cols)
+                )
+        
+        print 'plotting radius comparison \n'
+        self.outcomeModel.displayDiameterPlot()
+        
+        print '\nfull eval table on input frames \n'
+        self.evalDfh.setRowsRequested(s_cmd='inputframes')
+        display(self.evalDfh.getDatasetDisplay())
+
+        print '\na preview of each eval dataframe'
+        self.previewEachDf()
+
+        
 
     def previewEachDf(self, clip_rows=3):
         ''' output each of the three main df's with formatting; 
@@ -83,7 +112,14 @@ class EvalSuite:
 
             if df_name == 'agg':
                 _df = self.aggDfh.getAggEvalDisplay()
-                print _df  # this is a string output
+                if clip_rows > 0:
+                    _df = _df[:clip_rows]
+                display(_df)
+
+                _df = self.aggFilterDfh.getAggFilterDisplay()
+                if clip_rows > 0:
+                    _df = _df[:clip_rows]
+                display(_df)
 
             if df_name == 'eval':
                 _df = self.evalDfh.getDatasetDisplay()

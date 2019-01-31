@@ -776,12 +776,17 @@ class DFHelper:
         return _df
 
 
+    @staticmethod
+    def toStringFormatOutput(series_data):
+        return series_data.to_string(float_format= '{:,.2f}'.format)
+    
     def getAggEvalDisplay(self, single_metric='mean', metrics_requested=None):
         ''' return a string for the pandas table of the <single_metric> for each 
             eval method
         '''
         _df = self.df.copy()
         _series = _df[single_metric]
+        
 
         if metrics_requested is not None:
             _series = _series.T
@@ -789,7 +794,19 @@ class DFHelper:
             _series = _series[_valid_cols]
             _series = _series.T
 
-        return _series.to_string(float_format= '{:,.2f}'.format)
+        return _series
+
+    def getAggFilterDisplay(self, metrics_requested=None):
+        
+        _df = self.df.copy()
+        _df = _df.T
+        _valid_cols = _df.columns
+        _valid_cols = [row for row in metrics_requested if row in list(_valid_cols)]
+        _df = _df[_valid_cols]
+        return _df.T
+
+
+
 
 
     @staticmethod

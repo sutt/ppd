@@ -1,5 +1,12 @@
 #Tasks
 
+1/31
+
+    [ ] Comparison Report
+        [ ] it's own class
+        [ ] load a suite + a benchmark-suite:
+        [ ] methods to compare the suites against each other
+
 1/30
 
     Commit-1
@@ -11,8 +18,8 @@
 
     
     [ ] EvalSuite.fullReport()
-        [ ] multiple
-        [ ] custom agg fields, e.g. balls < 20 pixels
+        [x] multiple
+        [x] custom agg fields, e.g. balls < 20 pixels
 
     [ ] Need to flow-thru video-notes: 
         e.g. framesize -> impacts "relative" ballsize
