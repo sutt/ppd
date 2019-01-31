@@ -3,9 +3,47 @@
 1/31
 
     [ ] Comparison Report
-        [ ] it's own class
-        [ ] load a suite + a benchmark-suite:
-        [ ] methods to compare the suites against each other
+        [x] it's own class
+        [x] load a suite + a benchmark-suite:
+        [x] methods to compare the suites against each other
+
+        [x] how to make the pandas table, 
+            where multiple cols have one header 'benchmark metrics'
+
+        [x] how to apply a diff to the respective cols
+
+        [ ] explore the concept of a pivot table in pandas
+
+        [x] indv-frames improve or worse concept:
+            >0, =0, <0
+            >0+e, (-e,+e), <0-e [e:epsilon for small dis-regardeable diff's]
+
+        [ ] metrics can go up OR down to mean improvement, how to handle this?
+            - can assign do something in name/ just memorize it
+            - if we systemize it we can color-code it
+            - can convert all abominable down=improvement metrics to negative scale:
+                e.g. distanceFromBaseline -> - distanceFromBaseline
+                current = -1; benchmark = -2 => imporvement = +1
+                    -> positive always means improvement
+                and for boolean can switch between success-rate vs error-rate
+        
+        [ ] need to organize some fields in Eval / Agg df's:
+            [ ] in agg-df, we need "shared" fields like 'n' which are same for both
+            [ ] in eval-df, we should not include properties propBaselineRadius
+
+        [ ] need to limit the amount of fields shown in CmpAlgoReport output
+
+        [ ] need average-improvement-amt, average-deprovement-amt too
+
+        [ ] note: multi-line (carriage-returned) field names don't work in multiIndex-df's
+            like basic2() output; can this be changed?
+            [ ] at least remove line carriages in basic2(), basic3()
+
+        [ ] checkTrackSuccess() should be applied to all frames, not just inputframes
+        
+
+    Misc
+    [ ] Really need to profile the imports: why is this taking so long to load?
 
 1/30
 
@@ -17,7 +55,7 @@
         [~] Radius Delta Calc e.g. diff from 3-prev-frame-avg
 
     
-    [ ] EvalSuite.fullReport()
+    [x] EvalSuite.fullReport()
         [x] multiple
         [x] custom agg fields, e.g. balls < 20 pixels
 
