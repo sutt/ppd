@@ -29,6 +29,9 @@ class EvalTracker:
             e.g. EvalTracker.setBaselineScore(gs.displaytrackScore)
                  (where gs.displaytrackScore is a score-dict)
 
+        note: all eval-methods are improved when value increases, thus
+              "distance-away"-functions are set negative (so, 0.0 is best score)
+
         Todo
         [ ] this only evals for type='circle'; not for type='ray'
 
@@ -116,23 +119,23 @@ class EvalTracker:
             return self.naReturn
 
         if not(self.checkTrackSuccess(trackScore)):
-            return 9999.9
+            return self.naReturn
 
         xA, yA, rA = Display.rectToCircle(trackScore[self.objEnum]['data'])
         xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
         cartDistance = ((xA - xB)**2 + (yA - yB)**2)**(0.5)
 
-        return cartDistance
+        return -cartDistance
 
     def checkTrackSuccess(self, trackScore):
         ''' easiest way to check a ScoreSchema if track returned True '''
         
-        if not(self._validateParams(trackScore)):
-            return self.naReturn
+        if trackScore is None:
+            return False
         
         try:
-            if trackScore[self.objEnum]['data'] == (0,0,0,0):
+            if trackScore[self.objEnum]['data'] == [0,0,0,0]:
                 return False
             return True
         except:
@@ -467,6 +470,9 @@ class AggEval:
                 ,'conditional_function':    'filterBaselineRadiusLessThan'
                 ,'conditional_paramaters':  (20,)
             },
+            
+            # note: this is a useless metric as we'll always find track
+            #       success when we've already found a radius in the filter.
             'less_than_30_pix_success': {
                  'agg_method':              ('mean',)
                 ,'agg_metric':              'checkTrackSuccess'
@@ -750,9 +756,15 @@ class DFHelper:
                 
                 elif self.df_type == 'eval':
                     self.rows_requested = [not(math.isnan(elem)) for elem 
-                                            in self.df['compareRadii']]
+                                            in self.df['propBaselineRadius']]
 
 
+    def getRows(self):
+        if self.rows_requested is not None:
+            return self.df[self.rows_requested]
+        else:
+            return self.df
+    
     def getDatasetDisplay(self, sort_args=None):
         ''' return.print  a dataframe with various formatting niceties'''
 
@@ -771,7 +783,7 @@ class DFHelper:
         # rounding / clipping
         dict_formatting = self.new_col_formatting(_new_cols, self.formatting_cols)
         for k in dict_formatting.keys():    
-            _df[k] = _df[k] = _df[k].map(dict_formatting[k].format)
+            _df[k] =  _df[k].map(dict_formatting[k].format)
         
         return _df
 

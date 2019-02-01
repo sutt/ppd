@@ -137,12 +137,10 @@ class EvalSuite:
 class CmpAlgoReport:
 
     ''' a report that compares the difference between two
-        different tracking-algos:
+        different tracking-algos on same data:
             
             current - the input / "most recent" eval run
             benchmark - the exisiting (best?) eval run on the same data
-
-        
 
     '''
     
@@ -168,10 +166,12 @@ class CmpAlgoReport:
     def loadCurrent(self, current_outcome_data):
         self.current.buildFromOutcome(current_outcome_data)
     
-    def basic(self, metrics=None, fields=None):
-        ''' sample cmp-report'''
-
-        #compare Agg Tables: Can this be universalized for aggFilter, etc...
+    def diffAggTable(self, metrics=None, fields=None):
+        ''' return a 3-section df: diff, current, benchmark 
+            input:
+                metrics - list of pandas agg function names e.g. ['mean']
+                fields - list of  AggEval function names e.g. ['agg_checkTrackSucess']
+        '''
         
         benchmark_df = self.benchmark.aggDfh.df.copy()
         current_df   = self.current.aggDfh.df.copy()
@@ -180,32 +180,39 @@ class CmpAlgoReport:
             benchmark_df = benchmark_df[metrics]
             current_df   = current_df[metrics]
 
-        diff_values = current_df.values - benchmark_df.values
-        diff_df = pd.DataFrame( diff_values
-                                ,columns=current_df.columns
-                                ,index=current_df.index)
-        
-        
-        col_order = ['diff','current', 'benchmark']
-        d_tmp = {
-                 'diff':      diff_df
-                ,'current':   current_df
-                ,'benchmark': benchmark_df
-                }
-
-        keys, values = zip(*d_tmp.items())
-
-        shared_table = pd.concat(values, keys=keys, axis=1)
-        shared_table = shared_table[col_order]
+        shared_table = self.diffDf(benchmark_df, current_df)
 
         if fields is not None:
-            shared_table = shared_table[fields]
+            shared_table = shared_table.T[fields].T
 
         shared_table = shared_table.applymap('{:,.3f}'.format)
 
         return shared_table
 
-    def basic2(self, metrics=None, fields=None):
+    def diffAggFilterTable(self, metrics=None, fields=None):
+        ''' return a 3-section df: diff, current, benchmark 
+            input:
+                metrics - list of pandas agg function names e.g. ['mean']
+                fields - list of  AggEval function names e.g. ['agg_checkTrackSucess']
+        '''
+        
+        benchmark_df = self.benchmark.aggFilterDfh.df.copy()
+        current_df   = self.current.aggFilterDfh.df.copy()
+
+        if metrics is not None:
+            benchmark_df = benchmark_df[metrics]
+            current_df   = current_df[metrics]
+
+        shared_table = self.diffDf(benchmark_df, current_df)
+
+        if fields is not None:
+            shared_table = shared_table.T[fields].T
+
+        shared_table = shared_table.applymap('{:,.3f}'.format)
+
+        return shared_table
+
+    def diffEvalTable(self, metrics=None, fields=None):
         ''' sample cmp-report'''
 
         #compare Agg Tables: Can this be universalized for aggFilter, etc...
@@ -220,11 +227,90 @@ class CmpAlgoReport:
             benchmark_df = benchmark_df[metrics]
             current_df   = current_df[metrics]
 
+        shared_table = self.diffDf(benchmark_df, current_df)
+
+        if fields is not None:
+            shared_table = shared_table.T[fields].T
+
+        shared_table.applymap('{:,.3f}'.format)
+
+        return shared_table
+
+    def inputFrameChanges(self, metrics=None, fields=None):
+        ''' sample cmp-report'''
+
+        #compare Agg Tables: Can this be universalized for aggFilter, etc...
+        
+        self.benchmark.evalDfh.setRowsRequested(s_cmd='inputframes')
+        self.current.evalDfh.setRowsRequested(s_cmd='inputframes')
+        
+        benchmark_df = self.benchmark.evalDfh.getRows()
+        current_df   = self.current.evalDfh.getRows()
+
+        if metrics is not None:
+            benchmark_df = benchmark_df[metrics]
+            current_df   = current_df[metrics]
+
         d_diff = {}
         for _col in current_df.columns:
+            d_diff[_col] = (current_df[_col].astype('float64') - 
+                            benchmark_df[_col].astype('float64'))
+        diff_df = pd.DataFrame(d_diff)
+
+        changes_df = self.changesTable(diff_df)
+        
+        col_order = ['improvements', 'deprovements', 'sames']
+        shared_table = changes_df[col_order]
+
+        shared_table.applymap('{:,.3f}'.format)
+
+        return shared_table
+
+    
+    def allFrameChanges(self, metrics=None, fields=None):
+        ''' sample cmp-report'''
+
+        #compare Agg Tables: Can this be universalized for aggFilter, etc...
+        
+        self.benchmark.evalDfh.rows_requested = None
+        self.current.evalDfh.rows_requested = None
+        
+        benchmark_df = self.benchmark.evalDfh.getRows()
+        current_df   = self.current.evalDfh.getRows()
+
+        if metrics is not None:
+            benchmark_df = benchmark_df[metrics]
+            current_df   = current_df[metrics]
+
+        d_diff = {}
+        for _col in current_df.columns:
+            d_diff[_col] = (current_df[_col].astype('float64') - 
+                            benchmark_df[_col].astype('float64'))
+
+        diff_df = pd.DataFrame(d_diff)
+
+        changes_df = self.changesTable(diff_df)
+        
+        col_order = ['improvements', 'deprovements', 'sames']
+        shared_table = changes_df[col_order]
+
+        shared_table.applymap('{:,.3f}'.format)
+
+        return shared_table
+
+    @staticmethod
+    def diffDf(benchmark_df, current_df):
+        ''' return diff_df (pd.DataFrame), with three indexes - 'diff', 'current',
+            and 'baseline' - for the input_df's and their diffs '''
+
+        d_diff = {}
+        
+        for _col in current_df.columns:
+            
             # note: convert everything to float to evaluate minus operator
             #       on all types of data: float, int, bool, etc.
             #       None should be converted to NaN
+            
             d_diff[_col] = (current_df[_col].astype('float64') - 
                             benchmark_df[_col].astype('float64'))
 
@@ -243,36 +329,15 @@ class CmpAlgoReport:
         shared_table = pd.concat(values, keys=keys, axis=1)
         shared_table = shared_table[col_order]
 
-        if fields is not None:
-            shared_table = shared_table[fields]
-
-        # shared_table.applymap('{:,.3f}'.format)
-
         return shared_table
 
-    def basic3(self, metrics=None, fields=None):
-        ''' sample cmp-report'''
 
-        #compare Agg Tables: Can this be universalized for aggFilter, etc...
-        
-        self.benchmark.evalDfh.setRowsRequested(s_cmd='inputframes')
-        self.current.evalDfh.setRowsRequested(s_cmd='inputframes')
-        
-        benchmark_df = self.benchmark.evalDfh.getDatasetDisplay()
-        current_df   = self.current.evalDfh.getDatasetDisplay()
+    @staticmethod
+    def changesTable(diff_df):
+        ''' input: (pd.DataFrame) diff_df is an agg_metric(index) by a
+            return (pd.DataFrame)
+        '''
 
-        if metrics is not None:
-            benchmark_df = benchmark_df[metrics]
-            current_df   = current_df[metrics]
-
-        d_diff = {}
-        for _col in current_df.columns:
-            d_diff[_col] = (current_df[_col].astype('float64') - 
-                            benchmark_df[_col].astype('float64'))
-
-        diff_df = pd.DataFrame(d_diff)
-
-        
         EPSILON = 0.001
 
         def isImprovement(series_input):
@@ -282,7 +347,7 @@ class CmpAlgoReport:
             return series_input < - EPSILON
 
         def isSame(series_input):
-            #note: use bitwse operators {~, &, | } for pd.Series
+            # use bitwse operators {~, &, | } for pd.Series
             return ~(series_input > EPSILON) & ~(series_input < -EPSILON)
         
         improve_df = diff_df.apply(isImprovement).sum()
@@ -300,20 +365,44 @@ class CmpAlgoReport:
         changes_df = changes_df.swaplevel(-1, -2)
 
         changes_df = changes_df.unstack()
-        
-        # changes_df = changes_df.T
-        
-        col_order = ['improvements', 'deprovements', 'sames']
-        shared_table = changes_df[col_order]
 
-        # shared_table.applymap('{:,.3f}'.format)
+        return changes_df
 
-        return shared_table
+    def report1(self):
 
+        display(self.allFrameChanges(
+                    metrics=[
+                        'checkTrackSuccess'
+                        ]
+                    )
+                )
 
+        display(self.inputFrameChanges(
+                    metrics = [
+                                'checkTrackSuccess',
+                                'calcBaselineBallUnitsAway', 
+                                'checkBothContainsOther',
+                                'distanceFromBaseline'
+                                ]
+                    )
+                )
 
-        
+        display(self.diffAggTable(
+                    metrics=['mean'],
+                    fields = [
+                            'agg_checkTrackSuccess',
+                            'agg_calcBaselineBallUnitsAway', 
+                            'agg_checkBothContainsOther',
+                            'agg_distanceFromBaseline'
+                    ]
+                    )
+                )
 
+        display(self.diffAggFilterTable(
+                    metrics = None,  #['mean'],
+                    fields = None
+                    )
+                )
 
 if __name__ == "__main__":
     od = OutcomeData()

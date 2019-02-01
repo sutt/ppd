@@ -112,10 +112,11 @@ def test_EvalTracker_eval_methods_good():
             val = 'exception'
         list_data.append(val)
 
-    ANSWER = [False, False, False, False, True, True, 1, 3.605551275463989]
+    ANSWER = [True, True, True, True, True, True, 1, -3.605551275463989]
     assert list_data == ANSWER
 
-def test_EvalTracker_eval_methods_good():
+
+def test_EvalTracker_eval_methods_good_2():
 
     ev = EvalTracker()
     
@@ -133,7 +134,7 @@ def test_EvalTracker_eval_methods_good():
             val = 'exception'
         list_data.append(val)
 
-    ANSWER = [None, None, None, None, None, None, None, None]
+    ANSWER = [None, None, None, None, None, False, None, None]
     assert list_data == ANSWER
 
 
@@ -144,7 +145,9 @@ def test_EvalTracker_eval_methods_good():
     ev.setNaReturn(np.NaN)
 
     list_data = []
-    for meth_name in copy.copy(ev.eval_method_names):
+    names = copy.copy(ev.eval_method_names)
+    names.pop(ev.eval_method_names.index('checkTrackSuccess'))
+    for meth_name in names:
         try:
             evMeth = getattr(ev, meth_name)
             val = evMeth(trackScore)
@@ -341,7 +344,7 @@ def test_DFHelper_1():
     assert outcome_display_df.shape == (19,49)
     assert 'distance\nFrom\nBaseline\n' in eval_display_df.columns
     assert eval_display_df.shape == (19,11)
-    assert str.strip(eval_display_df['distance\nFrom\nBaseline\n'][0]) == '2'
+    assert str.strip(eval_display_df['distance\nFrom\nBaseline\n'][0]) == '-2'
     
 
 

@@ -18,7 +18,7 @@
             >0, =0, <0
             >0+e, (-e,+e), <0-e [e:epsilon for small dis-regardeable diff's]
 
-        [ ] metrics can go up OR down to mean improvement, how to handle this?
+        [x] metrics can go up OR down to mean improvement, how to handle this?
             - can assign do something in name/ just memorize it
             - if we systemize it we can color-code it
             - can convert all abominable down=improvement metrics to negative scale:
@@ -26,24 +26,44 @@
                 current = -1; benchmark = -2 => imporvement = +1
                     -> positive always means improvement
                 and for boolean can switch between success-rate vs error-rate
+            -> all distances set to negative values to make this work
         
         [ ] need to organize some fields in Eval / Agg df's:
             [ ] in agg-df, we need "shared" fields like 'n' which are same for both
-            [ ] in eval-df, we should not include properties propBaselineRadius
+            [x] in eval-df, we should not include properties propBaselineRadius
 
-        [ ] need to limit the amount of fields shown in CmpAlgoReport output
+        [x] need to limit the amount of fields shown in CmpAlgoReport output
 
         [ ] need average-improvement-amt, average-deprovement-amt too
 
         [ ] note: multi-line (carriage-returned) field names don't work in multiIndex-df's
             like basic2() output; can this be changed?
-            [ ] at least remove line carriages in basic2(), basic3()
+            [x] at least remove line carriages in basic2(), basic3()
 
-        [ ] checkTrackSuccess() should be applied to all frames, not just inputframes
+        [x] checkTrackSuccess() should be applied to all frames, not just inputframes
+
+        [ ] plot comparing TrackingRadius
+
+        [x] report1() has aggFilter diff summary
+
+        [ ] largest-discrepancy-function
+            [ ] feed this into batchOutputState() or whatever in book demo
+
+        [ ] is there a way to title dataframes? if so add to report output
+
+        [x] Commit2
+            [x] commit new test data
+
+        [ ] what's going on with changed test data in test/guiview/meta_adv ?
         
 
-    Misc
+    Misc/Thoughts
     [ ] Really need to profile the imports: why is this taking so long to load?
+
+    Pandas.to_sql has an easy but hackish implementation:
+        load full_table from sql into pandas,
+        append new data to pandas,
+        write that new dataframe back into db with a replace action
 
 1/30
 
