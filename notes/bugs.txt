@@ -1,5 +1,46 @@
 #Tasks
 
+2/4 
+
+    First Action
+    [x] Figure out what I've written in HEAD
+    [x] Cleanup and commit
+
+    More
+    [ ] test None-> nans in evalsuite_test
+
+    Other
+    [ ] checkBothContainsOther + (prolly other metrics) are wrong, now that
+        distance is negative.
+        [ ] also, this wasn't caught with tests: add more eval-processing tests
+
+2/2
+
+    [ ] largestDiscrepancy()
+        [ ] distance function current vs. benchmark
+        [ ] each of the standard metrics
+
+2/1
+
+    [ ] Mop-up commit
+        [x] plot comparing TrackingRadius
+        [x] helpful constructor for OutcomeData
+        [~] in agg-df, we need "shared" fields like 'n' which are same for both
+        [ ] largest-discrepancy-function
+            [ ] need to preserve diff_df
+            [ ] feed this into batchOutputState() or whatever in book demo
+        [ ] is there a way to title dataframes? if so add to report output
+        [ ] explore the concept of a pivot table in pandas
+
+    [ ] MasterDB tinkering
+
+    Other
+    [ ] Locality Plot: plot X,Y from track onto a line plot, see what regions
+        they diverge
+
+    
+    
+
 1/31
 
     [ ] Comparison Report
@@ -54,7 +95,8 @@
         [x] Commit2
             [x] commit new test data
 
-        [ ] what's going on with changed test data in test/guiview/meta_adv ?
+        [x] what's going on with changed test data in test/guiview/meta_adv ?
+            -> Nothing: we ctrl+c on that previously disrupting it's natural state
         
 
     Misc/Thoughts

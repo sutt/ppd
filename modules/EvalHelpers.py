@@ -692,6 +692,8 @@ class DFHelper:
 
         Types:  'outcome'   - track+input scoreschema to scalars
                 'eval'      - calculated field on outcome, comparison b/w them
+                'agg_eval'  - aggregated metrics of the eval table
+                'agg_eval_filter' - sames as agg, but with frames filtered
     '''
 
     def __init__(self, df=None, df_type=None):
@@ -737,6 +739,8 @@ class DFHelper:
             self.df_type = 'eval'
         elif 'agg_checkTrackSuccess' in df.columns:
             self.df_type = 'agg_eval'
+        elif 'fagg_checkTrackSuccess' in df.columns:
+            self.df_type = 'agg_eval_filter'
 
     
     def setRowsRequested(self, series_data=None, range_data=None, s_cmd=None):
@@ -916,6 +920,7 @@ class OutcomeData:
     def __init__(self, 
                  dbPathFn='data/usr/eval_tmp.db',
                  tblName='outcome_dataframe',
+                 outcomeDf=None,
                  bLoad=True,
                  bEval=True
                  ):
@@ -936,6 +941,10 @@ class OutcomeData:
         
         self.loaded = False
         self.loaded_ss = False
+
+        if outcomeDf is not None:
+            self.loads(outcomeDf)
+            bLoad = False
         
         if bLoad:
             self.load()
@@ -1279,10 +1288,14 @@ class OutcomeData:
         ''' populate a ScoreSchema object(s) for each record in outcome dataframe;
             add to a dict (for input vs track), add that to a list. 
             scoreObjList:
+            
+                (where SS is ScoreSchema or None)
+                
                 [   {'input':SS, 'track':SS }   <record0>
                     {'input':SS, 'track':SS }   <record1>
                      ...
                 ]
+                    
         '''
         if self.loaded_ss:
             self.listScoreObjs = []
