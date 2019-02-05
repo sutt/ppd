@@ -8,29 +8,32 @@
 
     More
     [ ] test None-> nans in evalsuite_test
+    [ ] interpolate + smooth ball radius calc'd series, 
+        [ ] use this to create a filter and then filtered-agg
+        [ ] capture algo 3's perf boost over frames 220-250
 
     Other
-    [ ] checkBothContainsOther + (prolly other metrics) are wrong, now that
+    [x] checkBothContainsOther + (prolly other metrics) are wrong, now that
         distance is negative.
         [ ] also, this wasn't caught with tests: add more eval-processing tests
 
 2/2
 
-    [ ] largestDiscrepancy()
+    [x] largestDiscrepancy()
         [ ] distance function current vs. benchmark
-        [ ] each of the standard metrics
+        [x] each of the standard metrics
 
 2/1
 
-    [ ] Mop-up commit
+    [x] Mop-up commit
         [x] plot comparing TrackingRadius
         [x] helpful constructor for OutcomeData
         [~] in agg-df, we need "shared" fields like 'n' which are same for both
-        [ ] largest-discrepancy-function
-            [ ] need to preserve diff_df
-            [ ] feed this into batchOutputState() or whatever in book demo
-        [ ] is there a way to title dataframes? if so add to report output
-        [ ] explore the concept of a pivot table in pandas
+        [x] largest-discrepancy-function
+            [x] need to preserve diff_df
+            [x] feed this into batchOutputState() or whatever in book demo
+        [x] is there a way to title dataframes? if so add to report output
+        [~] explore the concept of a pivot table in pandas
 
     [ ] MasterDB tinkering
 
@@ -53,7 +56,7 @@
 
         [x] how to apply a diff to the respective cols
 
-        [ ] explore the concept of a pivot table in pandas
+        [~] explore the concept of a pivot table in pandas
 
         [x] indv-frames improve or worse concept:
             >0, =0, <0
@@ -75,22 +78,22 @@
 
         [x] need to limit the amount of fields shown in CmpAlgoReport output
 
-        [ ] need average-improvement-amt, average-deprovement-amt too
+        [~] need average-improvement-amt, average-deprovement-amt too
 
-        [ ] note: multi-line (carriage-returned) field names don't work in multiIndex-df's
+        [~] note: multi-line (carriage-returned) field names don't work in multiIndex-df's
             like basic2() output; can this be changed?
             [x] at least remove line carriages in basic2(), basic3()
 
         [x] checkTrackSuccess() should be applied to all frames, not just inputframes
 
-        [ ] plot comparing TrackingRadius
+        [x] plot comparing TrackingRadius
 
         [x] report1() has aggFilter diff summary
 
-        [ ] largest-discrepancy-function
-            [ ] feed this into batchOutputState() or whatever in book demo
+        [x] largest-discrepancy-function
+            [x] feed this into batchOutputState() or whatever in book demo
 
-        [ ] is there a way to title dataframes? if so add to report output
+        [x] is there a way to title dataframes? if so add to report output
 
         [x] Commit2
             [x] commit new test data

@@ -179,7 +179,7 @@ class EvalTracker:
 
         xB, yB, rB = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
 
-        dist = self.distanceFromBaseline(trackScore)
+        dist =  -self.distanceFromBaseline(trackScore)
 
         if dist < rB:
             return True
@@ -201,7 +201,7 @@ class EvalTracker:
 
         xA, yA, rA = Display.rectToCircle(trackScore[self.objEnum]['data'])
 
-        dist = self.distanceFromBaseline(trackScore)
+        dist = -self.distanceFromBaseline(trackScore)
 
         if dist < rA:
             return True

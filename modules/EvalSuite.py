@@ -142,6 +142,26 @@ class CmpAlgoReport:
             current - the input / "most recent" eval run
             benchmark - the exisiting (best?) eval run on the same data
 
+        Terms:
+
+            "Changes":each frame on each metric can be an:
+
+                Improvement, Deprovement, Same
+
+                same = diff is contained in (-epsilon, +epsilon) interval
+
+                a changes_df is only for eval-tables, not agg-eval-tables.
+
+                for all EvalTrack methods, "metrics", incr-value = incr-perf
+                which helps us infer the sign of an improvement
+
+            "Diff":   Diff = Current - Benchmark
+            
+                a diff_df is a dataframe with these threee sections as top index
+                and an eval_metric (like checkTrackSuccess) or an agg_eval_metric
+                like (agg_checkTrackSuccess) as second-level index
+
+
     '''
     
     def __init__(   self, 
@@ -155,7 +175,8 @@ class CmpAlgoReport:
         # comparison tables
         self.all_changes_df = None
         self.input_changes_df = None
-        self.diff_eval_table = None
+        self.diff_eval_table_input = None
+        self.diff_eval_table_all = None
         
 
         if benchmark_outcome_data is not None:
@@ -191,7 +212,7 @@ class CmpAlgoReport:
         if fields is not None:
             shared_table = shared_table.T[fields].T
 
-        shared_table = shared_table.applymap('{:,.3f}'.format)
+        shared_table = self.formatDf(shared_table)
 
         return shared_table
 
@@ -214,21 +235,19 @@ class CmpAlgoReport:
         if fields is not None:
             shared_table = shared_table.T[fields].T
 
-        try:
-            shared_table = shared_table.applymap('{:,.3f}'.format)
-        except Exception as e:
-            print e
-            # problem appears to be formatting apparent numeric columns that
-            # are really str
-
+        shared_table = self.formatDf(shared_table)
 
         return shared_table
 
-    def diffEvalTable(self, metrics=None, fields=None):
+    def diffEvalTable(self, metrics=None, fields=None, b_input_frames=True):
         ''' EvalTable with diff,current,benchmark-sections'''
         
-        self.benchmark.evalDfh.setRowsRequested(s_cmd='inputframes')
-        self.current.evalDfh.setRowsRequested(s_cmd='inputframes')
+        if b_input_frames:
+            self.benchmark.evalDfh.setRowsRequested(s_cmd='inputframes')
+            self.current.evalDfh.setRowsRequested(s_cmd='inputframes')
+        else:
+            self.benchmark.evalDfh.rows_requested = None
+            self.current.evalDfh.rows_requested = None
         
         benchmark_df = self.benchmark.evalDfh.getRows()
         current_df   = self.current.evalDfh.getRows()
@@ -239,24 +258,32 @@ class CmpAlgoReport:
 
         shared_table = self.diffDf(benchmark_df, current_df)
 
-        self.diff_eval_table = shared_table
-
         if fields is not None:
             shared_table = shared_table.T[fields].T
 
-        try:
-            shared_table.applymap('{:,.3f}'.format)
-        except Exception as e:
-            print e
-            # problem appears to be formatting apparent numeric columns that
-            # are really str
+        shared_table = self.formatDf(shared_table)
+
+        if b_input_frames:
+            self.diff_eval_table_input = shared_table
+        else:
+            self.diff_eval_table_all = shared_table
 
         return shared_table
 
     def inputFrameChanges(self, metrics=None, fields=None):
-        ''' sample cmp-report'''
+        ''' 
+            build and return self.all_changes_df:
+                rows - every metric in (allFrames) evalTable
+                cols - improvement/regression/same on evalTable-metric
 
-        #compare Agg Tables: Can this be universalized for aggFilter, etc...
+                (since input-data includes all frames, not just inputframes,
+                 this is best for non input-frame comparisons, 
+                 e.g. trackSuccess)
+
+            args:
+                metrics  - (list of str) filter for these from input-data
+                fields   - (list of str) [not implemented] filter for these 
+        '''
         
         self.benchmark.evalDfh.setRowsRequested(s_cmd='inputframes')
         self.current.evalDfh.setRowsRequested(s_cmd='inputframes')
@@ -268,19 +295,15 @@ class CmpAlgoReport:
             benchmark_df = benchmark_df[metrics]
             current_df   = current_df[metrics]
 
-        d_diff = {}
-        for _col in current_df.columns:
-            d_diff[_col] = (current_df[_col].astype('float64') - 
-                            benchmark_df[_col].astype('float64'))
-        diff_df = pd.DataFrame(d_diff)
+        diff_df = self.diffDf(benchmark_df, current_df)
 
-        changes_df = self.changesTable(diff_df)
+        changes_df = self.changesTable(diff_df['diff'])
         
         col_order = ['improvements', 'deprovements', 'sames']
         shared_table = changes_df[col_order]
+        self.formatDf(shared_table)
 
-        shared_table.applymap('{:,.3f}'.format)
-
+        self.input_changes_df = shared_table
         return shared_table
 
     
@@ -309,21 +332,15 @@ class CmpAlgoReport:
             benchmark_df = benchmark_df[metrics]
             current_df   = current_df[metrics]
 
-        d_diff = {}
-        for _col in current_df.columns:
-            d_diff[_col] = (current_df[_col].astype('float64') - 
-                            benchmark_df[_col].astype('float64'))
+        diff_df = self.diffDf(benchmark_df, current_df)
 
-        diff_df = pd.DataFrame(d_diff)
-
-        changes_df = self.changesTable(diff_df)
-
-        self.all_changes_df = changes_df
+        changes_df = self.changesTable(diff_df['diff'])
         
         col_order = ['improvements', 'deprovements', 'sames']
         shared_table = changes_df[col_order]
+        shared_table = self.formatDf(shared_table)
 
-        shared_table.applymap('{:,.3f}'.format)
+        self.all_changes_df = shared_table
 
         return shared_table
 
@@ -406,6 +423,16 @@ class CmpAlgoReport:
         return changes_df
 
     
+    @staticmethod
+    def formatDf(df):
+        ''' format df decimal output '''
+        try:
+            df = df.applymap('{:,.3f}'.format)
+        except Exception as e:
+            print e
+        return df
+
+    
     def plotTrackRadius(self, epsilon_offset = 3):
         '''
             plot two line graphs of trackRadius (Y) from current and benchmark algo
@@ -442,53 +469,103 @@ class CmpAlgoReport:
                     if zero, return both improve/deprove (absolute value)
 
                 e.g: obj.largestDiscrepancy(checkTrackSuccess=1)
-                    
-                    returns:  <INSERT DF PRINTOUT HERE>
+                returns:
+                                diff           current         benchmark
+                    checkTrackSuccess checkTrackSuccess checkTrackSuccess
+                239               1.0              True             False
+                232               1.0              True             False
+                223               1.0              True             False
 
         '''
         
         # do we know to save / re-create the filters that counted improvements
-
-        # this should include AND conditions for various requested metrics:
-        # e.g. distance AND checkSuccess; might be too difficult
         
-        if self.diff_eval_table is None:
-            self.diffEvalTable()
+        if self.diff_eval_table_all is None:
+            self.diffEvalTable(b_input_frames=False)
 
-        metric_distanceCurrentToBenchmark = kwargs.get('distanceCurrentToBenchmark', None)
-        if metric_distanceCurrentToBenchmark is not None:
-            data = 1
-            self.diff_eval_table['distanceCurrentToBenchmark'] = data
+        # custom metrics; don't exist within diff_eval_table_input
+        # build these metrics into the diff_eval_table_input
+        
+        custom_metric = kwargs.get('distanceCurrentToBenchmark', None)
+        if custom_metric is not None:
+            pass
+
+            #NOT IMPLEMENTED
+            # custom_metric
+            # need to build this calculation
+            # but we can't even build this without outcome data,
+            # this needs to happen in EvalTracker, not here
+            # but actually we do have outcomeModel, no?
+            # self.diff_eval_table_input['distanceCurrentToBenchmark'] = 1 
 
         
-        # perform operation on standard metrics
+        # standard metrics - exist within diff_eval_table
+
         ev = EvalTracker()
         eval_metrics = ev.getMethodNames()
-        eval_metrics.extend(ev.getCalcNames)
+        eval_metrics.extend(ev.getCalcNames())
+        #this should be equivalent to self.diff_eval_table_input.columns (w/o property fields)
+
+        #improvements = positive-diffs, deprovements = negative-diffs
 
         for _metric in eval_metrics:
 
             if _metric in kwargs.keys():
 
+                # match input arguments to valid columns
+                
                 arg_val = kwargs.get(_metric, None)
 
                 if arg_val is None:
                     continue
 
-                if arg_val == 0:
+                # field sort-style
+                
+                b_abs_value = False
+                b_top_largest = True
+                
+                if arg_val == 0:            # look for greatest absolute value
+                    b_abs_value = True
+                    b_top_largest = True
 
-                    self.diff_eval_table()
-        
-        metric_checkTrackSuccess = kwargs.get('checkTrackSuccess', None)
-        if metric_checkTrackSuccess is not None:
-            pass
-            # return improvements or deprovements?
+                if arg_val > 0:             # look for improvements
+                    b_abs_value = False
+                    b_top_largest = True
 
-        
-        # sort a pandas table here:
-        # self.all_changes_df.
+                if arg_val < 0:             # look for deprovements
+                    b_abs_value = False
+                    b_top_largest = False
 
-    def getChanges(self,idk, **kwargs):
+                
+                pd.set_option('mode.chained_assignment', None)
+                
+                df_whole = self.diff_eval_table_all.copy()
+
+                metric_col = _metric if not(b_abs_value) else 'abs_' + _metric
+
+                df_diff = df_whole['diff']
+                
+                if b_abs_value:    
+                    df_diff['abs_' + _metric] = df_diff[_metric].apply(abs)
+                    
+                df_sort = df_diff.sort_values(
+                                            by=[metric_col]
+                                            ,ascending=not(b_top_largest)
+                                            )
+
+                metric_ind = pd.MultiIndex.from_product(
+                                    [['diff', 'current', 'benchmark'], [_metric]]
+                                    )
+
+                return_table = pd.DataFrame(df_whole[metric_ind], index = df_sort.index)
+
+                return_table = self.formatDf(return_table)
+
+                return return_table[:max_n]
+
+
+    
+    def getChanges(self, **kwargs):
         pass
         # improvement / deprovement / same
         # how to get frame indices from these agg tables?
