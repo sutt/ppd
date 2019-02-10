@@ -97,9 +97,9 @@ def test_EvalTracker_eval_methods_good():
     assert list_data == ANSWER
 
 
-    # test small diff
-    inputScore = {'0':{'type':'circle','data':[10,10,5,5] } }
-    trackScore = {'0':{'type':'circle','data':[12,11,6,7] } }
+    # test small diff (rebenched 2.10.19)
+    inputScore = {'0':{'type':'circle','data':[10,10,6,6] } }
+    trackScore = {'0':{'type':'circle','data':[11,11,8,8] } }
 
     ev.setBaselineScore(inputScore)
 
@@ -112,7 +112,7 @@ def test_EvalTracker_eval_methods_good():
             val = 'exception'
         list_data.append(val)
 
-    ANSWER = [True, True, True, True, True, True, 1, -3.605551275463989]
+    ANSWER = [True, True, True, True, True, True, 1, -2.8284271247461903]
     assert list_data == ANSWER
 
 
@@ -245,7 +245,8 @@ def test_OutcomeData_displayDiameterPlot():
 
 
 def test_EvalDataset_buildDataset():
-    
+    ''' rebenched 2.10.19'''
+
     path_test = '''data/test/evalhelpers/EvalDataset/'''
     path_gs = os.path.join('..', path_test, 'input_gs.db')
     path_answer = os.path.join('..', path_test, 'answer_outcome.pickle')
@@ -351,5 +352,6 @@ def test_DFHelper_1():
 
 if __name__ == "__main__":
     # test_OutcomeData_buildScoreSchemaList()
-    test_DFHelper_1()
+    # test_DFHelper_1()
+    test_EvalTracker_eval_methods_good()
     pass

@@ -181,7 +181,6 @@ class TrackFactory:
         
         frameType, frameScore = frameScoreData
 
-        #TODO-SS
         objScoring = ScoreSchema()
         objScoring.load(frameScore)
         circleDataObj0 = objScoring.getData(objEnum=0)
@@ -412,7 +411,7 @@ class TrackFactory:
                             ,threshLo = thresh_lo   
                             ,threshHi = thresh_hi ) 
 
-        if not(img_mask is None):
+        if not(img_mask is None) and (img_mask.sum() != 0):
 
             img_mask_2 = repairA(img_mask, iterations = repair_iterations)
 
@@ -429,7 +428,10 @@ class TrackFactory:
             else:
                 self.currentTrackSuccess = False
                 self.currentTrackScore.reset()
-                
+
+        else:
+            self.currentTrackSuccess = False
+            self.currentTrackScore.reset()
 
         if b_log:
             
@@ -508,8 +510,8 @@ class TrackFactory:
                 self.currentTrackScore.reset()
 
         else:
-                self.currentTrackSuccess = False
-                self.currentTrackScore.reset()
+            self.currentTrackSuccess = False
+            self.currentTrackScore.reset()
 
         if b_log:
             

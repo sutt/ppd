@@ -561,7 +561,10 @@ class CmpAlgoReport:
 
                 return_table = self.formatDf(return_table)
 
-                return return_table[:max_n]
+                if max_n is not None:
+                    return_table = return_table[:max_n]
+                
+                return return_table
 
 
     

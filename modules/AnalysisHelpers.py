@@ -117,6 +117,63 @@ def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
                             
     return ret
 
+def compareTrackers(listGS, listTrackers, roiSelectFunc, **kwargs):
+    '''
+        plot side-by-side results of different trackers on frame(s)
+        
+        input:
+            listGS          - (list of GS-objs), they don't have to be initialized.
+            listTrackers    - (list of TrackFactory-objs), already initialized
+                                and configured.
+            roiSelectFunc   - (reference to a function) used to select the portion
+                                of the image that will be displayed
+                                if None, will return full image
+            kwargs          - 
+        
+        output:
+            None, will just display to calling jupyter notebook
+    '''
+    
+    
+    for _gs in listGS:
+
+        plot_data, col_titles, row_titles = [], [], []
+    
+        for _tracker in listTrackers:
+    
+            data = applyTracker([_gs], _tracker, roiSelectFunc)
+
+            # this is all to get the drawn-on score-frame
+            # this doesn't do what we want when 
+            # roiSelectFunc is not roiSelectScoreWindow
+            _gs.initDisplay()
+            _tracker.setFrame(_gs.getOrigFrame())
+            _tracker.trackFrame()
+            _gs.display.setTrack(trackScore = _tracker.getTrackScore())
+            _gs.display.drawOperators(score_thick = 4)
+            _gs.display.drawTrackers(score_thick = 4)
+            score_frame = _gs.display.scoreFrame.copy()
+            
+            tmp_data = []
+            tmp_data.append(score_frame)
+            tmp_data.extend(copy.deepcopy(data['listPlts'][0]))
+            
+            plot_data.append(tmp_data)
+
+            sAlgoEnum = str(_tracker.tp_trackAlgoEnum)
+            col_titles.append( 'AlgoEnum=' + sAlgoEnum )
+
+            row_titles = copy.copy(data['listTransformTitles'])
+                                        
+
+        #plot this frame
+        multiPlot(   list_list_imgs=plot_data
+                    ,input_frame_titles=col_titles
+                    ,input_transform_titles=row_titles
+                    ,input_figure_title='FrameCounter=' + str(_gs.frameCounter)
+                    )
+
+
 
 def roiSelectZoomWindow(inputGuiviewState):
     ''' a roiSelectFunc for use with applyTracker(); pass a *reference*
@@ -125,12 +182,18 @@ def roiSelectZoomWindow(inputGuiviewState):
     inputGuiviewState.initDisplay()
     return inputGuiviewState.getZoomWindow()
 
-def roiSelectScoreWindow(inputGuiviewState):
+def roiSelectScoreWindow(inputGuiviewState, b_resize=False):
     ''' a roiSelectFunc for use with applyTracker(); pass a *reference*
         to this function into that function 
     '''
     inputGuiviewState.initDisplay()
-    return inputGuiviewState.display.scoreFrame.copy()
+    if b_resize:
+        return inputGuiviewState.display.scoreFrame.copy()
+    else:
+        score_rect = inputGuiviewState.display.scoreRect
+        return inputGuiviewState.getZoomWindow(inputRect=score_rect)
+    #TODO - use GuiviewState.getScoreWindow()?
+
 
 
 def buildImgComparisonData(listGS, tracker):
@@ -492,7 +555,10 @@ def colorInRange(data, threshes):
 
 def cvtPlot(img):
     ''' show the image after converting from bgr to rgb '''
-    _img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+    try:
+        _img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+    except:
+        _img = img.copy()
     plt.imshow(_img)
 
 
@@ -1324,7 +1390,15 @@ def exploreImgs(listGS, figw = 20):
         _gs.initDisplay()
         tmp = []
         tmp.append(_gs.getOrigFrame())
-        tmp.append(_gs.display.zoomFrame.copy())
+        try:
+            tmp.append(_gs.display.zoomFrame.copy())
+        except:
+            pass
+
+        try:
+            tmp.append(_gs.display.scoreFrame.copy())
+        except:
+            pass
         chart_data.append(tmp)
 
     titles = [_gs.frameCounter for _gs in listGS]

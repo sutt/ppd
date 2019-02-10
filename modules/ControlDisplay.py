@@ -362,10 +362,11 @@ class Display:
         self.adjustOrient()
         
     
-    def drawOperators(self):
+    def drawOperators(self, **kwargs):
         ''' Draw onto frame(s) based on user input.
             This has to be called for every new frame.
             And everytime user/gui changes zoomRect or roiRect; resetOperators()
+            (use kwargs to adjust line thickness)
         '''
 
         if self.zoomOn and self.zoomRect is not None:
@@ -373,7 +374,7 @@ class Display:
             self.frame = draw_rect(  self.frame
                                     ,self.absRect(self.zoomRect)
                                     ,color='blue'
-                                    ,thick = 1
+                                    ,thick = kwargs.get('zoom_thick', 1)
                                     )
 
         if self.outputScore.checkHasContents():
@@ -408,7 +409,7 @@ class Display:
                               ,data=self.inputScore
                               ,coordsRelative='origToMain'
                               ,color='blue'
-                              ,thick=2
+                              ,thick=kwargs.get('main_thick', 2)
                               ,b_annotate = self.bAnnotateObjEnum)
 
             
@@ -418,7 +419,8 @@ class Display:
                               ,data=self.inputScore
                               ,coordsRelative='origToScore'
                               ,color='blue'
-                              ,thick=1)
+                              ,thick=kwargs.get('score_thick', 1)
+                              )
 
                 
 
@@ -530,10 +532,11 @@ class Display:
                 self.trackOn = True
     
     
-    def drawTrackers(self):
+    def drawTrackers(self, **kwargs):
         ''' Draw onto frame(s) based on data from trackFactory.
             All data is relative to Orig frame size; so we need to
             convert to Main or convert to Zoom where nec.
+            (use kwargs to adjust line thickness)
         '''
         
         if self.trackOn:
@@ -542,7 +545,7 @@ class Display:
                              ,data = self.trackScore
                              ,coordsRelative = 'origToMain'
                              ,color = 'red'
-                             ,thick = 2
+                             ,thick = kwargs.get('main_thick', 2)
                              ,b_annotate = self.bAnnotateObjEnum
                              )
 
@@ -552,7 +555,7 @@ class Display:
                                 ,data = self.trackScore
                                 ,coordsRelative = 'origToZoom'
                                 ,color = 'red'
-                                ,thick = 1
+                                ,thick = kwargs.get('zoom_thick', 1)
                                 ,b_annotate = False
                                 )
 
@@ -563,7 +566,7 @@ class Display:
                                 ,data = self.trackScore
                                 ,coordsRelative = 'origToScore'
                                 ,color = 'red'
-                                ,thick = 1
+                                ,thick = kwargs.get('score_thick', 1)
                                 ,b_annotate = False
                                 )
 

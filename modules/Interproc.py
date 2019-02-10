@@ -153,22 +153,17 @@ class GuiviewState:
 
         frame = self.getOrigFrame()
 
-        #TODO - this will avoid all the annotations like drawTrackers()
-
         if inputRect is None:
+            # only scale for zoomRect, other rects are in terms or orig
             _rect = self.zoomRect
+            crop_rect = [self.display.scaleMainToOrig(p) for p in _rect]
         else:
-            _rect = inputRect
+            crop_rect = inputRect
         
-        #TODO - only need to scale if it's a self.zoomRect, otherwise you're doing
-        #       scaleToMain() when your input is in terms of orig
+        crop_rect = tuple(crop_rect)
         
         zoom_img = crop_img( frame
-                            ,self.display.absRect(
-                                tuple( 
-                                    self.display.scaleMainToOrig(p) for p in _rect
-                                    )
-                                )
+                            ,self.display.absRect(crop_rect)
                             )
         return zoom_img
 
