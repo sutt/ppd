@@ -10,7 +10,9 @@ sys.path.append("../")
 from modules.AnalysisHelpers import ( multiPlot
                                      ,applyTracker
                                      ,roiSelectZoomWindow
+                                     ,roiSelectZoomWindow
                                      ,subprocEval
+                                     ,compareTrackers
                                      )
 from modules.ControlTracking import TrackFactory
 from modules.Interproc import DBInterface, GuiviewState
@@ -56,8 +58,9 @@ def test_applyTracker_1():
     tracker.setAlgoEnum(0)
     tracker.setInit(ballColor="green")
     
-    test_data = "applyTracker_1.db"
-    testDB = DBInterface(os.path.join(TEST_PARENT_DIR, test_data))
+    test_data = "applyTracker.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'applyTracker')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
 
     listGS = [  pickle.loads(record[1])
                 for record in testDB.selectAll()
@@ -76,7 +79,7 @@ def test_applyTracker_1():
     assert len(data['listPlts'][0]) == 3
     assert data['listPlts'][0][0].shape == (480,640,3)
     assert data['listPlts'][0][1].shape == (480,640)
-    assert data['listTransformTitles'] == ['img_t', 'img_mask', 'img_mask_2']
+    assert data['listTransformTitles'] == ['img_t', 'img_mask', 'img_repair']
     assert data['listFrameTitles'] == ['0','189', '312']
     assert len(data['listScore']) == 3
     assert data['listScore'][0]['0']['data'] == [209, 168, 35, 35]
@@ -92,8 +95,9 @@ def test_applyTracker_2():
     tracker.setAlgoEnum(0)
     tracker.setInit(ballColor="green")
     
-    test_data = "applyTracker_1.db"
-    testDB = DBInterface(os.path.join(TEST_PARENT_DIR, test_data))
+    test_data = "applyTracker.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'applyTracker')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
 
     listGS = [  pickle.loads(record[1])
                 for record in testDB.selectAll()
@@ -112,14 +116,14 @@ def test_applyTracker_2():
     assert len(data['listPlts'][0]) == 3
     assert data['listPlts'][0][0].shape == (480,640,3)
     assert data['listPlts'][0][1].shape == (480,640)
-    assert data['listTransformTitles'] == ['img_t', 'img_mask', 'img_mask_2']
+    assert data['listTransformTitles'] == ['img_t', 'img_mask', 'img_repair']
     assert data['listFrameTitles'] == ['0','189', '312']
     assert len(data['listScore']) == 3
     assert data['listScore'][0]['0']['data'] == [209, 168, 35, 35]
     assert data['listScore'][1] == None
 
 
-def test_applyTracker_2():
+def test_applyTracker_3():
     ''' test applyTracker; roiSelectFunc=roiSelectZoomWindow.
         test_data has guiview states with a zoomRect '''
     
@@ -128,8 +132,9 @@ def test_applyTracker_2():
     tracker.setAlgoEnum(0)
     tracker.setInit(ballColor="green")
     
-    test_data = "applyTracker_1.db"
-    testDB = DBInterface(os.path.join(TEST_PARENT_DIR, test_data))
+    test_data = "applyTracker.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'applyTracker')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
 
     listGS = [  pickle.loads(record[1])
                 for record in testDB.selectAll()
@@ -170,7 +175,39 @@ def test_subprocEval_1():
         diff_pd(answer, output)
         raise Exception
 
+def test_compareTrackers_1():
+    '''
+    '''
+    
+    # build listTrackers
+    listTrackers = []
+    for _algoenum in [0,1]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="green")
+        listTrackers.append(_tracker)
+    
+    # build listGS
+    test_data = "compareTrackers_green.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
+    listGS = [  pickle.loads(record[1])
+                for record in testDB.selectAll()]
+
+    # run method with test_mock flag
+    data_dict = compareTrackers(listGS, listTrackers, test_stub=True)
+
+    # checks
+    print data_dict['row_titles']
+    assert data_dict['row_titles'] == ['marked_frame', 'img_t', 'img_mask', 'img_repair', 'img_terminal']
+    assert data_dict['col_titles'] == ['AlgoEnum=0', 'AlgoEnum=1']
+
+    # TODO - test img shape, should be full image
+    # TODO - test kwargs col_titles
+    # TODO - test bMarkedFrame
+    # TODO - test roiSelectFunc
+    # TODO - test roiSelectParams
 
 if __name__ == "__main__":
 
-    test_applyTracker_1()
+    test_compareTrackers_1()

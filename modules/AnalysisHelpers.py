@@ -27,7 +27,8 @@ from ControlDisplay import Display
         [ ] subprocColorPlot runs from jupyter instead of cmd-line
 '''
 
-def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
+def applyTracker(listGS, tracker, roiSelectFunc = None, 
+                roiSelectParams = {}, bLogPlts = True):
     ''' 
         pass in:
          listGS -  list of GuiviewState objs; "states"
@@ -61,7 +62,7 @@ def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
         if roiSelectFunc is None:
             img = _gs.getOrigFrame()
         else:
-            img = roiSelectFunc(_gs)
+            img = roiSelectFunc(_gs, **roiSelectParams)
 
         
         tracker.setFrame(img)
@@ -117,60 +118,170 @@ def applyTracker(listGS, tracker, roiSelectFunc = None, bLogPlts = True):
                             
     return ret
 
-def compareTrackers(listGS, listTrackers, roiSelectFunc, **kwargs):
+
+
+def getAnnotatedScoreFrame(gs, tracker, expand_factor=None):
+    '''
+        return an annotated image from the gs-obj and tracker-obj
+        input: gs-obj, tracker-obj
+
+        why/how we do it:
+
+            step1
+            perfrom a trackFrame() to get the track_score for annotation
+            the data for input_score should already exist in gs-obj if it exists
+
+            step2
+            if we need to expand the marked_frame field of view use expand_factor
+            build a new scoreFrame in the Display obj contained in gs
+
+            step3
+            apply annotations through Display-api, these operate on Display contained
+            data objects like .scoreFrame
+            note: we change line thickness b/c a resize occurs to bring these windows
+            to roughly shape=(240,320)
+
+            step4
+            return the scoreFrame
+
+    '''
+    gs.initDisplay()
+    
+    # step1
+    tracker.setFrame(gs.getOrigFrame())
+    tracker.trackFrame()
+    track_score = tracker.getTrackScore()
+    
+    # step2
+    if expand_factor is not None:
+
+        gs.display.scoreRect = Display.zoomInRect( gs.display.scoreRect
+                                                ,zoomFct=expand_factor
+                                                ,b_zoomout=True)
+        
+        gs.display.scoreFrame = gs.display.buildScoreFrame()
+    
+    # step3
+    gs.display.setTrack(trackScore = track_score)
+    gs.display.drawOperators(score_thick = 4)
+    gs.display.drawTrackers(score_thick = 4)
+    
+    return gs.display.scoreFrame.copy()
+
+
+def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
+                    ,**kwargs):
     '''
         plot side-by-side results of different trackers on frame(s)
         
         input:
+            
             listGS          - (list of GS-objs), they don't have to be initialized.
+            
             listTrackers    - (list of TrackFactory-objs), already initialized
                                 and configured.
+            
             roiSelectFunc   - (reference to a function) used to select the portion
                                 of the image that will be displayed
                                 if None, will return full image
-            kwargs          - 
-        
+            
+            kwargs          - formatting/configuration suggestions:
+                
+                expand_factor - (float) expand the frame (from default size) by 
+                                that factor. used for viewing off-ball tracks
+                test_stub      - (bool) if True will return a dict with data
+                                 instead of plot display
+                col_titles    - (list of str) overide default labels for columns 
+                                to denote which algo method corresponds to that col
+                                e.g. ['repairIters=0', 'repairIters=1']
+                multiplot_params - (dict) {arg_name1: arg_val1, arg_name2: arg_val2, ...}
+                                     for passing into mutliPlot()
+                
         output:
-            None, will just display to calling jupyter notebook
+            None; will simply display to calling jupyter notebook
+
+        TODO
+            [ ] this still doesn't work when the track_log names don't align well
+                e.g. if trackalgo=4 had img_mask_2 between img_mask and img_repair
+                then it would show up as a row label on the bottom
+                proposed solution: plot_dict = {name:data} ->
+                                     plot_mat (list of list) with keys aligned
     '''
     
     
+    expand_factor = kwargs.get('expand_factor')
+    
+    # this carries optional arguments into applyTracker for use within
+    roiSelectParams = {}
+    if expand_factor is not None:
+        roiSelectParams = {'expand_factor': expand_factor}
+
+    def uniqueAppend(new_elems, old_elems):
+        ''' for updating row_titles '''
+        for _elem in new_elems:
+            if _elem not in old_elems:
+                old_elems.append(_elem)
+        return copy.copy(old_elems)
+            
+    # top-of-the-loop
     for _gs in listGS:
 
         plot_data, col_titles, row_titles = [], [], []
     
         for _tracker in listTrackers:
     
-            data = applyTracker([_gs], _tracker, roiSelectFunc)
+            # return the tracker log 
+            data = applyTracker( [_gs]
+                                ,_tracker
+                                ,roiSelectFunc=roiSelectFunc
+                                ,roiSelectParams=roiSelectParams
+                                )
 
-            # this is all to get the drawn-on score-frame
-            # this doesn't do what we want when 
-            # roiSelectFunc is not roiSelectScoreWindow
-            _gs.initDisplay()
-            _tracker.setFrame(_gs.getOrigFrame())
-            _tracker.trackFrame()
-            _gs.display.setTrack(trackScore = _tracker.getTrackScore())
-            _gs.display.drawOperators(score_thick = 4)
-            _gs.display.drawTrackers(score_thick = 4)
-            score_frame = _gs.display.scoreFrame.copy()
-            
-            tmp_data = []
-            tmp_data.append(score_frame)
-            tmp_data.extend(copy.deepcopy(data['listPlts'][0]))
-            
-            plot_data.append(tmp_data)
+            if bMarkedFrame:
 
-            sAlgoEnum = str(_tracker.tp_trackAlgoEnum)
-            col_titles.append( 'AlgoEnum=' + sAlgoEnum )
+                # marked_frame - an additional img which shows track/score
+                #                drawn onto frame and has been resized
+                
+                marked_frame = getAnnotatedScoreFrame(_gs, _tracker, expand_factor)
+                
+                tmp_data = []
+                tmp_data.append(marked_frame)
+                tmp_data.extend(copy.deepcopy(data['listPlts'][0]))
+                plot_data.append(tmp_data)
 
-            row_titles = copy.copy(data['listTransformTitles'])
+            else:
+                plot_data.append(copy.deepcopy(data['listPlts'][0]))
+
+            # set unqiue row_titles
+            tmp_row_titles = []
+            if bMarkedFrame:
+                tmp_row_titles.append('marked_frame')
+            tmp_row_titles.extend(copy.copy(data['listTransformTitles']))
+            row_titles = uniqueAppend(tmp_row_titles, row_titles)
+
+            col_titles.append( 'AlgoEnum=' + str(_tracker.tp_trackAlgoEnum) )
+
+        fig_title = 'FrameCounter=' + str(_gs.frameCounter)
+
+        tmp_col_titles = kwargs.get('col_titles', None)
+        if tmp_col_titles is not None:
+            col_titles = tmp_col_titles
+
+
+        if kwargs.get('test_stub', False):
+            ret = {
+                     'plot_data': plot_data
+                    ,'col_titles': col_titles
+                    ,'row_titles': row_titles
+            }
+            return ret
                                         
-
-        #plot this frame
+        # plot each frame separately
         multiPlot(   list_list_imgs=plot_data
                     ,input_frame_titles=col_titles
                     ,input_transform_titles=row_titles
-                    ,input_figure_title='FrameCounter=' + str(_gs.frameCounter)
+                    ,input_figure_title=fig_title
+                    ,**kwargs.get('multiplot_params', {})
                     )
 
 
@@ -182,7 +293,7 @@ def roiSelectZoomWindow(inputGuiviewState):
     inputGuiviewState.initDisplay()
     return inputGuiviewState.getZoomWindow()
 
-def roiSelectScoreWindow(inputGuiviewState, b_resize=False):
+def roiSelectScoreWindow(inputGuiviewState, b_resize=False, expand_factor=None):
     ''' a roiSelectFunc for use with applyTracker(); pass a *reference*
         to this function into that function 
     '''
@@ -190,9 +301,16 @@ def roiSelectScoreWindow(inputGuiviewState, b_resize=False):
     if b_resize:
         return inputGuiviewState.display.scoreFrame.copy()
     else:
+        
         score_rect = inputGuiviewState.display.scoreRect
+        
+        if expand_factor is not None:
+            score_rect = Display.zoomInRect( score_rect
+                                            ,zoomFct=expand_factor
+                                            ,b_zoomout=True)
+        
         return inputGuiviewState.getZoomWindow(inputRect=score_rect)
-    #TODO - use GuiviewState.getScoreWindow()?
+
 
 
 
@@ -1333,7 +1451,7 @@ def multiPlot(list_list_imgs
     '''
     
     w = len(list_list_imgs)
-    h = len(list_list_imgs[0])  
+    h = max(map(len, list_list_imgs))
     
     b_multiline = False
     if (h > 1) and (w > 1):
@@ -1350,20 +1468,32 @@ def multiPlot(list_list_imgs
     for h_i in range(h):
         for w_i in range(w):
             
-            plt.box(False)
+            
+            b_dummy=False
+            try:
+                if list_list_imgs[w_i][h_i] is None:
+                    b_dummy=True
+            except:
+                b_dummy=True
 
-            if list_list_imgs[w_i][h_i] is None:
-                continue
+            plt.box(False)
                 
-            _img = list_list_imgs[w_i][h_i]
-            _img = GuiviewState.cvtColor(_img.copy())
+            if not(b_dummy):
+                _img = list_list_imgs[w_i][h_i]
+                _img = GuiviewState.cvtColor(_img.copy())
             
             if b_multiline:
                 _ax = ax[h_i][w_i]
             else:
                 _ax = ax[(h_i * w_i) + w_i]
                 
-            _ax.imshow(_img)
+            try:
+                if b_dummy:
+                    _ax.imshow(np.array(np.zeros(shape=(10,10,3)), dtype='uint8'))
+                else:
+                    _ax.imshow(_img)
+            except:
+                _ax.imshow(np.array(np.zeros(shape=(10,10,3)), dtype='uint8'))
             
             if input_transform_titles is not None:
                 if ((not(b_multiline) or w_i == 0) or bForceTitles):
@@ -1379,6 +1509,7 @@ def multiPlot(list_list_imgs
                 _ax.axis('off')
 
     plt.show()
+
 
 
 def exploreImgs(listGS, figw = 20):

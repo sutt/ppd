@@ -1,25 +1,67 @@
 #Tasks
 
+2/11
+
+    commit1
+    [x] col_titles off by one
+    [x] so applyTracker.db listGS has no scoreRect? is has a scoreFrame,
+        the "n/a"-screen-of-black, but we'd need to manually crop it. -> Correct
+    [x] does tracker log have an img_terminal? if so, is it better?
+        -> algo_enum > 0 do, but not helpful
+    [x] how to handle comparing algos with different numbers of transform rows?
+        [x] can it at least work when we alter plot_data manually with a None
+            in the bottom rows of column1? -> Yes
+    [x] can you compare trackers, same algo_enum, diff parameters?
+    [x] get the expand_factor parameter into applyTracker without hard-coding
+    
+    
+    commit2
+    [ ] this still doesn't work as changing the track-log keys 
+        will not align the images correctly - fix
+            the tough functionality is aligning the keys in an interpolated order
+    [ ] we could also want to just have each algo show each of its plots
+        even if they don't align by name
+            e.g. b_blend_row_titles
+    [ ] tidy mutliPlot()
+    [ ] demo a col_titles with different params
+    [ ] more compareTrackers() tests
+
+    Down the line:
+    [ ] get pixels from a [sub-] image with roiSelect and plot them into colorCube:
+        why are we still not capturing them?
+    [ ] incorporate largestDiscrepancy and compareTrackers into CmpAlgoReport
+
+
 2/10
 
     [x] get a commit in
         [x] commit new test data first
 
     stuff to do:
-        consistent variable names
-        encapsulate the drawing on frame thing
-        allow drawing options
-        rename that row instead of img_t
-        remove applyTracker as a function
-        kwargs - score_Frame_expand_factor = 0.5 -> expand score frame 50%
+        x consistent variable names
+        x encapsulate the drawing on frame thing
+        ~ allow drawing options
+        x rename that row instead of img_t
+        ~ remove applyTracker as a function
+        x kwargs - score_Frame_expand_factor = 0.5 -> expand score frame 50%
+        x for fig_title, display the im/de-provement and amount
 
         thoughts
-            drawTrackers() / drawOperators use kwargs to thicken lines
+            x drawTrackers() / drawOperators use kwargs to thicken lines
+            need to pin-point which mask-pixel-block is the top contour
+                do this in jupyter
+            verify this works with frames w/o inputframe (drawOperators() has no effect)
+    
+    larger stuff:
+
+        orientation likely doesn't work throughout this pipeline, can it be made to?
+        tease it out...
+
 2/7
 
-    [ ] build an applyTracker2 to replicate function in eval-report-3 of comparing
+    [x] build an applyTracker2 to replicate function in eval-report-3 of comparing
         different algo perf of the same frame
-        [ ] need to expand the scoreFrame slightly 
+        [x] need to expand the scoreFrame slightly 
         [x] need thicker drawing lines
     
     [ ] Need to add TrackFactory to guiviewState set() which will allow us to
@@ -40,16 +82,16 @@
     
     Second Commit
     [ ] exploreImgs / other function to view scoreFrames
-    [ ] build showcase test-feedback report with frames-of-interest
-        [ ] how to draw onto scoreFrames / show masks
+    [x] build showcase test-feedback report with frames-of-interest
+        [x] how to draw onto scoreFrames / show masks
             see: demo-interproc-analysis-2: In[89]
             multiPlot / applyTracker
-    [ ] we might need to expand roiSelectScoreWindow in size to capture
+    [x] we might need to expand roiSelectScoreWindow in size to capture
         outside the frame scored regions
-    [ ] how to draw onto the scoreFrames with helper functions
+    [x] how to draw onto the scoreFrames with helper functions
 
     Other
-    [ ] debug flow for both:
+    [x] debug flow for both:
         --eval run
         trackFrame(b_log=True) run
 

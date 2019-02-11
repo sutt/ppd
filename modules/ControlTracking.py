@@ -435,8 +435,8 @@ class TrackFactory:
 
         if b_log:
             
-            keys = ['img_t','img_mask','img_mask_2','xy', 'radius', 'scoreCircle']
-            data = {}
+            keys = ['img_t','img_mask','img_repair','xy', 'radius', 'scoreCircle']
+            data = OrderedDict()
             for k in keys:
                 data[k] = None
 
@@ -444,7 +444,7 @@ class TrackFactory:
             data['img_mask'] = img_mask
             
             if img_mask is not None:
-                data['img_mask_2'] = img_mask_2
+                data['img_repair'] = img_mask_2
                 data['xy'] = (x,y)
                 data['radius'] = radius
                 data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
