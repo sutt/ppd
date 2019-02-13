@@ -1,5 +1,37 @@
 #Tasks
 
+2/12 - 2/13
+
+    [ ] subprocBathcOutput has progressBar?
+    
+    [x] make transform tile alignment work for added names in the middle:
+
+        [~] can we print row names for each col in multiPlot? -> unneeded
+            [x] if not, can we put the separate names on left axis? -> We'll do that
+                [x] can we use carriage returns in these fields? -> Yes
+
+        [~] how do we get insertion order from an orderedDict?
+        [~] how do we alter insertion order in an orderedDict?
+
+        [x] my method doesn't completely work b/c it can't account for new keys
+            after the first algo col -> fixed
+
+    [x] Testing Plan
+        [x] build compareTrackers_orange.db
+        [x] test img shape, should be full image
+        [x] test running multiPlot
+        [x] test kwargs col_titles
+        [x] test bMarkedFrame
+        [x] test roiSelectFunc
+        [x] test multiplot_params
+        [x] blend titles
+        [x] test expand_factor
+        [x] test img pixels
+
+    [ ] build a dummy tracker with expanded log
+        [ ] test middle insertion
+        [ ] test blend_rowtitles
+
 2/11
 
     commit1
@@ -16,15 +48,15 @@
     
     
     commit2
-    [ ] this still doesn't work as changing the track-log keys 
+    [x] this still doesn't work as changing the track-log keys 
         will not align the images correctly - fix
             the tough functionality is aligning the keys in an interpolated order
-    [ ] we could also want to just have each algo show each of its plots
+    [x] we could also want to just have each algo show each of its plots
         even if they don't align by name
             e.g. b_blend_row_titles
-    [ ] tidy mutliPlot()
+    [x] tidy mutliPlot()
     [ ] demo a col_titles with different params
-    [ ] more compareTrackers() tests
+    [x] more compareTrackers() tests
 
     Down the line:
     [ ] get pixels from a [sub-] image with roiSelect and plot them into colorCube:
@@ -66,8 +98,13 @@
     
     [ ] Need to add TrackFactory to guiviewState set() which will allow us to
         work with stateful Trackers, e.g. with a motion-diff step
+        
+        [ ] once we change GuiviewState definition (with more data-elements) can we
+            still load old outputStateDB's?
 
     [ ] maybe build some HTML() img display functions for Ipython
+        this would be nice for taking 'screenshots' of multiPlot and stacking
+        them horizontally in jupyter
 
 2/5
 

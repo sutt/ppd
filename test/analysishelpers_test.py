@@ -4,13 +4,14 @@ import time
 import cv2
 import pickle
 import pandas as pd
+from utils import ImgDiff
 if False: from cv2 import *
 from utils import diff_pd
 sys.path.append("../")
 from modules.AnalysisHelpers import ( multiPlot
                                      ,applyTracker
                                      ,roiSelectZoomWindow
-                                     ,roiSelectZoomWindow
+                                     ,roiSelectScoreWindow
                                      ,subprocEval
                                      ,compareTrackers
                                      )
@@ -177,6 +178,12 @@ def test_subprocEval_1():
 
 def test_compareTrackers_1():
     '''
+        functionality test for:
+             basic functionality
+             roiSelectWindow
+             bMarkedFrame
+             success calling multiPlot
+             multiplot_params
     '''
     
     # build listTrackers
@@ -184,11 +191,11 @@ def test_compareTrackers_1():
     for _algoenum in [0,1]:
         _tracker = TrackFactory(on=True)
         _tracker.setAlgoEnum(_algoenum)
-        _tracker.setInit(ballColor="green")
+        _tracker.setInit(ballColor="orange")
         listTrackers.append(_tracker)
     
     # build listGS
-    test_data = "compareTrackers_green.db"
+    test_data = "compareTrackers_orange.db"
     test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
     testDB = DBInterface(os.path.join(test_dir, test_data))
     listGS = [  pickle.loads(record[1])
@@ -201,13 +208,137 @@ def test_compareTrackers_1():
     print data_dict['row_titles']
     assert data_dict['row_titles'] == ['marked_frame', 'img_t', 'img_mask', 'img_repair', 'img_terminal']
     assert data_dict['col_titles'] == ['AlgoEnum=0', 'AlgoEnum=1']
+    assert data_dict['plot_data'][0][1].shape == (480,640,3)  # since roiSelectFunc=None
 
-    # TODO - test img shape, should be full image
-    # TODO - test kwargs col_titles
-    # TODO - test bMarkedFrame
-    # TODO - test roiSelectFunc
-    # TODO - test roiSelectParams
+    # run 1. without markedFrame at the top, 2. with selectRoiFunc
+    data_dict = compareTrackers(listGS, listTrackers
+                                ,roiSelectFunc=roiSelectScoreWindow
+                                ,bMarkedFrame=False
+                                ,test_stub=True)
+
+    assert data_dict['row_titles'] == ['img_t', 'img_mask', 'img_repair', 'img_terminal']
+    assert data_dict['plot_data'][0][1].shape != (480,640, 3)
+
+    # don't run with test_stub; thus sending data into multiPlot() to see 
+    # if any exceptions are thrown. use bSupressDisplay to prevent matplotlib output
+    # from popping-up during the tests
+    compareTrackers(listGS, listTrackers
+                    ,test_stub=False
+                    ,multiplot_params = {'figsize': (20,20), 'bSupressDisplay': True}
+                    )
+
+
+def test_compareTrackers_2():
+    '''
+        test functionality:
+            col_titles
+            expand_factor
+            blend_rowtitles
+            pixel-comparison
+    '''
+
+    # build listTrackers
+    listTrackers = []
+    for _algoenum in [0,1]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="orange")
+        listTrackers.append(_tracker)
+    
+    # build listGS
+    test_data = "compareTrackers_orange.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
+    listGS = [  pickle.loads(record[1])
+                for record in testDB.selectAll()]
+
+    # run two separate functions with different params, compare their output
+    
+    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+                                ,col_titles = ['my_col_1', 'my_col_2']
+                                ,test_stub=True)
+
+    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+                                ,expand_factor = 0.5
+                                ,blend_rowtitles = True
+                                ,test_stub=True)
+
+    # checks
+    assert data_dict_1['row_titles'] == ['marked_frame', 'img_t', 'img_mask', 'img_repair', 'img_terminal']
+    assert data_dict_2['row_titles'] == ['marked_frame\nmarked_frame', 'img_t\nimg_t', 'img_mask\nimg_mask', 'img_repair\nimg_repair', 'n/a\nimg_terminal']
+    
+    assert data_dict_1['col_titles'] == ['my_col_1', 'my_col_2']
+    assert data_dict_2['col_titles'] == ['AlgoEnum=0', 'AlgoEnum=1']
+
+    assert (data_dict_1['plot_dict']['img_t'][0].shape[0] < 
+            data_dict_2['plot_dict']['img_t'][0].shape[0])
+    
+    # pixel-wise comparison
+    DIFF_LOG_DIR = "../data/test/guiview/displayclass/log/"
+    diff = ImgDiff(log_path = DIFF_LOG_DIR)
+    
+    loaded_mf1 = cv2.imread(os.path.join(test_dir, 'benchmark_markedframe_1.png'))
+    loaded_mf2 = cv2.imread(os.path.join(test_dir, 'benchmark_markedframe_2.png'))
+
+    mf1 = data_dict_1['plot_dict']['marked_frame'][0]
+    mf2 = data_dict_2['plot_dict']['marked_frame'][0]
+
+    assert diff.diffImgs(mf1, loaded_mf1)
+    assert diff.diffImgs(mf2, loaded_mf2)
+
+
+def test_compareTrackers_orderDict_1():
+    ''' copy over the inner function to see if it works as advertised '''
+    
+    def updateOrderDict(order_dict, tmp_names):
+        ''' if there's a new key/row_title, add it at its current position 
+            and shift all higher values up one
+        '''
+        for _i, _name in enumerate(tmp_names):
+
+            if _name in order_dict.keys():
+                continue
+            else:
+                if _i == 0:
+                    new_i = 0
+                else:
+                    new_i = order_dict[tmp_names[_i-1]] + 1
+                for _item in order_dict.items():
+                    k, v = _item[0], _item[1]
+                    if v >= new_i:
+                        order_dict[k] = v + 1
+                order_dict[_name] = new_i
+        return order_dict
+
+    order_dict = {}
+
+    tmp_names = ['genesis', 'revelations']
+    order_dict = updateOrderDict(order_dict, tmp_names)
+
+    tmp_names = ['genesis', 'gospel']
+    order_dict = updateOrderDict(order_dict, tmp_names)
+
+    tmp_names = ['genesis', 'exodus']
+    order_dict = updateOrderDict(order_dict, tmp_names)
+
+    tmp_names = ['revelations', 'self-help', 'post-help']
+    order_dict = updateOrderDict(order_dict, tmp_names)
+
+    tmp_names = ['exodus', 'gospel']
+    order_dict = updateOrderDict(order_dict, tmp_names)
+
+    elems = order_dict.items()
+
+    # note - .items() doesn't neccesarily return in sorted order
+    # so, we compare each elem separately
+    assert ('genesis', 0) in elems
+    assert ('exodus', 1) in elems
+    assert ('gospel', 2) in elems
+    assert ('revelations', 3) in elems
+    assert ('self-help', 4) in elems
+    assert ('post-help', 5) in elems
 
 if __name__ == "__main__":
 
-    test_compareTrackers_1()
+    # test_compareTrackers_1()
+    test_compareTrackers_orderDict_1()

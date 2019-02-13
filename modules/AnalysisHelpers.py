@@ -184,6 +184,8 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
             roiSelectFunc   - (reference to a function) used to select the portion
                                 of the image that will be displayed
                                 if None, will return full image
+
+            bMarkedFrame    - (bool) add a top image showing circles for 
             
             kwargs          - formatting/configuration suggestions:
                 
@@ -195,42 +197,126 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
                                 to denote which algo method corresponds to that col
                                 e.g. ['repairIters=0', 'repairIters=1']
                 multiplot_params - (dict) {arg_name1: arg_val1, arg_name2: arg_val2, ...}
-                                     for passing into mutliPlot()
+                                   for passing into mutliPlot() e.g. {'figsize':(20,20)}
+                blend_rowtitles - (bool) don't align img frames by transform-name 
+                                        between algos, simply list them in the order 
+                                        they exist within their respective track_log
                 
         output:
             None; will simply display to calling jupyter notebook
 
-        TODO
-            [ ] this still doesn't work when the track_log names don't align well
-                e.g. if trackalgo=4 had img_mask_2 between img_mask and img_repair
-                then it would show up as a row label on the bottom
-                proposed solution: plot_dict = {name:data} ->
-                                     plot_mat (list of list) with keys aligned
     '''
     
-    
+    # get optional args which alter control flow of output
     expand_factor = kwargs.get('expand_factor')
     
-    # this carries optional arguments into applyTracker for use within
     roiSelectParams = {}
     if expand_factor is not None:
         roiSelectParams = {'expand_factor': expand_factor}
 
-    def uniqueAppend(new_elems, old_elems):
-        ''' for updating row_titles '''
-        for _elem in new_elems:
-            if _elem not in old_elems:
-                old_elems.append(_elem)
-        return copy.copy(old_elems)
+    b_blend_rowtitles = kwargs.get('blend_rowtitles', False)
+
+    # helper functions
+    def addOrAppend(d_data, key, val):
+        ''' if key is present, append val to list of that key;
+            otherwise, add the key and that val as a 1-elem list
+        '''
+        try:
+            if key in d_data.keys():
+                d_data[key].append(val)
+            else:
+                d_data[key] = [val]
+        except:
+            pass
+        return d_data
+
+    def addNonesForEmpties(d_data):
+        ''' add Nones where d_data.values (which are lists) but are empty 
+            in current position 
+        '''
+        width = max(map(lambda elem: len(elem), d_data.values()))
+        for _k in d_data.keys():
+            if len(d_data[_k]) < width:
+                if (len(d_data[_k]) == 1) and (width > 1):
+                    # if this is a new key prepend Nones for all
+                    # previous algos
+                    prev_value = copy.deepcopy(d_data[_k])[0]
+                    prepend = [None for _ in range(width - 1)]
+                    prepend.append(prev_value)
+                    d_data[_k] = prepend
+                else:
+                    # if this is an existing key without a value in this col
+                    # simply add a None to the next position
+                    d_data[_k].append(None)
+        return d_data
+
+    def updateOrderDict(order_dict, tmp_names):
+        ''' if there's a new key/row_title, add it at its current position 
+            and shift all higher values up one
+        '''
+        for _i, _name in enumerate(tmp_names):
+
+            if _name in order_dict.keys():
+                continue
+            else:
+                if _i == 0:
+                    new_i = 0
+                else:
+                    new_i = order_dict[tmp_names[_i-1]] + 1
+                for _item in order_dict.items():
+                    k, v = _item[0], _item[1]
+                    if v >= new_i:
+                        order_dict[k] = v + 1
+                order_dict[_name] = new_i
+        return order_dict
+
+    def getOrderSorted(order_dict):
+        ''' return the keys/titles in ASC order based on '''
+        items = order_dict.items()
+        items.sort(key = lambda elem: elem[1])
+        ret = [elem[0] for elem in items]
+        return ret
+
+    def transformListListRows(list_list_rows):
+        ''' convert to list of strings with each row_title 
+            carriage-separated for it's respective col
+        '''        
+        height = max(map(len, list_list_rows))
+        width = len(list_list_rows)
+        
+        ret = []
+
+        for _irow in range(height):
             
-    # top-of-the-loop
+            tmp = []
+            
+            for _icol in range(width):
+
+                try:
+                    tmp.append(list_list_rows[_icol][_irow])
+                except:
+                    tmp.append("n/a")
+
+            _rowtitle = '\n'.join(tmp)
+            
+            ret.append(_rowtitle)
+
+        return ret
+
+
+    # top-of-the-loop, loop over frames
     for _gs in listGS:
 
+        # reset all data for each frame
+        plot_dict = OrderedDict()
+        plot_order_dict = {}
         plot_data, col_titles, row_titles = [], [], []
+        algo_enums = []
+        row_titles_order = []
     
         for _tracker in listTrackers:
     
-            # return the tracker log 
+            # return a dict of information from the _tracker's tracker_log 
             data = applyTracker( [_gs]
                                 ,_tracker
                                 ,roiSelectFunc=roiSelectFunc
@@ -239,38 +325,76 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
 
             if bMarkedFrame:
 
-                # marked_frame - an additional img which shows track/score
-                #                drawn onto frame and has been resized
+                # an additional img which shows track/score drawn onto frame
                 
                 marked_frame = getAnnotatedScoreFrame(_gs, _tracker, expand_factor)
                 
-                tmp_data = []
-                tmp_data.append(marked_frame)
-                tmp_data.extend(copy.deepcopy(data['listPlts'][0]))
-                plot_data.append(tmp_data)
+                plot_dict = addOrAppend(plot_dict, 'marked_frame', marked_frame)
 
-            else:
-                plot_data.append(copy.deepcopy(data['listPlts'][0]))
+            # add all tracker_log images into dict; applyTracker() has already
+            # separted tracker_log into listPlts/listTransformTitles using
+            # the 'does this data element have a .shape property?' criterion
+            
+            tmp_plts = copy.deepcopy(data['listPlts'][0])
+            tmp_names = copy.copy(data['listTransformTitles'])
+            
+            for _i, _name in enumerate(tmp_names):
+                
+                _plt = tmp_plts[_i]
 
-            # set unqiue row_titles
-            tmp_row_titles = []
+                plot_dict = addOrAppend(plot_dict, _name, _plt)
+
+            plot_dict = addNonesForEmpties(plot_dict)
+
+            # remember the order of the plots
+            new_tmp_names = []
             if bMarkedFrame:
-                tmp_row_titles.append('marked_frame')
-            tmp_row_titles.extend(copy.copy(data['listTransformTitles']))
-            row_titles = uniqueAppend(tmp_row_titles, row_titles)
+                new_tmp_names.append('marked_frame')
+            new_tmp_names.extend(tmp_names)
+            if b_blend_rowtitles:
+                row_titles_order.append(new_tmp_names)
+            else:
+                for _i, _name in enumerate(new_tmp_names):
+                    
+                    plot_order_dict = updateOrderDict(plot_order_dict,
+                                                      copy.copy(new_tmp_names))
 
-            col_titles.append( 'AlgoEnum=' + str(_tracker.tp_trackAlgoEnum) )
+            # log the tracker enums for use as col_titles
+            algo_enums.append(_tracker.tp_trackAlgoEnum)
 
+        
+        # transform loop data into input data for multiPlot()
+        if b_blend_rowtitles:
+            ordered_rows = list(plot_dict.keys())
+        else:
+            ordered_rows = getOrderSorted(plot_order_dict)
+        
         fig_title = 'FrameCounter=' + str(_gs.frameCounter)
+
+        if b_blend_rowtitles:
+            row_titles = transformListListRows(row_titles_order)
+        else:
+            row_titles = ordered_rows 
 
         tmp_col_titles = kwargs.get('col_titles', None)
         if tmp_col_titles is not None:
             col_titles = tmp_col_titles
+        else:
+            col_titles = ['AlgoEnum=' + str(enum) for enum in algo_enums]
 
+        # transform plot_dict info into input data for multiPlot()
+        plot_data = []
+        for _icol, _vcol in enumerate(col_titles):
+            _tmp = []
+            for _srow in ordered_rows:
+                _tmp.append( plot_dict[_srow][_icol] )
+            plot_data.append(_tmp)
 
+        # return data for testing
         if kwargs.get('test_stub', False):
             ret = {
-                     'plot_data': plot_data
+                     'plot_dict':  plot_dict
+                    ,'plot_data':  plot_data
                     ,'col_titles': col_titles
                     ,'row_titles': row_titles
             }
@@ -1436,6 +1560,7 @@ def multiPlot(list_list_imgs
               ,wspace = 0.3
               ,bGrid = True          
               ,bForceTitles = False
+              ,bSupressDisplay = False
              ):
     '''
         output an N x M array of images
@@ -1448,6 +1573,9 @@ def multiPlot(list_list_imgs
                             use applyTracker()['listPlts'] for this.
             input_xxx: list of strings; labelling titles
             b_cvt_color: account for cv2 vs pyplot array style
+
+        TODO
+            [ ] this doesn't work well for single images; fix that
     '''
     
     w = len(list_list_imgs)
@@ -1469,32 +1597,40 @@ def multiPlot(list_list_imgs
         for w_i in range(w):
             
             
+            # b_dummy: True if this data object is not an image
+            # allows us to bypass exception-causing-operations ------
             b_dummy=False
+            
             try:
-                if list_list_imgs[w_i][h_i] is None:
-                    b_dummy=True
+                _img = list_list_imgs[w_i][h_i]
             except:
                 b_dummy=True
 
+            if _img is None:
+                b_dummy = True
+
+            dummy_img = np.array(np.zeros(shape=(10,10,3)), dtype='uint8')
+
             plt.box(False)
                 
-            if not(b_dummy):
-                _img = list_list_imgs[w_i][h_i]
-                _img = GuiviewState.cvtColor(_img.copy())
-            
+            # get axis and use it to display image / dummy-image -------
             if b_multiline:
                 _ax = ax[h_i][w_i]
             else:
                 _ax = ax[(h_i * w_i) + w_i]
                 
+            if not(b_dummy):
+                _img = GuiviewState.cvtColor(_img.copy())
+            
             try:
                 if b_dummy:
-                    _ax.imshow(np.array(np.zeros(shape=(10,10,3)), dtype='uint8'))
+                    _ax.imshow(dummy_img.copy())
                 else:
                     _ax.imshow(_img)
             except:
-                _ax.imshow(np.array(np.zeros(shape=(10,10,3)), dtype='uint8'))
+                _ax.imshow(dummy_img.copy())
             
+            # axis formatting -------------------------------------------
             if input_transform_titles is not None:
                 if ((not(b_multiline) or w_i == 0) or bForceTitles):
                     _ax.set_ylabel(input_transform_titles[h_i])
@@ -1508,7 +1644,8 @@ def multiPlot(list_list_imgs
                 _ax.tick_params(axis='y', colors=(0,0,0,0))
                 _ax.axis('off')
 
-    plt.show()
+    if not(bSupressDisplay):
+        plt.show()
 
 
 
