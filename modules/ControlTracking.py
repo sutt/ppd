@@ -4,6 +4,8 @@ from collections import OrderedDict
 
 import numpy as np
 import cv2
+if False:
+    from cv2 import *
 
 sys.path.append("../")
 from vidwriter import VidWriter
@@ -41,6 +43,8 @@ class TrackFactory:
         self.threshInitial = [ (0,0,0), (255,255,255) ]
 
         self.threshes = []
+
+        self.lastFrame = None
 
         self.declaredBallColor = ""
 
@@ -315,6 +319,8 @@ class TrackFactory:
 
         threshes = copy.copy(self.threshes)
 
+        last_frame = self.lastFrame
+
         if self.bTrackTimer:
             t0 = time.time()
 
@@ -349,6 +355,17 @@ class TrackFactory:
                         ,repair_iterations = repair_iterations
                         ,threshes = threshes
                         ,b_log = b_log
+                        # ,objEnum = 0
+            )
+
+        elif self.tp_trackAlgoEnum == 3:
+            
+            ret = self.trackDummyRichLog(
+                         tracking_blur = tracking_blur
+                        ,repair_iterations = repair_iterations
+                        ,threshes = threshes
+                        ,b_log = b_log
+                        ,last_frame = last_frame
                         # ,objEnum = 0
             )
         else:
@@ -598,6 +615,102 @@ class TrackFactory:
             
             if img_mask.sum() != 0:
                 data['img_terminal'] = img_terminal
+                data['xy'] = (x,y)
+                data['radius'] = radius
+                if repair_iterations > 0:
+                    data['img_repair'] = img_repair
+                if radius > 0:
+                    data['scoreCircle'] = self.currentTrackScore.getObjRect(0)
+            
+            return data
+
+
+    def trackDummyRichLog(self
+                    ,tracking_blur
+                    ,repair_iterations
+                    ,threshes
+                    ,last_frame
+                    ,b_log = False
+                    ):
+        '''
+            trackDummyRichLog:
+
+                copied from trackMultiThresh1; here we're just adding 
+                extra track_log keys like img_diff and img_diff_repair
+                to see how they'll impact reporting functions downstream.
+
+                this is the start though of looking at adding a movement
+                element to trackers and we're adding the last_frame input / 
+                self.lastFrame output.
+
+        '''
+
+        img_t = transformA(self.currentFrame.copy(), tracking_blur)
+        
+        img_mask = threshMultiOr(  img_t 
+                                  ,threshes = threshes
+                                ) 
+
+        # add new-lines in here:
+        if last_frame is not None and False:
+
+            img_diff = cv2.absdiff( self.currentFrame, last_frame)
+
+            if repair_iterations > 0:
+                img_diff_repair = repairA(img_diff, iterations = repair_iterations)
+
+        self.lastFrame = self.currentFrame.copy()
+        
+        if img_mask.sum() != 0:
+
+            if repair_iterations > 0:
+                img_repair = repairA(img_mask, iterations = repair_iterations)
+                img_terminal = img_repair
+            else:
+                img_terminal = img_mask
+
+            x,y = find_xy(img_terminal)
+            radius = find_radius(img_terminal)
+                    
+            if radius > 0:
+                
+                self.currentTrackSuccess = True
+
+                self.currentTrackScore.addCircle(
+                                            self.circleToRect((x,y,radius))
+                                            ,objEnum=0   
+                                        )
+            else:
+                self.currentTrackSuccess = False
+                self.currentTrackScore.reset()
+        
+        else:
+            self.currentTrackSuccess = False
+            self.currentTrackScore.reset()
+
+        if b_log:
+            
+            keys = ['img_t','img_mask','img_repair', 
+                    'img_dummy', 'img_dummy_2',
+                    'img_diff','img_diff_repair' 'img_terminal', 'img_terminal_2'
+                    'xy', 'radius', 'scoreCircle']
+            data = OrderedDict()
+            for k in keys:
+                data[k] = None
+
+            data['img_t'] = img_t
+            data['img_mask'] = img_mask
+
+            data['img_dummy'] = transformA(self.currentFrame.copy(), 11)
+            data['img_dummy_2'] = transformA(self.currentFrame.copy(), 5)
+
+            if last_frame is not None and False:
+                data['img_diff'] = img_diff
+                data['img_diff_repair'] = img_diff_repair
+            
+            if img_mask.sum() != 0:
+                data['img_terminal'] = img_terminal
+                data['img_terminal_2'] = img_terminal
                 data['xy'] = (x,y)
                 data['radius'] = radius
                 if repair_iterations > 0:

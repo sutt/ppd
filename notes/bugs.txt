@@ -28,9 +28,26 @@
         [x] test expand_factor
         [x] test img pixels
 
-    [ ] build a dummy tracker with expanded log
-        [ ] test middle insertion
-        [ ] test blend_rowtitles
+    [x] build a dummy tracker with expanded log
+        [x] test middle insertion
+        [x] test blend_rowtitles
+        [~] three columned
+
+    [x] build new dummy tracking-algo
+    
+        [x] we're just adding in some dummy vars for now
+
+        [ ] last_frame is getting set in the Tracker-obj during compareTracker
+            when running trackFrame() method, erroneously
+        
+        [ ] this isn't going to work until we:
+            1. add tracker to gs.set(), so we can access self.lastFrame
+            2. run that new gs through subprocBathcOutput / --eval
+                but how do we get make sure algo_enum=3 gets called and run?
+        
+        [ ] it would be nice to have the option to view these transformations in
+            guiview display screens, either main-frame or score-frame or another
+            pop-up-frame
 
 2/11
 
@@ -55,7 +72,7 @@
         even if they don't align by name
             e.g. b_blend_row_titles
     [x] tidy mutliPlot()
-    [ ] demo a col_titles with different params
+    [x] demo a col_titles with different params
     [x] more compareTrackers() tests
 
     Down the line:

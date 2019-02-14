@@ -205,6 +205,7 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
         output:
             None; will simply display to calling jupyter notebook
 
+
     '''
     
     # get optional args which alter control flow of output
@@ -351,13 +352,14 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
             if bMarkedFrame:
                 new_tmp_names.append('marked_frame')
             new_tmp_names.extend(tmp_names)
+            
             if b_blend_rowtitles:
                 row_titles_order.append(new_tmp_names)
-            else:
-                for _i, _name in enumerate(new_tmp_names):
-                    
-                    plot_order_dict = updateOrderDict(plot_order_dict,
-                                                      copy.copy(new_tmp_names))
+        
+            for _i, _name in enumerate(new_tmp_names):
+                
+                plot_order_dict = updateOrderDict(plot_order_dict,
+                                                    copy.copy(new_tmp_names))
 
             # log the tracker enums for use as col_titles
             algo_enums.append(_tracker.tp_trackAlgoEnum)
@@ -365,7 +367,8 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
         
         # transform loop data into input data for multiPlot()
         if b_blend_rowtitles:
-            ordered_rows = list(plot_dict.keys())
+            # ordered_rows = list(plot_dict.keys())
+            ordered_rows = getOrderSorted(plot_order_dict)
         else:
             ordered_rows = getOrderSorted(plot_order_dict)
         

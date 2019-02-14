@@ -286,7 +286,54 @@ def test_compareTrackers_2():
     assert diff.diffImgs(mf1, loaded_mf1)
     assert diff.diffImgs(mf2, loaded_mf2)
 
+def test_compareTrackers_3():
+    '''
+        test functionality:
+            aligning algo's with different num of diagnostic-plots
+    '''
 
+    # build listTrackers
+    listTrackers = []
+    for _algoenum in [2,3]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="orange")
+        listTrackers.append(_tracker)
+    
+    # build listGS
+    test_data = "compareTrackers_orange.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
+    listGS = [  pickle.loads(record[1])
+                for record in testDB.selectAll()]
+
+    # run two separate functions with different params, compare their output
+    
+    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+                                ,test_stub=True)
+
+    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+                                ,expand_factor = 0.5
+                                ,blend_rowtitles = True
+                                ,test_stub=True)
+
+    # checks
+    
+    assert data_dict_1['row_titles'] == ['marked_frame', 'img_t', 'img_mask', 'img_repair', 'img_dummy', 'img_dummy_2', 'img_terminal', 'img_terminal_2']
+    print data_dict_2['row_titles']
+    assert data_dict_2['row_titles'] == ['marked_frame\nmarked_frame', 'img_t\nimg_t', 'img_mask\nimg_mask', 'img_repair\nimg_repair','img_terminal\nimg_dummy', 'n/a\nimg_dummy_2', 'n/a\nimg_terminal', 'n/a\nimg_terminal_2']
+
+    assert sum(sum(sum(data_dict_1['plot_dict']['img_t'][0]))) > 0
+    assert data_dict_1['plot_dict']['img_dummy'][0] is None
+    assert sum(sum(sum(data_dict_1['plot_dict']['img_dummy'][1]))) > 0
+
+    assert data_dict_2['plot_dict']['img_dummy'][0] is None
+    assert sum(sum(sum(data_dict_2['plot_dict']['img_dummy'][1]))) > 0
+
+    assert data_dict_1['plot_data'][0][7] is None
+    # assert sum(sum(sum(data_dict_1['plot_data'][1][7]))) > 0
+
+    
 def test_compareTrackers_orderDict_1():
     ''' copy over the inner function to see if it works as advertised '''
     
@@ -341,4 +388,5 @@ def test_compareTrackers_orderDict_1():
 if __name__ == "__main__":
 
     # test_compareTrackers_1()
-    test_compareTrackers_orderDict_1()
+    # test_compareTrackers_orderDict_1()
+    test_compareTrackers_3()
