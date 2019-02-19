@@ -817,7 +817,8 @@ class DFHelper:
         _df = self.df.copy()
         _df = _df.T
         _valid_cols = _df.columns
-        _valid_cols = [row for row in metrics_requested if row in list(_valid_cols)]
+        if metrics_requested is not None:
+            _valid_cols = [row for row in metrics_requested if row in list(_valid_cols)]
         _df = _df[_valid_cols]
         return _df.T
 
@@ -957,6 +958,9 @@ class OutcomeData:
 
     def getEval(self):
         return self.evalData.copy()
+
+    def getScoreObjsList(self):
+        return copy.deepcopy(self.listScoreObjs)
     
     def load(self):
         ''' load data from db '''

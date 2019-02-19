@@ -144,6 +144,35 @@ def test_CmpAlgoReport_largestDiscrepancy_1():
     assert (cbco_improvement[:4].values == ANSWER.values).all()
     assert (cbco_improvement.columns == ANSWER.columns).all()
 
+def test_CmpAlgoReport_largestDiscrepancy_2():
+    ''' use custom metrics that call .distanceBetweenTracks() method'''
+    
+    test_path = '../data/test/evalsuite/largestDiscrepancy/'
+    input_benchmark = pd.read_pickle(test_path + 'outcome_0.pickle')
+    input_current = pd.read_pickle(test_path + 'outcome_2.pickle')
+
+    cmpA = CmpAlgoReport(b_testing=True)
+    cmpA.loadBenchmark(input_benchmark) 
+    cmpA.loadCurrent(input_current) 
+
+    dbt_improvement = cmpA.largestDiscrepancy(distanceBetweenTracks=1)
+    
+    bubt_improvement = cmpA.largestDiscrepancy(ballUnitsBetweenTracks=1)
+
+    ANSWER = [-304.6850833237492, -283.0194339616981, -20.615528128088304, -11.661903789690601, -10.295630140987, -9.433981132056603, -8.06225774829855, -6.324555320336759, -6.082762530298219, -5.385164807134504, -5.385164807134504, -5.0990195135927845, -5.0990195135927845, -5.0, -5.0, -5.0, -4.47213595499958, -4.47213595499958, -4.47213595499958, -4.242640687119285]
+    assert list(dbt_improvement) == ANSWER
+    assert list(dbt_improvement.index) == [244, 202, 206, 305, 306, 163, 303, 334, 34, 336, 33, 335, 330, 210, 81, 329, 219, 49, 295, 67]
+
+    ANSWER = [-283.0194339616981, -152.3425416618746, -10.307764064044152, -3.3333333333333335, -3.331972511340172, -2.9814239699997196, -2.57390753524675, -2.096440251568134, -1.4658650451451907, -1.0301575072754254, -0.9428090415820635, -0.9428090415820635, -0.9428090415820635, -0.9035079029052513, -0.894427190999916, -0.8081220356417687, -0.8, -0.7905694150420949, -0.75, -0.7453559924999299]
+    assert list(bubt_improvement) == ANSWER
+    assert list(bubt_improvement.index) == [202, 244, 206, 210, 305, 219, 306, 163, 303, 192, 191, 199, 215, 304, 295, 220, 251, 214, 212, 200]
+
+    # make sure plot method is callable
+    try:
+        cmpA.plotTrackDistance()
+    except:
+        assert False
+
 
 if __name__ == "__main__":
     test_CmpAlgoReport_largestDiscrepancy_1()

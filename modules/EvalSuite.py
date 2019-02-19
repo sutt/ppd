@@ -166,11 +166,14 @@ class CmpAlgoReport:
     
     def __init__(   self, 
                     benchmark_outcome_data=None,
-                    current_outcome_data=None
+                    current_outcome_data=None,
+                    b_testing=False
                     ):
         
         self.benchmark  = EvalSuite()
         self.current    = EvalSuite()
+        
+        self.b_testing = b_testing     #suppress pyplot.show()
 
         # comparison tables
         self.all_changes_df = None
@@ -432,7 +435,150 @@ class CmpAlgoReport:
             print e
         return df
 
-    
+    @staticmethod
+    def distanceBetweenTracks(outcome_df_1, outcome_df_2
+                             ,eval_dfh_1=None, eval_dfh_2=None):
+        '''
+            compare the distance b/w each algo's track-score at each frame
+
+            input: 
+                outcome_df_1 (df of class OutcomeData)  self.current.outcomeModel
+                outcome_df_2 (df of class OutcomeData)  self.benchmark.outcomeModel
+                eval_dfh_1   (df of class DFHelper)  self.current.evalDfh
+                eval_dfh_2   (df of class DFHelper)  self.benchmark.evalDfh
+        output:
+            dict of list(s):  all elements are floats or Nones
+                distanceList - distances (as negative) 
+                radiusList   - avg-radius (as postives)  [optional]
+                ballsAwayList - distance/radius (as negative) [optional]
+        '''
+
+        # validation + build loop-data
+        assert outcome_df_1.__class__.__name__ == 'OutcomeData' 
+        assert outcome_df_2.__class__.__name__ == 'OutcomeData'
+
+        assert len(outcome_df_1.outcomeData) == len(outcome_df_1.outcomeData)
+
+        try:
+            assert outcome_df_1
+        except:
+            outcome_df_1.buildScoreSchemaList()
+            outcome_df_2.buildScoreSchemaList()
+
+        obj_list_1 = outcome_df_1.getScoreObjsList()
+        obj_list_2 = outcome_df_2.getScoreObjsList()
+
+        assert len(obj_list_1) == len(obj_list_2)
+        
+        # loop over all records, build distanceList    
+        distanceList = []
+        ev = EvalTracker()
+
+        for _obj1, _obj2 in zip(obj_list_1, obj_list_2):
+
+            track_score_1 = _obj1['track']
+            track_score_2 = _obj2['track']
+        
+            ev.setBaselineScore(track_score_1)
+            dist = ev.distanceFromBaseline(track_score_2)
+
+            distanceList.append(dist)
+
+        # build ballUnitsAway calculated field
+        b_ballunits = False
+        if (eval_dfh_1 is not None) and (eval_dfh_2 is not None):
+
+            # validation
+            assert eval_dfh_1.__class__.__name__ == 'DFHelper'
+            assert eval_dfh_2.__class__.__name__ == 'DFHelper'
+            
+            b_ballunits = True
+
+            radiusList = []
+            ballsAwayList = []
+            
+            radius1 = eval_dfh_1.df['propTrackRadius']
+            radius2 = eval_dfh_2.df['propTrackRadius']
+
+            for _rad1, _rad2, _dist in zip(radius1, radius2, distanceList):
+
+                _n = 2 - (int(math.isnan(_rad1)) + int(math.isnan(_rad2)))
+
+                _summed = _rad1 + _rad2
+
+                if _n == 0:
+                    _avgradius = None
+                else:
+                    _avgradius = float(_summed) / float(_n)
+
+                radiusList.append(_avgradius)
+
+                if (_avgradius is not None) and (_dist is not None):
+                    if not(math.isnan(_avgradius)) and not(math.isnan(_dist)):
+                        
+                        _ballsAway = float(_dist) / float(_avgradius)
+                    else:
+                        _ballsAway = None
+                else:
+                    _ballsAway = None
+
+                ballsAwayList.append(_ballsAway)
+        
+        return_dict = {}
+        
+        return_dict['distanceList'] = distanceList
+        
+        if b_ballunits:
+            return_dict['radiusList'] = radiusList
+            return_dict['ballsAwayList'] = ballsAwayList
+        
+        return return_dict
+
+    def plotTrackDistance(self, epsilon_offset = 3):
+        '''
+            plot two line graphs of trackRadius (Y) from current and benchmark algo
+            across each frame-index (X)
+
+                epsilon_offset: add this to one of the series so that the 
+                                   lines don't overlay/occlude each other.
+
+        '''
+
+        series_dict = self.distanceBetweenTracks(
+                                         self.current.outcomeModel
+                                        ,self.benchmark.outcomeModel
+                                        ,self.current.evalDfh
+                                        ,self.benchmark.evalDfh
+                                                 )
+        
+        def negOrNone(x):
+            if x is None: 
+                return None
+            else:
+                return -x
+        
+        series_pixel = [negOrNone(x) for x in series_dict['distanceList']]
+        series_ballunits = [negOrNone(x) for x in series_dict['ballsAwayList']]
+        
+        fig, ax1 = plt.subplots()
+        ax1.plot(series_pixel, color='b')
+        ax1.set_ylabel('pixel distance')
+        ax2 = ax1.twinx()
+        ax2.plot(series_ballunits, color='r')
+        ax2.set_ylabel('ball units')
+
+        #TODO - finish formatting / dynamic elements
+        # data = zip(series_pixel, series_ballunits)
+        # plt.plot(series_pixel)
+        # plt.legend(['pixel distance'])
+        # plt.title('Compare Distance b/w Tracks')
+        # plt.ylim(-1,20)
+        ax1.set_ylim([0,20])
+        ax2.set_ylim([0,6])
+        if not(self.b_testing):
+            plt.show()
+
+
     def plotTrackRadius(self, epsilon_offset = 3):
         '''
             plot two line graphs of trackRadius (Y) from current and benchmark algo
@@ -454,7 +600,8 @@ class CmpAlgoReport:
         plt.plot(data)
         plt.legend(['current + ' + str(epsilon_offset),'benchmark'])
         plt.title('Compare Track Radius')
-        plt.show()
+        if not(self.b_testing):
+            plt.show()
 
     
     def largestDiscrepancy(self, max_n = 20, **kwargs):
@@ -485,20 +632,40 @@ class CmpAlgoReport:
 
         # custom metrics; don't exist within diff_eval_table_input
         # build these metrics into the diff_eval_table_input
+        # they don't have a current+benchmark headers in their return table
         
-        custom_metric = kwargs.get('distanceCurrentToBenchmark', None)
+        custom_metrics = ['distanceBetweenTracks', 'ballUnitsBetweenTracks']
+        
+        custom_metric = None
+        for _cm in custom_metrics:
+            if _cm in kwargs.keys():
+                custom_metric = _cm
+                break
+
         if custom_metric is not None:
-            pass
-
-            #NOT IMPLEMENTED
-            # custom_metric
-            # need to build this calculation
-            # but we can't even build this without outcome data,
-            # this needs to happen in EvalTracker, not here
-            # but actually we do have outcomeModel, no?
-            # self.diff_eval_table_input['distanceCurrentToBenchmark'] = 1 
-
         
+            series_dict = self.distanceBetweenTracks(
+                                         self.current.outcomeModel
+                                        ,self.benchmark.outcomeModel
+                                        ,self.current.evalDfh
+                                        ,self.benchmark.evalDfh
+                                                 )
+
+            if custom_metric == 'distanceBetweenTracks':
+                series_key = 'distanceList'
+            if custom_metric == 'ballUnitsBetweenTracks':
+                series_key = 'ballsAwayList'
+
+            custom_series = pd.Series(series_dict[series_key])
+
+            return_series = custom_series.sort_values(ascending=True)
+
+            if max_n is not None:
+                return_series = return_series[:max_n]
+
+            return return_series
+
+
         # standard metrics - exist within diff_eval_table
 
         ev = EvalTracker()
@@ -615,6 +782,8 @@ class CmpAlgoReport:
                 )
 
         self.plotTrackRadius()
+
+        self.plotTrackDistance()
 
         #TODO - add largest discrepancy (by some metric)
 

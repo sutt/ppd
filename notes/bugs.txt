@@ -1,5 +1,115 @@
 #Tasks
 
+2/19
+
+    Cleanup and commit prior work
+    [ ] Commit1 - CompareDistanceBetweenTracks
+        [x] write a test
+        [~] write a non-static method to call it?
+        [x] testing feature for CmpAlgo class to silently build plots
+    [ ] Commit2 - new report
+        [ ] verify it works as expected
+
+    [ ] Get test data up
+
+    TODOs
+    [ ] plotTrackDistance() is unfinished on formatting, etc.
+
+    Questions/Notes:
+        [ ] test_CmpAlgoReport_largestDiscrepancy_2(), why is ballUnits[0]
+            at 283? is radius less than 1? the fook?
+
+
+
+2/18
+
+    Adding misc-notes to ppd repo
+
+    accel data is in data/usr/nov_calib_1/ output1-6ish
+
+2/17
+
+    List of the current major-architectural-problems in the workspace:
+        - frame-orientation doesn't flow thru
+        - obj_enum isn't avaialble for all reporting/eval/comparison features
+        - ScoreSchema / rect<->circle is changing thru repetivie transforms:
+            e.g. top-left coord is changing + radius is changing 300 -> 302 etc..
+
+
+2/16
+
+    [ ] why is compareTrackers so brittle? and breaking in my new notebook
+        - did we forget to initDisplay on gs's?
+            -> roiSelectScoreWindow applies initDisplay()
+        - do we have to run subprocBathcOutput with tracking turned on or something?
+        - why do these gs's not have a scoreRect?
+        - can we debug?
+        [x] check that the gallery notebook can be run-thru
+        - AnalysisHelpers.roiSelectScoreWindow() relies on scoreFrame / scoreRect
+            so if these are None, we can't do anything
+        - Ahh, so previously we were only adding 'inputframes' to listGS, as in those
+            with a input_score, thus they naturally had a scoreRect, now we need to
+            specify the scoreRect from track_score
+        Recipe:
+            [x] applyTracker() gets None for roiSelectFunc
+            [x] post aT()-return, crop the images
+            [ ] how do you handle no-track_score/track_Score=[0,0,0,0]?
+            [x] why is MarkedFrame not working? -> no scoreRect prop
+        TODOs
+            [x] add roi to column headers
+            [x] match expansion factor between getAnnotatedScoreFrame and crop_rect
+                the 10% vs 30% expansion
+            [ ] bFirstTrackerRoi - shared roi for all trackers
+            [ ] handle out-of-frame crop_rects
+
+
+    [ ] explain how you have to fiddle with expand_factor
+
+2/14 - 2/15
+
+    Cleanups1
+    [ ] Need to add TrackFactory to guiviewState set() which will allow us to
+        work with stateful Trackers, e.g. with a motion-diff step
+        
+        [ ] once we change GuiviewState definition (with more data-elements) can we
+            still load old outputStateDB's?
+
+    [ ] incorporate largestDiscrepancy and compareTrackers into CmpAlgoReport
+        [ ] looks like we need vid_fn available in OutcomeData input arguments
+            to CmpAlgoReport to add to subprocBatchOutput
+            -> this should be a separate table in the db: video_metadata
+            [ ] need to add sorting listGS by the order of FOI
+            [ ] we can overcome this currently by adding a vid_fn arg to largestD()
+
+    [ ] lastFrame progress
+
+    [ ] blend_rowtitles is still wrong as seen in compare-tracker-gallery-1
+
+    [x] add subprocBathcOutput progressBar
+
+    Cleanups2
+    [ ] distance function in CmpAlgo.largestDiscr
+    [ ] tests:
+        [ ] Nones -> nans
+        [x] largestDiscrepancy
+    [ ] calcs: interpolate radius, locality
+    [ ] filtered_agg from the calcs
+    [ ] add test data in commit
+
+    [ ] distance function b/w two trackers:
+        - this can only work for CmpAlgoReport b/c it's the only one with
+        two Trackscores
+        - this should be easy enough use: 
+        EvalTracker.setBaseline(track_score_1)
+        dist = EvalTracker.distanceFromBaseline(track_score_2)
+        - add a "ballUnitsAway" calculated field too
+        [x] add to report
+        [ ] add ballunits series
+        [ ] add to largestDiscrepancy
+        [ ] need to test videos with missing tracks
+
+
+
 2/12 - 2/13
 
     [ ] subprocBathcOutput has progressBar?
