@@ -982,6 +982,26 @@ class Display:
 
         return rect
 
+    @staticmethod
+    def zoomInRect2(rect, zoomFct = 0.1, b_zoomout=False):
+
+        # zoomFct = 0.1
+        c = 1
+        
+        if b_zoomout: 
+            c = -1
+
+        deltaW, deltaH = zoomFct * rect[2], zoomFct * rect[3]
+
+        rect = (
+                 int(round(rect[0] + (deltaW * c)))
+                ,int(round(rect[1] + (deltaH * c)))
+                ,int(round(rect[2] - 2*(deltaW * c)))
+                ,int(round(rect[3] - 2*(deltaH * c)))
+               )
+
+        return rect
+
     
     def adjOrientationRect(self, rect, (imgH, imgW)):
         ''' adjusting bounding box from selectROI into original images orientation '''

@@ -3,21 +3,51 @@
 2/19
 
     Cleanup and commit prior work
-    [ ] Commit1 - CompareDistanceBetweenTracks
+    [x] Commit1 - CompareDistanceBetweenTracks
         [x] write a test
         [~] write a non-static method to call it?
         [x] testing feature for CmpAlgo class to silently build plots
-    [ ] Commit2 - new report
-        [ ] verify it works as expected
+    [x] Commit2 - new report
+        [x] verify it works as expected
+        [x] Additional stuff needed:
+            [x] bFirstTrackerRoi for roi in compareTrackers()
+                [x] diagnostic plots are out of alignments
+            [x] add tests for this
+            [x] eliminate print statement
+            [x] Add these to plot-gallery book
+            [x] Correct plot gallery calls
+            [x] blend_rowttitles
+        [ ] Get test data up
+        [x] the rest of the code-diffs
 
-    [ ] Get test data up
+    [ ] Commit3 - get 
+        [ ] add compareTrackers() to largestDiff()
+            [ ] need rearrange foi's func
+        [ ] plotTrackDistance() is unfinished on formatting, etc.
+        [ ] we  don't want to be doing batchStateOutput each turn, instead just load from a pre-built db
+
+    [ ] Commit4 - notes on hardware
+
+    notes on cT problems:
+        [x] what happens if we go back to inputframes with an input_score?
+            initial_expand_factor = 0.1 [line397[ would not be correct?
+            ->marked_frame is no longer lining up with roi is input_score based
+        [x] why is expand_factor not working on testGS[0] frame
+            in largest-discrepancy-1.ipynb In[50]
+            
+        [ ] display.buildScoreFrame()has scoreRect getting converted main->orig
+            but we don't want that do we?
+                -> test a 1080 video on this     
 
     TODOs
-    [ ] plotTrackDistance() is unfinished on formatting, etc.
 
     Questions/Notes:
         [ ] test_CmpAlgoReport_largestDiscrepancy_2(), why is ballUnits[0]
             at 283? is radius less than 1? the fook?
+        [ ] err-msg when running CmpAlgo methods: 
+            ("Unknown format code 'f' for object of type 'str'", u'occurred at index (current, checkBaselineInsideTrack)')
+        [ ] the auto-focus on the logitcech is a YUGE problem; easy-fix?
+            - can we set the focus depth we want?
 
 
 

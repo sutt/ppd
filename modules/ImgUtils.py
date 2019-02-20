@@ -26,8 +26,10 @@ def px_remove_crop(img, crop_params ):
 def crop_img(img, current_tracking_frame):
     x0,y0 = current_tracking_frame[0][0], current_tracking_frame[0][1]
     x1,y1 = current_tracking_frame[1][0], current_tracking_frame[1][1]
-    return img[y0:y1,x0:x1,:]    
-
+    if (img.shape) == 3:
+        return img[y0:y1,x0:x1,:]    
+    else:
+        return img[y0:y1,x0:x1]    
 
 def circle_xcoords(radius):
     ''' returns list of length radius, with each x coord on the unit circle line'''    

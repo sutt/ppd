@@ -15,6 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
+from ImgUtils import crop_img
 
 '''
     functions to use in jupyter notebooks to debug different
@@ -120,16 +121,24 @@ def applyTracker(listGS, tracker, roiSelectFunc = None,
 
 
 
-def getAnnotatedScoreFrame(gs, tracker, expand_factor=None):
+def getAnnotatedScoreFrame(gs, tracker, score_rect=None, expand_factor=None):
     '''
-        return an annotated image from the gs-obj and tracker-obj
+        return an annotated image from the gs-obj and tracker-obj; for use as
+        'MarkedFrame' in compareTrackers(). Uses the same pattern as guiview
+        for utilizing the Display class to draw/annotate onto an img/img-roi.
+        
         input: gs-obj, tracker-obj
+        return img (np.array of dims (h,w,num_color_channels))
 
         why/how we do it:
 
             step1
             perfrom a trackFrame() to get the track_score for annotation
             the data for input_score should already exist in gs-obj if it exists
+
+            step1a
+            if we enter a score_rect, we want to override the [possible] exisiting
+            scoreRect within the gs-obj
 
             step2
             if we need to expand the marked_frame field of view use expand_factor
@@ -151,15 +160,23 @@ def getAnnotatedScoreFrame(gs, tracker, expand_factor=None):
     tracker.setFrame(gs.getOrigFrame())
     tracker.trackFrame()
     track_score = tracker.getTrackScore()
+
+    # step1a
+    if score_rect is None:
+        scoreRect = gs.display.scoreRect
+    else:
+        scoreRect = score_rect
     
     # step2
     if expand_factor is not None:
 
-        gs.display.scoreRect = Display.zoomInRect( gs.display.scoreRect
-                                                ,zoomFct=expand_factor
-                                                ,b_zoomout=True)
-        
-        gs.display.scoreFrame = gs.display.buildScoreFrame()
+        scoreRect = Display.zoomInRect( scoreRect
+                                        ,zoomFct=expand_factor
+                                        ,b_zoomout=True)
+    
+    gs.display.scoreRect = scoreRect    
+    gs.display.scoreFrame = gs.display.buildScoreFrame()
+
     
     # step3
     gs.display.setTrack(trackScore = track_score)
@@ -169,8 +186,8 @@ def getAnnotatedScoreFrame(gs, tracker, expand_factor=None):
     return gs.display.scoreFrame.copy()
 
 
-def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
-                    ,**kwargs):
+def compareTrackers(listGS, listTrackers, roiSelectFunc=False, bMarkedFrame=True
+                    ,bTrackScore=False, bFirstTrackerRoi=False, **kwargs):
     '''
         plot side-by-side results of different trackers on frame(s)
         
@@ -181,11 +198,19 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
             listTrackers    - (list of TrackFactory-objs), already initialized
                                 and configured.
             
-            roiSelectFunc   - (reference to a function) used to select the portion
-                                of the image that will be displayed
-                                if None, will return full image
+            roiSelectFunc   - (bool) if True, select the window-roi around the 
+                                input_score or track_score. bTrackScore and 
+                                expand_factor will further affect this window
 
-            bMarkedFrame    - (bool) add a top image showing circles for 
+            bMarkedFrame    - (bool) add a top image showing circles for input_score
+                                and track_score
+
+            bTrackScore     - (bool) use the track_score (instead of input_score when
+                                available) to provide coords for window-roi
+
+            bFirstTrackerRoi- (bool) if True, use the window-roi from the first tracker
+                                 for all the other trackers in  the list.
+                                 recommended to use in conjunction with bTrackScore=True
             
             kwargs          - formatting/configuration suggestions:
                 
@@ -231,14 +256,14 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
             pass
         return d_data
 
-    def addNonesForEmpties(d_data):
+    def addNonesForEmpties(d_data, s_keys):
         ''' add Nones where d_data.values (which are lists) but are empty 
             in current position 
         '''
         width = max(map(lambda elem: len(elem), d_data.values()))
         for _k in d_data.keys():
             if len(d_data[_k]) < width:
-                if (len(d_data[_k]) == 1) and (width > 1):
+                if _k in s_keys:
                     # if this is a new key prepend Nones for all
                     # previous algos
                     prev_value = copy.deepcopy(d_data[_k])[0]
@@ -311,41 +336,94 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
         # reset all data for each frame
         plot_dict = OrderedDict()
         plot_order_dict = {}
-        plot_data, col_titles, row_titles = [], [], []
+        col_titles, row_titles = [], []
         algo_enums = []
         row_titles_order = []
+        cropped_rects = []
     
-        for _tracker in listTrackers:
+        for _itracker, _tracker in enumerate(listTrackers):
     
             # return a dict of information from the _tracker's tracker_log 
             data = applyTracker( [_gs]
                                 ,_tracker
-                                ,roiSelectFunc=roiSelectFunc
-                                ,roiSelectParams=roiSelectParams
+                                ,roiSelectFunc=None
                                 )
 
-            if bMarkedFrame:
+            tmp_plts = copy.deepcopy(data['listPlts'][0])
+            tmp_names = copy.copy(data['listTransformTitles'])
+            tmp_score = data['listScore'][0]
 
-                # an additional img which shows track/score drawn onto frame
+            # set plot_crop_rect for future cropping of roi
+            obj_enum = 0
+
+            if not(bFirstTrackerRoi) or (_itracker==0):
+            
+                # which data source is used to build roi
+                b_input_score = (_gs.displayInputScore is not None)
                 
-                marked_frame = getAnnotatedScoreFrame(_gs, _tracker, expand_factor)
+                if b_input_score:
+                    plot_crop_rect = _gs.displayInputScore[str(obj_enum)]['data']
+                
+                if bTrackScore or not(b_input_score):
+                    plot_crop_rect = tmp_score[str(obj_enum)]['data']
+
+                # now expand the rect as needed
+                initial_expand_factor = 0.1  # match Display.alterFrame behavior
+                input_expand_factor = (expand_factor 
+                                        if expand_factor is not None else 0.0)
+                total_expand_factor = initial_expand_factor + input_expand_factor
+                
+                plot_crop_rect = Display.zoomInRect2(  copy.copy(plot_crop_rect)
+                                                ,zoomFct=total_expand_factor
+                                                ,b_zoomout=True)
+
+            # an additional img which shows track/score drawn onto frame
+            if bMarkedFrame:
+                
+                marked_frame = getAnnotatedScoreFrame(  
+                                             _gs
+                                            ,_tracker
+                                            ,score_rect=copy.copy(plot_crop_rect)
+                                            ,expand_factor=None
+                                            )
                 
                 plot_dict = addOrAppend(plot_dict, 'marked_frame', marked_frame)
+            
+            
+            #crop diagnostic-plots here; crop based on track_score or input_score
+            cropped_plts = []
+            for _i, _plt in enumerate(tmp_plts):
+
+                if not(roiSelectFunc):
+                    cropped_plts.append(_plt)
+
+                else:
+                    try:
+                        
+                        
+                        
+                        crop_plt = crop_img(_plt, Display.absRect(plot_crop_rect))
+                        
+                        cropped_plts.append(crop_plt)
+                        
+                        if _i == 0:    
+                            cropped_rects.append(str(plot_crop_rect))
+                    
+                    except:
+                        cropped_plts.append(_plt)
+                        if _i == 0:
+                            cropped_rects.append('no_crop')
 
             # add all tracker_log images into dict; applyTracker() has already
             # separted tracker_log into listPlts/listTransformTitles using
             # the 'does this data element have a .shape property?' criterion
-            
-            tmp_plts = copy.deepcopy(data['listPlts'][0])
-            tmp_names = copy.copy(data['listTransformTitles'])
-            
             for _i, _name in enumerate(tmp_names):
                 
-                _plt = tmp_plts[_i]
+                _plt = cropped_plts[_i]
 
                 plot_dict = addOrAppend(plot_dict, _name, _plt)
 
-            plot_dict = addNonesForEmpties(plot_dict)
+            plot_dict = addNonesForEmpties(plot_dict, tmp_names)
 
             # remember the order of the plots
             new_tmp_names = []
@@ -356,10 +434,10 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
             if b_blend_rowtitles:
                 row_titles_order.append(new_tmp_names)
         
-            for _i, _name in enumerate(new_tmp_names):
-                
-                plot_order_dict = updateOrderDict(plot_order_dict,
-                                                    copy.copy(new_tmp_names))
+            # for _i, _name in enumerate(new_tmp_names):
+            plot_order_dict = updateOrderDict(  plot_order_dict,
+                                                copy.copy(new_tmp_names)
+                                            )
 
             # log the tracker enums for use as col_titles
             algo_enums.append(_tracker.tp_trackAlgoEnum)
@@ -385,12 +463,20 @@ def compareTrackers(listGS, listTrackers, roiSelectFunc=None, bMarkedFrame=True
         else:
             col_titles = ['AlgoEnum=' + str(enum) for enum in algo_enums]
 
+        if bTrackScore or bFirstTrackerRoi:
+            col_titles = [a + '\n' + b for a,b in zip(col_titles, cropped_rects)]
+
         # transform plot_dict info into input data for multiPlot()
         plot_data = []
         for _icol, _vcol in enumerate(col_titles):
             _tmp = []
-            for _srow in ordered_rows:
-                _tmp.append( plot_dict[_srow][_icol] )
+            
+            if b_blend_rowtitles:
+                for _srow in row_titles_order[_icol]:
+                    _tmp.append( plot_dict[_srow][_icol] )
+            else:
+                for _srow in ordered_rows:
+                    _tmp.append( plot_dict[_srow][_icol] )
             plot_data.append(_tmp)
 
         # return data for testing
@@ -425,6 +511,7 @@ def roiSelectScoreWindow(inputGuiviewState, b_resize=False, expand_factor=None):
         to this function into that function 
     '''
     inputGuiviewState.initDisplay()
+    
     if b_resize:
         return inputGuiviewState.display.scoreFrame.copy()
     else:
@@ -436,7 +523,11 @@ def roiSelectScoreWindow(inputGuiviewState, b_resize=False, expand_factor=None):
                                             ,zoomFct=expand_factor
                                             ,b_zoomout=True)
         
-        return inputGuiviewState.getZoomWindow(inputRect=score_rect)
+        try:
+            img = inputGuiviewState.getZoomWindow(inputRect=score_rect)
+            return img
+        except:
+            return None
 
 
 
@@ -819,10 +910,37 @@ def argsFromCmd(strCmd):
 def listToCommas(list_input):
     return ",".join(map(str, list_input))
 
+
+def pollAndRead(proc, outLog, timeout=30):
+
+    out_counter = 0
+    sleep_interval = 0.001
+
+    for _ in range(int( float(timeout) / float(sleep_interval) ) ):
+
+        if proc.poll() is None:
+
+            outLog.seek(out_counter)
+            
+            ret = outLog.read()
+
+            if ret != '':
+                out_counter += len(str(ret))
+                sys.stdout.write(str(ret))
+            
+            time.sleep(sleep_interval)
+            
+        else:
+            return
+    
+    print 'subproc timed out after %s seconds' % str(timeout)
+
+
 def subprocBatchOutput(  f_pathfn
                         ,batch_enum = None
                         ,batch_list = None
                         ,db_pathfn = "data/usr/batch_tmp.db"
+                        ,b_log = True
                         ):
     '''
         get a batch of guiview-state outputs based on defined criteria.
@@ -835,6 +953,7 @@ def subprocBatchOutput(  f_pathfn
                 db_pathfn   - (str) path and fn for db for interproc-comm
                                     path is relative ppd/ root not calling 
                                     function
+                b_log       - (bool) output the messages from stdout
     '''
 
     # validate
@@ -860,14 +979,21 @@ def subprocBatchOutput(  f_pathfn
                                         ,db_pathfn
                                         )
     args = argsFromCmd(cmd)
+
+    #progressbar
+    outLog = tempfile.SpooledTemporaryFile() if b_log else subprocess.PIPE
     
     # call subproc
     proc =  subprocess.Popen(    args
                                 ,stderr = subprocess.PIPE
-                                ,stdout = subprocess.PIPE
+                                ,stdout = outLog
                                 ,cwd = "../"
                                 )
-    ret = proc.wait()
+    # for progressbar
+    if b_log:
+        pollAndRead(proc, outLog)
+    else:
+        ret = proc.wait()
 
     # load from db - assume we're calling from ppd/books/
     db = DBInterface("../" + db_pathfn)     
@@ -875,29 +1001,6 @@ def subprocBatchOutput(  f_pathfn
 
     return listGS
 
-def pollAndRead(proc, outLog, timeout=30):
-
-    out_counter = 0
-    sleep_interval = 0.001
-
-    for _ in range(int( float(timeout) / float(sleep_interval) ) ):
-
-        if proc.poll() is None:
-
-            outLog.seek(out_counter)
-            
-            ret = outLog.read()
-
-            if ret != '':
-                out_counter += len(str(ret))
-                sys.stdout.write(str(ret))
-            
-            time.sleep(sleep_interval)
-            
-        else:
-            return
-    
-    print 'subproc timed out after %s seconds' % str(timeout)
 
 def subprocEval( f_pathfn
                 ,algo_enum = 0

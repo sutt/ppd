@@ -14,6 +14,7 @@ from modules.AnalysisHelpers import ( multiPlot
                                      ,roiSelectScoreWindow
                                      ,subprocEval
                                      ,compareTrackers
+                                     ,subprocBatchOutput
                                      )
 from modules.ControlTracking import TrackFactory
 from modules.Interproc import DBInterface, GuiviewState
@@ -212,7 +213,7 @@ def test_compareTrackers_1():
 
     # run 1. without markedFrame at the top, 2. with selectRoiFunc
     data_dict = compareTrackers(listGS, listTrackers
-                                ,roiSelectFunc=roiSelectScoreWindow
+                                ,roiSelectFunc=True
                                 ,bMarkedFrame=False
                                 ,test_stub=True)
 
@@ -254,11 +255,11 @@ def test_compareTrackers_2():
 
     # run two separate functions with different params, compare their output
     
-    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectFunc=True
                                 ,col_titles = ['my_col_1', 'my_col_2']
                                 ,test_stub=True)
 
-    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectFunc=True
                                 ,expand_factor = 0.5
                                 ,blend_rowtitles = True
                                 ,test_stub=True)
@@ -272,6 +273,12 @@ def test_compareTrackers_2():
 
     assert (data_dict_1['plot_dict']['img_t'][0].shape[0] < 
             data_dict_2['plot_dict']['img_t'][0].shape[0])
+    
+    
+    # verify plots in blend_rowtitles is in correct order
+    # data_dict_2['plot_data'][col][row] is None
+    # data_dict_2['plot_data'][col][row] is not None
+
     
     # pixel-wise comparison
     DIFF_LOG_DIR = "../data/test/guiview/displayclass/log/"
@@ -309,10 +316,10 @@ def test_compareTrackers_3():
 
     # run two separate functions with different params, compare their output
     
-    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+    data_dict_1 = compareTrackers(listGS, listTrackers, roiSelectFunc=True
                                 ,test_stub=True)
 
-    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectScoreWindow
+    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectFunc=True
                                 ,expand_factor = 0.5
                                 ,blend_rowtitles = True
                                 ,test_stub=True)
@@ -332,6 +339,112 @@ def test_compareTrackers_3():
 
     assert data_dict_1['plot_data'][0][7] is None
     # assert sum(sum(sum(data_dict_1['plot_data'][1][7]))) > 0
+
+def test_compareTrackers_4():
+    '''
+        test functionality:
+            bFirstTrackerRoi
+    '''
+
+    # build listTrackers: place algo_enum=2 in first position
+    listTrackers = []
+    for _algoenum in [2,0]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="orange")
+        listTrackers.append(_tracker)
+    
+    # build listGS - these foi's are specifically chosen as the roi from track_score
+    # from algo_enum=0 and algo_enum=2 are very different
+    test_data = "compareTrackers_disparateRoi.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
+    listGS = [  pickle.loads(record[1])
+                for record in testDB.selectAll()]
+
+    # run two separate functions with different params, compare their output
+    
+    data_indv_roi = compareTrackers(listGS
+                                ,listTrackers
+                                ,roiSelectFunc=True
+                                ,bTrackScore=True
+                                ,bFirstTrackerRoi=False     # var-of-interest
+                                ,expand_factor=2.0
+                                ,test_stub=True)
+
+    data_first_roi = compareTrackers(listGS
+                                ,listTrackers
+                                ,roiSelectFunc=True
+                                ,bTrackScore=True
+                                ,bFirstTrackerRoi=True     # var-of-interest
+                                ,expand_factor=2.0
+                                ,test_stub=True)
+
+    
+    #compare col_titles - extract window-roi from string
+    assert data_indv_roi['col_titles'] == ['AlgoEnum=2\n(373, 277, 10, 10)', 'AlgoEnum=0\n(395, -7, 16, 16)']
+    assert data_first_roi['col_titles'] == ['AlgoEnum=2\n(373, 277, 10, 10)', 'AlgoEnum=0\n(373, 277, 10, 10)']
+
+    #make sure empty plot is in correct position - the second position
+    plot_row = data_indv_roi['plot_dict']['img_terminal']
+    assert sum(sum(plot_row[0])) > 0
+    assert  plot_row[1] is None
+    plot_row = data_first_roi['plot_dict']['img_terminal']
+    assert sum(sum(plot_row[0])) > 0
+    assert  plot_row[1] is None
+
+    # use shape to verify the same roi is being applied across all trackers
+    
+    assert (data_indv_roi['plot_dict']['img_t'][0].shape 
+            != 
+            data_indv_roi['plot_dict']['img_t'][1].shape)
+
+    assert (data_first_roi['plot_dict']['img_t'][0].shape 
+            == 
+            data_first_roi['plot_dict']['img_t'][1].shape)
+
+def test_compareTrackers_5():
+    '''
+        test functionality:
+            blend_rowtitles
+    '''
+
+    # build listTrackers
+    listTrackers = []
+    for _algoenum in [2,3]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="orange")
+        listTrackers.append(_tracker)
+    
+    # build listGS
+    test_data = "compareTrackers_orange.db"
+    test_dir = os.path.join(TEST_PARENT_DIR, 'compareTrackers')
+    testDB = DBInterface(os.path.join(test_dir, test_data))
+    listGS = [  pickle.loads(record[1])
+                for record in testDB.selectAll()]
+
+    # run with blend_rowtitles
+
+    data_dict_2 = compareTrackers(listGS, listTrackers, roiSelectFunc=True
+                                ,expand_factor = 0.5
+                                ,blend_rowtitles = True
+                                ,test_stub=True)
+
+    # checks
+    print data_dict_2['row_titles']
+    assert data_dict_2['row_titles'] == ['marked_frame\nmarked_frame', 'img_t\nimg_t', 'img_mask\nimg_mask', 'img_repair\nimg_repair', 'img_terminal\nimg_dummy', 'n/a\nimg_dummy_2','n/a\nimg_terminal','n/a\nimg_terminal_2']
+    
+    # verify plots in blend_rowtitles is in correct order
+    data_dict_2['plot_data'][0][4] is not None
+    try:
+        data_dict_2['plot_data'][0][5] is None
+        assert False  # this should be out-of-index
+    except:
+        pass
+    data_dict_2['plot_data'][1][4] is not None
+    data_dict_2['plot_data'][1][5] is not None
+
 
     
 def test_compareTrackers_orderDict_1():
@@ -385,8 +498,41 @@ def test_compareTrackers_orderDict_1():
     assert ('self-help', 4) in elems
     assert ('post-help', 5) in elems
 
+def debug_reveresed_plots():
+
+    # build listGS
+    foi = [202, 206, 210, 244, 305]
+    vid_fn = 'data/proc/tmp/dec14/output5.proc1.proc1.avi'
+    listGS = subprocBatchOutput(vid_fn, batch_list = foi)
+    
+    
+    #build trackers
+    listTrackers = []
+    for _algoenum in [0,2]:
+        _tracker = TrackFactory(on=True)
+        _tracker.setAlgoEnum(_algoenum)
+        _tracker.setInit(ballColor="orange")
+        listTrackers.append(_tracker)
+    print 'algo_enums=', str([_tracker.tp_trackAlgoEnum for _tracker in listTrackers])
+    listTrackers.sort(reverse=True)
+    print 'algo_enums=', str([_tracker.tp_trackAlgoEnum for _tracker in listTrackers])
+
+
+    #run method
+    ret = compareTrackers(listGS
+                ,listTrackers
+                ,roiSelectFunc=True
+                ,bMarkedFrame=True
+                ,bTrackScore=True
+                ,bFirstTrackerRoi=True
+                ,expand_factor=5.0
+               ,test_stub=True
+               )
+
+
 if __name__ == "__main__":
 
-    # test_compareTrackers_1()
+    test_compareTrackers_5()
     # test_compareTrackers_orderDict_1()
-    test_compareTrackers_3()
+    # test_compareTrackers_3()
+    # debug_reveresed_plots()
