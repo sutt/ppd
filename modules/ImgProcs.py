@@ -7,6 +7,8 @@ from ImgUtils import px3clr_3px1clr
 from ImgUtils import px_to_list
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
+if False:
+    from cv2 import *
 
 def transformA(img, blur = 11, b_hsv = False):
     #frame = imutils.resize(frame, width=600)

@@ -6,6 +6,7 @@ import sqlalchemy
 from matplotlib import pyplot as plt
 from DataSchemas import ScoreSchema
 from EvalHelpers import (EvalTracker, OutcomeData, AggEval, DFHelper)
+from AnalysisHelpers import (subprocBatchOutput, compareTrackers)
 from IPython.display import display
 
 
@@ -516,7 +517,7 @@ class CmpAlgoReport:
                 if (_avgradius is not None) and (_dist is not None):
                     if not(math.isnan(_avgradius)) and not(math.isnan(_dist)):
                         
-                        _ballsAway = float(_dist) / float(_avgradius)
+                        _ballsAway = float(_dist) / (float(_avgradius) * 2.0)
                     else:
                         _ballsAway = None
                 else:
@@ -534,14 +535,14 @@ class CmpAlgoReport:
         
         return return_dict
 
-    def plotTrackDistance(self, epsilon_offset = 3):
+    def plotTrackDistance(self):
         '''
-            plot two line graphs of trackRadius (Y) from current and benchmark algo
-            across each frame-index (X)
-
-                epsilon_offset: add this to one of the series so that the 
-                                   lines don't overlay/occlude each other.
-
+            plot two line graphs of the cartesian distance between baseline
+            and current track_score. 
+            across each frame-index (X), calculate (Y) by:
+            a.) pixels,
+            b.) "ball units" = pixel-distance / 2*avg_radius 
+                    avg_radius = avg(baseline-radius, current-radius)
         '''
 
         series_dict = self.distanceBetweenTracks(
@@ -604,6 +605,75 @@ class CmpAlgoReport:
             plt.show()
 
     
+    def reportDiscrepancy(self 
+                        ,metric_name
+                        ,metric_val
+                        ,vid_fn
+                        ,current_algo
+                        ,benchmark_algo
+                        ,b_ret=False
+                        ,max_display_n=5
+                        ,max_plot_n=5 
+                        ,**kwargs
+                        ):
+        '''
+            calls to largestDiscrepancy and then performs comparison plot
+            and displays report automatically
+
+            input:
+                metric_name - (str) name of eval metric to pass to largestDiscrep
+                metric_val  - (int) value associated with metric_name
+                vid_fn      - (str) path to video on which comparison is based
+                current_algo - (obj) initialized tracker obj
+                benchmark_algo - (obj) initialized tracker obj
+                b_ret       - (bool) if True, return a dict of information
+            
+            return:
+                dict of information if b_ret=True
+        '''
+        
+        # call into func for sorted list
+        args = {metric_name: metric_val}
+        discrep_table = self.largestDiscrepancy(max_n=5, **args)
+        
+        num_rows = len(discrep_table)
+        
+        display(discrep_table[:min(num_rows,max_display_n)])
+
+        foi_list = discrep_table.index[:min(num_rows, max_plot_n)]
+        foi_list = [int(x) for x in foi_list]
+
+        try:
+            print 'runnning subprocBathcOutput, takes 5-30 seconds'
+            tmpGS = subprocBatchOutput(
+                                        f_pathfn=vid_fn
+                                        ,batch_list=foi_list
+                                        ,b_log=False
+                                        )
+        except Exception as e:
+            print 'failed to run subprocBatchOutput on ', str(vid_fn)
+            print 'err code: ', str(e)
+
+        tmpGS.sort(key=lambda gs: foi_list.index(gs.frameCounter))
+        
+        listGS = copy.copy(tmpGS)
+
+        listTrackers = [current_algo, benchmark_algo]
+
+        compareTrackers(listGS, listTrackers, roiSelectFunc=True, expand_factor=1.0)
+
+        if not(b_ret):
+            return None
+        
+        ret = {}
+        ret['discrep_table'] = discrep_table
+        ret['foi_list'] = foi_list
+        ret['listGS'] = listGS
+        
+        return ret
+
+
+
     def largestDiscrepancy(self, max_n = 20, **kwargs):
         ''' 
             for specified metric, return it sorted in descending order, w/
@@ -788,7 +858,22 @@ class CmpAlgoReport:
         #TODO - add largest discrepancy (by some metric)
 
 if __name__ == "__main__":
-    od = OutcomeData()
-    suite = EvalSuite()
-    suite.buildFromOutcome(od.getOutcome())
-    suite.displayCli()
+
+    # od = OutcomeData()
+    # suite = EvalSuite()
+    # suite.buildFromOutcome(od.getOutcome())
+    # suite.displayCli()
+
+    db_path = 'data/misc/books/eval-report-3/'
+
+    outcome_0 = OutcomeData(dbPathFn = db_path + 'algo_0.db')
+    outcome_1 = OutcomeData(dbPathFn = db_path + 'algo_1.db')
+    outcome_2 = OutcomeData(dbPathFn = db_path + 'algo_2.db')
+
+    cmpA = CmpAlgoReport(benchmark_outcome_data = outcome_0.getOutcome(), 
+                     current_outcome_data = outcome_2.getOutcome()
+                    )
+
+    discrep_ballsaway = cmpA.largestDiscrepancy(ballUnitsBetweenTracks=1, max_n=5)
+    
+    print discrep_ballsaway

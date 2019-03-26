@@ -1,6 +1,19 @@
 #Tasks
 
-2/19
+2/21
+
+    [ ] Commit1 - add meta data to outcomeDB's
+
+        [ ] vid_fn in vid_meta table
+
+        [ ] tp_params in track_meta
+            [ ] how to add json?
+
+        [ ] eval_time in eval_meta
+
+        Johnny Winter - Highway61 revisted (Second Winter)
+
+2/19 - 2/20
 
     Cleanup and commit prior work
     [x] Commit1 - CompareDistanceBetweenTracks
@@ -17,16 +30,33 @@
             [x] Add these to plot-gallery book
             [x] Correct plot gallery calls
             [x] blend_rowttitles
-        [ ] Get test data up
+        [x] Get test data up
         [x] the rest of the code-diffs
 
     [ ] Commit3 - get 
         [ ] add compareTrackers() to largestDiff()
-            [ ] need rearrange foi's func
+            [x] need rearrange foi's func
+        [ ] add diff to Compare Radius Plot
         [ ] plotTrackDistance() is unfinished on formatting, etc.
-        [ ] we  don't want to be doing batchStateOutput each turn, instead just load from a pre-built db
+        [x] we  don't want to be doing batchStateOutput each turn, instead just load from a pre-built db
+        [x] test_CmpAlgoReport_largestDiscrepancy_2(), why is ballUnits[0]
+            at 283? is radius less than 1? the fook?
+            -> with a rect of height/wdith = 3; int(3/2)=1
+        notes:
+            [ ] need to handle two types of return from largestD(): 
+                a series (from a custom metric) 
+                and a table (for standard metric)
+                -> either way, we're just interested in the .index
+            [ ] This really doesn't work as is: need much more data flowing into 
+                CmpAlgoReport:
+                    - vid_fn
+                    - algo_enum for outcome, algo_params/initialization steps?
+
 
     [ ] Commit4 - notes on hardware
+        [ ] finish the write-up
+        [ ] take extra pictures
+        [ ] annotate images where nec
 
     notes on cT problems:
         [x] what happens if we go back to inputframes with an input_score?

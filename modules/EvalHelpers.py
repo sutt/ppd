@@ -253,7 +253,7 @@ class EvalTracker:
         if not(self._validateParams()):
             return self.naReturn
 
-        x, y, r = Display.rectToCircle(self.baselineScore[self.objEnum]['data'])
+        r = Display.radiusFloatFromCircle(self.baselineScore[self.objEnum]['data'])
         return r
 
     def propTrackRadius(self, trackScore):
@@ -262,7 +262,7 @@ class EvalTracker:
         # if not(self._validateParams()):
         #     return self.naReturn
 
-        x, y, r = Display.rectToCircle(trackScore[self.objEnum]['data'])
+        r = Display.radiusFloatFromCircle(trackScore[self.objEnum]['data'])
         return r
 
     # build calcs -----------------

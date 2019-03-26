@@ -1143,6 +1143,21 @@ class Display:
         return rect
 
     @staticmethod
+    def radiusFloatFromCircle(input_rect):
+        ''' takes relative-format rect, fits a circle inside it
+            (x0,y0, d_x, d_y) -> radius 
+        '''
+
+        # (x0,y0, d_x, d_y)
+        rect = copy.copy(input_rect)            
+
+        radius = min( rect[2], rect[3] )
+        radius = float(radius) / 2.0
+
+        return radius
+
+
+    @staticmethod
     def rectToCircle(input_rect):
         ''' takes relative-format rect, fits a circle inside it
             (x0,y0, d_x, d_y) -> (x,y, radius) 
