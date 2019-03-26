@@ -12,9 +12,9 @@
     [x] refactor tests
     [x] make sure all tests pass, guirecord works
     
-    [ ] figure out how to run
-    [ ] move extraneous root modules into modules; rename
-    [ ] make sure indv and global tests still pass
+    [x] figure out how to run
+    [x] move extraneous root modules into modules; rename
+    [x] make sure indv and global tests still pass
 
     [ ] clean out ppd_data/ git-module
 
@@ -30,6 +30,9 @@
         miscutils -> myutils
 
         writevid1 needs .dll's in modules/ to pass test
+
+        note CameraA.py and AgendaA.py changed to Camera.py and Agenda.py
+        respectively due to some quirk of git mv
 
 
 
