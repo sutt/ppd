@@ -3,7 +3,7 @@ import time
 import copy
 import json
 import re
-from StatsUtils import print_summary_stats
+from myutils import print_summary_stats
 
 '''
     define TimeLog and MetaDataLog which are associated with each video
