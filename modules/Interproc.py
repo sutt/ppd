@@ -9,39 +9,10 @@ from ControlDisplay import Display
 
 
 '''
-    build a prototype for interproc communication
 
-    Ideas:
-
-        Ultimately, need a list of these frames
-
-    Dataset:
-
-        lag intervals
-        
-        tracker-state
-
-    Need Common operations methods on 
-
-        GuiviewState.get_zoom_window()
-
-        and operations like show multiple frames in 1-img
-
-    TODOs
-
-        [x] db interface class
-            [x] open a connection
-        [X] add to gui
-        [x] add functionality to guiview
-        [x] test w/ ipy
-        [ ] add pathToData() function (see chess workspace)
-        [x] add id as primary_key increment function (?)
-        [ ] test that ScoreSchemas load from pickle?
-        [ ] add datetime to state_tbl
-            [ ] then helper function like get all from 'last 30 seconds'
-
-
-
+    defines GuiveiwState and DBInterface which together let us 
+    move *state* from guiview into jupyter: interproc-communication.
+    
 '''
 
 class GuiviewState:

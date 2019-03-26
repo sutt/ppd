@@ -15,29 +15,9 @@ if False: from cv2 import *
 
 '''
 
-Features: 
-
-    [ ] New resize method for when score_display wants to be vertical
-
-Refactors:
-
-    [ ] only build "n/a" zoom frame once
+    defining Display class used in guiview and throughout other modules.
     
-    [ ] add unittests, can't test with guiview_test
-        [ ] test for coord conversion between zoom and main
-        [ ] test an actual image for cutting pixels
-            [ ] show pixel blending on the border
-        [ ] test for resize behavior
-        [ ] test mod0 vs not-mod0
-
-Bugs:
-    [ ] how to cancel an roi request?
-    [ ] on --file, after reopen file zoomOn is off so zoom_display is frozen
-    [ ] can't z/x zoom unzoom with tracking roi
-    [ ] in a --dir run, old zoomframe can be OOB for new vid's frames
-        "#BUG-check if zoomRect is in bounds in new video"
-
-
+    some modules use thie class just for its static methods of image processing.
 
 '''
 

@@ -1,7 +1,8 @@
 import copy
 
 '''
-    [ ] score_types as training vs challenge
+   
+   defines ScoreSchema for handling tracking multiple objects
 
 '''
 

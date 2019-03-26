@@ -1,0 +1,353 @@
+
+
+3/26
+
+    [ ] Organize re-start thoughts
+
+        Future developments:
+        - 2to3
+        - refactor directory structure: modules, scripts
+        - remove deprecated/ duplicate code
+        - renaming functions, modules, etc
+        - organize notebooks
+        - remove notes from/check-boxes from scattered format; centralize
+        - ?
+        After all this we'll still need to put together "12 steps to ppd"
+            this will require lots of manual testing, helping us to make
+            sure the conversion worked.
+        This will also require a condensing functionality 
+            into core vs. peripheral.
+        Taken together, this means we should edit first, before adding
+            more features and tests.
+        So, the first step is to organize project for conversion:
+        
+        - refactor notebooks:
+            - imports name/path will change: can ide refactor?
+        
+        - existing functionality
+            - documented
+            - some tests
+            - commands list
+            - full workflow documented
+
+        - notes: finished tasks, un-tested code pathces, outstanding items
+
+    [ ] Build savoire-faire on how to handle refactor:
+
+        [ ] ide conversion for ipynb's
+            - import paths / names
+            - data-paths could change too, if notebook moves in repo!
+
+        [ ] directory architecture
+            - where to put stuff to call various scripts as main?
+            - where to put dll's for ffmpeg/h264?
+
+        [ ] how to use github issues instead of bugs.txt
+
+        [ ] get worksapce settings from chess
+
+        [ ] will my code complete still work? test on chess worksapce
+            [ ] do i have got-definition / refrncs from a relative import?
+
+    [ ] Make List of all notebooks, what do they show?
+        What do we want them to show?  
+
+    [ ] Conversion basecamp.
+
+        [ ] add all previous notes and data:
+            [ ] ball-speed
+            [ ] drone speed
+
+    [ ] List of all changes:
+
+        [ ] root/notes/ also holds config files like framenote.json
+
+        [ ] books/ is too sprawling, need subdirectories to organize
+
+        [ ] too many scripts in root
+
+        [ ] root/miscutils.py, root/ should be in modules/
+
+
+
+# priority yet lacking ------
+    
+    ball size at distance: max distance from cam to track
+    
+    example mirror bounces
+
+
+
+# commands ----
+
+    guiview.py
+        
+        main:
+        --file / --dir
+        --eval
+        --batchoutputenum / --batchoutputlist
+        --
+
+        details:
+        --track
+        --algoenum
+        --showscoring / --scoreoff
+        --nodelay
+        --firstN
+        --allowduplicates
+        --framelog x/x/guiview-jsonc
+        --evallog
+        --evaldbpathfn
+        --batchdbpathfn
+
+    guirecord.py
+
+        --sleepschedule
+        --funkyread
+    
+    timelog.py
+
+        --file: main method
+        --graph
+        --skip
+        --hz
+        --filterval, --filtervar
+
+    test_vid_sizes.py 
+
+        --cam_num
+
+    analysisHelpers.py 
+
+        --subprocColorCube
+        --dbpathfn
+
+    pytest -vv in test/
+
+    deprecated:
+
+        writevid1.py
+        fbf2.py
+        adaptive_thresh.py
+        
+        rpi stuff:
+
+            client1.py
+            pi-client.py
+            laptop-server.py
+
+        modules:
+
+            guiA.py
+            iterThreshA.py
+
+
+# notebook concepts ------
+
+
+
+# moving files / directories ------
+
+    writevid.py
+
+        goes in modules
+
+    miscutils.py
+
+        goes in modules
+
+    config files in notes
+
+        goes in src
+
+    test/ -> tests/
+
+        should this be in src/ or root/?
+        https://docs.pytest.org/en/latest/goodpractices.html
+        according to ^, no
+
+    candidate deprecated modules:
+
+        DeprecatedA.py
+        Globals.py
+        GuiA.py
+        LoggingA.py
+        AgendaA.py
+        CameraA.py
+
+    semi-useless modules:
+
+        StatsUtils.py
+        GraphicsA.py
+        GraphicsB.py
+        Methods.py
+
+    candidate deprecated functions:
+
+        relating to hist / LiveHist
+
+
+# new src structure ---------
+
+    src/
+
+        __init__.py (?)
+
+        scripts/
+
+            guirecord
+            guiview
+            timelog
+            test_vid_sizes
+
+
+        modules/
+
+            app/
+
+                globals
+                gui
+                apputils
+
+                
+                or, could be:
+
+                    guiview/
+                        globals
+                        gui
+                    guirecord/
+                        globals
+                        gui
+                    common/
+                        utils
+                        timelog   (in utils)
+                        metadatalog (in utils)
+
+            control/
+
+                ControlDisplay
+                ControlFlow
+                ControlEval
+                ControlTracking
+
+                TimeLog defined in Utils should be here too
+
+            eval/
+
+                EvalHelpers
+                EvalSuite
+
+            model/
+
+                Tracking functions, blank for now
+
+            imgutils/
+
+                ImgUtils.py
+                ImgProcs.py
+                GraphicsA.py
+                GraphicsB.py
+                GraphicsCV.py
+                TrackA.py
+                
+                (combined to 1?)
+
+            things that dont fit
+
+                DataSchemas
+                SearchParams
+                Interproc
+                AnalysisHelpers - could be split into subgroups
+                iterThresh
+    notes - 
+
+        Utils.py mostly defines TimeLog class
+        does ControlDisplay get used a lot throughout other modules? 
+            -> yes, also has unique testing strategy
+
+# new books structure -------
+
+    [ ] how to refactor all the changes in relative path?
+
+    books/
+
+        readme.md - contains introduction + index of links
+                    to other notebooks, and a one sentence 
+                    summary of what being acheived, and date
+
+
+        jupyter-recipes/ (now 'legacy_books/')
+
+        camera-sync/
+
+            low-fps-low-light
+            sync-frame-to-framelog
+            fix_vids_timelog
+            analyze-frame-time
+
+        stats/
+
+            (basic stats/metrics on perf expected)
+            
+            compare-compression-frames
+
+        info/
+
+            (build a proof work for adding to stats)
+
+            speed-estimate-1
+
+        recipes/
+
+            (how to use a particular function)
+            
+            demo-interproc-analysis-x
+            eval-report-X
+            eval-data-x
+            eval-module-x
+            largest-discrepancy-plotting
+            
+            
+        galleries/
+
+            (variety and impact on display)
+
+            cc-gallery
+            colorcube-gallry
+            compare-tracker-gallery-1
+
+
+        scratch/
+
+            (howtos/tests/try to get something working)
+
+            crop_cricle_1
+            rotation_test_1
+
+        issues/
+
+            (analyze a problem you have, how to diagnose and fix)
+
+            encoding-issue-1
+
+        oneoff/
+
+            (isolated analysis for a single issue)
+
+            iterThreshA-vizdebug
+            search-params-1
+            find-orange-thresh-x
+            analyze-orange-thresh-x
+
+
+        usr/
+
+            (temp folder where all new books start)
+
+
+# list of todo-tags ---------
+
+
+# misc concepts -------------
+
+    can reference notebooks in function doc

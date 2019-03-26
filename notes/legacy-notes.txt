@@ -1,0 +1,101 @@
+
+
+guiview.py ---------
+
+    [ ] refactor gui to not use globals, instead thread-safe
+        [ ] does this enable debugging better?
+        
+
+    [ ] functionality
+        [ ] i/o images
+        [x] delete frame(s) from a video via script:
+        [~] add --semiload flag for --dir runs. (it's just --preload)
+        [ ] filter videos played via metalog props
+        [ ] filter frames played via metalog props
+        [ ] add other file extensions for vids
+
+    BUGS:
+        [ ] pauseTime - doesn't account for when called with no-delay
+        [~] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
+        [~] gui display for track timer is -1 even with --tracktimer, when turned on via 
+            gui instead of via --track
+
+
+AnalysisHelpers.py ----------
+
+    
+    [ ] inWindowCheck() returns True if trackScuess and center is
+        in window
+    [ ] add unit tests
+    [ ] subprocColorPlot runs from jupyter instead of cmd-line
+
+ControlDisplay.py ---------------
+
+Features: 
+
+    [ ] New resize method for when score_display wants to be vertical
+
+Refactors:
+
+    [ ] only build "n/a" zoom frame once
+    
+    [ ] add unittests, can't test with guiview_test
+        [ ] test for coord conversion between zoom and main
+        [ ] test an actual image for cutting pixels
+            [ ] show pixel blending on the border
+        [ ] test for resize behavior
+        [ ] test mod0 vs not-mod0
+
+Bugs:
+    [ ] how to cancel an roi request?
+    [ ] on --file, after reopen file zoomOn is off so zoom_display is frozen
+    [ ] can't z/x zoom unzoom with tracking roi
+    [ ] in a --dir run, old zoomframe can be OOB for new vid's frames
+        "#BUG-check if zoomRect is in bounds in new video"
+
+DataSchemas.py ----
+
+ [ ] score_types as training vs challenge
+
+
+Interproc.py -------
+
+     build a prototype for interproc communication
+
+    Ideas:
+
+        Ultimately, need a list of these frames
+
+    Dataset:
+
+        lag intervals
+        
+        tracker-state
+
+    Need Common operations methods on 
+
+        GuiviewState.get_zoom_window()
+
+        and operations like show multiple frames in 1-img
+
+    TODOs
+
+        [x] db interface class
+            [x] open a connection
+        [X] add to gui
+        [x] add functionality to guiview
+        [x] test w/ ipy
+        [ ] add pathToData() function (see chess workspace)
+        [x] add id as primary_key increment function (?)
+        [ ] test that ScoreSchemas load from pickle?
+        [ ] add datetime to state_tbl
+            [ ] then helper function like get all from 'last 30 seconds'
+
+SearchParams.py -------
+
+    TODOs:
+        [ ] buildGradient -> combineThreshes -> doesn't work
+            for combinations with multiple indexes
+            [ ] need to decompose the tuple into 
+                thesh_lo_r, thesh_lo_g, etc. then recompose before
+                setting trackParams

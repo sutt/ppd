@@ -1,5 +1,22 @@
 #Tasks
 
+
+3/26
+
+    [x] copy out all module-level notes into centralized legacy-notes.txt
+    [x] add refactor-notes
+
+    [ ] run tests, make sure all pass, make sure guirecord runs
+    [ ] move modules into a deprecated folder
+    [ ] delete extraneous root files
+    [ ] make sure all tests pass, guirecord works
+    
+    [ ] figure out how to run
+    [ ] move extraneous root modules into modules; rename
+    [ ] make sure indv and global tests still pass
+
+
+
 2/21
 
     [ ] Commit1 - add meta data to outcomeDB's

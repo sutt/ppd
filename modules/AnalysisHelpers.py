@@ -21,11 +21,6 @@ from ImgUtils import crop_img
     functions to use in jupyter notebooks to debug different
     trackers under different scenarios
 
-    TODOs
-        [ ] inWindowCheck() returns True if trackScuess and center is
-            in window
-        [ ] add unit tests
-        [ ] subprocColorPlot runs from jupyter instead of cmd-line
 '''
 
 def applyTracker(listGS, tracker, roiSelectFunc = None, 

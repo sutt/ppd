@@ -91,7 +91,7 @@
 
 9/19
 
->python guirecord.py -- dir data/folder/ --preload --firstN 20
+>python guiview.py -- dir data/folder/ --preload --firstN 20
 
     --preload: allows rewind, but bad for long vids
 
@@ -102,7 +102,7 @@
 
     focus on opencv window and press 'q' to quit that video; on to next
 
->python guirecord.py --file data/folder/output1.avi
+>python guiview.py --file data/folder/output1.avi
 
     defaults for --file:
     --preload

@@ -3,12 +3,6 @@ from itertools import product
 '''
     Helper functions for batch changing track params.
 
-    TODOs:
-        [ ] buildGradient -> combineThreshes -> doesn't work
-            for combinations with multiple indexes
-            [ ] need to decompose the tuple into 
-                thesh_lo_r, thesh_lo_g, etc. then recompose before
-                setting trackParams
 '''
 
 

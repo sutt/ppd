@@ -23,25 +23,8 @@ from modules.Utils import parseCliList
 if False: from cv2 import *  # for vscode intellisense
 
 '''
-
-[ ] refactor gui to not use globals, instead thread-safe
-    [ ] does this enable debugging better?
-    
-
-[ ] functionality
-    [ ] i/o images
-    [x] delete frame(s) from a video via script:
-    [~] add --semiload flag for --dir runs. (it's just --preload)
-    [ ] filter videos played via metalog props
-    [ ] filter frames played via metalog props
-    [ ] add other file extensions for vids
-
-BUGS:
-    [ ] pauseTime - doesn't account for when called with no-delay
-    [~] "a" won't start a new video on preload (output4), but will on semiloaded (output7)
-    [~] gui display for track timer is -1 even with --tracktimer, when turned on via 
-        gui instead of via --track
-    
+    main script for viewing and evaluating videos
+        
 '''
 
 #Globals---------------------------------
