@@ -3,10 +3,10 @@ from collections import OrderedDict
 import numpy as np
 import cv2
 import argparse
-from vidwriter import VidWriter
-from miscutils import uniqueFn
-from modules.Utils import TimeLog
-from modules.Utils import MetaDataLog
+from modules.vidwriter import VidWriter
+from modules.myutils import uniqueFn
+from modules.filelog import TimeLog
+from modules.filelog import MetaDataLog
 from modules.DataSchemas import ScoreSchema
 from modules.Interproc import DBInterface
 from modules.Interproc import GuiviewState

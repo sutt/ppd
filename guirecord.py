@@ -2,14 +2,13 @@ import numpy as np
 import cv2
 import argparse
 import os, sys, time
-# from modules.writevid1 import main
 from modules.myutils import uniqueFn
 from modules.vidwriter import VidWriter
 import modules.GlobalsB as Globals
 from modules.GuiB import GuiB
 from modules.GraphicsCV import resize_img
-from modules.Utils import TimeLog
-from modules.Utils import MetaDataLog
+from modules.filelog import TimeLog
+from modules.filelog import MetaDataLog
 
 '''
 

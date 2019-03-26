@@ -3,22 +3,18 @@ import numpy as np
 import cv2
 import argparse
 import modules.GlobalsC as g
-from modules.myutils import uniqueFn
-# from modules.vidwriter import VidWriter
-from modules.GuiC import GuiC
-from modules.GuiC import GuiInterface
-from modules.Utils import TimeLog
-from modules.Utils import MetaDataLog
-from modules.ControlFlow import DirectoryFactory
-from modules.ControlFlow import FrameFactory
-from modules.ControlFlow import TimeFactory
-from modules.ControlFlow import OutputFactory
-from modules.ControlFlow import NotesFactory
+from modules.myutils import (uniqueFn, parseCliList)
+from modules.GuiC import (GuiC, GuiInterface)
+from modules.filelog import (TimeLog, MetaDataLog)
+from modules.ControlFlow import ( DirectoryFactory
+                                 ,FrameFactory
+                                 ,TimeFactory
+                                 ,OutputFactory
+                                 ,NotesFactory
+                                )
 from modules.ControlDisplay import Display
 from modules.ControlTracking import TrackFactory
 from modules.ControlEval import EvalFactory
-from modules.GraphicsCV import (draw_annotations, resize_img, draw_text)
-from modules.Utils import parseCliList
 
 if False: from cv2 import *  # for vscode intellisense
 

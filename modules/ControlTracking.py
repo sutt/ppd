@@ -8,11 +8,11 @@ if False:
     from cv2 import *
 
 sys.path.append("../")
-from vidwriter import VidWriter
-from miscutils import uniqueFn
+from modules.vidwriter import VidWriter
+from modules.myutils import uniqueFn
 
-from modules.Utils import TimeLog
-from modules.Utils import MetaDataLog
+from modules.filelog import TimeLog
+from modules.filelog import MetaDataLog
 
 from modules.ImgUtils import (crop_img, filter_pixels_circle
                              ,pixlist_to_pseduoimg)

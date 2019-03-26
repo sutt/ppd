@@ -1,6 +1,6 @@
 import os
 import argparse
-from modules.Utils import TimeLog
+from modules.filelog import TimeLog
 from modules.myutils import parseCommas
 from matplotlib import pyplot as plt
 

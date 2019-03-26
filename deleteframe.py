@@ -1,7 +1,7 @@
 import os, sys
 import cv2
 import argparse
-from vidwriter import VidWriter
+from modules.vidwriter import VidWriter
 
 '''
     Script to re-write a vid, without particular frames:

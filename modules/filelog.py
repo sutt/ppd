@@ -5,34 +5,19 @@ import json
 import re
 from StatsUtils import print_summary_stats
 
+'''
+    define TimeLog and MetaDataLog which are associated with each video
+    and holds data on recording params and frame ground-truths
 
-def parseCliList(str_input):
-    '''
-        parses comma separated cli arg:
-            e.g. --mylist 1,2,x,3 -> "1,2,x,3" -> [1,2,3]
-            (removes no int-parsable elements before return)
-
-        input: str
-        return: list of int's (or None if error)
-    '''
-    
-    def tryInt(str_input):
-        try:
-            return int(str_input)
-        except:
-            return None
-    
-    try:
-        assert type(str_input) == str
-        split_input = str_input.split(",")
-        parsed_input = map(tryInt, split_input)
-        return filter(lambda num: num is not None, parsed_input)
-    except:
-        return None
+'''
 
 
 class TimeLog:
-    ''' to track timing '''
+    
+    ''' to track return timing of camera.read() as it is performed.
+        advanced methods allow us to do analysis on deliberate or 
+        inadvertant delays during record
+    '''
     
     def __init__(self, inert=False, b_log_vars=False, b_sleep_schedule=False):
         

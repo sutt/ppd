@@ -22,6 +22,33 @@ def parseCommas(strArg, bInt=True, bFloat=False):
     else:
         return None
 
+def parseCliList(str_input):
+    '''
+        #TODO-refactor DUPLICATE of parseCommas()
+
+        parses comma separated cli arg:
+            e.g. --mylist 1,2,x,3 -> "1,2,x,3" -> [1,2,3]
+            (removes no int-parsable elements before return)
+
+        input: str
+        return: list of int's (or None if error)
+    '''
+    
+    def tryInt(str_input):
+        try:
+            return int(str_input)
+        except:
+            return None
+    
+    try:
+        assert type(str_input) == str
+        split_input = str_input.split(",")
+        parsed_input = map(tryInt, split_input)
+        return filter(lambda num: num is not None, parsed_input)
+    except:
+        return None
+
+
 def uniqueFn(fn_base
             ,fn_dir = None
             ,fn_ext = None

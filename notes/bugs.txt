@@ -16,6 +16,8 @@
     [x] move extraneous root modules into modules; rename
     [x] make sure indv and global tests still pass
 
+    [ ] start moving renaming and combining modules
+
     [ ] clean out ppd_data/ git-module
 
     [ ] move indv tests from their own modules into test/ dir
@@ -33,6 +35,14 @@
 
         note CameraA.py and AgendaA.py changed to Camera.py and Agenda.py
         respectively due to some quirk of git mv
+
+        Duplicates:
+            Utils.py/parseCliList
+            myutils.py/parseCommas
+
+        Utils.py -> filelog.py
+
+        ControlFlow:NotesFactory has .mergeDicts() etc methods which can standalone
 
 
 
