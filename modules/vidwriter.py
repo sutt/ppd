@@ -73,8 +73,8 @@ def test_vidwriter_basic_1():
 
     import os
 
-    input_staging_dir = "data/test/vidwriter/input/"
-    output_staging_dir = "data/test/vidwriter/output/"
+    input_staging_dir = "../data/test/vidwriter/input/"
+    output_staging_dir = "../data/test/vidwriter/output/"
     
     #Setup
     output_files = os.listdir(output_staging_dir)
@@ -165,6 +165,3 @@ def test_vidwriter_basic_1():
     fn = output_staging_dir + "testlossless.avi"
     assert os.path.getsize(fn) > 0
 
-def test_videowriter_dif_sizes():
-    pass
-    #outfps and outsize are varied here

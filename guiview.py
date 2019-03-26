@@ -3,8 +3,8 @@ import numpy as np
 import cv2
 import argparse
 import modules.GlobalsC as g
-from miscutils import uniqueFn
-from vidwriter import VidWriter
+from modules.myutils import uniqueFn
+# from modules.vidwriter import VidWriter
 from modules.GuiC import GuiC
 from modules.GuiC import GuiInterface
 from modules.Utils import TimeLog

@@ -2,9 +2,9 @@ import numpy as np
 import cv2
 import argparse
 import os, sys, time
-from writevid1 import main
-from miscutils import uniqueFn
-from vidwriter import VidWriter
+# from modules.writevid1 import main
+from modules.myutils import uniqueFn
+from modules.vidwriter import VidWriter
 import modules.GlobalsB as Globals
 from modules.GuiB import GuiB
 from modules.GraphicsCV import resize_img

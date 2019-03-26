@@ -6,14 +6,32 @@
     [x] copy out all module-level notes into centralized legacy-notes.txt
     [x] add refactor-notes
 
-    [ ] run tests, make sure all pass, make sure guirecord runs
-    [ ] move modules into a deprecated folder
-    [ ] delete extraneous root files
-    [ ] make sure all tests pass, guirecord works
+    [x] run tests, make sure all pass, make sure guirecord runs
+    [x] move modules into a deprecated folder
+    [x] delete extraneous root files
+    [x] refactor tests
+    [x] make sure all tests pass, guirecord works
     
     [ ] figure out how to run
     [ ] move extraneous root modules into modules; rename
     [ ] make sure indv and global tests still pass
+
+    [ ] clean out ppd_data/ git-module
+
+    [ ] move indv tests from their own modules into test/ dir
+
+    notes:
+    
+        "indv tests"
+            >pytest -vv writevid1.py
+            >pytest -vv miscutils.py
+            >pytest -vv vidwriter.py
+
+        miscutils -> myutils
+
+        writevid1 needs .dll's in modules/ to pass test
+
+
 
 
 

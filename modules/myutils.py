@@ -101,7 +101,7 @@ def uniqueFn(fn_base
 def test_uniqueFn_1():
     ''' test increment method '''
     
-    TEST_DIR = "data/test/uniquefn/test1/"
+    TEST_DIR = "../data/test/uniquefn/test1/"
     NEW_FN = "testfn5.txt"
 
     files = os.listdir(TEST_DIR)
@@ -122,7 +122,7 @@ def test_uniqueFn_1():
 def test_uniqueFn_2():
     ''' test increment method past first digit '''
 
-    TEST_DIR = "data/test/uniquefn/test2/"
+    TEST_DIR = "../data/test/uniquefn/test2/"
     NEW_FN = "testfn11.txt"
 
     for i in range(1,11):
@@ -149,7 +149,7 @@ def test_uniqueFn_2():
 def test_uniqueFn_3():
     ''' test increment method with different ext '''
  
-    TEST_DIR = "data/test/uniquefn/test3/"
+    TEST_DIR = "../data/test/uniquefn/test3/"
     NEW_FN = "testfn1.h264"
 
     assert NEW_FN not in os.listdir(TEST_DIR)
@@ -165,7 +165,7 @@ def test_uniqueFn_3():
 def test_uniqueFn_4():
     ''' test increment method with different base_fn '''
  
-    TEST_DIR = "data/test/uniquefn/test4/"
+    TEST_DIR = "../data/test/uniquefn/test4/"
     NEW_FN = "justfn1.txt"
 
     assert len(os.listdir(TEST_DIR)) > 0
@@ -182,7 +182,7 @@ def test_uniqueFn_5():
     ''' test increment method with ext=None 
         file contents: a1.txt, a2.txt, a1.bmp, a2.bmp, a3.bmp
     '''
-    TEST_DIR = "data/test/uniquefn/test5/"
+    TEST_DIR = "../data/test/uniquefn/test5/"
 
     newFn = uniqueFn(fn_base="a", fn_dir = TEST_DIR, fn_ext=None)
 
@@ -192,7 +192,7 @@ def test_uniqueFn_6():
     ''' test increment method with ext=None and multi-dot file names
         file contents: a1.txt, a2.txt, a.diff.1.bmp, a.a2.bmp, a3.bmp
     '''
-    TEST_DIR = "data/test/uniquefn/test6/"
+    TEST_DIR = "../data/test/uniquefn/test6/"
 
     newFn = uniqueFn(fn_base="a", fn_dir = TEST_DIR, fn_ext=None)
 
@@ -233,16 +233,4 @@ def test_parseCommas_1():
     
     assert parseCommas(arg_1, bInt=True) == (1,2,3)
     assert parseCommas(arg_3, bInt=True) == (1,2,3)
-    
-
-def test_parseCommas_2():
-    
-    assert True
-    
-    # arg_2 = "1.2,2.9999,3"
-    # arg_4 = "[1,2.2,3]"
-    #TODO - add bFloat examples
-    
-    # assert parseCommas(arg_2, bInt=True) == (1,2,3)
-    # assert parseCommas(arg_3, bInt=True) == (1,2,3)
     

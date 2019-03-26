@@ -2,10 +2,10 @@ import numpy as np
 import cv2
 import argparse
 import os, sys, time
-from miscutils import uniqueFn
+from myutils import uniqueFn
 from vidwriter import VidWriter
-import modules.GlobalsB as Globals
-from modules.GuiB import GuiB
+import GlobalsB as Globals
+from GuiB import GuiB
 
 '''
 EXAMPLES
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 def test_unit_1():
     ''' basic test of functionality '''
     
-    TEST_DIR = "data/test/writevid1/test1/"
+    TEST_DIR = "../data/test/writevid1/test1/"
     FN = "output1.avi"
     
     #SETUP
@@ -254,7 +254,7 @@ def test_unit_1():
 def test_unit_2():
     ''' test frame size '''
     
-    TEST_DIR = "data/test/writevid1/test2/"
+    TEST_DIR = "../data/test/writevid1/test2/"
     FN640 = "output1.avi"
     FN1280 = "output2.avi"
     FN1920 = "output3.avi"
@@ -293,7 +293,7 @@ def test_unit_2():
 def test_unit_3():
     ''' test time_to_record arg '''
 
-    TEST_DIR = "data/test/writevid1/test3/"
+    TEST_DIR = "../data/test/writevid1/test3/"
     FN1sec = "output1.avi"
     FN2sec = "output2.avi"
 
@@ -317,7 +317,7 @@ def test_unit_3():
 def test_unit_4():
     ''' test b_codec, ext, b_save, input_fn '''
 
-    TEST_DIR = "data/test/writevid1/test4/"
+    TEST_DIR = "../data/test/writevid1/test4/"
     FN_bcodec = "output1.avi"
     FN_ext = "output1.h264"
     FN_dryrun = "output2.avi"

@@ -1,7 +1,7 @@
 import os
 import argparse
 from modules.Utils import TimeLog
-from miscutils import parseCommas
+from modules.myutils import parseCommas
 from matplotlib import pyplot as plt
 
 def showGraph(data):
