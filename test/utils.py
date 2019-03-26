@@ -8,14 +8,6 @@ from modules.ImgUtils import binary_diff
 
 ''' 
 
-TODO:
-    
-    [x] supress log output for expected bErrors
-    [ ] update relevant regions for rgb vs grayscale
-
-BUGS:
-    
-
 RECIPE:
     use this recipe during debug to capture benchmark-data / stub-data 
     for use in displayclass tests:

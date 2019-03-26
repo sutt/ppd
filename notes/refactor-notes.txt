@@ -132,14 +132,14 @@
         
         rpi stuff:  (already in scratch/)
 
-            client1.py
-            pi-client.py
-            laptop-server.py
+            X client1.py
+            X pi-client.py
+            X laptop-server.py
 
         modules:
 
-            guiA.py
-            iterThreshA.py
+            X guiA.py
+            ~ iterThreshA.py
 
 
 # notebook concepts ------
@@ -177,10 +177,10 @@
 
     semi-useless modules:
 
-        StatsUtils.py
-        GraphicsA.py
-        GraphicsB.py
-        Methods.py
+        X StatsUtils.py
+        X GraphicsA.py
+        X GraphicsB.py
+        X Methods.py
 
     candidate deprecated functions:
 

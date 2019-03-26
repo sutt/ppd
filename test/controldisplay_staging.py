@@ -11,19 +11,8 @@ from modules.ControlDisplay import Display
 from modules.DataSchemas import ScoreSchema
 
 
-
 '''
-DEV-MODULE:
-
-    [ ] pass in args via pytest, turn diff logging on/off
-    [ ] debug indv test under __main__ with diff params
-
-    [ ] do IF-block's in all_display_methods
-
-    [x] test_ -> tmethod(data_dir) 
-            + test_1 calls tmethod(data_dir_1) 
-            + test_2 calls tmethod(data_dir_2)
-
+    helper class to assist with testing Display class in controldisplay_test.py
 '''
 
 class StagingDisplay:

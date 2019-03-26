@@ -16,7 +16,9 @@
     [x] move extraneous root modules into modules; rename
     [x] make sure indv and global tests still pass
 
-    [ ] start moving renaming and combining modules
+    [x] start moving renaming and combining modules
+
+    [ ] combine all img-util, modules
 
     [ ] clean out ppd_data/ git-module
 
@@ -40,9 +42,16 @@
             Utils.py/parseCliList
             myutils.py/parseCommas
 
+        NaiveFunc:
+            px3clr_3px1clr()
+
         Utils.py -> filelog.py
 
         ControlFlow:NotesFactory has .mergeDicts() etc methods which can standalone
+
+        beyond find_xy, find_radius, only shapes_seen() is used once in iterThreshB()
+
+
 
 
 

@@ -99,3 +99,25 @@ SearchParams.py -------
             [ ] need to decompose the tuple into 
                 thesh_lo_r, thesh_lo_g, etc. then recompose before
                 setting trackParams
+
+test/utils.py -----------
+
+TODO:
+    
+    [x] supress log output for expected bErrors
+    [ ] update relevant regions for rgb vs grayscale
+
+
+test/controldisplay_staging.py -------
+
+DEV-MODULE:
+
+    [ ] pass in args via pytest, turn diff logging on/off
+    [ ] debug indv test under __main__ with diff params
+
+    [ ] do IF-block's in all_display_methods
+
+    [x] test_ -> tmethod(data_dir) 
+            + test_1 calls tmethod(data_dir_1) 
+            + test_2 calls tmethod(data_dir_2)
+
