@@ -4,7 +4,7 @@ import cv2
 import pandas as pd
 
 sys.path.append("../")
-from modules.ImgUtils import binary_diff
+from modules.imgutils import binary_diff
 
 ''' 
 

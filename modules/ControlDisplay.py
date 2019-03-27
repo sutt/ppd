@@ -8,7 +8,7 @@ from DataSchemas import ScoreSchema
 import GlobalsC as g
 from GraphicsCV import (draw_text, resize_img, draw_rect, draw_circle
                         ,draw_ray, convert_color)
-from ImgUtils import crop_img
+from imgutils import crop_img
 
 if False: from cv2 import *
 

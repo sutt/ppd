@@ -6,7 +6,7 @@ import imutils
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 
-
+''' general image manipulation functions '''
 
 def px3clr_3px1clr(list_pixels):
     return [ map( lambda v: v[clr], list_pixels ) for clr in range(3)]

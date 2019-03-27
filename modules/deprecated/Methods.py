@@ -3,7 +3,7 @@ import cv2
 import sys, os, time, copy
 import imutils
 from GraphicsA import LiveHist
-from ImgUtils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
+from imgutils import px3clr_3px1clr, px_to_list, px_remove_crop, crop_img
 import Globals
 #from adaptive_thresh import b_show_histos, b_histo, current_tracking_frame
 

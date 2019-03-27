@@ -14,10 +14,10 @@ from modules.myutils import uniqueFn
 from modules.filelog import TimeLog
 from modules.filelog import MetaDataLog
 
-from modules.ImgUtils import (crop_img, filter_pixels_circle
+from modules.imgutils import (crop_img, filter_pixels_circle
                              ,pixlist_to_pseduoimg)
-from modules.ImgProcs import (threshA, transformA, repairA, threshMultiOr)
-from modules.TrackA import (find_xy, find_radius)
+from modules.imgprocs import (threshA, transformA, repairA, threshMultiOr)
+from modules.imgprocs import (find_xy, find_radius)
 
 from modules.IterThresh import iterThreshA
 

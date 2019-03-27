@@ -4,7 +4,7 @@ import cv2
 import pickle
 import sqlite3
 from DataSchemas import ScoreSchema
-from ImgUtils import crop_img
+from imgutils import crop_img
 from ControlDisplay import Display
 
 

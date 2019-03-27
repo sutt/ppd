@@ -1,10 +1,14 @@
 import os,sys, random, copy
 import cv2
 import numpy as np
+from imgprocs import (px_range, pct_inrange_cv)
+from shapesmisc import shapes_seen
 
-from ImgProcs import px_data, px_range, pct_inrange_cv
-from TrackA import shapes_seen
+'''
+    gradient descent methods iterThreshA, iterThreshB 
 
+    methods are not useful in practive see: books/iterThreshA-vizdebug.ipynb
+'''
 
 class F:
     

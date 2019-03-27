@@ -15,7 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from Interproc import GuiviewState
 from ControlTracking import TrackFactory
 from ControlDisplay import Display
-from ImgUtils import crop_img
+from imgutils import crop_img
 
 '''
     functions to use in jupyter notebooks to debug different

@@ -243,7 +243,7 @@
 
             imgutils/
 
-                ImgUtils.py
+                imgutils.py
                 ImgProcs.py
                 GraphicsA.py
                 GraphicsB.py

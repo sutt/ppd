@@ -18,11 +18,14 @@
 
     [x] start moving renaming and combining modules
 
-    [ ] combine all img-util, modules
+    [x] combine all img-util, modules
 
     [ ] clean out ppd_data/ git-module
 
-    [ ] move indv tests from their own modules into test/ dir
+    [x] move indv tests from their own modules into test/ dir
+        [x] myutils
+        [x] vidwriter
+      
 
     notes:
     

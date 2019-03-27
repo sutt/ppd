@@ -1,17 +1,17 @@
-import os, sys, time, copy, random, argparse
-import traceback
+import os, sys, time, copy
 import numpy as np
 import cv2
 import imutils
-from ImgUtils import px3clr_3px1clr
-from ImgUtils import px_to_list
+from imgutils import px3clr_3px1clr
+from imgutils import px_to_list
 from matplotlib import image as mpimg
 from matplotlib import pyplot as plt
 if False:
     from cv2 import *
 
+''' image procedures used in color-thresholding protocols'''
+
 def transformA(img, blur = 11, b_hsv = False):
-    #frame = imutils.resize(frame, width=600)
     out = cv2.GaussianBlur(img, (blur, blur), 0)
     if b_hsv: return cv2.cvtColor(out, cv2.COLOR_BGR2HSV)
     return out    
@@ -37,30 +37,6 @@ def repairA(img, iterations = 2):
     img = cv2.dilate(img, None, iterations=iterations)
     return img
 
-def multi_thresh_cv(img1, img2, b_And = True, b_Or = False):
-    return cv2.bitwise_and(img1,img2)
-    
-
-def multi_thresh(img1, img2, b_And = True, b_Or = False):
-    
-    ret = img1.copy()
-    
-    for r in range(0, len(img1)):
-         for c in range(0,len(img1[0])):
-            
-            if b_And:
-                if img2[r][c] == 0:
-                    ret[r][c] = 0
-            elif b_Or:
-                if img2[r][c] == 1:
-                    ret[r][c] = 1
-
-    return ret
-
-
-def px_data(img):
-    return px3clr_3px1clr(px_to_list(img))
-
 def px_range(data):
     return min(data), max(data)
 
@@ -72,4 +48,25 @@ def pct_inrange_cv(img, lo, hi, total = 0):
     return pct_i
 
 
+def find_xy(mask):
+    
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE)[-2]
 
+    if len(cnts) > 0:
+        c = max(cnts, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        return (x,y)
+    
+    return 0,0
+
+def find_radius(mask):
+
+    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE)[-2]
+
+    if len(cnts) > 0:
+        c = max(cnts, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        return radius
+    return 0
